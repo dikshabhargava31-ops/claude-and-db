@@ -68,20 +68,7 @@
       background: var(--soft); border: 1px solid var(--line);
       aspect-ratio: 16 / 9;
     }
-    .video video { display: block; width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-    .video .sound {
-      position: absolute; right: 10px; bottom: 10px;
-      background: rgba(11,22,64,.8); color: #fff;
-      border: 0; border-radius: 999px; padding: 6px 12px;
-      font: inherit; font-size: 14px; cursor: pointer;
-    }
-    .video .empty {
-      position: absolute; inset: 0; display: none;
-      align-items: center; justify-content: center; text-align: center;
-      color: var(--muted); font-size: 15px; padding: 16px;
-    }
-    .video.missing video, .video.missing .sound { display: none; }
-    .video.missing .empty { display: flex; }
+    .video iframe { display: block; width: 100%; height: 100%; border: 0; }
     .caption { margin-top: 10px; text-align: center; font-weight: 600; }
 
     .exams { color: var(--muted); }
@@ -157,11 +144,14 @@
     </section>
 
     <section>
-      <!-- Promo video: put the file at assets/promo.mp4 (and optionally a poster at assets/promo-poster.jpg). -->
-      <figure class="video" id="promo">
-        <video src="assets/promo.mp4" poster="assets/promo-poster.jpg" autoplay muted loop playsinline preload="metadata"></video>
-        <button class="sound" type="button" aria-label="Turn sound on">🔇 Tap for sound</button>
-        <div class="empty">Institute promo video goes here</div>
+      <!-- Promo video: YouTube WNVaQFqKj3o. Starts muted (browsers only allow muted autoplay); tap the speaker icon in the player for sound. -->
+      <figure class="video">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/WNVaQFqKj3o?autoplay=1&amp;mute=1&amp;playsinline=1&amp;loop=1&amp;playlist=WNVaQFqKj3o&amp;rel=0&amp;modestbranding=1"
+          title="PARTHU.AI promo video"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowfullscreen
+          loading="lazy"></iframe>
       </figure>
       <p class="caption">Your marking scheme. Every copy.</p>
     </section>
@@ -221,28 +211,5 @@
     </div>
   </footer>
 
-  <script>
-    (function () {
-      var box = document.getElementById('promo');
-      var video = box.querySelector('video');
-      var btn = box.querySelector('.sound');
-
-      function render() {
-        btn.textContent = video.muted ? '🔇 Tap for sound' : '🔊 Sound on';
-        btn.setAttribute('aria-label', video.muted ? 'Turn sound on' : 'Turn sound off');
-      }
-      function toggle() {
-        video.muted = !video.muted;
-        if (video.paused) video.play().catch(function () {});
-        render();
-      }
-
-      video.addEventListener('click', toggle);
-      btn.addEventListener('click', toggle);
-      // No video file yet: keep the slot visible with a placeholder.
-      video.addEventListener('error', function () { box.classList.add('missing'); });
-      if (video.error) box.classList.add('missing');
-    })();
-  </script>
 </body>
 </html>
