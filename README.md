@@ -4,5 +4,5 @@ A single static page: `index.html`, plus `assets/`. There is no build step. Open
 
 ## Before going live
 
-1. **WhatsApp number.** In `index.html`, replace `919999999999` with your number in country-code format, with no `+`, spaces or dashes. It appears 3 times.
+1. **WhatsApp number.** Already set to 9216652471 (`919216652471` in the links). To change it, replace that value in `index.html`. It appears 3 times.
 2. **Promo video.** Put the video at `assets/promo.mp4`. You can also add a poster image at `assets/promo-poster.jpg`. Until the video is there, the page shows a placeholder in the same slot.
