@@ -42,12 +42,12 @@
     /* Top bar */
     .top {
       position: sticky; top: 0; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
       padding: 10px 18px;
       background: rgba(255,255,255,.92);
       -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--line);
     }
+    .top-in { display: flex; align-items: center; justify-content: space-between; }
     .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
     .brand img { height: 30px; width: auto; display: block; }
     .brand span { font: 900 18px var(--head); letter-spacing: -.01em; color: var(--navy); }
@@ -179,6 +179,7 @@
 
     /* Price */
     .price { padding: 44px 20px 0; display: flex; flex-direction: column; gap: 12px; }
+    .packs { display: flex; flex-direction: column; gap: 12px; }
     .pack {
       display: flex; justify-content: space-between; align-items: center; gap: 10px;
       padding: 18px; border: 1px solid var(--line-2); border-radius: 14px;
@@ -194,13 +195,66 @@
     .cta { padding: 26px 20px 0; display: flex; flex-direction: column; gap: 10px; }
     .cta .sub { text-align: center; font-size: 14px; color: var(--muted); }
 
-    footer {
-      margin-top: 44px; padding: 26px 20px 34px; background: var(--navy); color: #d5ddee;
-      display: flex; flex-direction: column; gap: 8px;
-    }
+    footer { margin-top: 44px; padding: 26px 20px 34px; background: var(--navy); color: #d5ddee; }
+    .foot-in { display: flex; flex-direction: column; gap: 8px; }
     footer .name { font: 700 16px var(--head); color: #fff; }
     footer .line { font-size: 14px; line-height: 1.5; }
     footer .tag { margin-top: 10px; font: 600 12px var(--mono); color: #8fb4f5; }
+
+    /* ---------- Desktop (960px and wider) ---------- */
+    @media (min-width: 960px) {
+      .page { max-width: none; box-shadow: none; }
+      .top { padding: 14px 32px; }
+      .top-in, .foot-in { max-width: 1120px; margin-left: auto; margin-right: auto; }
+      .how, .buy { max-width: 1184px; margin-left: auto; margin-right: auto; } /* 1120 + 2 × 32px padding */
+      .brand img { height: 36px; }
+      .brand span { font-size: 22px; }
+
+      /* Headline left, video right, exam ticker full width underneath */
+      .intro {
+        display: grid; align-items: center;
+        grid-template-columns: minmax(32px, 1fr) minmax(0, 500px) 56px minmax(0, 564px) minmax(32px, 1fr);
+        padding-top: 72px;
+      }
+      .hero { grid-column: 2; grid-row: 1; padding: 0; gap: 22px; }
+      .hero .count { font-size: 14px; }
+      h1 { font-size: 54px; }
+      .hero p { font-size: 19px; max-width: 30em; }
+      .media { grid-column: 4; grid-row: 1; }
+      .video { border-radius: 16px; box-shadow: 0 24px 60px -30px rgba(10,26,68,.45); }
+      .video-note { padding: 12px 0 0; }
+      .ticker { grid-column: 1 / -1; grid-row: 2; margin-top: 72px; padding: 16px 0; }
+      .ticker-track span { font-size: 16px; gap: 24px; padding-right: 24px; }
+
+      /* Marking demo left (stays in view), who-it's-for and steps right */
+      .how {
+        display: grid; grid-template-columns: 1fr 1fr; column-gap: 64px; align-items: start;
+        grid-template-areas: "demo who" "demo steps";
+        padding: 88px 32px 0;
+      }
+      .demo { grid-area: demo; padding: 0; position: sticky; top: 100px; }
+      .who { grid-area: who; margin: 31px 0 0; padding: 26px; }
+      .who .big { font-size: 20px; }
+      .steps { grid-area: steps; padding: 48px 0 0; }
+      h2 { font-size: 30px; }
+      .step { grid-template-columns: 80px 1fr; padding: 18px 0; }
+      .step .v { font-size: 17px; }
+
+      /* Prices side by side, button centred under them */
+      .buy { padding: 96px 32px 0; }
+      .price { padding: 0; gap: 18px; text-align: center; }
+      .packs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
+      .pack { padding: 28px; }
+      .pack .name b { font-size: 19px; }
+      .pack .name span { font-size: 15px; }
+      .pack .amt { font-size: 36px; }
+      .price .note { font-size: 15px; }
+      .cta { max-width: 460px; margin: 0 auto; padding: 36px 0 0; }
+
+      footer { margin-top: 96px; padding: 40px 32px; }
+      .foot-in { display: grid; grid-template-columns: 1fr auto; column-gap: 32px; align-items: end; }
+      .foot-in .tag { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
+    }
 
     /* Scroll reveal: only hidden once JS has marked the page ready, so no-JS still shows everything */
     .js [data-reveal] { transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
@@ -227,13 +281,16 @@
   <div class="page">
 
     <header class="top">
+      <div class="top-in">
       <a class="brand" href="#">
         <img src="assets/parthu-mark.png" alt="">
         <span>PARTHU<b>.AI</b></span>
       </a>
       <a class="wa wa-small" href="https://wa.me/919216652471?text=Hi%2C%20I%20want%20a%2020-minute%20demo%20of%20PARTHU%20for%20my%20institute." target="_blank" rel="noopener">WhatsApp us</a>
+      </div>
     </header>
 
+    <div class="intro">
     <section class="hero">
       <div class="count">300 students × 4 tests = <span data-count="1200" data-delay="900" data-dur="1400">1,200</span> copies</div>
       <h1>
@@ -256,6 +313,7 @@
       <div class="ticker-track" aria-hidden="true"></div>
     </div>
 
+    <div class="media">
     <figure class="video" id="promo">
       <iframe
         src="https://www.youtube-nocookie.com/embed/WNVaQFqKj3o?autoplay=1&amp;mute=1&amp;playsinline=1&amp;loop=1&amp;playlist=WNVaQFqKj3o&amp;controls=0&amp;rel=0&amp;modestbranding=1&amp;enablejsapi=1"
@@ -265,6 +323,10 @@
       <span class="sound">Tap for sound</span>
     </figure>
     <p class="video-note">See an institute use it — 60 seconds.</p>
+    </div>
+    </div>
+
+    <div class="how">
 
     <section class="demo" data-reveal>
       <div class="mono">WATCH A COPY GET CHECKED</div>
@@ -302,8 +364,12 @@
       <div class="step" data-reveal data-delay="420"><span class="k">YOU</span><span class="v">See scores, missed points and a report — for every student.</span></div>
     </section>
 
+    </div>
+
+    <div class="buy">
     <section class="price" data-reveal data-prices>
       <h2>Price for 3 months</h2>
+      <div class="packs">
       <div class="pack">
         <div class="name"><b>Standard</b><span>Up to 300 students</span></div>
         <span class="amt">₹<span data-count="100000" data-dur="1300">1,00,000</span></span>
@@ -312,6 +378,7 @@
         <div class="name"><b>Plus</b><span>Up to 500 students</span></div>
         <span class="amt">₹<span data-count="150000" data-dur="1500">1,50,000</span></span>
       </div>
+      </div>
       <p class="note">Over 500 students: price on the call. Only students whose copies are checked are counted.</p>
     </section>
 
@@ -319,11 +386,14 @@
       <a class="wa wa-big" href="https://wa.me/919216652471?text=Hi%2C%20I%20want%20a%2020-minute%20demo%20of%20PARTHU%20for%20my%20institute." target="_blank" rel="noopener"><span class="label">Try it on one of your tests</span><span class="shine"></span></a>
       <div class="sub">We'll reply on WhatsApp with two demo times</div>
     </section>
+    </div>
 
     <footer>
-      <div class="name">Mahendra Singh Shekhawat</div>
-      <div class="line">20-minute demo. Payment and invoice on WhatsApp, only after you say yes.</div>
-      <div class="tag">Practice. Feedback. Real Growth.</div>
+      <div class="foot-in">
+        <div class="name">Mahendra Singh Shekhawat</div>
+        <div class="line">20-minute demo. Payment and invoice on WhatsApp, only after you say yes.</div>
+        <div class="tag">Practice. Feedback. Real Growth.</div>
+      </div>
     </footer>
   </div>
 
