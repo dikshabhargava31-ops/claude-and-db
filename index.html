@@ -4,212 +4,408 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PARTHU.AI</title>
-  <meta name="description" content="Every copy checked the way your teacher marks. For coaching institutes: school, CA, UPSC and State PCS.">
+  <meta name="description" content="Your teacher writes the marking scheme. PARTHU checks every copy against it, the same way, every time. For coaching institutes: Class 9–12, CA, UPSC and State PCS.">
   <link rel="icon" href="assets/parthu-mark.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #ffffff;
-      --text: #0b1640;
-      --muted: #4a5375;
-      --line: #e3e6ef;
-      --soft: #f5f6fa;
-      --accent: #12873f;       /* WhatsApp green, darkened so white text passes contrast */
-      --accent-hover: #0e7034;
+      --navy: #0A1A44;
+      --blue: #1565E8;
+      --sky: #0E9BF0;
+      --red: #b42318;
+      --text-2: #33415e;
+      --muted: #4a5875;
+      --line: #e8ecf4;
+      --line-2: #dbe2ef;
+      --tint: #eef3fd;
+      --page: #f3f6fb;
+      --cta: linear-gradient(135deg, #1554E0, #0E9BF0);
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+      --head: Montserrat, system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
-      font-size: 17px;
-      line-height: 1.5;
+    body { margin: 0; background: var(--page); -webkit-font-smoothing: antialiased; }
+    a { color: var(--blue); }
+    p, h1, h2 { margin: 0; }
+
+    .page {
+      max-width: 480px; margin: 0 auto; min-height: 100vh;
+      background: #fff; color: var(--navy);
+      font-family: 'IBM Plex Sans', system-ui, sans-serif;
+      box-shadow: 0 0 0 1px #e6ebf4;
     }
-    .wrap { max-width: 640px; margin: 0 auto; padding: 0 16px; }
+    .mono { font: 600 12px var(--mono); color: var(--blue); letter-spacing: .04em; }
 
     /* Top bar */
     .top {
       position: sticky; top: 0; z-index: 10;
-      background: rgba(255,255,255,.96);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 18px;
+      background: rgba(255,255,255,.92);
+      -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--line);
     }
-    .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
-    .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
-    .brand img { width: 26px; height: auto; }
-    .brand span { font-weight: 800; font-size: 20px; letter-spacing: .5px; }
+    .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .brand img { height: 30px; width: auto; display: block; }
+    .brand span { font: 900 18px var(--head); letter-spacing: -.01em; color: var(--navy); }
+    .brand span b { color: var(--blue); font-weight: 900; }
 
     /* WhatsApp buttons */
     .wa {
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      background: var(--accent); color: #fff;
-      font-weight: 700; text-decoration: none;
-      border-radius: 10px;
+      position: relative; overflow: hidden;
+      background: var(--cta); color: #fff; text-decoration: none;
+      animation: waPulse 2.2s ease-out infinite;
     }
-    .wa:hover, .wa:focus-visible { background: var(--accent-hover); }
-    .wa:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
-    .wa svg { width: 20px; height: 20px; flex: none; fill: currentColor; }
-    .wa-small { padding: 9px 14px; font-size: 15px; }
-    .wa-big { width: 100%; padding: 16px 18px; font-size: 18px; }
-    .cta { margin: 24px 0 0; text-align: center; }
-    .cta small { display: block; margin-top: 8px; color: var(--muted); font-size: 15px; }
+    .wa:hover, .wa:focus-visible { color: #fff; }
+    .wa:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+    .wa-small {
+      font: 700 14px var(--head); padding: 0 16px; border-radius: 10px;
+      min-height: 44px; display: flex; align-items: center;
+    }
+    .wa-big {
+      display: block; font: 800 17px var(--head); padding: 19px;
+      border-radius: 12px; text-align: center;
+    }
+    .wa-big .label { position: relative; z-index: 1; }
+    .wa-big .shine {
+      position: absolute; top: 0; bottom: 0; left: 0; width: 30%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent);
+      animation: shimmer 3s ease-in-out infinite;
+    }
 
-    section { padding: 28px 0; }
-    h1 { font-size: 30px; line-height: 1.2; margin: 8px 0 14px; letter-spacing: -.3px; }
-    h2 { font-size: 21px; margin: 0 0 10px; }
-    p { margin: 0 0 10px; }
-    .lead { color: var(--muted); font-size: 18px; }
-    .lead strong { color: var(--text); }
+    /* Hero */
+    .hero { padding: 34px 20px 30px; display: flex; flex-direction: column; gap: 16px; }
+    .hero .count { font: 600 13px var(--mono); color: var(--blue); animation: fadeUp .6s ease both; }
+    h1 {
+      font: 800 35px/1.08 var(--head); letter-spacing: -.025em;
+      display: flex; flex-wrap: wrap; column-gap: .26em;
+    }
+    h1 span { display: inline-block; animation: wordUp .7s cubic-bezier(.2,.7,.2,1) both; }
+    h1 .em { color: var(--blue); }
+    .hero p { font-size: 17px; line-height: 1.5; color: var(--text-2); text-wrap: pretty; animation: fadeUp .7s ease 1.3s both; }
+
+    /* Exam ticker */
+    .ticker { overflow: hidden; background: var(--navy); padding: 12px 0; }
+    .ticker-track { display: flex; width: max-content; animation: ticker 22s linear infinite; }
+    .ticker-track span {
+      display: flex; align-items: center; gap: 18px; padding-right: 18px;
+      font: 700 14px var(--head); color: #fff; white-space: nowrap;
+    }
+    .ticker-track span::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--sky); }
 
     /* Video */
     .video {
-      position: relative; margin: 0;
-      border-radius: 12px; overflow: hidden;
-      background: var(--soft); border: 1px solid var(--line);
-      aspect-ratio: 16 / 9;
+      position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 0;
+      background: repeating-linear-gradient(135deg, #f1f4fa 0 10px, #e7ecf5 10px 20px);
+      overflow: hidden;
     }
-    .video iframe { display: block; width: 100%; height: 100%; border: 0; }
-    .caption { margin-top: 10px; text-align: center; font-weight: 600; }
-
-    .exams { color: var(--muted); }
-
-    ol.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
-    ol.steps li {
-      counter-increment: s; position: relative;
-      padding: 12px 0 12px 44px; border-top: 1px solid var(--line);
+    .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .video .tap {
+      position: absolute; inset: 0; z-index: 2;
+      background: transparent; border: 0; padding: 0; cursor: pointer;
     }
-    ol.steps li:first-child { border-top: 0; }
-    ol.steps li::before {
-      content: counter(s);
-      position: absolute; left: 0; top: 11px;
-      width: 30px; height: 30px; border-radius: 50%;
-      border: 2px solid var(--text); font-weight: 700; font-size: 15px;
+    .video .sound {
+      position: absolute; right: 10px; bottom: 10px; z-index: 3; pointer-events: none;
+      background: #fff; color: var(--navy);
+      font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px;
+    }
+    .video-note { padding: 10px 20px 0; font-size: 14px; color: var(--muted); }
+
+    /* Marking demo */
+    .demo { padding: 40px 20px 0; display: flex; flex-direction: column; gap: 12px; }
+    .card {
+      border: 1px solid var(--line-2); border-radius: 16px; overflow: hidden; background: #fff;
+      box-shadow: 0 10px 30px -18px rgba(10,26,68,.35);
+    }
+    .card-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 12px 16px; background: #f6f8fc; border-bottom: 1px solid var(--line);
+      font: 600 12px var(--mono); color: var(--muted);
+    }
+    .card-head .scheme { color: var(--blue); }
+    .card-body {
+      padding: 16px; display: flex; flex-direction: column; gap: 14px;
+      background-image: repeating-linear-gradient(to bottom, transparent 0 33px, #eef1f7 33px 34px);
+    }
+    .card-body .q { font-size: 15px; font-weight: 600; line-height: 1.4; }
+    .row { display: flex; align-items: center; gap: 12px; height: 20px; }
+    .row .bar-wrap { flex: 1; }
+    .row .bar { height: 8px; border-radius: 4px; background: #dfe4ee; transition: background .4s; }
+    .row.on .bar { background: #c9dafb; }
+    .row.on.bad .bar { background: #f3d0d0; }
+    .row .mark { width: 54px; display: flex; justify-content: flex-end; align-items: center; gap: 6px; opacity: 0; }
+    .row.on .mark { opacity: 1; animation: markPop .45s cubic-bezier(.2,.8,.3,1.3) both; }
+    .row .pts { font: 600 11px var(--mono); color: var(--blue); }
+    .row .tick {
+      width: 22px; height: 22px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff; background: var(--blue);
     }
+    .row.bad .pts { color: var(--red); }
+    .row.bad .tick { background: var(--red); }
+    .card-foot {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: 14px 16px; border-top: 1px solid var(--line);
+    }
+    .card-foot .left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .card-foot .label { font: 600 11px var(--mono); color: var(--muted); }
+    .card-foot .missing { font-size: 14px; font-weight: 500; color: var(--red); opacity: 0; transform: translateY(6px); transition: all .4s; }
+    .card-foot .missing.on { opacity: 1; transform: none; }
+    .score { font: 800 30px var(--head); letter-spacing: -.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .score small { font-size: 16px; color: var(--muted); font-weight: 700; }
+
+    /* Who it is for */
+    .who {
+      margin: 40px 20px 0; padding: 20px; background: var(--tint); border-radius: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .who .big { font-size: 17px; line-height: 1.45; font-weight: 500; text-wrap: pretty; }
+    .who .exams { font-size: 14px; line-height: 1.5; color: var(--text-2); }
+
+    /* Steps */
+    .steps { padding: 40px 20px 0; display: flex; flex-direction: column; }
+    h2 { font: 800 23px var(--head); letter-spacing: -.015em; }
+    .steps h2 { margin-bottom: 14px; }
+    .step {
+      display: grid; grid-template-columns: 62px 1fr; gap: 14px;
+      padding: 14px 0; border-top: 1px solid var(--line);
+    }
+    .step:last-child { border-bottom: 1px solid var(--line); }
+    .step .k { font: 600 12px var(--mono); color: var(--blue); padding-top: 4px; }
+    .step .v { font-size: 16px; line-height: 1.45; }
 
     /* Price */
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; vertical-align: top; padding: 14px 8px; border-bottom: 1px solid var(--line); }
-    th { font-size: 14px; color: var(--muted); font-weight: 600; padding-top: 0; }
-    th:first-child, td:first-child { padding-left: 0; }
-    th:last-child, td:last-child { padding-right: 0; }
-    td.pack { font-weight: 700; }
-    td.price strong { display: block; font-size: 20px; white-space: nowrap; }
-    td.price span { font-size: 15px; color: var(--muted); }
-    .note { margin-top: 14px; font-size: 15px; color: var(--muted); }
-
-    footer { border-top: 1px solid var(--line); padding: 24px 0 40px; }
-    footer .name { font-weight: 700; margin-bottom: 4px; }
-    footer p { color: var(--muted); font-size: 15px; }
-
-    @media (min-width: 700px) {
-      h1 { font-size: 40px; }
-      section { padding: 36px 0; }
+    .price { padding: 44px 20px 0; display: flex; flex-direction: column; gap: 12px; }
+    .pack {
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 18px; border: 1px solid var(--line-2); border-radius: 14px;
     }
+    .pack.dark { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .pack .name { display: flex; flex-direction: column; gap: 2px; }
+    .pack .name b { font: 700 16px var(--head); }
+    .pack .name span { font-size: 14px; color: var(--muted); }
+    .pack.dark .name span { color: #c9d4ea; }
+    .pack .amt { font: 800 27px var(--head); letter-spacing: -.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .price .note { font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty; }
+
+    .cta { padding: 26px 20px 0; display: flex; flex-direction: column; gap: 10px; }
+    .cta .sub { text-align: center; font-size: 14px; color: var(--muted); }
+
+    footer {
+      margin-top: 44px; padding: 26px 20px 34px; background: var(--navy); color: #d5ddee;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    footer .name { font: 700 16px var(--head); color: #fff; }
+    footer .line { font-size: 14px; line-height: 1.5; }
+    footer .tag { margin-top: 10px; font: 600 12px var(--mono); color: #8fb4f5; }
+
+    /* Scroll reveal: only hidden once JS has marked the page ready, so no-JS still shows everything */
+    .js [data-reveal] { transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+    .js [data-reveal].pending { opacity: 0; transform: translateY(28px); }
+
+    @keyframes wordUp { from { opacity: 0; transform: translateY(.6em); } to { opacity: 1; transform: none; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    @keyframes waPulse {
+      0% { box-shadow: 0 0 0 0 rgba(21,101,232,.5); }
+      70% { box-shadow: 0 0 0 14px rgba(21,101,232,0); }
+      100% { box-shadow: 0 0 0 0 rgba(21,101,232,0); }
+    }
+    @keyframes shimmer { 0% { transform: translateX(-150%) skewX(-20deg); } 55%, 100% { transform: translateX(350%) skewX(-20deg); } }
+    @keyframes ticker { to { transform: translateX(-50%); } }
+    @keyframes markPop { 0% { opacity: 0; transform: scale(.3) rotate(-20deg); } 70% { transform: scale(1.15); } 100% { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
-
   <!--
-    WhatsApp number: 919216652471 (91 + 9216652471). To change it, replace it in every href below
-    (country code + number, no +, spaces or dashes). It appears 3 times.
+    WhatsApp number: 919216652471 (91 + 9216652471). To change it, replace it in both hrefs below.
+    Promo video: YouTube WNVaQFqKj3o. To change it, replace that ID in the iframe src (it appears twice).
   -->
+  <div class="page">
 
-  <header class="top">
-    <div class="wrap">
+    <header class="top">
       <a class="brand" href="#">
         <img src="assets/parthu-mark.png" alt="">
-        <span>PARTHU.AI</span>
+        <span>PARTHU<b>.AI</b></span>
       </a>
-      <a class="wa wa-small" href="https://wa.me/919216652471?text=Hi%2C%20I%20want%20a%2020-minute%20demo%20of%20PARTHU%20for%20my%20institute." target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></svg>
-        WhatsApp us
-      </a>
+      <a class="wa wa-small" href="https://wa.me/919216652471?text=Hi%2C%20I%20want%20a%2020-minute%20demo%20of%20PARTHU%20for%20my%20institute." target="_blank" rel="noopener">WhatsApp us</a>
+    </header>
+
+    <section class="hero">
+      <div class="count">300 students × 4 tests = <span data-count="1200" data-delay="900" data-dur="1400">1,200</span> copies</div>
+      <h1>
+        <span style="animation-delay:.15s">Your</span>
+        <span style="animation-delay:.23s">teachers</span>
+        <span style="animation-delay:.31s">can't</span>
+        <span style="animation-delay:.39s">check</span>
+        <span style="animation-delay:.47s">them</span>
+        <span style="animation-delay:.55s">all.</span>
+        <span class="em" style="animation-delay:.8s">Now</span>
+        <span class="em" style="animation-delay:.88s">they</span>
+        <span class="em" style="animation-delay:.96s">don't</span>
+        <span class="em" style="animation-delay:1.04s">have</span>
+        <span class="em" style="animation-delay:1.12s">to.</span>
+      </h1>
+      <p>Your teacher writes the marking scheme. PARTHU checks every copy against it — the same way, every time.</p>
+    </section>
+
+    <div class="ticker" aria-label="Class 9–12, CA Foundation, CA Intermediate, CA Final, UPSC, State PCS">
+      <div class="ticker-track" aria-hidden="true"></div>
     </div>
-  </header>
 
-  <main class="wrap">
+    <figure class="video" id="promo">
+      <iframe
+        src="https://www.youtube-nocookie.com/embed/WNVaQFqKj3o?autoplay=1&amp;mute=1&amp;playsinline=1&amp;loop=1&amp;playlist=WNVaQFqKj3o&amp;controls=0&amp;rel=0&amp;modestbranding=1&amp;enablejsapi=1"
+        title="PARTHU.AI promo video"
+        allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+      <button class="tap" type="button" aria-label="Turn sound on"></button>
+      <span class="sound">Tap for sound</span>
+    </figure>
+    <p class="video-note">See an institute use it — 60 seconds.</p>
 
-    <section>
-      <h1>Every copy checked the way your teacher marks</h1>
-      <p class="lead">Your teacher sets the marking scheme and the way you teach it. Every answer is checked against that. <strong>The teacher sets the standard. The system does the checking.</strong></p>
-
-      <div class="cta">
-        <a class="wa wa-big" href="https://wa.me/919216652471?text=Hi%2C%20I%20want%20a%2020-minute%20demo%20of%20PARTHU%20for%20my%20institute." target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></svg>
-          See it on your own marking scheme
-        </a>
-        <small>20-minute demo on WhatsApp</small>
+    <section class="demo" data-reveal>
+      <div class="mono">WATCH A COPY GET CHECKED</div>
+      <div class="card" id="markCard">
+        <div class="card-head"><span>CA Foundation · Law · Q3</span><span class="scheme">Your scheme · 5 marks</span></div>
+        <div class="card-body">
+          <div class="q">Explain the doctrine of indoor management.</div>
+          <div class="row"><div class="bar-wrap"><div class="bar" style="width:92%"></div></div><div class="mark"><span class="pts">+1</span><span class="tick">✓</span></div></div>
+          <div class="row"><div class="bar-wrap"><div class="bar" style="width:78%"></div></div><div class="mark"><span class="pts">+1</span><span class="tick">✓</span></div></div>
+          <div class="row bad"><div class="bar-wrap"><div class="bar" style="width:85%"></div></div><div class="mark"><span class="pts">0</span><span class="tick">✗</span></div></div>
+          <div class="row"><div class="bar-wrap"><div class="bar" style="width:70%"></div></div><div class="mark"><span class="pts">+1</span><span class="tick">✓</span></div></div>
+          <div class="row"><div class="bar-wrap"><div class="bar" style="width:60%"></div></div><div class="mark"><span class="pts">+0.5</span><span class="tick">½</span></div></div>
+        </div>
+        <div class="card-foot">
+          <div class="left">
+            <span class="label">MISSING POINT</span>
+            <span class="missing">Exceptions to the rule not stated</span>
+          </div>
+          <div class="score"><span id="score">3.5</span><small> / 5</small></div>
+        </div>
       </div>
     </section>
 
-    <section>
-      <!-- Promo video: YouTube WNVaQFqKj3o. Starts muted (browsers only allow muted autoplay); tap the speaker icon in the player for sound. -->
-      <figure class="video">
-        <iframe
-          src="https://www.youtube-nocookie.com/embed/WNVaQFqKj3o?autoplay=1&amp;mute=1&amp;playsinline=1&amp;loop=1&amp;playlist=WNVaQFqKj3o&amp;rel=0&amp;modestbranding=1"
-          title="PARTHU.AI promo video"
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowfullscreen
-          loading="lazy"></iframe>
-      </figure>
-      <p class="caption">Your marking scheme. Every copy.</p>
+    <section class="who" data-reveal>
+      <div class="mono">FOR COACHING INSTITUTES</div>
+      <p class="big">You already have a way of marking. You just don't have enough hours to apply it to every copy.</p>
+      <p class="exams">Class 9–12 · CA Foundation · CA Inter &amp; Final · UPSC · State PCS</p>
     </section>
 
-    <section>
-      <h2>Who it is for</h2>
-      <p>Coaching institutes for school, CA, UPSC, and State PCS that already have a teacher standard and cannot check every copy by hand.</p>
-      <p class="exams">Class 9 to 12, CA Foundation, CA Intermediate and Final, UPSC, and State PCS.</p>
+    <section class="steps">
+      <h2 data-reveal>What changes for you</h2>
+      <div class="step" data-reveal data-delay="0"><span class="k">ONCE</span><span class="v">Your teacher shares the marking scheme.</span></div>
+      <div class="step" data-reveal data-delay="140"><span class="k">DAILY</span><span class="v">Students type answers or send a photo of their copy.</span></div>
+      <div class="step" data-reveal data-delay="280"><span class="k">EVERY</span><span class="v">Copy is checked against that scheme.</span></div>
+      <div class="step" data-reveal data-delay="420"><span class="k">YOU</span><span class="v">See scores, missed points and a report — for every student.</span></div>
     </section>
 
-    <section>
-      <h2>What you get</h2>
-      <ol class="steps">
-        <li>Teacher shares the marking scheme once.</li>
-        <li>Student writes the answer, or sends a photo of it.</li>
-        <li>Every copy is checked against that marking scheme.</li>
-        <li>You get the score, missing points, and a report. You can see every student.</li>
-      </ol>
-    </section>
-
-    <section>
-      <h2>Price</h2>
-      <table>
-        <thead>
-          <tr><th>Pack</th><th>Price</th><th>For</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="pack">Standard</td>
-            <td class="price"><strong>₹1,00,000</strong><span>for 3 months</span></td>
-            <td>Up to 300 students</td>
-          </tr>
-          <tr>
-            <td class="pack">Plus</td>
-            <td class="price"><strong>₹1,50,000</strong><span>for 3 months</span></td>
-            <td>Up to 500 students</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="note">Above 500 students, price is shared on the call. Only students whose copies are checked are counted.</p>
-
-      <div class="cta">
-        <a class="wa wa-big" href="https://wa.me/919216652471?text=Hi%2C%20I%20want%20a%2020-minute%20demo%20of%20PARTHU%20for%20my%20institute." target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></svg>
-          See it on your own marking scheme
-        </a>
-        <small>20-minute demo on WhatsApp</small>
+    <section class="price" data-reveal data-prices>
+      <h2>Price for 3 months</h2>
+      <div class="pack">
+        <div class="name"><b>Standard</b><span>Up to 300 students</span></div>
+        <span class="amt">₹<span data-count="100000" data-dur="1300">1,00,000</span></span>
       </div>
+      <div class="pack dark">
+        <div class="name"><b>Plus</b><span>Up to 500 students</span></div>
+        <span class="amt">₹<span data-count="150000" data-dur="1500">1,50,000</span></span>
+      </div>
+      <p class="note">Over 500 students: price on the call. Only students whose copies are checked are counted.</p>
     </section>
 
-  </main>
+    <section class="cta" data-reveal>
+      <a class="wa wa-big" href="https://wa.me/919216652471?text=Hi%2C%20I%20want%20a%2020-minute%20demo%20of%20PARTHU%20for%20my%20institute." target="_blank" rel="noopener"><span class="label">Try it on one of your tests</span><span class="shine"></span></a>
+      <div class="sub">We'll reply on WhatsApp with two demo times</div>
+    </section>
 
-  <footer>
-    <div class="wrap">
-      <p class="name">Mahendra Singh Shekhawat</p>
-      <p>Demo in 20 minutes. Payment and invoice are sent on WhatsApp after you say yes.</p>
-    </div>
-  </footer>
+    <footer>
+      <div class="name">Mahendra Singh Shekhawat</div>
+      <div class="line">20-minute demo. Payment and invoice on WhatsApp, only after you say yes.</div>
+      <div class="tag">Practice. Feedback. Real Growth.</div>
+    </footer>
+  </div>
 
+  <script>
+    (function () {
+      var reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var fmt = function (n) { return n.toLocaleString('en-IN'); };
+
+      // Exam ticker: repeat the list so the -50% loop is seamless.
+      var exams = ['Class 9–12', 'CA Foundation', 'CA Intermediate', 'CA Final', 'UPSC', 'State PCS'];
+      var track = document.querySelector('.ticker-track');
+      for (var r = 0; r < 4; r++) exams.forEach(function (t) {
+        var s = document.createElement('span'); s.textContent = t; track.appendChild(s);
+      });
+
+      // Count-up numbers (hero copies, prices).
+      function countUp(el, delay) {
+        var target = +el.dataset.count, dur = +(el.dataset.dur || 1300), step = target > 5000 ? 1000 : 1;
+        if (reduced) { el.textContent = fmt(target); return; }
+        el.textContent = '0';
+        setTimeout(function () {
+          var t0 = performance.now();
+          (function tick(now) {
+            var p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+            el.textContent = fmt(Math.round(target * e / step) * step);
+            if (p < 1) requestAnimationFrame(tick);
+          })(t0);
+        }, delay);
+      }
+      var heroCount = document.querySelector('.hero [data-count]');
+      countUp(heroCount, +heroCount.dataset.delay);
+
+      // Scroll reveal.
+      document.documentElement.classList.add('js');
+      var els = [].slice.call(document.querySelectorAll('[data-reveal]'));
+      function show(el) {
+        setTimeout(function () { el.classList.remove('pending'); }, +(el.dataset.delay || 0));
+        if (el.hasAttribute('data-prices')) el.querySelectorAll('[data-count]').forEach(function (n) { countUp(n, 200); });
+      }
+      if ('IntersectionObserver' in window && !reduced) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) { if (en.isIntersecting) { io.unobserve(en.target); show(en.target); } });
+        }, { threshold: 0.2 });
+        els.forEach(function (el) {
+          if (el.getBoundingClientRect().top > innerHeight * 0.9) el.classList.add('pending');
+          io.observe(el);
+        });
+      }
+
+      // Marking demo: marks pop in one by one, score adds up, then the missing point shows. Loops.
+      var rows = [].slice.call(document.querySelectorAll('#markCard .row'));
+      var pts = [1, 1, 0, 1, 0.5];
+      var scoreEl = document.getElementById('score');
+      var missing = document.querySelector('#markCard .missing');
+      var step = 0;
+      function renderCard() {
+        rows.forEach(function (row, i) { row.classList.toggle('on', step >= i + 2); });
+        var n = Math.max(0, Math.min(5, step - 1)), score = 0;
+        for (var i = 0; i < n; i++) score += pts[i];
+        scoreEl.textContent = String(score);
+        missing.classList.toggle('on', step >= 8);
+      }
+      if (reduced) { step = 8; renderCard(); }
+      else { renderCard(); setInterval(function () { step = (step + 1) % 16; renderCard(); }, 600); }
+
+      // Video: starts muted (browsers only autoplay muted). Tap toggles sound via the YouTube player API.
+      var box = document.getElementById('promo');
+      var frame = box.querySelector('iframe');
+      var btn = box.querySelector('.tap');
+      var label = box.querySelector('.sound');
+      var muted = true;
+      function cmd(func) {
+        frame.contentWindow.postMessage(JSON.stringify({ event: 'command', func: func, args: [] }), '*');
+      }
+      btn.addEventListener('click', function () {
+        muted = !muted;
+        cmd('playVideo');
+        cmd(muted ? 'mute' : 'unMute');
+        label.textContent = muted ? 'Tap for sound' : 'Sound on';
+        btn.setAttribute('aria-label', muted ? 'Turn sound on' : 'Turn sound off');
+      });
+    })();
+  </script>
 </body>
 </html>
