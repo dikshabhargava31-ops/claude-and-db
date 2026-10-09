@@ -8,4 +8,4 @@ A single static page: `index.html`, plus `assets/`. There is no build step. It's
 
 ## Daily Focus app
 
-`daily/index.html` is a separate personal productivity page: plan the day, journal, set reminders and run focus (Pomodoro) sessions. Open it in a browser; there is no build step. Data is saved in that browser's local storage, so use **Export** / **Import** to back it up or move it to another device.
+`daily/index.html` is a separate personal productivity page: plan the day, track habits, journal, set reminders and run focus (Pomodoro) sessions. Open it in a browser; there is no build step. Data is saved in that browser's local storage, so use **Export** / **Import** to back it up or move it to another device.
