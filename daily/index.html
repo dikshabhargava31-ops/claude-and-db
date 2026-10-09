@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>My Day Planner</title>
+  <meta name="description" content="A soft daily planner: timeline, to-do lists, habits, journal, focus timer and reminders. Everything is saved in this browser.">
+  <meta name="theme-color" content="#fde7f0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fdf4f8;
+      --ink: #4b3b4f;
+      --muted: #9b8a9e;
+      --head: #7a5a85;
+      --pink: #c45f8c;
+      --rose: #f6c5d8;
+      --rose-2: #fce6ef;
+      --lav: #ece5ff;
+      --lav-ink: #5d4b93;
+      --mint: #dcf2e4;
+      --mint-2: #eef8f1;
+      --mint-edge: #a6dcbc;
+      --peach: #ffe9dd;
+      --sky: #e1f0fb;
+      --card: #ffffff;
+      --blush: #fff8fb;
+      --line: #f1e3ea;
+      --tick: #eea2c1;
+      --btn: #f3b6cf;
+      --btn-ink: #5e2f4c;
+      --radius: 20px;
+      --shadow: 0 8px 24px #c99ab424;
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg); }
+    body {
+      margin: 0; color: var(--ink); min-height: 100vh;
+      font: 16px/1.45 Nunito, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(160deg, #fde7f0 0%, #f4eeff 50%, #e8f6f0 100%) fixed, var(--bg);
+    }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    .wrap { max-width: 560px; margin: 0 auto; padding: 0 16px 120px; }
+
+    /* top bar */
+    .top { display: flex; align-items: center; gap: 6px; padding: 14px 0 10px; color: var(--head); }
+    .top .hello { flex: 1; font-size: 16px; padding-left: 4px; }
+    .top .hello small { display: block; font-size: 13px; color: var(--muted); }
+    .ibtn { background: none; border: 0; color: inherit; cursor: pointer; padding: 8px; border-radius: 12px; position: relative; display: grid; place-items: center; }
+    .ibtn:hover { background: #ffffffaa; }
+    .dot { position: absolute; top: 6px; right: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--pink); border: 2px solid var(--bg); }
+    .dot[hidden] { display: none; }
+
+    section[hidden] { display: none; }
+
+    /* affirmation & mood */
+    .affirm { background: linear-gradient(135deg, var(--lav), #f9e3f0); color: var(--lav-ink); border-radius: var(--radius); padding: 14px 16px 14px; margin-bottom: 12px; box-shadow: var(--shadow); }
+    .affirm .lbl { font-size: 12px; letter-spacing: .8px; text-transform: uppercase; font-weight: 700; opacity: .8; }
+    .affirm p { margin: 4px 0 0; font-size: 17px; }
+    .affirm .row { display: flex; align-items: flex-start; gap: 6px; }
+    .affirm .row > div { flex: 1; }
+    .mood { display: flex; align-items: center; gap: 8px; color: var(--head); margin: 4px 4px 14px; font-size: 14px; }
+    .mood b { font-weight: 700; letter-spacing: .5px; }
+    .mood button { background: #ffffffb3; border: 0; color: var(--ink); cursor: pointer; padding: 3px 12px; border-radius: 99px; font-size: 15px; }
+    .mood button:hover { background: var(--card); }
+    .moodpick { display: flex; flex-wrap: wrap; gap: 6px; margin: -6px 0 14px; }
+    .moodpick[hidden] { display: none; }
+    .moodpick button { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 99px; padding: 4px 12px; cursor: pointer; font-size: 14px; }
+    .moodpick button[aria-pressed="true"] { background: var(--rose); border-color: var(--rose); }
+
+    /* cards */
+    .card { background: var(--card); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; box-shadow: var(--shadow); }
+    .sec-head { display: flex; align-items: center; justify-content: space-between; color: var(--head); margin: 18px 4px 8px; }
+    .sec-head h2 { margin: 0; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; font-weight: 800; }
+    .sec-head .r { display: flex; align-items: center; gap: 2px; }
+    .sec-head small { font-size: 13px; color: var(--muted); margin-right: 6px; }
+    .round-add { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--card); color: var(--pink); display: grid; place-items: center; cursor: pointer; box-shadow: var(--shadow); }
+    .round-add:hover { background: var(--rose-2); }
+    .round-add svg { width: 18px; height: 18px; }
+
+    /* week strip */
+    .month { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 10px; }
+    .month b { font-size: 15px; letter-spacing: .8px; text-transform: uppercase; color: var(--head); }
+    .month .ibtn { color: var(--muted); padding: 4px; }
+    .month .ibtn:hover { background: var(--rose-2); }
+    .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .wd { border: 0; background: var(--blush); border-radius: 12px; padding: 8px 0 7px; cursor: pointer; text-align: center; position: relative; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+    .wd:hover { background: var(--rose-2); }
+    .wd span { display: block; font-size: 13px; }
+    .wd strong { display: block; font-weight: 600; color: var(--muted); font-size: 15px; }
+    .wd.today { box-shadow: inset 0 0 0 2px var(--tick); }
+    .wd.sel { background: var(--rose); }
+    .wd.sel strong { color: var(--btn-ink); }
+    .wd.has::after { content: ""; position: absolute; bottom: 3px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--mint-edge); }
+
+    /* timeline */
+    .timeline { padding: 12px 12px 10px 6px; }
+    .slot { display: grid; grid-template-columns: 74px 1fr; align-items: center; gap: 8px; margin-bottom: 9px; animation: rise .25s ease-out; }
+    .slot .t { font-size: 14px; color: var(--muted); text-align: right; white-space: nowrap; }
+    .slot .t::before { content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--mint-edge); margin-right: 6px; vertical-align: middle; }
+    .block {
+      background: linear-gradient(90deg, var(--mint-edge) 0 5px, var(--mint) 5px);
+      border-radius: 6px 14px 14px 6px; padding: 9px 10px 8px 17px; cursor: pointer; display: flex; gap: 6px; align-items: flex-start; transition: transform .12s;
+    }
+    .slot:nth-child(4n+2) .block { background: linear-gradient(90deg, #f3b2cb 0 5px, var(--rose-2) 5px); }
+    .slot:nth-child(4n+3) .block { background: linear-gradient(90deg, #c7b6f2 0 5px, var(--lav) 5px); }
+    .slot:nth-child(4n+4) .block { background: linear-gradient(90deg, #f6c4a3 0 5px, var(--peach) 5px); }
+    .block:hover { transform: translateX(2px); }
+    .block:active { transform: scale(.98); }
+    .block .grow { flex: 1; min-width: 0; }
+    .block .ttl { font-size: 16px; overflow-wrap: anywhere; }
+    .block .tm { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-top: 1px; }
+    .block .tm svg { width: 14px; height: 14px; }
+    .block.done { opacity: .6; }
+    .block.done .ttl { text-decoration: line-through; }
+    .block.now { box-shadow: 0 0 0 2px var(--tick); }
+    .x { background: none; border: 0; cursor: pointer; color: var(--muted); padding: 2px; border-radius: 8px; display: grid; place-items: center; }
+    .x svg { width: 16px; height: 16px; }
+    .x:hover { background: #00000010; }
+    .empty { color: var(--muted); text-align: center; padding: 14px 8px; font-size: 15px; }
+
+    /* to-do cards */
+    .lists { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 14px; margin: 0 -2px; scrollbar-width: none; }
+    .lists::-webkit-scrollbar { display: none; }
+    .tlist { flex: 0 0 82%; max-width: 360px; scroll-snap-align: start; background: var(--card); border-radius: 16px; padding: 12px 12px 10px; box-shadow: var(--shadow); display: flex; flex-direction: column; border-top: 5px solid var(--rose); }
+    .tlist:nth-child(4n+2) { border-top-color: #cfc1f5; }
+    .tlist:nth-child(4n+3) { border-top-color: var(--mint-edge); }
+    .tlist:nth-child(4n+4) { border-top-color: #f8c9a8; }
+    .tlist.new { background: #ffffff80; box-shadow: none; border: 2px dashed var(--rose); color: var(--pink); align-items: center; justify-content: center; cursor: pointer; min-height: 150px; flex-basis: 45%; font-weight: 700; }
+    .tlist.new:hover { background: var(--card); }
+    .tlist-h { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 4px; }
+    .tlist-h span { flex: 1; overflow-wrap: anywhere; }
+    .item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 15px; animation: rise .2s ease-out; }
+    .item span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .item.done span { text-decoration: line-through; color: var(--muted); }
+    .circ { width: 22px; height: 22px; flex: none; border-radius: 50%; border: 1.8px solid #e3c9d6; background: var(--card); cursor: pointer; display: grid; place-items: center; color: var(--card); padding: 0; transition: transform .12s; }
+    .circ:hover { border-color: var(--tick); }
+    .circ svg { width: 13px; height: 13px; stroke-width: 2.8; }
+    .circ.on { background: var(--tick); border-color: var(--tick); animation: pop .3s; }
+    .circ:active { transform: scale(.85); }
+    .additem { display: flex; gap: 6px; margin-top: 8px; }
+    .additem input { flex: 1; min-width: 0; border: 0; background: var(--blush); border-radius: 10px; padding: 7px 10px; font-size: 14px; box-shadow: inset 0 0 0 1px var(--line); }
+    .tlist-f { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .link { background: none; border: 0; color: var(--pink); cursor: pointer; font-size: 13px; padding: 2px 4px; }
+
+    /* habits */
+    .habit { background: var(--card); border-radius: 16px; padding: 10px 10px 10px 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow); animation: rise .25s ease-out; }
+    .h-ic { width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--rose-2); display: grid; place-items: center; font-size: 22px; border: 0; cursor: pointer; }
+    .habit:nth-child(4n+2) .h-ic { background: var(--lav); }
+    .habit:nth-child(4n+3) .h-ic { background: var(--mint); }
+    .habit:nth-child(4n+4) .h-ic { background: var(--peach); }
+    .h-body { flex: 1; min-width: 0; }
+    .h-name { font-size: 14px; font-weight: 700; margin: 0 0 4px 2px; display: flex; gap: 8px; align-items: baseline; }
+    .h-name small { font-weight: 400; color: var(--muted); font-size: 12px; }
+    .h-days { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
+    .h-days div { font-size: 11px; line-height: 1.2; color: var(--ink); }
+    .h-days div em { display: block; font-style: normal; color: var(--muted); }
+    .h-days .circ { margin: 3px auto 0; width: 24px; height: 24px; }
+    .h-days .future { opacity: .35; }
+    .h-days .future .circ { cursor: default; }
+
+    /* journal */
+    .paper { background: var(--card); border-radius: var(--radius); padding: 18px 16px; box-shadow: var(--shadow); margin-bottom: 14px; }
+    .paper h3 { margin: 0 0 4px; font-weight: 800; font-size: 20px; color: var(--head); }
+    .field { display: block; margin-top: 14px; }
+    .field > span { display: block; font-size: 12px; letter-spacing: .8px; text-transform: uppercase; color: var(--pink); font-weight: 800; margin-bottom: 4px; }
+    textarea.lined {
+      width: 100%; border: 0; resize: vertical; min-height: 84px; padding: 0 2px; outline: none; color: var(--ink);
+      background: repeating-linear-gradient(transparent 0 27px, var(--line) 27px 28px); line-height: 28px; font-size: 16px;
+    }
+    details.entry { border-bottom: 1px solid var(--line); padding: 10px 0; }
+    details.entry summary { cursor: pointer; font-weight: 700; }
+    details.entry p { white-space: pre-wrap; margin: 6px 0; }
+    details.entry p b { font-weight: 800; color: var(--pink); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; }
+
+    /* focus */
+    .focus { text-align: center; padding: 22px 16px; }
+    .modes { display: inline-flex; background: var(--rose-2); border-radius: 99px; padding: 4px; gap: 2px; margin-bottom: 14px; }
+    .modes button { border: 0; background: none; padding: 6px 14px; border-radius: 99px; cursor: pointer; font-size: 14px; color: var(--muted); }
+    .modes button[aria-pressed="true"] { background: var(--card); color: var(--btn-ink); font-weight: 700; box-shadow: 0 2px 6px #c99ab433; }
+    .ring { position: relative; width: 230px; height: 230px; margin: 0 auto 14px; }
+    .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring circle { fill: none; stroke-width: 10; }
+    .ring .bg { stroke: var(--rose-2); }
+    .ring .fg { stroke: url(#ringGrad); stroke-linecap: round; transition: stroke-dashoffset .5s linear; }
+    .ring .in { position: absolute; inset: 0; display: grid; place-content: center; }
+    .clock { font-size: 48px; font-weight: 300; font-variant-numeric: tabular-nums; color: var(--head); line-height: 1; }
+    .ring .in small { color: var(--muted); margin-top: 6px; }
+
+    /* buttons & inputs */
+    .btn { border: 0; border-radius: 99px; padding: 10px 22px; background: var(--btn); color: var(--btn-ink); cursor: pointer; font-weight: 800; box-shadow: 0 4px 12px #e7a3c133; }
+    .btn:hover { filter: brightness(1.03); }
+    .btn.soft { background: var(--rose-2); box-shadow: none; }
+    .btn.small { padding: 6px 14px; font-size: 14px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .in-f { border: 1.5px solid var(--line); background: var(--card); border-radius: 12px; padding: 10px 12px; min-width: 0; color: var(--ink); }
+    .in-f:focus, .additem input:focus { outline: 2px solid #eea2c166; outline-offset: 0; }
+    label.f { display: block; margin-bottom: 10px; }
+    label.f > span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+    ul.plain { list-style: none; margin: 0; padding: 0; }
+    ul.plain li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+    ul.plain li:last-child { border-bottom: 0; }
+    ul.plain li .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    ul.plain li small { color: var(--muted); }
+    .note { color: var(--muted); font-size: 14px; margin: 4px; }
+
+    /* bottom bar (phone) */
+    nav.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: center; pointer-events: none; }
+    nav.bar .in {
+      pointer-events: auto; width: 100%; max-width: 560px; background: var(--card); border-radius: 22px 22px 0 0;
+      display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; padding: 8px 8px calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -6px 24px #c99ab433;
+    }
+    nav.bar .brand, nav.bar .fab em, nav.bar .side-extra { display: none; }
+    nav.bar button { background: none; border: 0; color: var(--head); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; padding: 4px 0; opacity: .6; }
+    nav.bar button svg { width: 28px; height: 28px; stroke-width: 1.5; }
+    nav.bar button[aria-selected="true"] { opacity: 1; font-weight: 800; color: var(--pink); }
+    nav.bar .fab { opacity: 1; }
+    nav.bar .fab span { width: 62px; height: 62px; margin-top: -34px; border-radius: 50%; background: linear-gradient(135deg, #f7b6cf, #cbb7f4); color: #fff; display: grid; place-items: center; box-shadow: 0 6px 16px #d79cc066; border: 4px solid var(--card); transition: transform .15s; }
+    nav.bar .fab span svg { stroke-width: 2.4; }
+    nav.bar .fab:active span { transform: scale(.92); }
+
+    /* sheets */
+    dialog.sheet {
+      border: 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); width: 100%; max-width: 560px; margin: auto auto 0;
+      border-radius: 24px 24px 0 0; background: var(--blush); color: var(--ink); max-height: 88vh; overflow: auto;
+    }
+    dialog.sheet[open] { animation: up .25s ease-out; }
+    dialog.sheet::backdrop { background: #6b4a6a40; backdrop-filter: blur(2px); }
+    .grab { width: 40px; height: 4px; border-radius: 4px; background: #e8d3dd; margin: -6px auto 12px; }
+    .sheet h3 { margin: 0 0 12px; color: var(--head); font-size: 19px; }
+    .tabs2 { display: flex; background: var(--rose-2); border-radius: 99px; padding: 4px; margin-bottom: 14px; }
+    .tabs2 button { flex: 1; border: 0; background: none; padding: 7px 4px; border-radius: 99px; cursor: pointer; font-size: 14px; color: var(--muted); }
+    .tabs2 button[aria-pressed="true"] { background: var(--card); color: var(--btn-ink); font-weight: 800; box-shadow: 0 2px 6px #c99ab433; }
+    #addForm [hidden] { display: none; }
+    .emojis { display: flex; flex-wrap: wrap; gap: 6px; }
+    .emojis button { font-size: 22px; width: 42px; height: 42px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card); cursor: pointer; }
+    .emojis button[aria-pressed="true"] { border-color: var(--tick); background: var(--rose-2); }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 104px; transform: translateX(-50%); z-index: 20; background: var(--card); color: var(--btn-ink);
+      padding: 10px 18px; border-radius: 99px; font-weight: 700; box-shadow: 0 8px 24px #b07f9a4d; max-width: calc(100% - 32px); text-align: center;
+      animation: toastIn .25s ease-out;
+    }
+    .toast[hidden] { display: none; }
+    .heart { position: fixed; z-index: 25; pointer-events: none; color: var(--tick); font-size: 18px; animation: float 1.1s ease-out forwards; }
+    .two > *, .home-grid > * { min-width: 0; }
+
+    /* laptop & desktop */
+    @media (min-width: 1000px) {
+      body { padding-left: 240px; }
+      .wrap { max-width: 1180px; padding: 0 40px 48px; }
+      .top { padding: 26px 0 16px; }
+      .top .hello { font-size: 24px; font-weight: 700; }
+      .top .hello small { font-size: 15px; font-weight: 400; }
+      #menuBtn { display: none; }
+      .home-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+      .home-grid .sec-head:first-child { margin-top: 0; }
+      .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+      .two.j { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
+      .two .sec-head:first-child { margin-top: 0; }
+      .lists { flex-wrap: wrap; overflow: visible; scroll-snap-type: none; }
+      .tlist { flex: 1 1 230px; max-width: none; }
+      .tlist.new { min-height: 70px; flex: 1 1 100%; }
+      #habitList { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 0 18px; }
+      .ring { width: 280px; height: 280px; }
+      .clock { font-size: 58px; }
+
+      nav.bar { top: 0; bottom: 0; right: auto; width: 240px; }
+      nav.bar .in {
+        height: 100%; max-width: none; border-radius: 0 28px 28px 0; display: flex; flex-direction: column; align-items: stretch;
+        padding: 28px 16px; gap: 4px; box-shadow: 6px 0 28px #c99ab42e;
+      }
+      nav.bar .brand { display: block; font-weight: 800; font-size: 22px; color: var(--head); padding: 0 12px 18px; }
+      nav.bar .brand span { color: var(--pink); }
+      nav.bar button { flex-direction: row; gap: 12px; font-size: 16px; padding: 10px 14px; border-radius: 14px; opacity: .8; }
+      nav.bar button svg { width: 24px; height: 24px; }
+      nav.bar button:hover { background: var(--blush); opacity: 1; }
+      nav.bar button[aria-selected="true"] { background: var(--rose-2); }
+      nav.bar .fab { order: -1; padding: 0; margin-bottom: 14px; }
+      nav.bar .brand { order: -2; }
+      nav.bar .fab span { width: 100%; height: auto; margin: 0; border: 0; border-radius: 14px; padding: 11px 14px; display: flex; gap: 8px; justify-content: center; color: #fff; font-weight: 800; }
+      nav.bar .fab span svg { width: 20px; height: 20px; }
+      nav.bar .fab em { display: inline; font-style: normal; text-shadow: 0 1px 2px #b06a9b66; }
+      nav.bar .side-extra { display: flex; flex-direction: column; gap: 4px; margin-top: auto; }
+      nav.bar .side-extra button { opacity: .7; }
+      nav.bar .hint { font-size: 12px; color: var(--muted); padding: 8px 14px 0; }
+
+      dialog.sheet { margin: auto; border-radius: 24px; max-width: 520px; padding-bottom: 18px; }
+      dialog.sheet[open] { animation: pop2 .2s ease-out; }
+      .toast { bottom: 32px; left: calc(50% + 120px); }
+    }
+    @keyframes rise { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes pop { 50% { transform: scale(1.25); } }
+    @keyframes pop2 { from { transform: scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes toastIn { from { transform: translate(-50%, 10px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+    @keyframes float { to { transform: translate(var(--dx), -70px) scale(.6); opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-journal" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 1-.2 1.9-.6 2.8"/><path d="m14 20 1-3.5 5.5-5.5a1.4 1.4 0 0 1 2 2L17 18.5z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.6-7.5 10-7.5 10z"/></symbol>
+</svg>
+
+<main class="wrap">
+  <div class="top">
+    <button class="ibtn" id="menuBtn" type="button" aria-label="Settings"><svg class="i"><use href="#i-menu"/></svg></button>
+    <div class="hello" id="hello">good morning ♡</div>
+    <button class="ibtn" id="bellBtn" type="button" aria-label="Reminders"><svg class="i"><use href="#i-bell"/></svg><span class="dot" id="bellDot" hidden></span></button>
+  </div>
+
+  <!-- HOME -->
+  <section id="tab-home">
+   <div class="home-grid">
+    <div class="col">
+    <div class="affirm">
+      <div class="row">
+        <div><div class="lbl">today's affirmation</div><p id="affText"></p></div>
+        <button class="ibtn" id="affNext" type="button" aria-label="Show another affirmation" style="padding:2px 4px"><svg class="i"><use href="#i-dots"/></svg></button>
+      </div>
+    </div>
+    <div class="mood"><b>MOOD:</b><button type="button" id="moodBtn">pick one ♡</button></div>
+    <div class="moodpick" id="moodPick" hidden></div>
+
+    <div class="card">
+      <div class="month">
+        <button class="ibtn" id="wkPrev" type="button" aria-label="Previous week"><svg class="i"><use href="#i-left"/></svg></button>
+        <b id="monthName"></b>
+        <button class="ibtn" id="wkNext" type="button" aria-label="Next week"><svg class="i"><use href="#i-right"/></svg></button>
+      </div>
+      <div class="week" id="week"></div>
+    </div>
+
+    <div class="sec-head">
+      <h2 id="dayLabel">today</h2>
+      <div class="r"><small id="dayCount"></small><button class="round-add" type="button" data-add="plan" aria-label="Add to timeline"><svg class="i"><use href="#i-plus"/></svg></button></div>
+    </div>
+    <div class="card timeline" id="timeline"></div>
+    </div>
+    <div class="col">
+
+    <div class="sec-head">
+      <h2>to do</h2>
+      <div class="r"><button class="round-add" type="button" data-add="todo" aria-label="Add a to-do"><svg class="i"><use href="#i-plus"/></svg></button></div>
+    </div>
+    <div class="lists" id="lists"></div>
+
+    <div class="sec-head">
+      <h2>habits</h2>
+      <div class="r"><button class="round-add" type="button" data-add="habit" aria-label="Add a habit"><svg class="i"><use href="#i-plus"/></svg></button></div>
+    </div>
+    <div id="homeHabits"></div>
+    </div>
+   </div>
+  </section>
+
+  <!-- FOCUS -->
+  <section id="tab-focus" hidden>
+   <div class="two">
+    <div>
+    <div class="sec-head" style="margin-top:4px"><h2>focus time</h2></div>
+    <div class="card focus">
+      <div class="modes" id="modes">
+        <button type="button" data-m="focus" aria-pressed="true">focus</button>
+        <button type="button" data-m="short" aria-pressed="false">short break</button>
+        <button type="button" data-m="long" aria-pressed="false">long break</button>
+      </div>
+      <div class="ring">
+        <svg viewBox="0 0 120 120"><defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3a9c6"/><stop offset="1" stop-color="#b9a4f0"/></linearGradient></defs><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="ringFg" cx="60" cy="60" r="52"/></svg>
+        <div class="in"><div class="clock" id="clock">25:00</div><small id="modeLabel">time to focus</small></div>
+      </div>
+      <div class="row" style="justify-content:center">
+        <button class="btn" id="startBtn" type="button">start</button>
+        <button class="btn soft" id="resetBtn" type="button">reset</button>
+        <button class="btn soft" id="skipBtn" type="button">skip</button>
+      </div>
+      <p style="color:var(--muted);margin:14px 0 0" id="focusTaskLabel"></p>
+    </div>
+    </div>
+    <div>
+    <div class="sec-head" style="margin-top:4px"><h2>settings</h2></div>
+    <div class="card">
+      <label class="f"><span>working on</span><select class="in-f" id="focusTask" style="width:100%"><option value="">— nothing specific —</option></select></label>
+      <div class="row">
+        <label class="f"><span>focus (min)</span><input class="in-f" type="number" id="fMin" min="1" max="180" style="width:96px"></label>
+        <label class="f"><span>short break</span><input class="in-f" type="number" id="sMin" min="1" max="60" style="width:96px"></label>
+        <label class="f"><span>long break</span><input class="in-f" type="number" id="lMin" min="1" max="60" style="width:96px"></label>
+      </div>
+      <p style="color:var(--muted);font-size:14px;margin:0">A long break comes after every 4th focus session. Phone face down, water nearby ♡</p>
+    </div>
+    <div class="sec-head"><h2>today's sessions</h2><div class="r"><small id="focusTotal"></small></div></div>
+    <div class="card"><ul class="plain" id="sessionList"></ul></div>
+    </div>
+   </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section id="tab-journal" hidden>
+   <div class="two j">
+    <div>
+    <div class="sec-head" style="margin-top:4px"><h2>dear diary</h2><input type="date" id="jDate" class="in-f" style="padding:4px 8px;font-size:14px" aria-label="Journal date"></div>
+    <div class="paper">
+      <h3 id="jTitle"></h3>
+      <label class="field"><span>I'm grateful for</span><textarea class="lined" id="jGrateful"></textarea></label>
+      <label class="field"><span>today's little wins</span><textarea class="lined" id="jWins"></textarea></label>
+      <label class="field"><span>what I learned</span><textarea class="lined" id="jLessons"></textarea></label>
+      <label class="field"><span>thoughts</span><textarea class="lined" id="jNotes" style="min-height:140px"></textarea></label>
+      <p style="color:var(--muted);font-size:13px;margin:10px 0 0" id="jSaved">saves as you type</p>
+    </div>
+    </div>
+    <div>
+    <div class="sec-head" style="margin-top:4px"><h2>past entries</h2></div>
+    <div class="card">
+      <input type="text" class="in-f" id="jSearch" placeholder="search entries…" style="width:100%;margin-bottom:4px">
+      <div id="jHistory"></div>
+    </div>
+    </div>
+   </div>
+  </section>
+
+  <!-- HABITS -->
+  <section id="tab-habits" hidden>
+    <div class="sec-head" style="margin-top:4px"><h2>my habits</h2><div class="r"><button class="round-add" type="button" data-add="habit" aria-label="Add a habit"><svg class="i"><use href="#i-plus"/></svg></button></div></div>
+    <div id="habitList"></div>
+    <p class="note">Tap a circle to tick off a day. Tap a habit's icon to remove it.</p>
+  </section>
+</main>
+
+<nav class="bar">
+  <div class="in" role="tablist">
+    <div class="brand">my day <span>♡</span></div>
+    <button type="button" role="tab" data-tab="home" aria-selected="true"><svg class="i"><use href="#i-home"/></svg>home</button>
+    <button type="button" role="tab" data-tab="focus"><svg class="i"><use href="#i-timer"/></svg>focus</button>
+    <button type="button" class="fab" id="fab" aria-label="Add"><span><svg class="i"><use href="#i-plus"/></svg><em>add new</em></span></button>
+    <button type="button" role="tab" data-tab="journal"><svg class="i"><use href="#i-journal"/></svg>journal</button>
+    <button type="button" role="tab" data-tab="habits"><svg class="i"><use href="#i-check"/></svg>habits</button>
+    <div class="side-extra">
+      <button type="button" id="sideRem"><svg class="i"><use href="#i-bell"/></svg>reminders</button>
+      <button type="button" id="sideSet"><svg class="i"><use href="#i-menu"/></svg>settings</button>
+      <div class="hint">tip: press N to add something</div>
+    </div>
+  </div>
+</nav>
+
+<!-- add sheet -->
+<dialog class="sheet" id="addSheet">
+  <div class="grab"></div>
+  <h3>add something</h3>
+  <div class="tabs2" id="addTabs">
+    <button type="button" data-k="plan">timeline</button>
+    <button type="button" data-k="todo">to-do</button>
+    <button type="button" data-k="habit">habit</button>
+    <button type="button" data-k="remind">reminder</button>
+  </div>
+  <form id="addForm">
+    <label class="f"><span id="addNameLbl">what's the plan?</span><input class="in-f" id="addName" required style="width:100%" autocomplete="off"></label>
+    <div data-for="plan" class="row">
+      <label class="f"><span>day</span><input class="in-f" type="date" id="addDate"></label>
+      <label class="f"><span>from</span><input class="in-f" type="time" id="addStart"></label>
+      <label class="f"><span>to</span><input class="in-f" type="time" id="addEnd"></label>
+    </div>
+    <div data-for="todo">
+      <label class="f"><span>list</span><select class="in-f" id="addList" style="width:100%"></select></label>
+    </div>
+    <div data-for="habit">
+      <label class="f"><span>icon</span></label>
+      <div class="emojis" id="habitEmojis" style="margin-bottom:12px"></div>
+    </div>
+    <div data-for="remind" class="row">
+      <label class="f"><span>when</span><input class="in-f" type="datetime-local" id="addAt"></label>
+      <label class="f"><span>repeat</span><select class="in-f" id="addRepeat"><option value="none">once</option><option value="daily">every day</option><option value="weekly">every week</option></select></label>
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:4px">
+      <button class="btn soft" type="button" id="addCancel">cancel</button>
+      <button class="btn">add</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- reminders sheet -->
+<dialog class="sheet" id="remSheet">
+  <div class="grab"></div>
+  <div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0">reminders</h3><button class="btn small" type="button" id="remAdd">+ new</button></div>
+  <p style="color:var(--muted);font-size:14px;margin:4px 0 8px" id="notifState"></p>
+  <button class="btn soft small" id="notifBtn" type="button" style="margin-bottom:8px">turn on notifications</button>
+  <ul class="plain" id="remList"></ul>
+  <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn soft" type="button" data-close>close</button></div>
+</dialog>
+
+<!-- settings sheet -->
+<dialog class="sheet" id="menuSheet">
+  <div class="grab"></div>
+  <h3>settings</h3>
+  <label class="f"><span>your name</span><input class="in-f" id="nameIn" maxlength="24" placeholder="so I can say hi ♡" style="width:100%"></label>
+  <label class="row" style="margin:6px 0 14px;cursor:pointer"><input type="checkbox" id="soundOn"> soft sounds</label>
+  <label class="f"><span>my own affirmations (one per line, mixed in with the built-in ones)</span><textarea class="in-f" id="myAff" rows="3" style="width:100%;resize:vertical"></textarea></label>
+  <p style="color:var(--muted);font-size:14px;margin:6px 0 8px">Everything is saved in this browser only. Export a backup now and then, and import it to move to another device.</p>
+  <div class="row" style="justify-content:space-between">
+    <div class="row">
+      <button class="btn soft small" id="exportBtn" type="button">export</button>
+      <label class="btn soft small" style="cursor:pointer">import<input type="file" id="importFile" accept="application/json" hidden></label>
+    </div>
+    <button class="btn" type="button" data-close>done</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  const KEY = 'dailyFocus.v1';
+  const $ = (id) => document.getElementById(id);
+  const pad = (n) => String(n).padStart(2, '0');
+  const ymd = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const parseDay = (s) => new Date(s + 'T00:00');
+  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const monday = (d) => { const x = addDays(d, -((d.getDay() + 6) % 7)); x.setHours(0, 0, 0, 0); return x; };
+  const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const icon = (n) => `<svg class="i"><use href="#i-${n}"/></svg>`;
+  const fmtTime = (hm) => {
+    if (!hm) return '';
+    const [h, m] = hm.split(':').map(Number);
+    return `${((h + 11) % 12) + 1}:${pad(m)}${h < 12 ? 'am' : 'pm'}`;
+  };
+
+  // ---------- storage ----------
+  const blank = () => ({ tasks: [], journal: {}, reminders: [], sessions: [], habits: [], settings: { f: 25, s: 5, l: 15, sound: true } });
+  let db;
+  try { db = Object.assign(blank(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch { db = blank(); }
+  if (!db.lists) db.lists = ['personal 🎀', 'work 💼'];
+  if (!db.profile) db.profile = { name: db.game?.name && db.game.name !== 'Hero' ? db.game.name : '', affirmations: '' };
+  if (!db.moods) db.moods = {};
+  if (!db.affPick) db.affPick = {};
+  if (db.settings.sound === undefined) db.settings.sound = true;
+  // tasks without a time slot from older versions become to-dos
+  db.tasks.forEach((t) => { if (!t.start && !t.list) t.list = db.lists[0]; });
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {} };
+  save();
+
+  // ---------- little joys ----------
+  let actx;
+  function chime(freqs = [880, 1175], vol = 0.05, force = false) {
+    if (!db.settings.sound && !force) return;
+    try {
+      actx ||= new (window.AudioContext || window.webkitAudioContext)();
+      freqs.forEach((f, i) => {
+        const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * 0.1;
+        o.type = 'sine'; o.frequency.value = f; o.connect(g); g.connect(actx.destination);
+        g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+        o.start(t); o.stop(t + 0.5);
+      });
+    } catch {}
+  }
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.hidden = false;
+    t.style.animation = 'none'; void t.offsetWidth; t.style.animation = '';
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 3200);
+  }
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function hearts(el, n = 5) {
+    chime();
+    if (reduced || !el) return;
+    const r = el.getBoundingClientRect();
+    for (let i = 0; i < n; i++) {
+      const h = document.createElement('div'); h.className = 'heart'; h.textContent = '♥';
+      h.style.left = r.left + r.width / 2 - 8 + 'px'; h.style.top = r.top + 'px';
+      h.style.setProperty('--dx', `${(Math.random() - 0.5) * 70}px`);
+      h.style.animationDelay = `${i * 60}ms`; h.style.fontSize = `${12 + Math.random() * 10}px`;
+      document.body.appendChild(h); setTimeout(() => h.remove(), 1400);
+    }
+  }
+  function notify(title, body) {
+    chime([880, 880, 1175], 0.15, true); toast(`${title} · ${body}`);
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try { new Notification(title, { body }); } catch {}
+    }
+  }
+
+  // ---------- greeting & affirmation ----------
+  const AFFIRMATIONS = [
+    'I attract positive energy and repel negativity.', 'I am allowed to take up space.', 'I am becoming the best version of myself.',
+    'Small steps every day add up to big things.', 'I am proud of how far I have come.', 'I trust myself to figure it out.',
+    'My peace is my priority.', 'I am calm, focused and capable.', 'Good things are coming my way.', 'I choose progress over perfection.',
+    'I deserve rest as much as I deserve success.', 'I am worthy of the life I want.', 'I am doing better than I think.',
+    'I radiate confidence and kindness.', 'Today I will be gentle with myself.', 'I can do hard things.', 'My dreams are valid.',
+    'I am grateful for this moment.', 'I let go of what I can\'t control.', 'I bloom at my own pace.', 'My energy is precious and I protect it.',
+    'I am exactly where I need to be.', 'I believe in the person I am becoming.', 'I finish what I start.', 'Every day I grow a little more.',
+  ];
+  const allAff = () => AFFIRMATIONS.concat((db.profile.affirmations || '').split('\n').map((s) => s.trim()).filter(Boolean));
+  function dayHash(s) { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
+  const endOfToday = () => { const d = new Date(); d.setHours(23, 59, 59, 999); return d.getTime(); };
+  function renderTop() {
+    const hr = new Date().getHours();
+    const part = hr < 12 ? 'good morning' : hr < 17 ? 'good afternoon' : 'good evening';
+    $('hello').innerHTML = `${part}${db.profile.name ? ', ' + esc(db.profile.name) : ''} ♡<small>${new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}</small>`;
+    const list = allAff(), today = ymd();
+    const idx = db.affPick[today] ?? dayHash(today) % list.length;
+    $('affText').textContent = list[idx % list.length];
+    $('bellDot').hidden = !db.reminders.some((r) => r.at <= endOfToday());
+  }
+  $('affNext').onclick = () => {
+    const list = allAff(), today = ymd(), cur = db.affPick[today] ?? dayHash(today) % list.length;
+    db.affPick = { [today]: (cur + 1) % list.length }; save(); renderTop();
+  };
+
+  // ---------- mood ----------
+  const MOODS = ['happy ☀️', 'calm 🌿', 'whimsical 🌙', 'motivated ✨', 'productive 💪', 'loved 💗', 'tired 😴', 'anxious 🌧️', 'sad 💧', 'meh 🫧'];
+  function renderMood() {
+    const m = db.moods[ymd()];
+    $('moodBtn').textContent = m || 'pick one ♡';
+    $('moodPick').innerHTML = MOODS.map((x) => `<button type="button" aria-pressed="${x === m}">${x}</button>`).join('');
+    $('moodPick').querySelectorAll('button').forEach((b) => (b.onclick = () => {
+      db.moods[ymd()] = b.textContent === m ? '' : b.textContent; save(); $('moodPick').hidden = true; renderMood();
+    }));
+  }
+  $('moodBtn').onclick = () => ($('moodPick').hidden = !$('moodPick').hidden);
+
+  // ---------- week strip & timeline ----------
+  let sel = ymd(), weekStart = monday(new Date());
+  $('wkPrev').onclick = () => { weekStart = addDays(weekStart, -7); renderWeek(); };
+  $('wkNext').onclick = () => { weekStart = addDays(weekStart, 7); renderWeek(); };
+  const planFor = (d) => db.tasks.filter((t) => t.start && t.date === d).sort((a, b) => a.start.localeCompare(b.start));
+  function renderWeek() {
+    const mid = addDays(weekStart, 3);
+    $('monthName').textContent = mid.toLocaleDateString(undefined, { month: 'long' }) + (mid.getFullYear() !== new Date().getFullYear() ? ' ' + mid.getFullYear() : '');
+    $('week').innerHTML = Array.from({ length: 7 }, (_, i) => {
+      const d = addDays(weekStart, i), k = ymd(d);
+      const cls = ['wd', k === ymd() && 'today', k === sel && 'sel', planFor(k).length && 'has'].filter(Boolean).join(' ');
+      return `<button type="button" class="${cls}" data-d="${k}" aria-pressed="${k === sel}"><span>${d.toLocaleDateString(undefined, { weekday: 'short' })}</span><strong>${d.getDate()}</strong></button>`;
+    }).join('');
+    $('week').querySelectorAll('.wd').forEach((b) => (b.onclick = () => { sel = b.dataset.d; renderHome(); }));
+  }
+  function renderTimeline() {
+    const items = planFor(sel), now = new Date(), hm = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const d = parseDay(sel), diff = Math.round((d - parseDay(ymd())) / 864e5);
+    $('dayLabel').textContent = diff === 0 ? 'today' : diff === 1 ? 'tomorrow' : diff === -1 ? 'yesterday' : d.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' });
+    $('dayCount').textContent = items.length ? `${items.filter((t) => t.done).length}/${items.length} done` : '';
+    const box = $('timeline'); box.innerHTML = '';
+    if (!items.length) { box.innerHTML = '<div class="empty">nothing planned yet ♡<br>tap + to add a time block</div>'; return; }
+    items.forEach((t) => {
+      const isNow = sel === ymd() && !t.done && t.start <= hm && !!t.end && hm < t.end;
+      const el = document.createElement('div'); el.className = 'slot';
+      el.innerHTML = `<div class="t">${fmtTime(t.start)}</div>
+        <div class="block${t.done ? ' done' : ''}${isNow ? ' now' : ''}" role="button" tabindex="0" aria-pressed="${!!t.done}">
+          <div class="grow"><div class="ttl">${esc(t.text)}</div>
+          <div class="tm">${icon('clock')}${fmtTime(t.start)}${t.end ? ' - ' + fmtTime(t.end) : ''}</div></div>
+          <button class="x" type="button" aria-label="Delete">${icon('x')}</button>
+        </div>`;
+      const blk = el.querySelector('.block');
+      blk.onclick = (e) => {
+        if (e.target.closest('.x')) return;
+        t.done = !t.done; save(); if (t.done) hearts(blk); renderHome(); checkAllDone();
+      };
+      blk.onkeydown = (e) => { if (e.target === blk && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); blk.click(); } };
+      el.querySelector('.x').onclick = () => { if (confirm(`Remove "${t.text}"?`)) { db.tasks = db.tasks.filter((x) => x !== t); save(); renderHome(); } };
+      box.appendChild(el);
+    });
+  }
+  function checkAllDone() {
+    const items = planFor(sel);
+    if (sel === ymd() && items.length > 1 && items.every((t) => t.done)) toast('all done for today · so proud of you ♡');
+  }
+
+  // ---------- to-do lists ----------
+  function renderLists() {
+    const box = $('lists'), scroll = box.scrollLeft; box.innerHTML = '';
+    db.lists.forEach((name, li) => {
+      const items = db.tasks.filter((t) => !t.start && t.list === name).sort((a, b) => a.done - b.done);
+      const card = document.createElement('div'); card.className = 'tlist';
+      card.innerHTML = `<div class="tlist-h"><span>${esc(name)}</span>${items.length ? '' : `<button class="x" type="button" aria-label="Delete list">${icon('x')}</button>`}</div>
+        <div class="items"></div>
+        <form class="additem"><input placeholder="add an item…" aria-label="Add to ${esc(name)}"></form>
+        <div class="tlist-f"><span>${items.filter((t) => !t.done).length} left</span>${items.some((t) => t.done) ? '<button class="link" type="button">clear done</button>' : ''}</div>`;
+      const list = card.querySelector('.items');
+      if (!items.length) list.innerHTML = '<div class="empty" style="padding:10px 0">empty ♡</div>';
+      items.forEach((t) => {
+        const it = document.createElement('div'); it.className = 'item' + (t.done ? ' done' : '');
+        it.innerHTML = `<span>${esc(t.text)}</span><button type="button" class="circ ${t.done ? 'on' : ''}" aria-pressed="${!!t.done}" aria-label="Done">${t.done ? icon('tick') : ''}</button>`;
+        it.querySelector('.circ').onclick = (e) => { t.done = !t.done; save(); if (t.done) hearts(e.currentTarget, 3); renderLists(); };
+        list.appendChild(it);
+      });
+      card.querySelector('form').onsubmit = (e) => {
+        e.preventDefault(); const v = e.target.querySelector('input').value.trim(); if (!v) return;
+        db.tasks.push({ id: uid(), text: v, list: name, date: ymd(), pri: 'med', done: false }); save(); renderLists();
+        $('lists').querySelectorAll('.tlist')[li]?.querySelector('input')?.focus();
+      };
+      const del = card.querySelector('.tlist-h .x');
+      if (del) del.onclick = () => { db.lists = db.lists.filter((l) => l !== name); save(); renderLists(); };
+      const clr = card.querySelector('.link');
+      if (clr) clr.onclick = () => { db.tasks = db.tasks.filter((t) => !(t.list === name && !t.start && t.done)); save(); renderLists(); };
+      box.appendChild(card);
+    });
+    const nw = document.createElement('button'); nw.type = 'button'; nw.className = 'tlist new'; nw.textContent = '+ new list';
+    nw.onclick = () => {
+      const n = (prompt('Name your list (an emoji is cute ♡)', 'home 🏡') || '').trim();
+      if (n && !db.lists.includes(n)) { db.lists.push(n); save(); renderLists(); }
+    };
+    box.appendChild(nw);
+    box.scrollLeft = scroll;
+  }
+
+  // ---------- habits ----------
+  const HABIT_EMOJIS = ['🧘‍♀️', '💧', '🧴', '💊', '🏃‍♀️', '📚', '🥗', '😴', '✍️', '🌸', '🚶‍♀️', '🪥', '☀️', '📵', '🎨', '🎧'];
+  function habitStreak(h) {
+    let n = 0, d = new Date();
+    if (!h.days[ymd(d)]) d = addDays(d, -1);
+    while (h.days[ymd(d)]) { n++; d = addDays(d, -1); }
+    return n;
+  }
+  function habitRow(h, withName) {
+    const el = document.createElement('div'); el.className = 'habit';
+    const start = monday(new Date()), today = ymd(), streak = habitStreak(h);
+    el.innerHTML = `<button type="button" class="h-ic" aria-label="${withName ? 'Remove ' + esc(h.name) : esc(h.name)}" title="${esc(h.name)}">${esc(h.icon)}</button>
+      <div class="h-body">${withName ? `<div class="h-name">${esc(h.name)}<small>${streak ? streak + ' day streak ♡' : ''}</small></div>` : ''}<div class="h-days"></div></div>`;
+    const days = el.querySelector('.h-days');
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(start, i), k = ymd(d), on = !!h.days[k], fut = k > today;
+      const c = document.createElement('div'); if (fut) c.className = 'future';
+      c.innerHTML = `${d.toLocaleDateString(undefined, { weekday: 'short' })}<em>${d.getDate()}</em>
+        <button type="button" class="circ ${on ? 'on' : ''}" aria-pressed="${on}" aria-label="${esc(h.name)} on ${k}" ${fut ? 'disabled' : ''}>${on ? icon('tick') : ''}</button>`;
+      c.querySelector('button').onclick = (e) => {
+        if (h.days[k]) delete h.days[k]; else { h.days[k] = true; hearts(e.currentTarget, 3); }
+        save(); renderHabitsAll();
+        if (k === today && h.days[k] && db.habits.length > 1 && db.habits.every((x) => x.days[today])) toast('every habit done today ♡');
+      };
+      days.appendChild(c);
+    }
+    el.querySelector('.h-ic').onclick = () => {
+      if (withName) { if (confirm(`Remove the habit "${h.name}" and its history?`)) { db.habits = db.habits.filter((x) => x !== h); save(); renderHabitsAll(); } }
+      else toast(`${h.icon} ${h.name}${streak ? ` · ${streak} day streak` : ''}`);
+    };
+    return el;
+  }
+  function renderHabitsAll() {
+    ['homeHabits', 'habitList'].forEach((id) => {
+      const box = $(id); box.innerHTML = '';
+      if (!db.habits.length) box.innerHTML = '<div class="card empty">no habits yet · tap + to start one small habit ♡</div>';
+      db.habits.forEach((h) => box.appendChild(habitRow(h, id === 'habitList')));
+    });
+  }
+
+  // ---------- add sheet ----------
+  let addKind = 'plan', habitEmoji = HABIT_EMOJIS[0];
+  const LABELS = { plan: "what's the plan?", todo: 'what do you need to do?', habit: 'habit name', remind: 'remind me to…' };
+  const PH = { plan: 'e.g. morning routine ☀️', todo: 'e.g. grocery run', habit: 'e.g. drink 8 glasses of water', remind: 'e.g. call mom' };
+  function showKind(kind) {
+    addKind = kind;
+    $('addTabs').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.k === kind));
+    document.querySelectorAll('#addForm [data-for]').forEach((s) => (s.hidden = s.dataset.for !== kind));
+    $('addNameLbl').textContent = LABELS[kind]; $('addName').placeholder = PH[kind];
+    $('habitEmojis').innerHTML = HABIT_EMOJIS.map((e) => `<button type="button" aria-pressed="${e === habitEmoji}">${e}</button>`).join('');
+    $('habitEmojis').querySelectorAll('button').forEach((b) => (b.onclick = () => { habitEmoji = b.textContent; showKind('habit'); }));
+  }
+  function openAdd(kind) {
+    $('addDate').value = sel;
+    if (!$('addStart').value) {
+      const h = Math.min(22, new Date().getHours() + 1);
+      $('addStart').value = `${pad(h)}:00`; $('addEnd').value = `${pad(h + 1)}:00`;
+    }
+    $('addList').innerHTML = db.lists.map((l) => `<option>${esc(l)}</option>`).join('');
+    const at = new Date(Date.now() + 36e5); at.setMinutes(0, 0, 0);
+    $('addAt').value = `${ymd(at)}T${pad(at.getHours())}:00`;
+    showKind(kind);
+    if (!$('addSheet').open) $('addSheet').showModal();
+    $('addName').focus();
+  }
+  const currentTab = () => document.querySelector('nav.bar [aria-selected="true"]').dataset.tab;
+  $('fab').onclick = () => openAdd(currentTab() === 'habits' ? 'habit' : 'plan');
+  document.querySelectorAll('[data-add]').forEach((b) => (b.onclick = () => openAdd(b.dataset.add)));
+  $('addTabs').querySelectorAll('button').forEach((b) => (b.onclick = () => { showKind(b.dataset.k); $('addName').focus(); }));
+  $('addCancel').onclick = () => $('addSheet').close();
+  $('addStart').onchange = () => {
+    const [h, m] = $('addStart').value.split(':').map(Number);
+    if (!$('addEnd').value || $('addEnd').value <= $('addStart').value) $('addEnd').value = `${pad(Math.min(23, h + 1))}:${pad(m)}`;
+  };
+  $('addForm').onsubmit = (e) => {
+    e.preventDefault();
+    const text = $('addName').value.trim(); if (!text) return;
+    if (addKind === 'plan') {
+      if (!$('addStart').value) { $('addStart').focus(); return; }
+      const day = $('addDate').value || sel, start = $('addStart').value, end = $('addEnd').value > start ? $('addEnd').value : '';
+      db.tasks.push({ id: uid(), text, date: day, start, end, pri: 'med', done: false });
+      sel = day; weekStart = monday(parseDay(day));
+      // the next block starts where this one ended
+      if (end) { $('addStart').value = end; $('addEnd').value = ''; $('addStart').onchange(); }
+      toast('added to your day ♡');
+    } else if (addKind === 'todo') {
+      db.tasks.push({ id: uid(), text, list: $('addList').value, date: ymd(), pri: 'med', done: false }); toast('added to ' + $('addList').value);
+    } else if (addKind === 'habit') {
+      db.habits.push({ id: uid(), name: text, icon: habitEmoji, days: {} }); toast('new habit · you got this ♡');
+    } else {
+      const at = new Date($('addAt').value).getTime(); if (isNaN(at)) return;
+      db.reminders.push({ id: uid(), text, at, repeat: $('addRepeat').value }); askNotif(); toast('reminder set ⏰');
+    }
+    $('addName').value = ''; save(); $('addSheet').close(); renderAll();
+  };
+
+  // ---------- sheets ----------
+  document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-close]')) d.close(); }));
+  $('bellBtn').onclick = () => { renderReminders(); $('remSheet').showModal(); };
+  $('remAdd').onclick = () => { $('remSheet').close(); openAdd('remind'); };
+  $('menuBtn').onclick = () => { $('nameIn').value = db.profile.name; $('soundOn').checked = db.settings.sound; $('myAff').value = db.profile.affirmations || ''; $('menuSheet').showModal(); };
+  $('sideRem').onclick = () => $('bellBtn').click();
+  $('sideSet').onclick = () => $('menuBtn').click();
+  // laptop shortcut: N adds something
+  document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() !== 'n' || e.ctrlKey || e.metaKey || e.altKey || document.querySelector('dialog[open]')) return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName)) return;
+    e.preventDefault(); $('fab').click();
+  });
+  $('nameIn').oninput = () => { db.profile.name = $('nameIn').value.trim(); save(); renderTop(); };
+  $('soundOn').onchange = () => { db.settings.sound = $('soundOn').checked; save(); chime(); };
+  $('myAff').oninput = () => { db.profile.affirmations = $('myAff').value; save(); renderTop(); };
+
+  // ---------- reminders ----------
+  function askNotif() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().then(renderNotif); }
+  function renderNotif() {
+    if (!('Notification' in window)) { $('notifState').textContent = 'This browser can\'t show notifications; you\'ll hear a soft chime while this page is open.'; $('notifBtn').hidden = true; return; }
+    const p = Notification.permission;
+    $('notifState').textContent = p === 'granted' ? 'Notifications are on. Keep this tab open (it can be in the background) so reminders can reach you.'
+      : p === 'denied' ? 'Notifications are blocked in your browser settings. You\'ll still hear a chime while this page is open.'
+      : 'Turn on notifications so reminders reach you in other tabs too.';
+    $('notifBtn').hidden = p !== 'default';
+  }
+  $('notifBtn').onclick = askNotif;
+  function renderReminders() {
+    const list = $('remList'); list.innerHTML = '';
+    const items = db.reminders.slice().sort((a, b) => a.at - b.at);
+    if (!items.length) list.innerHTML = '<li class="empty" style="display:block">no reminders yet</li>';
+    items.forEach((r) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span style="color:var(--pink)">${icon('bell')}</span><span class="grow">${esc(r.text)}<br><small>${new Date(r.at).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}${r.repeat !== 'none' ? ' · ' + (r.repeat === 'daily' ? 'every day' : 'every week') : ''}</small></span>
+        <button class="x" type="button" aria-label="Delete reminder">${icon('x')}</button>`;
+      li.querySelector('.x').onclick = () => { db.reminders = db.reminders.filter((x) => x !== r); save(); renderReminders(); renderTop(); };
+      list.appendChild(li);
+    });
+    renderNotif();
+  }
+  function checkReminders() {
+    const now = Date.now(); let changed = false;
+    db.reminders.slice().forEach((r) => {
+      if (r.at > now) return;
+      notify('reminder ♡', r.text); changed = true;
+      if (r.repeat === 'none') db.reminders = db.reminders.filter((x) => x !== r);
+      else { const step = (r.repeat === 'daily' ? 1 : 7) * 864e5; while (r.at <= now) r.at += step; }
+    });
+    if (changed) { save(); renderAll(); }
+  }
+
+  // ---------- focus ----------
+  const S = db.settings;
+  $('fMin').value = S.f; $('sMin').value = S.s; $('lMin').value = S.l;
+  ['fMin', 'sMin', 'lMin'].forEach((id) => ($(id).onchange = () => {
+    S.f = +$('fMin').value || 25; S.s = +$('sMin').value || 5; S.l = +$('lMin').value || 15; save();
+    if (!timer.running) setMode(timer.mode);
+  }));
+  const timer = { mode: 'focus', left: 0, total: 0, endAt: 0, running: false, count: 0, taskId: '', tick: null };
+  const CIRC = 2 * Math.PI * 52;
+  $('ringFg').style.strokeDasharray = CIRC;
+  const minutesFor = (m) => (m === 'focus' ? S.f : m === 'short' ? S.s : S.l);
+  function setMode(m) {
+    timer.mode = m; timer.total = timer.left = minutesFor(m) * 60; timer.running = false;
+    clearInterval(timer.tick); drawTimer();
+  }
+  $('modes').querySelectorAll('button').forEach((b) => (b.onclick = () => setMode(b.dataset.m)));
+  function drawTimer() {
+    const s = Math.max(0, Math.round(timer.left));
+    $('clock').textContent = `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+    $('modeLabel').textContent = { focus: timer.running ? 'you\'re doing great' : 'time to focus', short: 'little break ☕', long: 'long break 🌿' }[timer.mode];
+    $('ringFg').style.strokeDashoffset = CIRC * (1 - timer.left / timer.total);
+    $('modes').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.m === timer.mode));
+    $('startBtn').textContent = timer.running ? 'pause' : timer.left < timer.total ? 'resume' : 'start';
+    document.title = timer.running ? `${$('clock').textContent} · ${timer.mode === 'focus' ? 'focus' : 'break'}` : 'My Day Planner';
+    const t = db.tasks.find((x) => x.id === timer.taskId);
+    $('focusTaskLabel').textContent = t ? `working on: ${t.text}` : 'one thing at a time ♡';
+  }
+  function finish(skipped) {
+    clearInterval(timer.tick); timer.running = false;
+    if (timer.mode === 'focus') {
+      timer.count++;
+      const t = db.tasks.find((x) => x.id === timer.taskId);
+      const min = Math.round((timer.total - Math.max(0, timer.left)) / 60);
+      if (min > 0) db.sessions.push({ date: ymd(), at: Date.now(), min, task: t ? t.text : '' });
+      save();
+      if (!skipped) notify('focus session done', 'beautiful work. time for a little break ♡');
+      setMode(timer.count % 4 === 0 ? 'long' : 'short');
+    } else {
+      if (!skipped) notify('break is over', 'ready when you are ♡');
+      setMode('focus');
+    }
+    renderFocus();
+  }
+  $('startBtn').onclick = () => {
+    if (timer.running) { timer.running = false; clearInterval(timer.tick); }
+    else {
+      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+      timer.running = true; timer.endAt = Date.now() + timer.left * 1000;
+      timer.tick = setInterval(() => { timer.left = (timer.endAt - Date.now()) / 1000; if (timer.left <= 0) finish(); else drawTimer(); }, 250);
+    }
+    drawTimer();
+  };
+  $('resetBtn').onclick = () => setMode(timer.mode);
+  $('skipBtn').onclick = () => finish(true);
+  $('focusTask').onchange = (e) => { timer.taskId = e.target.value; drawTimer(); };
+  function renderFocus() {
+    const open = db.tasks.filter((t) => !t.done && (t.start ? t.date === ymd() : true));
+    $('focusTask').innerHTML = '<option value="">— nothing specific —</option>' + open.map((t) => `<option value="${t.id}">${esc(t.text)}</option>`).join('');
+    $('focusTask').value = open.some((t) => t.id === timer.taskId) ? timer.taskId : '';
+    const today = db.sessions.filter((s) => s.date === ymd());
+    const total = today.reduce((a, s) => a + s.min, 0);
+    $('focusTotal').textContent = total ? `${total} min total` : '';
+    const list = $('sessionList'); list.innerHTML = '';
+    if (!today.length) list.innerHTML = '<li class="empty" style="display:block">no sessions yet today</li>';
+    today.slice().reverse().forEach((s) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span style="color:var(--pink)">${icon('heart')}</span><span class="grow">${esc(s.task || 'focus session')}</span><small>${s.min} min · ${new Date(s.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</small>`;
+      list.appendChild(li);
+    });
+    drawTimer();
+  }
+  setMode('focus');
+
+  // ---------- journal ----------
+  const jFields = { jGrateful: 'grateful', jWins: 'wins', jLessons: 'lessons', jNotes: 'notes' };
+  $('jDate').value = ymd();
+  const entry = () => (db.journal[$('jDate').value] ||= { grateful: '', wins: '', lessons: '', notes: '' });
+  const hasText = (e) => e && (e.grateful || e.wins || e.lessons || e.notes);
+  function loadEntry() {
+    const e = db.journal[$('jDate').value] || {};
+    Object.entries(jFields).forEach(([f, k]) => ($(f).value = e[k] || ''));
+    $('jTitle').textContent = parseDay($('jDate').value).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+  Object.entries(jFields).forEach(([f, k]) => ($(f).oninput = () => {
+    entry()[k] = $(f).value; save();
+    $('jSaved').textContent = 'saved ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' ♡';
+    renderHistory();
+  }));
+  $('jDate').onchange = () => { if (!$('jDate').value) $('jDate').value = ymd(); loadEntry(); };
+  $('jSearch').oninput = renderHistory;
+  const OLD_MOODS = ['😞', '😕', '😐', '🙂', '😄'];
+  function renderHistory() {
+    const q = $('jSearch').value.toLowerCase();
+    const days = Object.keys(db.journal).filter((d) => hasText(db.journal[d])).sort().reverse()
+      .filter((d) => !q || JSON.stringify(db.journal[d]).toLowerCase().includes(q));
+    $('jHistory').innerHTML = days.length ? days.map((d) => {
+      const e = db.journal[d], mood = db.moods[d] || (e.mood ? OLD_MOODS[e.mood - 1] : '');
+      const part = (label, v) => (v ? `<p><b>${label}</b><br>${esc(v)}</p>` : '');
+      return `<details class="entry"><summary>${parseDay(d).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}${mood ? ' · ' + esc(mood) : ''}</summary>
+        ${part('grateful for', e.grateful)}${part('little wins', e.wins)}${part('learned', e.lessons)}${part('thoughts', e.notes)}</details>`;
+    }).join('') : '<div class="empty">your first entry is waiting ♡</div>';
+  }
+
+  // ---------- backup ----------
+  $('exportBtn').onclick = () => {
+    const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `my-day-planner-backup-${ymd()}.json`; a.click(); URL.revokeObjectURL(a.href);
+  };
+  $('importFile').onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      if (!data || !Array.isArray(data.tasks)) throw new Error();
+      if (!confirm('Replace everything in this browser with the backup?')) return;
+      localStorage.setItem(KEY, JSON.stringify(data)); location.reload();
+    } catch { toast('that file isn\'t a planner backup'); }
+    e.target.value = '';
+  };
+
+  // ---------- tabs ----------
+  document.querySelectorAll('nav.bar [data-tab]').forEach((b) => (b.onclick = () => {
+    document.querySelectorAll('nav.bar [data-tab]').forEach((x) => x.setAttribute('aria-selected', x === b));
+    document.querySelectorAll('section[id^="tab-"]').forEach((s) => (s.hidden = s.id !== 'tab-' + b.dataset.tab));
+    try { localStorage.setItem(KEY + '.tab', b.dataset.tab); } catch {}
+    scrollTo(0, 0); renderAll();
+  }));
+
+  function renderHome() { renderWeek(); renderTimeline(); }
+  function renderAll() { renderTop(); renderMood(); renderHome(); renderLists(); renderHabitsAll(); renderFocus(); renderHistory(); }
+
+  loadEntry();
+  renderAll();
+  let lastTab; try { lastTab = localStorage.getItem(KEY + '.tab'); } catch {}
+  const tabBtn = lastTab && document.querySelector(`nav.bar [data-tab="${lastTab}"]`);
+  if (tabBtn) tabBtn.click();
+  checkReminders();
+  setInterval(checkReminders, 15000);
+  // keep "today" and the current time block fresh
+  let day = ymd();
+  setInterval(() => {
+    if (ymd() !== day) { if (sel === day) sel = ymd(); day = ymd(); weekStart = monday(new Date()); $('jDate').value = day; loadEntry(); renderAll(); }
+    else renderTimeline();
+  }, 60000);
+})();
+</script>
+</body>
+</html>
