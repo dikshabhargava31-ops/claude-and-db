@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daily Focus</title>
+  <meta name="description" content="Plan your day, journal, set reminders and run focus sessions. Everything is saved in this browser.">
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #14213d;
+      --muted: #5b6785;
+      --line: #e3e8f2;
+      --accent: #1565e8;
+      --accent-soft: #e8f0fe;
+      --good: #12805c;
+      --warn: #c2410c;
+      --radius: 14px;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0e1424; --card: #172036; --text: #e8edf7; --muted: #9aa6c2;
+        --line: #26304a; --accent: #5b9bff; --accent-soft: #1d2b4d;
+        --good: #3ccf91; --warn: #ff8a50; color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0e1424; --card: #172036; --text: #e8edf7; --muted: #9aa6c2;
+      --line: #26304a; --accent: #5b9bff; --accent-soft: #1d2b4d;
+      --good: #3ccf91; --warn: #ff8a50; color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 16px 16px 96px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    h1 { font-size: 20px; margin: 0; }
+    .date { color: var(--muted); font-size: 13px; }
+    nav { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 16px; }
+    nav button {
+      flex: 1 0 auto; border: 1px solid var(--line); background: var(--card); color: var(--text);
+      padding: 9px 14px; border-radius: 999px; font: inherit; cursor: pointer;
+    }
+    nav button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+    section[hidden] { display: none; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; }
+    .card h2 { font-size: 15px; margin: 0 0 10px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .stat { background: var(--accent-soft); border-radius: 12px; padding: 12px; }
+    .stat b { display: block; font-size: 24px; }
+    .stat span { color: var(--muted); font-size: 13px; }
+    form.row, .row { display: flex; gap: 8px; flex-wrap: wrap; }
+    input, select, textarea {
+      font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line);
+      border-radius: 10px; padding: 9px 11px; min-width: 0;
+    }
+    input[type="text"], textarea { flex: 1 1 200px; }
+    textarea { width: 100%; min-height: 70px; resize: vertical; }
+    label.field { display: block; margin-bottom: 10px; }
+    label.field span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+    .btn {
+      font: inherit; border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer;
+      background: var(--accent); color: #fff;
+    }
+    .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+    .btn.small { padding: 4px 9px; font-size: 13px; }
+    ul.list { list-style: none; margin: 0; padding: 0; }
+    ul.list li {
+      display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line);
+    }
+    ul.list li:last-child { border-bottom: 0; }
+    ul.list li .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    li.done .grow { text-decoration: line-through; color: var(--muted); }
+    .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+    .tag.high { background: #fde8e1; color: #b42318; }
+    .muted { color: var(--muted); font-size: 13px; }
+    .empty { color: var(--muted); font-size: 14px; padding: 6px 0; }
+    .timer { text-align: center; }
+    .clock { font-size: 64px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 1px; margin: 6px 0; }
+    .mode { color: var(--muted); }
+    .bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 14px; }
+    .bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .5s linear; }
+    .moods { display: flex; gap: 6px; flex-wrap: wrap; }
+    .moods button { font-size: 22px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 4px 10px; cursor: pointer; }
+    .moods button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+    details.entry { border-bottom: 1px solid var(--line); padding: 8px 0; }
+    details.entry summary { cursor: pointer; }
+    details.entry p { white-space: pre-wrap; margin: 6px 0; }
+    .toast {
+      position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
+      background: var(--text); color: var(--bg); padding: 12px 18px; border-radius: 12px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.2); max-width: calc(100% - 32px); z-index: 10;
+    }
+    .toast[hidden] { display: none; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Daily Focus</h1>
+      <div class="date" id="today"></div>
+    </div>
+    <button class="btn ghost small" id="themeBtn" type="button">Theme</button>
+  </header>
+
+  <nav role="tablist">
+    <button role="tab" data-tab="home" aria-selected="true">Today</button>
+    <button role="tab" data-tab="plan">Plan</button>
+    <button role="tab" data-tab="focus">Focus</button>
+    <button role="tab" data-tab="journal">Journal</button>
+    <button role="tab" data-tab="remind">Reminders</button>
+  </nav>
+
+  <!-- TODAY -->
+  <section id="tab-home">
+    <div class="card">
+      <h2>Today at a glance</h2>
+      <div class="stats">
+        <div class="stat"><b id="sTasks">0/0</b><span>tasks done</span></div>
+        <div class="stat"><b id="sFocus">0</b><span>focus minutes</span></div>
+        <div class="stat"><b id="sStreak">0</b><span>day journal streak</span></div>
+        <div class="stat"><b id="sRem">0</b><span>reminders left today</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Top 3 priorities</h2>
+      <ul class="list" id="topList"></ul>
+    </div>
+    <div class="card">
+      <h2>Up next</h2>
+      <ul class="list" id="nextRem"></ul>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section id="tab-plan" hidden>
+    <div class="card">
+      <h2>Add a task</h2>
+      <form class="row" id="taskForm">
+        <input type="text" id="taskText" placeholder="What needs to get done?" required>
+        <select id="taskPri" aria-label="Priority">
+          <option value="high">High</option>
+          <option value="med" selected>Medium</option>
+          <option value="low">Low</option>
+        </select>
+        <input type="date" id="taskDate" aria-label="Date">
+        <button class="btn">Add</button>
+      </form>
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px">
+        <h2 style="margin:0">Tasks for <input type="date" id="planDate" aria-label="Show date"></h2>
+        <button class="btn ghost small" id="carryBtn" type="button">Move unfinished from yesterday</button>
+      </div>
+      <ul class="list" id="taskList"></ul>
+    </div>
+  </section>
+
+  <!-- FOCUS -->
+  <section id="tab-focus" hidden>
+    <div class="card timer">
+      <div class="mode" id="modeLabel">Focus</div>
+      <div class="clock" id="clock">25:00</div>
+      <div class="bar"><i id="bar"></i></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn" id="startBtn" type="button">Start</button>
+        <button class="btn ghost" id="resetBtn" type="button">Reset</button>
+        <button class="btn ghost" id="skipBtn" type="button">Skip</button>
+      </div>
+      <p class="muted" id="focusTaskLabel" style="margin-top:12px"></p>
+    </div>
+    <div class="card">
+      <h2>Settings</h2>
+      <div class="row">
+        <label class="field">
+          <span>Working on</span>
+          <select id="focusTask"><option value="">— no task —</option></select>
+        </label>
+        <label class="field"><span>Focus (min)</span><input type="number" id="fMin" min="1" max="180" value="25" style="width:90px"></label>
+        <label class="field"><span>Short break</span><input type="number" id="sMin" min="1" max="60" value="5" style="width:90px"></label>
+        <label class="field"><span>Long break</span><input type="number" id="lMin" min="1" max="60" value="15" style="width:90px"></label>
+      </div>
+      <p class="muted">A long break comes after every 4th focus session. Close other tabs and put your phone away.</p>
+    </div>
+    <div class="card">
+      <h2>Today's sessions</h2>
+      <ul class="list" id="sessionList"></ul>
+    </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section id="tab-journal" hidden>
+    <div class="card">
+      <h2>Entry for <input type="date" id="jDate" aria-label="Journal date"></h2>
+      <label class="field"><span>How are you feeling?</span></label>
+      <div class="moods" id="moods" style="margin-bottom:12px"></div>
+      <label class="field"><span>I'm grateful for…</span><textarea id="jGrateful"></textarea></label>
+      <label class="field"><span>Today's wins</span><textarea id="jWins"></textarea></label>
+      <label class="field"><span>What I learned / what I'd do differently</span><textarea id="jLessons"></textarea></label>
+      <label class="field"><span>Free notes</span><textarea id="jNotes" style="min-height:120px"></textarea></label>
+      <p class="muted" id="jSaved">Saves automatically as you type.</p>
+    </div>
+    <div class="card">
+      <h2>Past entries</h2>
+      <input type="text" id="jSearch" placeholder="Search entries…" style="width:100%;margin-bottom:8px">
+      <div id="jHistory"></div>
+    </div>
+  </section>
+
+  <!-- REMINDERS -->
+  <section id="tab-remind" hidden>
+    <div class="card">
+      <h2>New reminder</h2>
+      <form class="row" id="remForm">
+        <input type="text" id="remText" placeholder="Remind me to…" required>
+        <input type="datetime-local" id="remAt" required aria-label="When">
+        <select id="remRepeat" aria-label="Repeat">
+          <option value="none">Once</option>
+          <option value="daily">Every day</option>
+          <option value="weekly">Every week</option>
+        </select>
+        <button class="btn">Add</button>
+      </form>
+      <p class="muted" id="notifState"></p>
+      <button class="btn ghost small" id="notifBtn" type="button">Turn on notifications</button>
+    </div>
+    <div class="card">
+      <h2>Upcoming</h2>
+      <ul class="list" id="remList"></ul>
+    </div>
+  </section>
+
+  <div class="card">
+    <h2>Backup</h2>
+    <p class="muted">Your data lives only in this browser. Export a backup now and then, and import it to move to another device.</p>
+    <div class="row">
+      <button class="btn ghost small" id="exportBtn" type="button">Export</button>
+      <label class="btn ghost small" style="cursor:pointer">Import<input type="file" id="importFile" accept="application/json" hidden></label>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  const KEY = 'dailyFocus.v1';
+  const $ = (id) => document.getElementById(id);
+  const pad = (n) => String(n).padStart(2, '0');
+  const ymd = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // ---------- storage ----------
+  const blank = () => ({ tasks: [], journal: {}, reminders: [], sessions: [], settings: { f: 25, s: 5, l: 15, theme: '' } });
+  let db;
+  try { db = Object.assign(blank(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch { db = blank(); }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {} };
+
+  // ---------- ui helpers ----------
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 5000);
+  }
+  function beep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0, 0.35, 0.7].forEach((at) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.2, ctx.currentTime + at);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + at + 0.3);
+        o.start(ctx.currentTime + at); o.stop(ctx.currentTime + at + 0.3);
+      });
+    } catch {}
+  }
+  function notify(title, body) {
+    beep(); toast(`${title}: ${body}`);
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try { new Notification(title, { body }); } catch {}
+    }
+  }
+
+  $('today').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+
+  // theme
+  function applyTheme() {
+    if (db.settings.theme) document.documentElement.dataset.theme = db.settings.theme;
+    else delete document.documentElement.dataset.theme;
+  }
+  $('themeBtn').onclick = () => {
+    const order = ['', 'light', 'dark'];
+    db.settings.theme = order[(order.indexOf(db.settings.theme || '') + 1) % 3];
+    $('themeBtn').textContent = db.settings.theme ? `Theme: ${db.settings.theme}` : 'Theme: auto';
+    applyTheme(); save();
+  };
+  $('themeBtn').textContent = db.settings.theme ? `Theme: ${db.settings.theme}` : 'Theme: auto';
+  applyTheme();
+
+  // tabs
+  document.querySelectorAll('nav button').forEach((b) => {
+    b.onclick = () => {
+      document.querySelectorAll('nav button').forEach((x) => x.setAttribute('aria-selected', x === b));
+      document.querySelectorAll('section[id^="tab-"]').forEach((s) => (s.hidden = s.id !== 'tab-' + b.dataset.tab));
+      try { localStorage.setItem(KEY + '.tab', b.dataset.tab); } catch {}
+      renderAll();
+    };
+  });
+
+  // ---------- PLAN ----------
+  const priRank = { high: 0, med: 1, low: 2 };
+  const priName = { high: 'High', med: 'Medium', low: 'Low' };
+  $('taskDate').value = ymd();
+  $('planDate').value = ymd();
+  $('taskForm').onsubmit = (e) => {
+    e.preventDefault();
+    const text = $('taskText').value.trim(); if (!text) return;
+    db.tasks.push({ id: uid(), text, pri: $('taskPri').value, date: $('taskDate').value || ymd(), done: false });
+    $('taskText').value = ''; save(); renderAll();
+  };
+  $('planDate').onchange = renderAll;
+  $('carryBtn').onclick = () => {
+    let n = 0;
+    db.tasks.forEach((t) => { if (!t.done && t.date < ymd()) { t.date = ymd(); n++; } });
+    save(); $('planDate').value = ymd(); renderAll();
+    toast(n ? `Moved ${n} unfinished task${n > 1 ? 's' : ''} to today` : 'Nothing left over — nice.');
+  };
+  const tasksFor = (d) => db.tasks.filter((t) => t.date === d).sort((a, b) => a.done - b.done || priRank[a.pri] - priRank[b.pri]);
+
+  function taskItem(t, withDelete) {
+    const li = document.createElement('li');
+    if (t.done) li.className = 'done';
+    li.innerHTML = `<input type="checkbox" ${t.done ? 'checked' : ''} aria-label="Done">
+      <span class="grow">${esc(t.text)}</span>
+      <span class="tag ${t.pri === 'high' ? 'high' : ''}">${priName[t.pri]}</span>
+      <button class="btn ghost small" data-act="focus" type="button">Focus</button>
+      ${withDelete ? '<button class="btn ghost small" data-act="del" type="button" aria-label="Delete">✕</button>' : ''}`;
+    li.querySelector('input').onchange = (e) => { t.done = e.target.checked; save(); renderAll(); };
+    li.querySelector('[data-act="focus"]').onclick = () => { timer.taskId = t.id; document.querySelector('[data-tab="focus"]').click(); };
+    const del = li.querySelector('[data-act="del"]');
+    if (del) del.onclick = () => { db.tasks = db.tasks.filter((x) => x !== t); save(); renderAll(); };
+    return li;
+  }
+  function renderPlan() {
+    const list = $('taskList'); list.innerHTML = '';
+    const items = tasksFor($('planDate').value || ymd());
+    if (!items.length) list.innerHTML = '<li class="empty">No tasks for this day yet.</li>';
+    items.forEach((t) => list.appendChild(taskItem(t, true)));
+  }
+
+  // ---------- FOCUS ----------
+  const timer = { mode: 'focus', left: 0, total: 0, endAt: 0, running: false, count: 0, taskId: '', tick: null };
+  const S = db.settings;
+  $('fMin').value = S.f; $('sMin').value = S.s; $('lMin').value = S.l;
+  ['fMin', 'sMin', 'lMin'].forEach((id) => ($(id).onchange = () => {
+    S.f = +$('fMin').value || 25; S.s = +$('sMin').value || 5; S.l = +$('lMin').value || 15; save();
+    if (!timer.running) setMode(timer.mode);
+  }));
+  const minutesFor = (m) => (m === 'focus' ? S.f : m === 'short' ? S.s : S.l);
+  function setMode(m) {
+    timer.mode = m; timer.total = timer.left = minutesFor(m) * 60; timer.running = false;
+    clearInterval(timer.tick); drawTimer();
+  }
+  function drawTimer() {
+    const s = Math.max(0, Math.round(timer.left));
+    $('clock').textContent = `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+    $('modeLabel').textContent = { focus: 'Focus', short: 'Short break', long: 'Long break' }[timer.mode];
+    $('bar').style.width = `${(1 - timer.left / timer.total) * 100}%`;
+    $('startBtn').textContent = timer.running ? 'Pause' : 'Start';
+    document.title = timer.running ? `${$('clock').textContent} · ${$('modeLabel').textContent}` : 'Daily Focus';
+    const t = db.tasks.find((x) => x.id === timer.taskId);
+    $('focusTaskLabel').textContent = t ? `Working on: ${t.text}` : 'Pick a task below to stay on track.';
+  }
+  function finish(skipped) {
+    clearInterval(timer.tick); timer.running = false;
+    if (timer.mode === 'focus') {
+      timer.count++;
+      const t = db.tasks.find((x) => x.id === timer.taskId);
+      const min = Math.round((timer.total - Math.max(0, timer.left)) / 60);
+      if (min > 0) db.sessions.push({ date: ymd(), at: Date.now(), min, task: t ? t.text : '' });
+      save();
+      if (!skipped) notify('Focus session done', 'Take a break — stand up, drink water.');
+      setMode(timer.count % 4 === 0 ? 'long' : 'short');
+    } else {
+      if (!skipped) notify('Break over', 'Back to focus.');
+      setMode('focus');
+    }
+    renderAll();
+  }
+  $('startBtn').onclick = () => {
+    if (timer.running) {
+      timer.running = false; clearInterval(timer.tick);
+    } else {
+      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+      timer.running = true; timer.endAt = Date.now() + timer.left * 1000;
+      timer.tick = setInterval(() => {
+        timer.left = (timer.endAt - Date.now()) / 1000;
+        if (timer.left <= 0) finish(); else drawTimer();
+      }, 250);
+    }
+    drawTimer();
+  };
+  $('resetBtn').onclick = () => setMode(timer.mode);
+  $('skipBtn').onclick = () => finish(true);
+  $('focusTask').onchange = (e) => { timer.taskId = e.target.value; drawTimer(); };
+  function renderFocus() {
+    const sel = $('focusTask');
+    sel.innerHTML = '<option value="">— no task —</option>' +
+      tasksFor(ymd()).filter((t) => !t.done || t.id === timer.taskId)
+        .map((t) => `<option value="${t.id}">${esc(t.text)}</option>`).join('');
+    sel.value = timer.taskId;
+    const list = $('sessionList'); list.innerHTML = '';
+    const today = db.sessions.filter((s) => s.date === ymd());
+    if (!today.length) list.innerHTML = '<li class="empty">No sessions yet. Start one!</li>';
+    today.slice().reverse().forEach((s) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="tag">${s.min} min</span><span class="grow">${esc(s.task || 'Focus session')}</span>
+        <span class="muted">${new Date(s.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
+      list.appendChild(li);
+    });
+    drawTimer();
+  }
+  setMode('focus');
+
+  // ---------- JOURNAL ----------
+  const MOODS = ['😞', '😕', '😐', '🙂', '😄'];
+  const jFields = ['jGrateful', 'jWins', 'jLessons', 'jNotes'];
+  const jKeys = { jGrateful: 'grateful', jWins: 'wins', jLessons: 'lessons', jNotes: 'notes' };
+  $('jDate').value = ymd();
+  MOODS.forEach((m, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = m; b.dataset.i = i + 1;
+    b.onclick = () => { entry().mood = i + 1; touch(); loadEntry(); };
+    $('moods').appendChild(b);
+  });
+  const entry = () => (db.journal[$('jDate').value] ||= { mood: 0, grateful: '', wins: '', lessons: '', notes: '' });
+  function touch() { save(); $('jSaved').textContent = 'Saved ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+  function loadEntry() {
+    const e = db.journal[$('jDate').value] || {};
+    jFields.forEach((f) => ($(f).value = e[jKeys[f]] || ''));
+    $('moods').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.i === e.mood));
+  }
+  jFields.forEach((f) => ($(f).oninput = () => { entry()[jKeys[f]] = $(f).value; touch(); renderHistory(); }));
+  $('jDate').onchange = loadEntry;
+  $('jSearch').oninput = renderHistory;
+  const hasContent = (e) => e && (e.mood || e.grateful || e.wins || e.lessons || e.notes);
+  function renderHistory() {
+    const q = $('jSearch').value.toLowerCase();
+    const days = Object.keys(db.journal).filter((d) => hasContent(db.journal[d])).sort().reverse()
+      .filter((d) => !q || JSON.stringify(db.journal[d]).toLowerCase().includes(q));
+    $('jHistory').innerHTML = days.length ? days.map((d) => {
+      const e = db.journal[d];
+      const part = (label, v) => (v ? `<p><b>${label}:</b> ${esc(v)}</p>` : '');
+      return `<details class="entry"><summary>${e.mood ? MOODS[e.mood - 1] + ' ' : ''}${new Date(d + 'T00:00').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</summary>
+        ${part('Grateful', e.grateful)}${part('Wins', e.wins)}${part('Lessons', e.lessons)}${part('Notes', e.notes)}</details>`;
+    }).join('') : '<div class="empty">No entries yet.</div>';
+  }
+  function streak() {
+    let n = 0; const d = new Date();
+    if (!hasContent(db.journal[ymd(d)])) d.setDate(d.getDate() - 1); // today not written yet doesn't break the streak
+    while (hasContent(db.journal[ymd(d)])) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+
+  // ---------- REMINDERS ----------
+  function defaultRemTime() { const d = new Date(Date.now() + 60 * 60 * 1000); d.setMinutes(0, 0, 0); return d; }
+  const toLocalInput = (d) => `${ymd(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  $('remAt').value = toLocalInput(defaultRemTime());
+  $('remForm').onsubmit = (e) => {
+    e.preventDefault();
+    const at = new Date($('remAt').value).getTime();
+    if (!$('remText').value.trim() || isNaN(at)) return;
+    db.reminders.push({ id: uid(), text: $('remText').value.trim(), at, repeat: $('remRepeat').value });
+    $('remText').value = ''; $('remAt').value = toLocalInput(defaultRemTime());
+    save(); renderAll(); askNotif();
+  };
+  function askNotif() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().then(renderNotif); }
+  function renderNotif() {
+    if (!('Notification' in window)) { $('notifState').textContent = 'This browser can\'t show notifications; you\'ll get a sound and a pop-up while this page is open.'; $('notifBtn').hidden = true; return; }
+    const p = Notification.permission;
+    $('notifState').textContent = p === 'granted' ? 'Notifications are on. Keep this tab open (it can be in the background) for reminders to fire.'
+      : p === 'denied' ? 'Notifications are blocked in browser settings. You\'ll still get a sound and pop-up while this page is open.'
+      : 'Turn on notifications so reminders reach you while you\'re in another tab.';
+    $('notifBtn').hidden = p !== 'default';
+  }
+  $('notifBtn').onclick = askNotif;
+  const fmtWhen = (ms) => new Date(ms).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  function remItem(r, withDelete) {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="grow">${esc(r.text)}<br><span class="muted">${fmtWhen(r.at)}</span></span>
+      ${r.repeat !== 'none' ? `<span class="tag">${r.repeat}</span>` : ''}
+      ${withDelete ? '<button class="btn ghost small" type="button" aria-label="Delete">✕</button>' : ''}`;
+    const del = li.querySelector('button');
+    if (del) del.onclick = () => { db.reminders = db.reminders.filter((x) => x !== r); save(); renderAll(); };
+    return li;
+  }
+  function renderReminders() {
+    const list = $('remList'); list.innerHTML = '';
+    const items = db.reminders.slice().sort((a, b) => a.at - b.at);
+    if (!items.length) list.innerHTML = '<li class="empty">No reminders set.</li>';
+    items.forEach((r) => list.appendChild(remItem(r, true)));
+    renderNotif();
+  }
+  function checkReminders() {
+    const now = Date.now(); let changed = false;
+    db.reminders.slice().forEach((r) => {
+      if (r.at > now) return;
+      notify('Reminder', r.text); changed = true;
+      if (r.repeat === 'none') db.reminders = db.reminders.filter((x) => x !== r);
+      else {
+        const step = (r.repeat === 'daily' ? 1 : 7) * 864e5;
+        while (r.at <= now) r.at += step;
+      }
+    });
+    if (changed) { save(); renderAll(); }
+  }
+
+  // ---------- TODAY ----------
+  function renderHome() {
+    const t = tasksFor(ymd());
+    $('sTasks').textContent = `${t.filter((x) => x.done).length}/${t.length}`;
+    $('sFocus').textContent = db.sessions.filter((s) => s.date === ymd()).reduce((a, s) => a + s.min, 0);
+    $('sStreak').textContent = streak();
+    const endOfDay = new Date(); endOfDay.setHours(23, 59, 59, 999);
+    $('sRem').textContent = db.reminders.filter((r) => r.at <= endOfDay.getTime()).length;
+
+    const top = $('topList'); top.innerHTML = '';
+    const open = t.filter((x) => !x.done).slice(0, 3);
+    if (!open.length) top.innerHTML = t.length ? '<li class="empty">All done for today 🎉</li>' : '<li class="empty">Nothing planned yet — add tasks in Plan.</li>';
+    open.forEach((x) => top.appendChild(taskItem(x, false)));
+
+    const next = $('nextRem'); next.innerHTML = '';
+    const up = db.reminders.slice().sort((a, b) => a.at - b.at).slice(0, 3);
+    if (!up.length) next.innerHTML = '<li class="empty">No upcoming reminders.</li>';
+    up.forEach((r) => next.appendChild(remItem(r, false)));
+  }
+
+  // ---------- backup ----------
+  $('exportBtn').onclick = () => {
+    const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `daily-focus-backup-${ymd()}.json`; a.click(); URL.revokeObjectURL(a.href);
+  };
+  $('importFile').onchange = async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      if (!data || !Array.isArray(data.tasks)) throw new Error();
+      if (!confirm('Replace everything in this browser with the backup?')) return;
+      db = Object.assign(blank(), data); save(); location.reload();
+    } catch { toast('That file isn\'t a Daily Focus backup.'); }
+    e.target.value = '';
+  };
+
+  function renderAll() { renderHome(); renderPlan(); renderFocus(); renderHistory(); renderReminders(); }
+
+  loadEntry();
+  renderAll();
+  let lastTab; try { lastTab = localStorage.getItem(KEY + '.tab'); } catch {}
+  if (lastTab) document.querySelector(`nav [data-tab="${lastTab}"]`)?.click();
+  checkReminders();
+  setInterval(checkReminders, 15000);
+  // refresh "today" views when the date rolls over
+  let day = ymd();
+  setInterval(() => { if (ymd() !== day) { day = ymd(); $('planDate').value = $('taskDate').value = $('jDate').value = day; loadEntry(); renderAll(); } }, 60000);
+})();
+</script>
+</body>
+</html>
