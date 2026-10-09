@@ -2,257 +2,411 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Daily Focus</title>
-  <meta name="description" content="Plan your day, journal, set reminders and run focus sessions. Everything is saved in this browser.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Quest Day</title>
+  <meta name="description" content="Turn your day into a game: quests, boss battles, habits, an adventure log, reminders and a rewards shop. Everything is saved in this browser.">
+  <meta name="theme-color" content="#140f34">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f4f6fb;
-      --card: #ffffff;
-      --text: #14213d;
-      --muted: #5b6785;
-      --line: #e3e8f2;
-      --accent: #1565e8;
-      --accent-soft: #e8f0fe;
-      --good: #12805c;
-      --warn: #c2410c;
-      --radius: 14px;
-      color-scheme: light;
+      --bg: #140f34;
+      --bg-2: #1d1648;
+      --card: #251d58;
+      --card-2: #2f2570;
+      --edge: #3c3088;
+      --shadow: #0d0926;
+      --text: #f6f3ff;
+      --muted: #b8b0e8;
+      --purple: #a78bfa;
+      --gold: #fbbf24;
+      --gold-dark: #b7860b;
+      --xp: #4ade80;
+      --xp-dark: #16a34a;
+      --easy: #34d399;
+      --normal: #facc15;
+      --hard: #f87171;
+      --hp: #fb7185;
+      --radius: 18px;
+      color-scheme: dark;
     }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --bg: #0e1424; --card: #172036; --text: #e8edf7; --muted: #9aa6c2;
-        --line: #26304a; --accent: #5b9bff; --accent-soft: #1d2b4d;
-        --good: #3ccf91; --warn: #ff8a50; color-scheme: dark;
-      }
-    }
-    :root[data-theme="dark"] {
-      --bg: #0e1424; --card: #172036; --text: #e8edf7; --muted: #9aa6c2;
-      --line: #26304a; --accent: #5b9bff; --accent-soft: #1d2b4d;
-      --good: #3ccf91; --warn: #ff8a50; color-scheme: dark;
-    }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg); }
     body {
-      margin: 0; background: var(--bg); color: var(--text);
-      font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      margin: 0; color: var(--text); min-height: 100vh;
+      font: 16px/1.45 Fredoka, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(2px 2px at 20% 30%, #ffffff55 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 70% 12%, #ffffff44 50%, transparent 51%),
+        radial-gradient(1.5px 1.5px at 85% 60%, #ffffff33 50%, transparent 51%),
+        radial-gradient(2px 2px at 40% 80%, #ffffff33 50%, transparent 51%),
+        radial-gradient(1200px 600px at 50% -10%, #3b2a8a 0%, transparent 60%),
+        var(--bg);
+      background-attachment: fixed;
     }
-    .wrap { max-width: 880px; margin: 0 auto; padding: 16px 16px 96px; }
-    header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-    h1 { font-size: 20px; margin: 0; }
-    .date { color: var(--muted); font-size: 13px; }
-    nav { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 16px; }
-    nav button {
-      flex: 1 0 auto; border: 1px solid var(--line); background: var(--card); color: var(--text);
-      padding: 9px 14px; border-radius: 999px; font: inherit; cursor: pointer;
+    button, input, select, textarea { font: inherit; color: inherit; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 12px 16px 110px; }
+
+    /* ---------- HUD ---------- */
+    .hud {
+      position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+      background: color-mix(in srgb, var(--bg) 85%, transparent); border-bottom: 1px solid var(--edge);
     }
-    nav button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .hud-in { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 54px; height: 54px; flex: none; border-radius: 16px; font-size: 32px; cursor: pointer;
+      background: linear-gradient(145deg, #7c5cff, #4a2fd1); border: 2px solid #b6a2ff;
+      box-shadow: 0 4px 0 var(--shadow); display: grid; place-items: center; position: relative;
+    }
+    .avatar .lv {
+      position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 700;
+      background: var(--gold); color: #3b2500; border-radius: 99px; padding: 0 7px; white-space: nowrap;
+    }
+    .hud-mid { flex: 1; min-width: 0; }
+    .hud-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hud-name small { color: var(--purple); font-weight: 500; }
+    .xpbar { height: 14px; border-radius: 99px; background: var(--shadow); border: 2px solid var(--edge); overflow: hidden; margin-top: 4px; position: relative; }
+    .xpbar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--xp-dark), var(--xp)); transition: width .6s cubic-bezier(.2,.9,.3,1.2); }
+    .xpbar span { position: absolute; inset: 0; font-size: 10px; font-weight: 600; display: grid; place-items: center; text-shadow: 0 1px 2px #000; }
+    .pills { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+    .pill { background: var(--card); border: 2px solid var(--edge); border-radius: 99px; padding: 1px 10px; font-weight: 600; font-size: 14px; white-space: nowrap; }
+    .pill.coin { color: var(--gold); }
+    .pill.fire { color: #fb923c; }
+
+    /* ---------- bottom tabs ---------- */
+    nav.tabs {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: center;
+      background: color-mix(in srgb, var(--bg-2) 92%, transparent); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--edge); padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    }
+    nav.tabs .in { display: flex; width: 100%; max-width: 760px; }
+    nav.tabs button {
+      flex: 1; min-width: 0; background: none; border: 0; cursor: pointer; padding: 4px 0; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; color: var(--muted); font-size: 11px;
+    }
+    nav.tabs button b { font-size: 22px; line-height: 1.2; transition: transform .15s; }
+    nav.tabs button[aria-selected="true"] { color: var(--text); background: var(--card); }
+    nav.tabs button[aria-selected="true"] b { transform: translateY(-2px) scale(1.15); }
+
     section[hidden] { display: none; }
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; }
-    .card h2 { font-size: 15px; margin: 0 0 10px; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-    .stat { background: var(--accent-soft); border-radius: 12px; padding: 12px; }
+    h1.page { font-size: 24px; margin: 8px 0 12px; }
+    .card {
+      background: var(--card); border: 2px solid var(--edge); border-radius: var(--radius);
+      padding: 16px; margin-bottom: 16px; box-shadow: 0 5px 0 var(--shadow);
+    }
+    .card h2 { font-size: 18px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+    .card h2 .r { margin-left: auto; font-size: 13px; color: var(--muted); font-weight: 500; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .empty { color: var(--muted); font-size: 15px; padding: 8px 0; text-align: center; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    input, select, textarea {
+      background: var(--shadow); border: 2px solid var(--edge); border-radius: 12px; padding: 10px 12px; min-width: 0;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--purple); }
+    input[type="text"] { flex: 1 1 180px; }
+    textarea { width: 100%; min-height: 70px; resize: vertical; }
+    label.field { display: block; margin-bottom: 12px; }
+    label.field > span { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+
+    .btn {
+      border: 0; border-radius: 14px; padding: 10px 18px; cursor: pointer; font-weight: 600;
+      background: var(--gold); color: #3b2500; box-shadow: 0 4px 0 var(--gold-dark);
+      transition: transform .08s, box-shadow .08s;
+    }
+    .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-dark); }
+    .btn:disabled { filter: grayscale(1) brightness(.7); cursor: not-allowed; }
+    .btn.purple { background: #7c5cff; color: #fff; box-shadow: 0 4px 0 #4a2fd1; }
+    .btn.ghost { background: var(--card-2); color: var(--text); box-shadow: 0 4px 0 var(--shadow); }
+    .btn.small { padding: 5px 11px; font-size: 14px; border-radius: 11px; }
+    .icon-btn { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 16px; padding: 6px; border-radius: 8px; }
+    .icon-btn:hover { color: var(--text); background: var(--card-2); }
+
+    /* difficulty picker */
+    .seg { display: flex; gap: 6px; }
+    .seg input { position: absolute; opacity: 0; pointer-events: none; }
+    .seg label {
+      cursor: pointer; padding: 7px 11px; border-radius: 12px; border: 2px solid var(--edge); background: var(--shadow);
+      font-size: 14px; font-weight: 600; white-space: nowrap;
+    }
+    .seg input:checked + label { border-color: currentColor; background: var(--card-2); }
+    .seg .easy { color: var(--easy); } .seg .normal { color: var(--normal); } .seg .hard { color: var(--hard); }
+
+    /* quests */
+    ul.list { list-style: none; margin: 0; padding: 0; }
+    .quest {
+      display: flex; align-items: center; gap: 10px; padding: 10px; margin-bottom: 8px;
+      background: var(--card-2); border-radius: 14px; border-left: 5px solid var(--normal);
+      animation: pop .25s ease-out;
+    }
+    .quest.easy { border-left-color: var(--easy); } .quest.hard { border-left-color: var(--hard); }
+    .quest .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .quest .meta { font-size: 12px; color: var(--muted); }
+    .quest.done { opacity: .55; }
+    .quest.done .title { text-decoration: line-through; }
+    .tick {
+      width: 34px; height: 34px; flex: none; border-radius: 50%; border: 3px solid var(--edge); background: var(--shadow);
+      cursor: pointer; color: #062e16; font-size: 17px; font-weight: 700; transition: transform .1s;
+    }
+    .tick:active { transform: scale(.85); }
+    .tick.on { background: var(--xp); border-color: var(--xp); }
+    .xp-tag { font-size: 12px; font-weight: 600; color: var(--xp); white-space: nowrap; }
+
+    /* challenges */
+    .chal { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--edge); }
+    .chal:last-child { border-bottom: 0; }
+    .chal .ic { font-size: 26px; width: 40px; height: 40px; display: grid; place-items: center; background: var(--card-2); border-radius: 12px; flex: none; }
+    .chal .grow { flex: 1; min-width: 0; }
+    .chal.done .ic { background: var(--xp-dark); }
+    .mini { height: 8px; background: var(--shadow); border-radius: 99px; overflow: hidden; margin-top: 5px; }
+    .mini i { display: block; height: 100%; background: var(--purple); transition: width .5s; }
+    .chal.done .mini i { background: var(--xp); }
+
+    /* stats & badges */
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    @media (min-width: 560px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+    .stat { background: var(--card-2); border-radius: 14px; padding: 10px 12px; }
     .stat b { display: block; font-size: 24px; }
     .stat span { color: var(--muted); font-size: 13px; }
-    form.row, .row { display: flex; gap: 8px; flex-wrap: wrap; }
-    input, select, textarea {
-      font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line);
-      border-radius: 10px; padding: 9px 11px; min-width: 0;
-    }
-    input[type="text"], textarea { flex: 1 1 200px; }
-    textarea { width: 100%; min-height: 70px; resize: vertical; }
-    label.field { display: block; margin-bottom: 10px; }
-    label.field span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
-    .btn {
-      font: inherit; border: 0; border-radius: 10px; padding: 9px 14px; cursor: pointer;
-      background: var(--accent); color: #fff;
-    }
-    .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
-    .btn.small { padding: 4px 9px; font-size: 13px; }
-    ul.list { list-style: none; margin: 0; padding: 0; }
-    ul.list li {
-      display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line);
-    }
-    ul.list li:last-child { border-bottom: 0; }
-    ul.list li .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-    li.done .grow { text-decoration: line-through; color: var(--muted); }
-    .tag { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
-    .tag.high { background: #fde8e1; color: #b42318; }
-    .muted { color: var(--muted); font-size: 13px; }
-    .empty { color: var(--muted); font-size: 14px; padding: 6px 0; }
-    .timer { text-align: center; }
-    .clock { font-size: 64px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 1px; margin: 6px 0; }
-    .mode { color: var(--muted); }
-    .bar { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 10px 0 14px; }
-    .bar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .5s linear; }
-    .moods { display: flex; gap: 6px; flex-wrap: wrap; }
-    .moods button { font-size: 22px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 4px 10px; cursor: pointer; }
-    .moods button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
-    details.entry { border-bottom: 1px solid var(--line); padding: 8px 0; }
-    details.entry summary { cursor: pointer; }
-    details.entry p { white-space: pre-wrap; margin: 6px 0; }
-    .habit { border-bottom: 1px solid var(--line); padding: 12px 0; }
+    .badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+    .badge { text-align: center; background: var(--card-2); border-radius: 14px; padding: 10px 6px; }
+    .badge b { display: block; font-size: 30px; }
+    .badge span { display: block; font-size: 12px; font-weight: 600; }
+    .badge small { display: block; font-size: 11px; color: var(--muted); line-height: 1.25; margin-top: 2px; }
+    .badge.locked b { filter: grayscale(1) brightness(.5); }
+    .badge.locked span { color: var(--muted); }
+
+    /* battle */
+    .arena { text-align: center; padding: 20px 16px; background: radial-gradient(circle at 50% 35%, #3a2b8f, var(--card) 70%); }
+    .boss { font-size: 96px; line-height: 1.1; display: inline-block; margin: 4px 0; }
+    .boss.running { animation: bob 1.6s ease-in-out infinite; }
+    .boss.hit { animation: hit .3s; }
+    .boss-name { font-weight: 700; font-size: 18px; }
+    .hpbar { height: 20px; border-radius: 99px; background: var(--shadow); border: 2px solid var(--edge); overflow: hidden; margin: 12px auto 6px; max-width: 420px; position: relative; }
+    .hpbar i { display: block; height: 100%; background: linear-gradient(90deg, #e11d48, var(--hp)); transition: width .5s linear; }
+    .hpbar.rest i { background: linear-gradient(90deg, #0ea5e9, #67e8f9); }
+    .hpbar span { position: absolute; inset: 0; font-size: 12px; font-weight: 700; display: grid; place-items: center; text-shadow: 0 1px 2px #000; }
+    .clock { font-size: 52px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 4px 0 12px; }
+
+    /* habits */
+    .habit { padding: 12px 0; border-bottom: 1px dashed var(--edge); }
     .habit:last-child { border-bottom: 0; }
     .habit-head { display: flex; align-items: center; gap: 10px; }
     .habit-head .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
-    .habit-icon { font-size: 22px; }
+    .habit-icon { font-size: 26px; }
     .week { display: flex; gap: 6px; margin: 10px 0 8px; }
     .day { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: var(--muted); }
-    .day button {
-      width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg);
-      color: #fff; font: inherit; font-size: 16px; cursor: pointer; transition: transform .12s, background .15s;
-    }
-    .day button:active { transform: scale(.88); }
-    .day button.on { background: var(--good); border-color: var(--good); }
-    .day.today span { color: var(--accent); font-weight: 700; }
+    .day .tick { width: 36px; height: 36px; }
+    .day.today span { color: var(--gold); font-weight: 700; }
     .heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 13px); gap: 3px; width: max-content; }
-    .heat i { width: 13px; height: 13px; border-radius: 3px; background: var(--line); }
-    .heat i.on { background: var(--good); }
+    .heat i { width: 13px; height: 13px; border-radius: 3px; background: var(--shadow); }
+    .heat i.on { background: var(--xp); }
     .heat i.future { background: transparent; }
-    .streak { font-size: 13px; color: var(--warn); white-space: nowrap; }
-    .check {
-      width: 30px; height: 30px; flex: none; border-radius: 50%; border: 2px solid var(--line); background: var(--bg);
-      color: #fff; cursor: pointer; font-size: 15px;
+    .streak { font-size: 14px; font-weight: 600; color: #fb923c; white-space: nowrap; }
+
+    /* journal */
+    .moods { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .moods button { font-size: 26px; background: var(--shadow); border: 2px solid var(--edge); border-radius: 14px; padding: 4px 10px; cursor: pointer; transition: transform .1s; }
+    .moods button[aria-pressed="true"] { border-color: var(--gold); background: var(--card-2); transform: scale(1.1); }
+    details.entry { border-bottom: 1px dashed var(--edge); padding: 8px 0; }
+    details.entry summary { cursor: pointer; font-weight: 500; }
+    details.entry p { white-space: pre-wrap; margin: 6px 0; color: var(--muted); }
+    details.entry p b { color: var(--text); }
+
+    /* shop */
+    .shop { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .reward { background: var(--card-2); border-radius: 16px; padding: 14px 10px 12px; text-align: center; position: relative; display: flex; flex-direction: column; gap: 4px; }
+    .reward .em { font-size: 40px; }
+    .reward .nm { font-weight: 600; overflow-wrap: anywhere; flex: 1; }
+    .reward .cost { color: var(--gold); font-weight: 700; }
+    .reward .icon-btn { position: absolute; top: 2px; right: 2px; font-size: 13px; }
+    .reward .need { font-size: 12px; color: var(--muted); }
+
+    /* dialog, overlay, toast, fx */
+    dialog {
+      background: var(--card); color: var(--text); border: 2px solid var(--edge); border-radius: 20px;
+      padding: 18px; width: min(440px, calc(100% - 32px)); box-shadow: 0 6px 0 var(--shadow);
     }
-    .check.on { background: var(--good); border-color: var(--good); }
+    dialog::backdrop { background: #05031099; }
+    .avatars { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 12px; }
+    .avatars button { font-size: 26px; padding: 6px 0; background: var(--shadow); border: 2px solid var(--edge); border-radius: 12px; cursor: pointer; position: relative; }
+    .avatars button[aria-pressed="true"] { border-color: var(--gold); }
+    .avatars button:disabled { cursor: not-allowed; }
+    .avatars button:disabled span { filter: grayscale(1) brightness(.4); }
+    .avatars button small { position: absolute; inset: auto 0 1px; font-size: 9px; color: var(--muted); }
+    .overlay {
+      position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px; background: #05031099;
+    }
+    .overlay[hidden] { display: none; }
+    .levelup { text-align: center; max-width: 360px; animation: pop .4s cubic-bezier(.2,.9,.3,1.4); }
+    .levelup .big { font-size: 40px; font-weight: 700; color: var(--gold); text-shadow: 0 4px 0 var(--gold-dark); letter-spacing: 1px; }
+    .levelup .em { font-size: 80px; }
     .toast {
-      position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
-      background: var(--text); color: var(--bg); padding: 12px 18px; border-radius: 12px;
-      box-shadow: 0 6px 24px rgba(0,0,0,.2); max-width: calc(100% - 32px); z-index: 10;
+      position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); z-index: 15;
+      background: var(--text); color: var(--bg); font-weight: 600; padding: 12px 18px; border-radius: 14px;
+      box-shadow: 0 5px 0 #0008; max-width: calc(100% - 32px); text-align: center; animation: toastIn .25s;
     }
     .toast[hidden] { display: none; }
-    a { color: var(--accent); }
+    .float {
+      position: fixed; z-index: 25; pointer-events: none; font-weight: 700; font-size: 20px; color: var(--xp);
+      text-shadow: 0 2px 0 #000; animation: floatUp 1.1s ease-out forwards; transform: translate(-50%, -50%);
+    }
+    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
+    @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes toastIn { from { transform: translateX(-50%) scale(.85); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+    @keyframes floatUp { to { transform: translate(-50%, -140%); opacity: 0; } }
+    @keyframes bob { 50% { transform: translateY(-10px) rotate(-3deg); } }
+    @keyframes hit { 25% { transform: translateX(-8px); filter: brightness(2); } 75% { transform: translateX(8px); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Daily Focus</h1>
-      <div class="date" id="today"></div>
+
+<header class="hud">
+  <div class="hud-in">
+    <button class="avatar" id="avatarBtn" type="button" aria-label="Edit your hero"><span id="hudAvatar">🧙</span><span class="lv" id="hudLv">Lv 1</span></button>
+    <div class="hud-mid">
+      <div class="hud-name"><span id="hudName">Hero</span> <small id="hudTitle">Novice</small></div>
+      <div class="xpbar"><i id="xpFill"></i><span id="xpText">0 / 100 XP</span></div>
     </div>
-    <button class="btn ghost small" id="themeBtn" type="button">Theme</button>
-  </header>
+    <div class="pills">
+      <span class="pill coin" title="Coins to spend in the shop">🪙 <span id="hudCoins">0</span></span>
+      <span class="pill fire" title="Days in a row you earned XP">🔥 <span id="hudStreak">0</span></span>
+    </div>
+  </div>
+</header>
 
-  <nav role="tablist">
-    <button role="tab" data-tab="home" aria-selected="true">Today</button>
-    <button role="tab" data-tab="plan">Plan</button>
-    <button role="tab" data-tab="focus">Focus</button>
-    <button role="tab" data-tab="habits">Habits</button>
-    <button role="tab" data-tab="journal">Journal</button>
-    <button role="tab" data-tab="remind">Reminders</button>
-  </nav>
+<main class="wrap">
 
-  <!-- TODAY -->
+  <!-- HOME -->
   <section id="tab-home">
+    <h1 class="page" id="greeting">Welcome, Hero!</h1>
     <div class="card">
-      <h2>Today at a glance</h2>
-      <div class="stats">
-        <div class="stat"><b id="sTasks">0/0</b><span>tasks done</span></div>
-        <div class="stat"><b id="sFocus">0</b><span>focus minutes</span></div>
-        <div class="stat"><b id="sStreak">0</b><span>day journal streak</span></div>
-        <div class="stat"><b id="sHabits">0/0</b><span>habits done today</span></div>
-        <div class="stat"><b id="sRem">0</b><span>reminders left today</span></div>
-      </div>
+      <h2>🎯 Daily challenges <span class="r" id="chalReset"></span></h2>
+      <div id="chalList"></div>
     </div>
     <div class="card">
-      <h2>Top 3 priorities</h2>
-      <ul class="list" id="topList"></ul>
+      <h2>📜 Today's quests <span class="r" id="homeQuestCount"></span></h2>
+      <form class="row" id="quickForm" style="margin-bottom:10px">
+        <input type="text" id="quickText" placeholder="Add a quest for today…" aria-label="Quick add quest">
+        <button class="btn small">+ Add</button>
+      </form>
+      <ul class="list" id="homeQuests"></ul>
     </div>
     <div class="card">
-      <h2>Today's habits</h2>
+      <h2>🌱 Today's habits <span class="r" id="homeHabitCount"></span></h2>
       <ul class="list" id="homeHabits"></ul>
     </div>
     <div class="card">
-      <h2>Up next</h2>
-      <ul class="list" id="nextRem"></ul>
+      <h2>📊 Hero stats</h2>
+      <div class="stats">
+        <div class="stat"><b id="stQuests">0</b><span>quests completed</span></div>
+        <div class="stat"><b id="stFocus">0h</b><span>focus time</span></div>
+        <div class="stat"><b id="stBattles">0</b><span>bosses defeated</span></div>
+        <div class="stat"><b id="stChal">0</b><span>challenges won</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🏅 Achievements <span class="r" id="badgeCount"></span></h2>
+      <div class="badges" id="badges"></div>
     </div>
   </section>
 
-  <!-- PLAN -->
-  <section id="tab-plan" hidden>
+  <!-- QUESTS -->
+  <section id="tab-quests" hidden>
+    <h1 class="page">📜 Quest board</h1>
     <div class="card">
-      <h2>Add a task</h2>
-      <form class="row" id="taskForm">
-        <input type="text" id="taskText" placeholder="What needs to get done?" required>
-        <select id="taskPri" aria-label="Priority">
-          <option value="high">High</option>
-          <option value="med" selected>Medium</option>
-          <option value="low">Low</option>
-        </select>
-        <input type="date" id="taskDate" aria-label="Date">
-        <button class="btn">Add</button>
+      <h2>New quest</h2>
+      <form id="taskForm">
+        <div class="row" style="margin-bottom:10px">
+          <input type="text" id="taskText" placeholder="What's your mission?" required>
+        </div>
+        <div class="row" style="justify-content:space-between">
+          <div class="seg" role="radiogroup" aria-label="Difficulty">
+            <input type="radio" name="diff" id="dEasy" value="low"><label for="dEasy" class="easy">Easy +10</label>
+            <input type="radio" name="diff" id="dNorm" value="med" checked><label for="dNorm" class="normal">Normal +20</label>
+            <input type="radio" name="diff" id="dHard" value="high"><label for="dHard" class="hard">Hard +35</label>
+          </div>
+          <div class="row">
+            <input type="date" id="taskDate" aria-label="Date">
+            <button class="btn">Add quest</button>
+          </div>
+        </div>
       </form>
     </div>
     <div class="card">
-      <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:6px">
-        <h2 style="margin:0">Tasks for <input type="date" id="planDate" aria-label="Show date"></h2>
-        <button class="btn ghost small" id="carryBtn" type="button">Move unfinished from yesterday</button>
-      </div>
+      <h2>Quests for <input type="date" id="planDate" aria-label="Show date" style="padding:4px 8px"></h2>
       <ul class="list" id="taskList"></ul>
+      <button class="btn ghost small" id="carryBtn" type="button" style="margin-top:6px">🛟 Rescue unfinished quests from earlier days</button>
     </div>
   </section>
 
-  <!-- FOCUS -->
-  <section id="tab-focus" hidden>
-    <div class="card timer">
-      <div class="mode" id="modeLabel">Focus</div>
+  <!-- BATTLE -->
+  <section id="tab-battle" hidden>
+    <h1 class="page">⚔️ Focus battle</h1>
+    <div class="card arena">
+      <div class="muted" id="modeLabel">Defeat the boss by focusing until the timer runs out</div>
+      <div class="boss" id="bossEmoji">👾</div>
+      <div class="boss-name" id="bossName">Procrastination Goblin</div>
+      <div class="hpbar" id="hpbar"><i id="hpFill" style="width:100%"></i><span id="hpText">HP 100%</span></div>
       <div class="clock" id="clock">25:00</div>
-      <div class="bar"><i id="bar"></i></div>
       <div class="row" style="justify-content:center">
-        <button class="btn" id="startBtn" type="button">Start</button>
-        <button class="btn ghost" id="resetBtn" type="button">Reset</button>
-        <button class="btn ghost" id="skipBtn" type="button">Skip</button>
+        <button class="btn" id="startBtn" type="button">⚔️ Attack</button>
+        <button class="btn ghost" id="skipBtn" type="button">🏳️ Retreat</button>
+        <button class="btn ghost" id="resetBtn" type="button">↺</button>
       </div>
-      <p class="muted" id="focusTaskLabel" style="margin-top:12px"></p>
+      <p class="muted" id="focusTaskLabel" style="margin:14px 0 0"></p>
     </div>
     <div class="card">
-      <h2>Settings</h2>
+      <h2>Battle setup</h2>
+      <label class="field">
+        <span>Quest you're fighting for</span>
+        <select id="focusTask" style="width:100%"><option value="">— no quest —</option></select>
+      </label>
       <div class="row">
-        <label class="field">
-          <span>Working on</span>
-          <select id="focusTask"><option value="">— no task —</option></select>
-        </label>
-        <label class="field"><span>Focus (min)</span><input type="number" id="fMin" min="1" max="180" value="25" style="width:90px"></label>
-        <label class="field"><span>Short break</span><input type="number" id="sMin" min="1" max="60" value="5" style="width:90px"></label>
-        <label class="field"><span>Long break</span><input type="number" id="lMin" min="1" max="60" value="15" style="width:90px"></label>
+        <label class="field"><span>Battle (min)</span><input type="number" id="fMin" min="1" max="180" value="25" style="width:90px"></label>
+        <label class="field"><span>Short rest</span><input type="number" id="sMin" min="1" max="60" value="5" style="width:90px"></label>
+        <label class="field"><span>Long rest</span><input type="number" id="lMin" min="1" max="60" value="15" style="width:90px"></label>
       </div>
-      <p class="muted">A long break comes after every 4th focus session. Close other tabs and put your phone away.</p>
+      <p class="muted" style="margin:0">Each focus minute earns 2 XP. A long rest comes after every 4th battle. Put your phone face down!</p>
     </div>
     <div class="card">
-      <h2>Today's sessions</h2>
+      <h2>Today's battles</h2>
       <ul class="list" id="sessionList"></ul>
     </div>
   </section>
 
   <!-- HABITS -->
   <section id="tab-habits" hidden>
+    <h1 class="page">🌱 Habit garden</h1>
     <div class="card">
-      <h2>New habit</h2>
+      <h2>Plant a new habit</h2>
       <form class="row" id="habitForm">
-        <input id="habitIcon" value="💧" aria-label="Icon (emoji)" maxlength="4" style="width:60px;text-align:center">
+        <input id="habitIcon" value="💧" aria-label="Icon (emoji)" maxlength="4" style="width:62px;text-align:center;font-size:20px">
         <input type="text" id="habitName" placeholder="e.g. Drink 8 glasses of water" required>
-        <button class="btn">Add</button>
+        <button class="btn">Plant</button>
       </form>
-      <p class="muted">Ideas: 📚 Read 20 pages · 🏃 Exercise · 🧘 Meditate · 📵 No phone after 10pm · 🌅 Wake up by 6</p>
+      <p class="muted" style="margin-bottom:0">Each tick earns 10 XP. Ideas: 📚 Read 20 pages · 🏃 Exercise · 🧘 Meditate · 📵 No phone after 10pm · 🌅 Wake up by 6</p>
     </div>
     <div class="card">
       <h2>Your habits</h2>
-      <p class="muted" style="margin-top:-6px">Tap a circle to tick off a day. The grid shows the last 12 weeks.</p>
       <div id="habitList"></div>
     </div>
   </section>
 
   <!-- JOURNAL -->
   <section id="tab-journal" hidden>
+    <h1 class="page">📖 Adventure log</h1>
     <div class="card">
-      <h2>Entry for <input type="date" id="jDate" aria-label="Journal date"></h2>
+      <h2>Entry for <input type="date" id="jDate" aria-label="Journal date" style="padding:4px 8px"> <span class="r xp-tag" id="jXp"></span></h2>
       <label class="field"><span>How are you feeling?</span></label>
-      <div class="moods" id="moods" style="margin-bottom:12px"></div>
-      <label class="field"><span>I'm grateful for…</span><textarea id="jGrateful"></textarea></label>
-      <label class="field"><span>Today's wins</span><textarea id="jWins"></textarea></label>
-      <label class="field"><span>What I learned / what I'd do differently</span><textarea id="jLessons"></textarea></label>
-      <label class="field"><span>Free notes</span><textarea id="jNotes" style="min-height:120px"></textarea></label>
-      <p class="muted" id="jSaved">Saves automatically as you type.</p>
+      <div class="moods" id="moods"></div>
+      <label class="field"><span>🙏 I'm grateful for…</span><textarea id="jGrateful"></textarea></label>
+      <label class="field"><span>🏆 Today's wins</span><textarea id="jWins"></textarea></label>
+      <label class="field"><span>💡 What I learned / what I'd do differently</span><textarea id="jLessons"></textarea></label>
+      <label class="field"><span>✍️ Free notes</span><textarea id="jNotes" style="min-height:110px"></textarea></label>
+      <p class="muted" id="jSaved" style="margin:0">Saves automatically as you type.</p>
     </div>
     <div class="card">
       <h2>Past entries</h2>
@@ -261,8 +415,32 @@
     </div>
   </section>
 
+  <!-- SHOP -->
+  <section id="tab-shop" hidden>
+    <h1 class="page">🎁 Reward shop</h1>
+    <div class="card">
+      <h2>Spend your coins <span class="r">You earn 1 🪙 per XP</span></h2>
+      <div class="shop" id="shopList"></div>
+    </div>
+    <div class="card">
+      <h2>Add your own reward</h2>
+      <form class="row" id="rewardForm">
+        <input id="rewardIcon" value="🍦" aria-label="Icon (emoji)" maxlength="4" style="width:62px;text-align:center;font-size:20px">
+        <input type="text" id="rewardName" placeholder="e.g. Ice cream" required>
+        <input type="number" id="rewardCost" min="1" value="150" aria-label="Cost in coins" style="width:100px">
+        <button class="btn">Add</button>
+      </form>
+      <p class="muted" style="margin-bottom:0">Pick treats you'd really enjoy. Expensive rewards are great long-term goals.</p>
+    </div>
+    <div class="card">
+      <h2>🎒 Loot bag</h2>
+      <ul class="list" id="lootList"></ul>
+    </div>
+  </section>
+
   <!-- REMINDERS -->
   <section id="tab-remind" hidden>
+    <h1 class="page">⏰ Reminders</h1>
     <div class="card">
       <h2>New reminder</h2>
       <form class="row" id="remForm">
@@ -283,17 +461,49 @@
       <ul class="list" id="remList"></ul>
     </div>
   </section>
+</main>
 
-  <div class="card">
-    <h2>Backup</h2>
-    <p class="muted">Your data lives only in this browser. Export a backup now and then, and import it to move to another device.</p>
-    <div class="row">
-      <button class="btn ghost small" id="exportBtn" type="button">Export</button>
-      <label class="btn ghost small" style="cursor:pointer">Import<input type="file" id="importFile" accept="application/json" hidden></label>
+<nav class="tabs" role="tablist">
+  <div class="in">
+    <button role="tab" data-tab="home" aria-selected="true"><b>🏠</b>Home</button>
+    <button role="tab" data-tab="quests"><b>📜</b>Quests</button>
+    <button role="tab" data-tab="battle"><b>⚔️</b>Battle</button>
+    <button role="tab" data-tab="habits"><b>🌱</b>Habits</button>
+    <button role="tab" data-tab="journal"><b>📖</b>Log</button>
+    <button role="tab" data-tab="shop"><b>🎁</b>Shop</button>
+    <button role="tab" data-tab="remind"><b>⏰</b>Alerts</button>
+  </div>
+</nav>
+
+<dialog id="heroDlg">
+  <form method="dialog">
+    <h2 style="margin:0 0 12px">🧙 Your hero</h2>
+    <label class="field"><span>Hero name</span><input type="text" id="heroName" maxlength="24" style="width:100%"></label>
+    <label class="field"><span>Avatar (more unlock as you level up)</span></label>
+    <div class="avatars" id="avatarGrid"></div>
+    <label class="row" style="margin-bottom:14px;cursor:pointer"><input type="checkbox" id="soundOn"> Sound effects</label>
+    <p class="muted" style="margin:0 0 8px">Your progress lives only in this browser. Export a backup now and then, and import it to move to another device.</p>
+    <div class="row" style="justify-content:space-between">
+      <div class="row">
+        <button class="btn ghost small" id="exportBtn" type="button">Export</button>
+        <label class="btn ghost small" style="cursor:pointer">Import<input type="file" id="importFile" accept="application/json" hidden></label>
+      </div>
+      <button class="btn">Done</button>
     </div>
+  </form>
+</dialog>
+
+<div class="overlay" id="levelUp" hidden>
+  <div class="card levelup">
+    <div class="em" id="luAvatar">🧙</div>
+    <div class="big">LEVEL UP!</div>
+    <p style="font-size:18px;margin:6px 0" id="luText">You reached level 2</p>
+    <p class="muted" id="luUnlock"></p>
+    <button class="btn" id="luClose" type="button">Awesome!</button>
   </div>
 </div>
 
+<canvas id="confetti"></canvas>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -302,109 +512,313 @@
   const $ = (id) => document.getElementById(id);
   const pad = (n) => String(n).padStart(2, '0');
   const ymd = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
   // ---------- storage ----------
-  const blank = () => ({ tasks: [], journal: {}, reminders: [], sessions: [], habits: [], settings: { f: 25, s: 5, l: 15, theme: '' } });
+  const DEFAULT_REWARDS = [
+    { icon: '☕', name: 'Fancy coffee', cost: 150 },
+    { icon: '📺', name: 'One episode of a show', cost: 200 },
+    { icon: '🎮', name: '30 min of gaming', cost: 300 },
+    { icon: '🍕', name: 'Pizza night', cost: 800 },
+    { icon: '🛍️', name: 'Buy something nice', cost: 1500 },
+    { icon: '🏖️', name: 'A full day off', cost: 3000 },
+  ];
+  const blank = () => ({ tasks: [], journal: {}, reminders: [], sessions: [], habits: [], settings: { f: 25, s: 5, l: 15, sound: true } });
   let db;
   try { db = Object.assign(blank(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch { db = blank(); }
+  if (!db.rewards) db.rewards = DEFAULT_REWARDS.map((r) => ({ id: uid(), ...r }));
+  if (!db.purchases) db.purchases = [];
+  if (!db.game) db.game = { name: 'Hero', avatar: '🧙', lastLevel: null, seen: [] };
+  if (db.settings.sound === undefined) db.settings.sound = true;
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {} };
 
-  // ---------- ui helpers ----------
-  let toastTimer;
-  function toast(msg) {
-    const t = $('toast'); t.textContent = msg; t.hidden = false;
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 5000);
-  }
-  function beep() {
+  // ---------- sound ----------
+  let actx;
+  function tone(freqs, { gap = 0.09, len = 0.16, type = 'square', vol = 0.06, force = false } = {}) {
+    if (!db.settings.sound && !force) return;
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      [0, 0.35, 0.7].forEach((at) => {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
-        g.gain.setValueAtTime(0.2, ctx.currentTime + at);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + at + 0.3);
-        o.start(ctx.currentTime + at); o.stop(ctx.currentTime + at + 0.3);
+      actx ||= new (window.AudioContext || window.webkitAudioContext)();
+      freqs.forEach((f, i) => {
+        const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * gap;
+        o.type = type; o.frequency.value = f; o.connect(g); g.connect(actx.destination);
+        g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+        o.start(t); o.stop(t + len);
       });
     } catch {}
   }
+  const sfx = {
+    coin: () => tone([988, 1319]),
+    undo: () => tone([440, 330], { type: 'triangle' }),
+    level: () => tone([523, 659, 784, 1047, 1319], { gap: 0.12, len: 0.25 }),
+    badge: () => tone([784, 988, 1175, 1568], { gap: 0.08 }),
+    win: () => tone([392, 523, 659, 784, 659, 784], { gap: 0.11, len: 0.2 }),
+    buy: () => tone([1319, 1047, 1568], { gap: 0.07 }),
+    alarm: () => tone([880, 880, 880], { gap: 0.35, len: 0.3, type: 'sine', vol: 0.2, force: true }),
+  };
+
+  // ---------- effects ----------
+  let toastTimer;
+  function toast(msg) {
+    const t = $('toast'); t.textContent = msg; t.hidden = false;
+    t.style.animation = 'none'; void t.offsetWidth; t.style.animation = '';
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 3800);
+  }
+  function floatText(x, y, text, color) {
+    const el = document.createElement('div'); el.className = 'float'; el.textContent = text;
+    el.style.left = x + 'px'; el.style.top = y + 'px'; if (color) el.style.color = color;
+    document.body.appendChild(el); setTimeout(() => el.remove(), 1200);
+  }
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cv = $('confetti'), cx = cv.getContext('2d'); let parts = [], raf = 0;
+  function confetti(x = innerWidth / 2, y = innerHeight / 3, n = 60) {
+    if (reduced) return;
+    const colors = ['#fbbf24', '#4ade80', '#a78bfa', '#f87171', '#38bdf8', '#f472b6'];
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, s = 3 + Math.random() * 7;
+      parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 4, r: 3 + Math.random() * 4, c: colors[i % colors.length], rot: Math.random() * 6, life: 70 + Math.random() * 40 });
+    }
+    if (!raf) loop();
+  }
+  function loop() {
+    cv.width = innerWidth; cv.height = innerHeight; cx.clearRect(0, 0, cv.width, cv.height);
+    parts = parts.filter((p) => p.life-- > 0 && p.y < cv.height + 20);
+    parts.forEach((p) => {
+      p.vy += 0.25; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.rot += 0.2;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.fillStyle = p.c; cx.globalAlpha = Math.min(1, p.life / 30);
+      cx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r); cx.restore();
+    });
+    raf = parts.length ? requestAnimationFrame(loop) : (cx.clearRect(0, 0, cv.width, cv.height), 0);
+  }
+  const centerOf = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+  function reward(el, xp) { // little celebration at the clicked element
+    const [x, y] = centerOf(el); floatText(x, y, `+${xp} XP`); confetti(x, y, 18); sfx.coin();
+  }
   function notify(title, body) {
-    beep(); toast(`${title}: ${body}`);
+    sfx.alarm(); toast(`${title}: ${body}`);
     if ('Notification' in window && Notification.permission === 'granted') {
       try { new Notification(title, { body }); } catch {}
     }
   }
 
-  $('today').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
-
-  // theme
-  function applyTheme() {
-    if (db.settings.theme) document.documentElement.dataset.theme = db.settings.theme;
-    else delete document.documentElement.dataset.theme;
-  }
-  $('themeBtn').onclick = () => {
-    const order = ['', 'light', 'dark'];
-    db.settings.theme = order[(order.indexOf(db.settings.theme || '') + 1) % 3];
-    $('themeBtn').textContent = db.settings.theme ? `Theme: ${db.settings.theme}` : 'Theme: auto';
-    applyTheme(); save();
+  // ---------- game rules ----------
+  const DIFF = {
+    low: { name: 'Easy', xp: 10, cls: 'easy' },
+    med: { name: 'Normal', xp: 20, cls: 'normal' },
+    high: { name: 'Hard', xp: 35, cls: 'hard' },
   };
-  $('themeBtn').textContent = db.settings.theme ? `Theme: ${db.settings.theme}` : 'Theme: auto';
-  applyTheme();
+  const XP = { focusMin: 2, habit: 10, journal: 25 };
+  const CHALLENGES = [
+    { id: 'q3', grp: 'q', icon: '📜', text: 'Complete 3 quests', goal: 3, xp: 40, val: (s) => s.done },
+    { id: 'q5', grp: 'q', icon: '🏹', text: 'Complete 5 quests', goal: 5, xp: 60, val: (s) => s.done },
+    { id: 'hard', grp: 'h', icon: '🔴', text: 'Defeat a Hard quest', goal: 1, xp: 40, val: (s) => s.hard },
+    { id: 'f50', grp: 'f', icon: '⏳', text: 'Focus for 50 minutes', goal: 50, xp: 50, val: (s) => s.focus },
+    { id: 'b2', grp: 'f', icon: '⚔️', text: 'Win 2 focus battles', goal: 2, xp: 40, val: (s) => s.battles },
+    { id: 'h3', grp: 'g', icon: '🌱', text: 'Tick off 3 habits', goal: 3, xp: 30, val: (s) => s.habits },
+    { id: 'j', grp: 'j', icon: '📖', text: 'Write in your adventure log', goal: 1, xp: 30, val: (s) => +s.journal },
+    { id: 'mood', grp: 'j', icon: '😊', text: 'Check in with your mood', goal: 1, xp: 15, val: (s) => +s.mood },
+    { id: 'p4', grp: 'p', icon: '🗺️', text: 'Plan 4 quests for the day', goal: 4, xp: 25, val: (s) => s.planned },
+  ];
+  function challengesFor(day) { // same 3 challenges for a given date, every time
+    let h = 2166136261; for (const ch of day) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    const rand = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909)) >>> 0) / 4294967296;
+    const pool = CHALLENGES.slice(), out = [], grps = new Set();
+    while (out.length < 3 && pool.length) {
+      const c = pool.splice(Math.floor(rand() * pool.length), 1)[0];
+      if (!grps.has(c.grp)) { grps.add(c.grp); out.push(c); }
+    }
+    return out;
+  }
+  const TITLES = [[1, 'Novice'], [3, 'Apprentice'], [5, 'Adventurer'], [8, 'Knight'], [12, 'Champion'], [16, 'Hero'], [20, 'Legend'], [30, 'Mythic']];
+  const titleFor = (lv) => TITLES.filter(([l]) => lv >= l).pop()[1];
+  const AVATARS = [['🧙', 1], ['🦸', 1], ['🧝', 1], ['🐱', 1], ['🥷', 2], ['🦊', 3], ['🧚', 4], ['🐼', 5], ['🤖', 6], ['🧛', 7], ['🦁', 8], ['🧜', 10], ['🦄', 12], ['🐲', 15], ['👑', 20], ['🌟', 25], ['🐉', 30], ['🔮', 35]];
+  function levelInfo(xp) {
+    let lv = 1, need = 100, rest = xp;
+    while (rest >= need) { rest -= need; lv++; need = 100 + (lv - 1) * 50; }
+    return { lv, into: rest, need };
+  }
+  const hasText = (e) => e && !!(e.grateful || e.wins || e.lessons || e.notes);
+  function habitStreak(h) {
+    let n = 0, d = new Date();
+    if (!h.days[ymd(d)]) d = addDays(d, -1); // not ticked yet today doesn't break the streak
+    while (h.days[ymd(d)]) { n++; d = addDays(d, -1); }
+    return n;
+  }
+  function bestStreak(h) {
+    let best = 0, run = 0, prev = null;
+    Object.keys(h.days).sort().forEach((d) => {
+      run = prev && ymd(addDays(prev + 'T00:00', 1)) === d ? run + 1 : 1;
+      best = Math.max(best, run); prev = d;
+    });
+    return best;
+  }
+  const BADGES = [
+    { id: 'first', icon: '🌱', name: 'First Step', desc: 'Complete a quest', ok: (g) => g.totalDone >= 1 },
+    { id: 'q25', icon: '📜', name: 'Quest Hunter', desc: 'Complete 25 quests', ok: (g) => g.totalDone >= 25 },
+    { id: 'q100', icon: '💯', name: 'Centurion', desc: 'Complete 100 quests', ok: (g) => g.totalDone >= 100 },
+    { id: 'hard10', icon: '🗡️', name: 'Boss Slayer', desc: 'Defeat 10 Hard quests', ok: (g) => g.totalHard >= 10 },
+    { id: 'battle1', icon: '⚔️', name: 'First Victory', desc: 'Win a focus battle', ok: (g) => g.totalBattles >= 1 },
+    { id: 'focus10', icon: '⏳', name: 'Deep Diver', desc: '10 hours of focus', ok: (g) => g.focusMin >= 600 },
+    { id: 'log7', icon: '📖', name: 'Storyteller', desc: '7 log entries', ok: (g) => g.journalDays >= 7 },
+    { id: 'habit7', icon: '🌿', name: 'Habit Builder', desc: '7-day habit streak', ok: (g) => g.bestHabit >= 7 },
+    { id: 'habit30', icon: '🌳', name: 'Habit Master', desc: '30-day habit streak', ok: (g) => g.bestHabit >= 30 },
+    { id: 'fire7', icon: '🔥', name: 'On Fire', desc: '7-day XP streak', ok: (g) => g.streak >= 7 },
+    { id: 'fire30', icon: '☄️', name: 'Unstoppable', desc: '30-day XP streak', ok: (g) => g.streak >= 30 },
+    { id: 'chal10', icon: '🎯', name: 'Challenger', desc: 'Win 10 daily challenges', ok: (g) => g.challengesDone >= 10 },
+    { id: 'buy1', icon: '🎁', name: 'Treat Yourself', desc: 'Claim a reward', ok: (g) => db.purchases.length >= 1 },
+    { id: 'lv5', icon: '🛡️', name: 'Adventurer', desc: 'Reach level 5', ok: (g) => g.lv >= 5 },
+    { id: 'lv10', icon: '👑', name: 'Royalty', desc: 'Reach level 10', ok: (g) => g.lv >= 10 },
+  ];
+
+  // Everything is worked out from your data, so unticking something takes its XP back.
+  function compute() {
+    const days = {};
+    const day = (d) => (days[d] ||= { done: 0, hard: 0, planned: 0, focus: 0, battles: 0, habits: 0, journal: false, mood: false, taskXp: 0 });
+    db.tasks.forEach((t) => {
+      const s = day(t.date); s.planned++;
+      if (t.done) { s.done++; s.taskXp += DIFF[t.pri].xp; if (t.pri === 'high') s.hard++; }
+    });
+    db.sessions.forEach((x) => { const s = day(x.date); s.focus += x.min; if (x.min >= 10) s.battles++; });
+    db.habits.forEach((h) => Object.keys(h.days).forEach((d) => day(d).habits++));
+    Object.entries(db.journal).forEach(([d, e]) => { if (hasText(e)) day(d).journal = true; if (e.mood) day(d).mood = true; });
+
+    const g = { days, xpByDay: {}, xp: 0, challengesDone: 0, totalDone: 0, totalHard: 0, totalBattles: 0, focusMin: 0, journalDays: 0 };
+    Object.entries(days).forEach(([d, s]) => {
+      let x = s.taskXp + s.focus * XP.focusMin + s.habits * XP.habit + (s.journal ? XP.journal : 0);
+      challengesFor(d).forEach((c) => { if (c.val(s) >= c.goal) { x += c.xp; g.challengesDone++; } });
+      g.xpByDay[d] = x; g.xp += x;
+      g.totalDone += s.done; g.totalHard += s.hard; g.totalBattles += s.battles; g.focusMin += s.focus; g.journalDays += +s.journal;
+    });
+    g.spent = db.purchases.reduce((a, p) => a + p.cost, 0);
+    g.coins = g.xp - g.spent;
+    Object.assign(g, levelInfo(g.xp));
+    let n = 0, d = new Date();
+    if (!g.xpByDay[ymd(d)]) d = addDays(d, -1);
+    while (g.xpByDay[ymd(d)]) { n++; d = addDays(d, -1); }
+    g.streak = n;
+    g.bestHabit = Math.max(0, ...db.habits.map(bestStreak));
+    g.today = days[ymd()] || day(ymd());
+    return g;
+  }
+
+  let G;
+  function checkProgress() {
+    const gm = db.game;
+    if (gm.lastLevel === null) { // first run: don't celebrate what's already there
+      gm.lastLevel = G.lv; gm.seen = BADGES.filter((b) => b.ok(G)).map((b) => b.id); save(); return;
+    }
+    const fresh = BADGES.filter((b) => b.ok(G) && !gm.seen.includes(b.id));
+    if (fresh.length) {
+      gm.seen.push(...fresh.map((b) => b.id));
+      setTimeout(() => { toast(`🏅 Achievement unlocked: ${fresh.map((b) => b.icon + ' ' + b.name).join(', ')}`); sfx.badge(); confetti(innerWidth / 2, innerHeight / 2, 50); }, 500);
+    }
+    if (G.lv > gm.lastLevel) {
+      const unlocked = AVATARS.filter(([, l]) => l > gm.lastLevel && l <= G.lv).map(([a]) => a);
+      $('luAvatar').textContent = gm.avatar;
+      $('luText').textContent = `You reached level ${G.lv} — ${titleFor(G.lv)}!`;
+      $('luUnlock').textContent = unlocked.length ? `New avatar${unlocked.length > 1 ? 's' : ''} unlocked: ${unlocked.join(' ')}` : 'Keep going, hero.';
+      setTimeout(() => { $('levelUp').hidden = false; sfx.level(); confetti(innerWidth / 2, innerHeight / 3, 140); }, 350);
+    }
+    gm.lastLevel = G.lv;
+    save();
+  }
+  $('luClose').onclick = () => ($('levelUp').hidden = true);
+  $('levelUp').onclick = (e) => { if (e.target.id === 'levelUp') $('levelUp').hidden = true; };
+
+  // ---------- HUD & hero ----------
+  function renderHud() {
+    $('hudAvatar').textContent = db.game.avatar;
+    $('hudName').textContent = db.game.name;
+    $('hudTitle').textContent = titleFor(G.lv);
+    $('hudLv').textContent = `Lv ${G.lv}`;
+    $('xpFill').style.width = `${(G.into / G.need) * 100}%`;
+    $('xpText').textContent = `${G.into} / ${G.need} XP`;
+    $('hudCoins').textContent = G.coins;
+    $('hudStreak').textContent = G.streak;
+  }
+  $('avatarBtn').onclick = () => {
+    $('heroName').value = db.game.name; $('soundOn').checked = db.settings.sound;
+    renderAvatarGrid(); $('heroDlg').showModal();
+  };
+  function renderAvatarGrid() {
+    $('avatarGrid').innerHTML = AVATARS.map(([a, l]) => `<button type="button" data-a="${a}" aria-pressed="${a === db.game.avatar}" ${G.lv < l ? 'disabled' : ''} aria-label="${G.lv < l ? 'Unlocks at level ' + l : a}"><span>${a}</span>${G.lv < l ? `<small>🔒Lv${l}</small>` : ''}</button>`).join('');
+    $('avatarGrid').querySelectorAll('button:not(:disabled)').forEach((b) => (b.onclick = () => { db.game.avatar = b.dataset.a; save(); renderAvatarGrid(); renderHud(); }));
+  }
+  $('heroName').oninput = () => { db.game.name = $('heroName').value.trim() || 'Hero'; save(); renderHud(); renderHome(); };
+  $('soundOn').onchange = () => { db.settings.sound = $('soundOn').checked; save(); if (db.settings.sound) sfx.coin(); };
 
   // tabs
-  document.querySelectorAll('nav button').forEach((b) => {
+  document.querySelectorAll('nav.tabs button').forEach((b) => {
     b.onclick = () => {
-      document.querySelectorAll('nav button').forEach((x) => x.setAttribute('aria-selected', x === b));
+      document.querySelectorAll('nav.tabs button').forEach((x) => x.setAttribute('aria-selected', x === b));
       document.querySelectorAll('section[id^="tab-"]').forEach((s) => (s.hidden = s.id !== 'tab-' + b.dataset.tab));
       try { localStorage.setItem(KEY + '.tab', b.dataset.tab); } catch {}
-      renderAll();
+      scrollTo(0, 0); renderAll();
     };
   });
+  const goTab = (t) => document.querySelector(`nav.tabs [data-tab="${t}"]`).click();
 
-  // ---------- PLAN ----------
+  // ---------- QUESTS ----------
   const priRank = { high: 0, med: 1, low: 2 };
-  const priName = { high: 'High', med: 'Medium', low: 'Low' };
   $('taskDate').value = ymd();
   $('planDate').value = ymd();
+  function addQuest(text, pri, date) {
+    db.tasks.push({ id: uid(), text, pri, date, done: false }); save(); renderAll();
+  }
   $('taskForm').onsubmit = (e) => {
     e.preventDefault();
     const text = $('taskText').value.trim(); if (!text) return;
-    db.tasks.push({ id: uid(), text, pri: $('taskPri').value, date: $('taskDate').value || ymd(), done: false });
-    $('taskText').value = ''; save(); renderAll();
+    addQuest(text, document.querySelector('input[name="diff"]:checked').value, $('taskDate').value || ymd());
+    $('taskText').value = ''; toast('📜 Quest added to the board');
+  };
+  $('quickForm').onsubmit = (e) => {
+    e.preventDefault();
+    const text = $('quickText').value.trim(); if (!text) return;
+    addQuest(text, 'med', ymd()); $('quickText').value = '';
   };
   $('planDate').onchange = renderAll;
   $('carryBtn').onclick = () => {
     let n = 0;
     db.tasks.forEach((t) => { if (!t.done && t.date < ymd()) { t.date = ymd(); n++; } });
     save(); $('planDate').value = ymd(); renderAll();
-    toast(n ? `Moved ${n} unfinished task${n > 1 ? 's' : ''} to today` : 'Nothing left over — nice.');
+    toast(n ? `🛟 Rescued ${plural(n, 'quest')} to today` : 'No unfinished quests left behind. Nice!');
   };
   const tasksFor = (d) => db.tasks.filter((t) => t.date === d).sort((a, b) => a.done - b.done || priRank[a.pri] - priRank[b.pri]);
 
-  function taskItem(t, withDelete) {
-    const li = document.createElement('li');
-    if (t.done) li.className = 'done';
-    li.innerHTML = `<input type="checkbox" ${t.done ? 'checked' : ''} aria-label="Done">
-      <span class="grow">${esc(t.text)}</span>
-      <span class="tag ${t.pri === 'high' ? 'high' : ''}">${priName[t.pri]}</span>
-      <button class="btn ghost small" data-act="focus" type="button">Focus</button>
-      ${withDelete ? '<button class="btn ghost small" data-act="del" type="button" aria-label="Delete">✕</button>' : ''}`;
-    li.querySelector('input').onchange = (e) => { t.done = e.target.checked; save(); renderAll(); };
-    li.querySelector('[data-act="focus"]').onclick = () => { timer.taskId = t.id; document.querySelector('[data-tab="focus"]').click(); };
+  function questItem(t, full) {
+    const d = DIFF[t.pri], li = document.createElement('li');
+    li.className = `quest ${d.cls}${t.done ? ' done' : ''}`;
+    li.innerHTML = `<button type="button" class="tick ${t.done ? 'on' : ''}" aria-pressed="${t.done}" aria-label="Complete quest">${t.done ? '✓' : ''}</button>
+      <span class="grow"><span class="title">${esc(t.text)}</span><br><span class="meta">${d.name} · <span class="xp-tag">+${d.xp} XP</span></span></span>
+      ${t.done ? '' : '<button class="btn ghost small" data-act="fight" type="button" title="Start a focus battle for this quest">⚔️</button>'}
+      ${full ? '<button class="icon-btn" data-act="del" type="button" aria-label="Delete quest">✕</button>' : ''}`;
+    li.querySelector('.tick').onclick = (e) => {
+      t.done = !t.done; save();
+      if (t.done) reward(e.currentTarget, d.xp); else sfx.undo();
+      renderAll();
+      if (t.done && tasksFor(t.date).every((x) => x.done)) setTimeout(() => { toast('🏆 Quest board cleared!'); confetti(innerWidth / 2, innerHeight / 3, 90); }, 300);
+    };
+    const fight = li.querySelector('[data-act="fight"]');
+    if (fight) fight.onclick = () => { timer.taskId = t.id; goTab('battle'); };
     const del = li.querySelector('[data-act="del"]');
     if (del) del.onclick = () => { db.tasks = db.tasks.filter((x) => x !== t); save(); renderAll(); };
     return li;
   }
-  function renderPlan() {
+  function renderQuests() {
     const list = $('taskList'); list.innerHTML = '';
     const items = tasksFor($('planDate').value || ymd());
-    if (!items.length) list.innerHTML = '<li class="empty">No tasks for this day yet.</li>';
-    items.forEach((t) => list.appendChild(taskItem(t, true)));
+    if (!items.length) list.innerHTML = '<li class="empty">No quests on the board for this day. Add one above!</li>';
+    items.forEach((t) => list.appendChild(questItem(t, true)));
   }
 
-  // ---------- FOCUS ----------
-  const timer = { mode: 'focus', left: 0, total: 0, endAt: 0, running: false, count: 0, taskId: '', tick: null };
+  // ---------- BATTLE ----------
+  const BOSSES = [
+    ['👾', 'Procrastination Goblin'], ['🐉', 'Distraction Dragon'], ['🧟', 'Scroll Zombie'], ['👻', 'Ghost of Doubt'],
+    ['🦑', 'Chaos Kraken'], ['🧌', 'Lazy Troll'], ['🕷️', 'Notification Spider'], ['🦇', 'Midnight Snack Bat'], ['🤡', 'Excuse Clown'],
+  ];
+  const timer = { mode: 'focus', left: 0, total: 0, endAt: 0, running: false, count: 0, taskId: '', tick: null, boss: BOSSES[0], lastPct: 100 };
   const S = db.settings;
   $('fMin').value = S.f; $('sMin').value = S.s; $('lMin').value = S.l;
   ['fMin', 'sMin', 'lMin'].forEach((id) => ($(id).onchange = () => {
@@ -413,18 +827,29 @@
   }));
   const minutesFor = (m) => (m === 'focus' ? S.f : m === 'short' ? S.s : S.l);
   function setMode(m) {
-    timer.mode = m; timer.total = timer.left = minutesFor(m) * 60; timer.running = false;
+    timer.mode = m; timer.total = timer.left = minutesFor(m) * 60; timer.running = false; timer.lastPct = 100;
+    if (m === 'focus') timer.boss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
     clearInterval(timer.tick); drawTimer();
   }
   function drawTimer() {
-    const s = Math.max(0, Math.round(timer.left));
+    const s = Math.max(0, Math.round(timer.left)), focus = timer.mode === 'focus';
+    const pct = Math.max(0, Math.round((timer.left / timer.total) * 100));
     $('clock').textContent = `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
-    $('modeLabel').textContent = { focus: 'Focus', short: 'Short break', long: 'Long break' }[timer.mode];
-    $('bar').style.width = `${(1 - timer.left / timer.total) * 100}%`;
-    $('startBtn').textContent = timer.running ? 'Pause' : 'Start';
-    document.title = timer.running ? `${$('clock').textContent} · ${$('modeLabel').textContent}` : 'Daily Focus';
+    $('bossEmoji').textContent = focus ? timer.boss[0] : '🏕️';
+    $('bossName').textContent = focus ? timer.boss[1] : timer.mode === 'long' ? 'Long rest at the campfire' : 'Short rest at the campfire';
+    $('modeLabel').textContent = focus ? (timer.running ? 'Keep focusing — every second is a hit!' : 'Focus until the timer runs out to defeat the boss') : 'Stretch, drink water, look away from the screen';
+    $('hpbar').classList.toggle('rest', !focus);
+    $('hpFill').style.width = `${pct}%`;
+    $('hpText').textContent = focus ? `BOSS HP ${pct}%` : `Rest ${100 - pct}%`;
+    $('bossEmoji').classList.toggle('running', timer.running);
+    if (focus && timer.running && pct <= timer.lastPct - 5) { // shake the boss every 5% of damage
+      timer.lastPct = pct; const b = $('bossEmoji'); b.classList.remove('hit'); void b.offsetWidth; b.classList.add('hit');
+    }
+    $('startBtn').textContent = timer.running ? '⏸ Pause' : focus ? '⚔️ Attack' : '▶ Rest';
+    $('skipBtn').textContent = focus ? '🏳️ Retreat' : '⏭ Skip rest';
+    document.title = timer.running ? `${$('clock').textContent} · ${focus ? timer.boss[1] : 'Rest'}` : 'Quest Day';
     const t = db.tasks.find((x) => x.id === timer.taskId);
-    $('focusTaskLabel').textContent = t ? `Working on: ${t.text}` : 'Pick a task below to stay on track.';
+    $('focusTaskLabel').textContent = t ? `Fighting for: ${t.text}` : 'Tip: pick the quest you are fighting for below.';
   }
   function finish(skipped) {
     clearInterval(timer.tick); timer.running = false;
@@ -434,10 +859,13 @@
       const min = Math.round((timer.total - Math.max(0, timer.left)) / 60);
       if (min > 0) db.sessions.push({ date: ymd(), at: Date.now(), min, task: t ? t.text : '' });
       save();
-      if (!skipped) notify('Focus session done', 'Take a break — stand up, drink water.');
+      if (!skipped) {
+        notify('Victory!', `You defeated the ${timer.boss[1]}. +${min * XP.focusMin} XP. Time to rest.`);
+        sfx.win(); confetti(...centerOf($('bossEmoji')), 120);
+      } else toast(min > 0 ? `🏳️ Retreated, but you still earned ${min * XP.focusMin} XP` : '🏳️ You retreated. The boss got away this time!');
       setMode(timer.count % 4 === 0 ? 'long' : 'short');
     } else {
-      if (!skipped) notify('Break over', 'Back to focus.');
+      if (!skipped) notify('Rest is over', 'A new boss appears. Ready to fight?');
       setMode('focus');
     }
     renderAll();
@@ -458,150 +886,41 @@
   $('resetBtn').onclick = () => setMode(timer.mode);
   $('skipBtn').onclick = () => finish(true);
   $('focusTask').onchange = (e) => { timer.taskId = e.target.value; drawTimer(); };
-  function renderFocus() {
+  function renderBattle() {
     const sel = $('focusTask');
-    sel.innerHTML = '<option value="">— no task —</option>' +
+    sel.innerHTML = '<option value="">— no quest —</option>' +
       tasksFor(ymd()).filter((t) => !t.done || t.id === timer.taskId)
         .map((t) => `<option value="${t.id}">${esc(t.text)}</option>`).join('');
     sel.value = timer.taskId;
     const list = $('sessionList'); list.innerHTML = '';
     const today = db.sessions.filter((s) => s.date === ymd());
-    if (!today.length) list.innerHTML = '<li class="empty">No sessions yet. Start one!</li>';
+    if (!today.length) list.innerHTML = '<li class="empty">No battles yet today. A boss awaits!</li>';
     today.slice().reverse().forEach((s) => {
-      const li = document.createElement('li');
-      li.innerHTML = `<span class="tag">${s.min} min</span><span class="grow">${esc(s.task || 'Focus session')}</span>
-        <span class="muted">${new Date(s.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
+      const li = document.createElement('li'); li.className = 'quest';
+      li.innerHTML = `<span style="font-size:22px">${s.min >= 10 ? '🏆' : '🏳️'}</span><span class="grow">${esc(s.task || 'Focus battle')}<br>
+        <span class="meta">${s.min} min · ${new Date(s.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></span>
+        <span class="xp-tag">+${s.min * XP.focusMin} XP</span>`;
       list.appendChild(li);
     });
     drawTimer();
   }
   setMode('focus');
 
-  // ---------- JOURNAL ----------
-  const MOODS = ['😞', '😕', '😐', '🙂', '😄'];
-  const jFields = ['jGrateful', 'jWins', 'jLessons', 'jNotes'];
-  const jKeys = { jGrateful: 'grateful', jWins: 'wins', jLessons: 'lessons', jNotes: 'notes' };
-  $('jDate').value = ymd();
-  MOODS.forEach((m, i) => {
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = m; b.dataset.i = i + 1;
-    b.onclick = () => { entry().mood = i + 1; touch(); loadEntry(); };
-    $('moods').appendChild(b);
-  });
-  const entry = () => (db.journal[$('jDate').value] ||= { mood: 0, grateful: '', wins: '', lessons: '', notes: '' });
-  function touch() { save(); $('jSaved').textContent = 'Saved ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
-  function loadEntry() {
-    const e = db.journal[$('jDate').value] || {};
-    jFields.forEach((f) => ($(f).value = e[jKeys[f]] || ''));
-    $('moods').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.i === e.mood));
-  }
-  jFields.forEach((f) => ($(f).oninput = () => { entry()[jKeys[f]] = $(f).value; touch(); renderHistory(); }));
-  $('jDate').onchange = loadEntry;
-  $('jSearch').oninput = renderHistory;
-  const hasContent = (e) => e && (e.mood || e.grateful || e.wins || e.lessons || e.notes);
-  function renderHistory() {
-    const q = $('jSearch').value.toLowerCase();
-    const days = Object.keys(db.journal).filter((d) => hasContent(db.journal[d])).sort().reverse()
-      .filter((d) => !q || JSON.stringify(db.journal[d]).toLowerCase().includes(q));
-    $('jHistory').innerHTML = days.length ? days.map((d) => {
-      const e = db.journal[d];
-      const part = (label, v) => (v ? `<p><b>${label}:</b> ${esc(v)}</p>` : '');
-      return `<details class="entry"><summary>${e.mood ? MOODS[e.mood - 1] + ' ' : ''}${new Date(d + 'T00:00').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</summary>
-        ${part('Grateful', e.grateful)}${part('Wins', e.wins)}${part('Lessons', e.lessons)}${part('Notes', e.notes)}</details>`;
-    }).join('') : '<div class="empty">No entries yet.</div>';
-  }
-  function streak() {
-    let n = 0; const d = new Date();
-    if (!hasContent(db.journal[ymd(d)])) d.setDate(d.getDate() - 1); // today not written yet doesn't break the streak
-    while (hasContent(db.journal[ymd(d)])) { n++; d.setDate(d.getDate() - 1); }
-    return n;
-  }
-
-  // ---------- REMINDERS ----------
-  function defaultRemTime() { const d = new Date(Date.now() + 60 * 60 * 1000); d.setMinutes(0, 0, 0); return d; }
-  const toLocalInput = (d) => `${ymd(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  $('remAt').value = toLocalInput(defaultRemTime());
-  $('remForm').onsubmit = (e) => {
-    e.preventDefault();
-    const at = new Date($('remAt').value).getTime();
-    if (!$('remText').value.trim() || isNaN(at)) return;
-    db.reminders.push({ id: uid(), text: $('remText').value.trim(), at, repeat: $('remRepeat').value });
-    $('remText').value = ''; $('remAt').value = toLocalInput(defaultRemTime());
-    save(); renderAll(); askNotif();
-  };
-  function askNotif() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().then(renderNotif); }
-  function renderNotif() {
-    if (!('Notification' in window)) { $('notifState').textContent = 'This browser can\'t show notifications; you\'ll get a sound and a pop-up while this page is open.'; $('notifBtn').hidden = true; return; }
-    const p = Notification.permission;
-    $('notifState').textContent = p === 'granted' ? 'Notifications are on. Keep this tab open (it can be in the background) for reminders to fire.'
-      : p === 'denied' ? 'Notifications are blocked in browser settings. You\'ll still get a sound and pop-up while this page is open.'
-      : 'Turn on notifications so reminders reach you while you\'re in another tab.';
-    $('notifBtn').hidden = p !== 'default';
-  }
-  $('notifBtn').onclick = askNotif;
-  const fmtWhen = (ms) => new Date(ms).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-  function remItem(r, withDelete) {
-    const li = document.createElement('li');
-    li.innerHTML = `<span class="grow">${esc(r.text)}<br><span class="muted">${fmtWhen(r.at)}</span></span>
-      ${r.repeat !== 'none' ? `<span class="tag">${r.repeat}</span>` : ''}
-      ${withDelete ? '<button class="btn ghost small" type="button" aria-label="Delete">✕</button>' : ''}`;
-    const del = li.querySelector('button');
-    if (del) del.onclick = () => { db.reminders = db.reminders.filter((x) => x !== r); save(); renderAll(); };
-    return li;
-  }
-  function renderReminders() {
-    const list = $('remList'); list.innerHTML = '';
-    const items = db.reminders.slice().sort((a, b) => a.at - b.at);
-    if (!items.length) list.innerHTML = '<li class="empty">No reminders set.</li>';
-    items.forEach((r) => list.appendChild(remItem(r, true)));
-    renderNotif();
-  }
-  function checkReminders() {
-    const now = Date.now(); let changed = false;
-    db.reminders.slice().forEach((r) => {
-      if (r.at > now) return;
-      notify('Reminder', r.text); changed = true;
-      if (r.repeat === 'none') db.reminders = db.reminders.filter((x) => x !== r);
-      else {
-        const step = (r.repeat === 'daily' ? 1 : 7) * 864e5;
-        while (r.at <= now) r.at += step;
-      }
-    });
-    if (changed) { save(); renderAll(); }
-  }
-
   // ---------- HABITS ----------
-  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   $('habitForm').onsubmit = (e) => {
     e.preventDefault();
     const name = $('habitName').value.trim(); if (!name) return;
     db.habits.push({ id: uid(), name, icon: $('habitIcon').value.trim() || '✅', days: {} });
-    $('habitName').value = ''; save(); renderAll();
+    $('habitName').value = ''; save(); renderAll(); toast('🌱 Habit planted. Water it daily!');
   };
-  function toggleHabit(h, day) {
-    if (h.days[day]) delete h.days[day]; else h.days[day] = true;
-    save();
+  function toggleHabit(h, day, el) {
+    if (h.days[day]) { delete h.days[day]; sfx.undo(); } else { h.days[day] = true; reward(el, XP.habit); }
+    save(); renderAll();
     if (day === ymd() && h.days[day]) {
       const n = habitStreak(h);
-      const all = db.habits.every((x) => x.days[ymd()]);
-      toast(all ? 'All habits done today 🎉 Great work!' : n > 1 ? `${h.icon} ${n}-day streak — keep it going!` : `${h.icon} Nice, ticked off!`);
-      if (all) beep();
+      if (db.habits.length > 1 && db.habits.every((x) => x.days[ymd()])) { toast('🌳 All habits done today! Your garden is thriving.'); confetti(innerWidth / 2, innerHeight / 3, 80); }
+      else if (n > 1) toast(`${h.icon} ${n}-day streak — keep it going!`);
     }
-    renderAll();
-  }
-  function habitStreak(h) {
-    let n = 0, d = new Date();
-    if (!h.days[ymd(d)]) d = addDays(d, -1); // not ticked yet today doesn't break the streak
-    while (h.days[ymd(d)]) { n++; d = addDays(d, -1); }
-    return n;
-  }
-  function bestStreak(h) {
-    const days = Object.keys(h.days).sort();
-    let best = 0, run = 0, prev = null;
-    days.forEach((d) => {
-      run = prev && ymd(addDays(prev + 'T00:00', 1)) === d ? run + 1 : 1;
-      best = Math.max(best, run); prev = d;
-    });
-    return best;
   }
   function renderHabits() {
     const box = $('habitList'); box.innerHTML = '';
@@ -610,27 +929,28 @@
     db.habits.forEach((h) => {
       const el = document.createElement('div'); el.className = 'habit';
       const done30 = Array.from({ length: 30 }, (_, i) => ymd(addDays(today, -i))).filter((d) => h.days[d]).length;
+      const best = bestStreak(h);
       el.innerHTML = `<div class="habit-head">
           <span class="habit-icon">${esc(h.icon)}</span><span class="grow">${esc(h.name)}</span>
           <span class="streak">🔥 ${habitStreak(h)}</span>
-          <button class="btn ghost small" type="button" aria-label="Delete habit">✕</button>
+          <button class="icon-btn" type="button" aria-label="Delete habit">✕</button>
         </div>
         <div class="week"></div>
         <div style="overflow-x:auto"><div class="heat"></div></div>
-        <p class="muted" style="margin:6px 0 0">Best streak ${bestStreak(h)} day${bestStreak(h) === 1 ? '' : 's'} · ${done30} of the last 30 days (${Math.round(done30 / 30 * 100)}%)</p>`;
+        <p class="muted" style="margin:6px 0 0">Best streak ${plural(best, 'day')} · ${done30} of the last 30 days</p>`;
       el.querySelector('.habit-head button').onclick = () => {
-        if (confirm(`Delete "${h.name}" and its history?`)) { db.habits = db.habits.filter((x) => x !== h); save(); renderAll(); }
+        if (confirm(`Delete "${h.name}" and its history? You'll lose the XP it earned.`)) { db.habits = db.habits.filter((x) => x !== h); save(); renderAll(); }
       };
       const week = el.querySelector('.week');
       for (let i = 6; i >= 0; i--) {
-        const d = addDays(today, -i), key = ymd(d);
+        const d = addDays(today, -i), key = ymd(d), on = !!h.days[key];
         const cell = document.createElement('div'); cell.className = 'day' + (i === 0 ? ' today' : '');
-        cell.innerHTML = `<button type="button" class="${h.days[key] ? 'on' : ''}" aria-pressed="${!!h.days[key]}" aria-label="${key}">${h.days[key] ? '✓' : ''}</button>
+        cell.innerHTML = `<button type="button" class="tick ${on ? 'on' : ''}" aria-pressed="${on}" aria-label="${key}">${on ? '✓' : ''}</button>
           <span>${i === 0 ? 'Today' : d.toLocaleDateString(undefined, { weekday: 'short' })}</span>`;
-        cell.querySelector('button').onclick = () => toggleHabit(h, key);
+        cell.querySelector('button').onclick = (e) => toggleHabit(h, key, e.currentTarget);
         week.appendChild(cell);
       }
-      // 12-week grid, columns are weeks starting Monday, last column is this week
+      // 12-week grid: columns are weeks starting Monday, last column is this week
       const heat = el.querySelector('.heat');
       const start = addDays(today, -((today.getDay() + 6) % 7) - 7 * 11);
       for (let i = 0; i < 84; i++) {
@@ -643,41 +963,188 @@
     });
   }
 
-  // ---------- TODAY ----------
-  function renderHome() {
-    const t = tasksFor(ymd());
-    $('sTasks').textContent = `${t.filter((x) => x.done).length}/${t.length}`;
-    $('sFocus').textContent = db.sessions.filter((s) => s.date === ymd()).reduce((a, s) => a + s.min, 0);
-    $('sStreak').textContent = streak();
-    const endOfDay = new Date(); endOfDay.setHours(23, 59, 59, 999);
-    $('sHabits').textContent = `${db.habits.filter((h) => h.days[ymd()]).length}/${db.habits.length}`;
-    const hl = $('homeHabits'); hl.innerHTML = '';
-    if (!db.habits.length) hl.innerHTML = '<li class="empty">No habits yet — add some in Habits.</li>';
-    db.habits.forEach((h) => {
-      const on = !!h.days[ymd()], li = document.createElement('li');
-      li.innerHTML = `<button type="button" class="check ${on ? 'on' : ''}" aria-pressed="${on}" aria-label="Done today">${on ? '✓' : ''}</button>
-        <span class="grow">${esc(h.icon)} ${esc(h.name)}</span><span class="streak">🔥 ${habitStreak(h)}</span>`;
-      li.querySelector('button').onclick = () => toggleHabit(h, ymd());
-      hl.appendChild(li);
+  // ---------- JOURNAL ----------
+  const MOODS = ['😞', '😕', '😐', '🙂', '😄'];
+  const jFields = { jGrateful: 'grateful', jWins: 'wins', jLessons: 'lessons', jNotes: 'notes' };
+  $('jDate').value = ymd();
+  MOODS.forEach((m, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = m; b.dataset.i = i + 1;
+    b.onclick = () => { const e = entry(); e.mood = e.mood === i + 1 ? 0 : i + 1; touch(); loadEntry(); };
+    $('moods').appendChild(b);
+  });
+  const entry = () => (db.journal[$('jDate').value] ||= { mood: 0, grateful: '', wins: '', lessons: '', notes: '' });
+  function touch() {
+    const had = G.days[$('jDate').value]?.journal;
+    save(); $('jSaved').textContent = 'Saved ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    renderAll();
+    if (!had && hasText(db.journal[$('jDate').value])) { const [x, y] = centerOf($('jXp')); floatText(x, y, `+${XP.journal} XP`); sfx.coin(); }
+  }
+  function loadEntry() {
+    const e = db.journal[$('jDate').value] || {};
+    Object.entries(jFields).forEach(([f, k]) => ($(f).value = e[k] || ''));
+    $('moods').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.i === e.mood));
+    renderJournalXp();
+  }
+  function renderJournalXp() {
+    const done = hasText(db.journal[$('jDate').value]);
+    $('jXp').textContent = done ? `✓ +${XP.journal} XP earned` : `+${XP.journal} XP for writing`;
+    $('jXp').style.color = done ? 'var(--xp)' : 'var(--muted)';
+  }
+  Object.entries(jFields).forEach(([f, k]) => ($(f).oninput = () => { entry()[k] = $(f).value; touch(); }));
+  $('jDate').onchange = loadEntry;
+  $('jSearch').oninput = renderHistory;
+  function renderHistory() {
+    const q = $('jSearch').value.toLowerCase();
+    const days = Object.keys(db.journal).filter((d) => hasText(db.journal[d]) || db.journal[d].mood).sort().reverse()
+      .filter((d) => !q || JSON.stringify(db.journal[d]).toLowerCase().includes(q));
+    $('jHistory').innerHTML = days.length ? days.map((d) => {
+      const e = db.journal[d];
+      const part = (label, v) => (v ? `<p><b>${label}:</b> ${esc(v)}</p>` : '');
+      return `<details class="entry"><summary>${e.mood ? MOODS[e.mood - 1] + ' ' : ''}${new Date(d + 'T00:00').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</summary>
+        ${part('Grateful', e.grateful)}${part('Wins', e.wins)}${part('Lessons', e.lessons)}${part('Notes', e.notes)}</details>`;
+    }).join('') : '<div class="empty">No entries yet. Your story starts today.</div>';
+    renderJournalXp();
+  }
+
+  // ---------- SHOP ----------
+  $('rewardForm').onsubmit = (e) => {
+    e.preventDefault();
+    const name = $('rewardName').value.trim(), cost = Math.max(1, Math.round(+$('rewardCost').value || 0));
+    if (!name) return;
+    db.rewards.push({ id: uid(), icon: $('rewardIcon').value.trim() || '🎁', name, cost });
+    $('rewardName').value = ''; save(); renderAll();
+  };
+  function renderShop() {
+    const box = $('shopList'); box.innerHTML = '';
+    if (!db.rewards.length) box.innerHTML = '<div class="empty">No rewards yet. Add one below.</div>';
+    db.rewards.slice().sort((a, b) => a.cost - b.cost).forEach((r) => {
+      const can = G.coins >= r.cost, el = document.createElement('div'); el.className = 'reward';
+      el.innerHTML = `<button class="icon-btn" type="button" aria-label="Remove reward">✕</button>
+        <span class="em">${esc(r.icon)}</span><span class="nm">${esc(r.name)}</span><span class="cost">🪙 ${r.cost}</span>
+        <button class="btn small ${can ? '' : 'ghost'}" type="button" ${can ? '' : 'disabled'}>${can ? 'Claim' : 'Locked'}</button>
+        ${can ? '' : `<span class="need">${r.cost - G.coins} more coins</span>`}`;
+      el.querySelector('.icon-btn').onclick = () => { if (confirm(`Remove "${r.name}" from the shop?`)) { db.rewards = db.rewards.filter((x) => x !== r); save(); renderAll(); } };
+      el.querySelector('.btn').onclick = (e) => {
+        if (G.coins < r.cost) return;
+        db.purchases.push({ id: uid(), icon: r.icon, name: r.name, cost: r.cost, at: Date.now() });
+        const [x, y] = centerOf(e.currentTarget);
+        save(); floatText(x, y, `-${r.cost} 🪙`, 'var(--gold)'); sfx.buy(); confetti(x, y, 70);
+        toast(`${r.icon} Enjoy your ${r.name}! You earned it.`); renderAll();
+      };
+      box.appendChild(el);
     });
-    $('sRem').textContent = db.reminders.filter((r) => r.at <= endOfDay.getTime()).length;
+    const loot = $('lootList'); loot.innerHTML = '';
+    if (!db.purchases.length) loot.innerHTML = '<li class="empty">Nothing claimed yet. Finish quests to earn coins!</li>';
+    db.purchases.slice().reverse().slice(0, 15).forEach((p) => {
+      const li = document.createElement('li'); li.className = 'quest';
+      li.innerHTML = `<span style="font-size:22px">${esc(p.icon)}</span><span class="grow">${esc(p.name)}<br>
+        <span class="meta">${new Date(p.at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</span></span><span class="cost" style="color:var(--gold)">🪙 ${p.cost}</span>`;
+      loot.appendChild(li);
+    });
+  }
 
-    const top = $('topList'); top.innerHTML = '';
-    const open = t.filter((x) => !x.done).slice(0, 3);
-    if (!open.length) top.innerHTML = t.length ? '<li class="empty">All done for today 🎉</li>' : '<li class="empty">Nothing planned yet — add tasks in Plan.</li>';
-    open.forEach((x) => top.appendChild(taskItem(x, false)));
+  // ---------- REMINDERS ----------
+  function defaultRemTime() { const d = new Date(Date.now() + 60 * 60 * 1000); d.setMinutes(0, 0, 0); return d; }
+  const toLocalInput = (d) => `${ymd(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  $('remAt').value = toLocalInput(defaultRemTime());
+  $('remForm').onsubmit = (e) => {
+    e.preventDefault();
+    const at = new Date($('remAt').value).getTime();
+    if (!$('remText').value.trim() || isNaN(at)) return;
+    db.reminders.push({ id: uid(), text: $('remText').value.trim(), at, repeat: $('remRepeat').value });
+    $('remText').value = ''; $('remAt').value = toLocalInput(defaultRemTime());
+    save(); renderAll(); askNotif(); toast('⏰ Reminder set');
+  };
+  function askNotif() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().then(renderNotif); }
+  function renderNotif() {
+    if (!('Notification' in window)) { $('notifState').textContent = 'This browser can\'t show notifications; you\'ll get a sound and a pop-up while this page is open.'; $('notifBtn').hidden = true; return; }
+    const p = Notification.permission;
+    $('notifState').textContent = p === 'granted' ? 'Notifications are on. Keep this tab open (it can be in the background) for reminders to fire.'
+      : p === 'denied' ? 'Notifications are blocked in browser settings. You\'ll still get a sound and pop-up while this page is open.'
+      : 'Turn on notifications so reminders reach you while you\'re in another tab.';
+    $('notifBtn').hidden = p !== 'default';
+  }
+  $('notifBtn').onclick = askNotif;
+  const fmtWhen = (ms) => new Date(ms).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  function renderReminders() {
+    const list = $('remList'); list.innerHTML = '';
+    const items = db.reminders.slice().sort((a, b) => a.at - b.at);
+    if (!items.length) list.innerHTML = '<li class="empty">No reminders set.</li>';
+    items.forEach((r) => {
+      const li = document.createElement('li'); li.className = 'quest';
+      li.innerHTML = `<span style="font-size:22px">⏰</span><span class="grow">${esc(r.text)}<br><span class="meta">${fmtWhen(r.at)}${r.repeat !== 'none' ? ' · ' + r.repeat : ''}</span></span>
+        <button class="icon-btn" type="button" aria-label="Delete reminder">✕</button>`;
+      li.querySelector('button').onclick = () => { db.reminders = db.reminders.filter((x) => x !== r); save(); renderAll(); };
+      list.appendChild(li);
+    });
+    renderNotif();
+  }
+  function checkReminders() {
+    const now = Date.now(); let changed = false;
+    db.reminders.slice().forEach((r) => {
+      if (r.at > now) return;
+      notify('⏰ Reminder', r.text); changed = true;
+      if (r.repeat === 'none') db.reminders = db.reminders.filter((x) => x !== r);
+      else {
+        const step = (r.repeat === 'daily' ? 1 : 7) * 864e5;
+        while (r.at <= now) r.at += step;
+      }
+    });
+    if (changed) { save(); renderAll(); }
+  }
 
-    const next = $('nextRem'); next.innerHTML = '';
-    const up = db.reminders.slice().sort((a, b) => a.at - b.at).slice(0, 3);
-    if (!up.length) next.innerHTML = '<li class="empty">No upcoming reminders.</li>';
-    up.forEach((r) => next.appendChild(remItem(r, false)));
+  // ---------- HOME ----------
+  function renderHome() {
+    const hr = new Date().getHours();
+    const part = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+    $('greeting').textContent = `${part}, ${db.game.name}! ${G.xpByDay[ymd()] ? `+${G.xpByDay[ymd()]} XP today ✨` : 'Ready for today\'s adventure?'}`;
+
+    const ch = challengesFor(ymd()), s = G.today;
+    const midnight = addDays(new Date(new Date().setHours(0, 0, 0, 0)), 1), hrsLeft = Math.ceil((midnight - Date.now()) / 36e5);
+    $('chalReset').textContent = `new ones in ${plural(hrsLeft, 'hour')}`;
+    $('chalList').innerHTML = ch.map((c) => {
+      const v = Math.min(c.goal, c.val(s)), done = v >= c.goal;
+      return `<div class="chal ${done ? 'done' : ''}"><span class="ic">${done ? '✅' : c.icon}</span>
+        <div class="grow"><div>${c.text}</div><div class="mini"><i style="width:${(v / c.goal) * 100}%"></i></div></div>
+        <span class="xp-tag" style="${done ? '' : 'color:var(--muted)'}">${done ? '✓ ' : ''}+${c.xp} XP<br><span class="muted" style="font-size:12px">${v}/${c.goal}</span></span></div>`;
+    }).join('');
+
+    const t = tasksFor(ymd());
+    $('homeQuestCount').textContent = t.length ? `${t.filter((x) => x.done).length}/${t.length} done` : '';
+    const hq = $('homeQuests'); hq.innerHTML = '';
+    const open = t.filter((x) => !x.done);
+    if (!t.length) hq.innerHTML = '<li class="empty">No quests yet. What will you conquer today?</li>';
+    else if (!open.length) hq.innerHTML = '<li class="empty">🏆 All quests complete! Legendary.</li>';
+    open.slice(0, 5).forEach((x) => hq.appendChild(questItem(x, false)));
+    if (open.length > 5) hq.insertAdjacentHTML('beforeend', `<li class="empty">+${open.length - 5} more on the quest board</li>`);
+
+    const hh = $('homeHabits'); hh.innerHTML = '';
+    $('homeHabitCount').textContent = db.habits.length ? `${db.habits.filter((h) => h.days[ymd()]).length}/${db.habits.length} done` : '';
+    if (!db.habits.length) hh.innerHTML = '<li class="empty">No habits yet. Plant some in the Habits tab.</li>';
+    db.habits.forEach((h) => {
+      const on = !!h.days[ymd()], li = document.createElement('li'); li.className = 'quest easy' + (on ? ' done' : '');
+      li.innerHTML = `<button type="button" class="tick ${on ? 'on' : ''}" aria-pressed="${on}" aria-label="Done today">${on ? '✓' : ''}</button>
+        <span class="grow"><span class="title">${esc(h.icon)} ${esc(h.name)}</span><br><span class="meta"><span class="xp-tag">+${XP.habit} XP</span></span></span><span class="streak">🔥 ${habitStreak(h)}</span>`;
+      li.querySelector('button').onclick = (e) => toggleHabit(h, ymd(), e.currentTarget);
+      hh.appendChild(li);
+    });
+
+    $('stQuests').textContent = G.totalDone;
+    $('stFocus').textContent = G.focusMin >= 60 ? `${(G.focusMin / 60).toFixed(1)}h` : `${G.focusMin}m`;
+    $('stBattles').textContent = G.totalBattles;
+    $('stChal').textContent = G.challengesDone;
+
+    const seen = db.game.seen || [];
+    const unlocked = (b) => b.ok(G) || seen.includes(b.id);
+    $('badgeCount').textContent = `${BADGES.filter(unlocked).length}/${BADGES.length}`;
+    $('badges').innerHTML = BADGES.map((b) => `<div class="badge ${unlocked(b) ? '' : 'locked'}"><b>${unlocked(b) ? b.icon : '🔒'}</b><span>${b.name}</span><small>${b.desc}</small></div>`).join('');
   }
 
   // ---------- backup ----------
   $('exportBtn').onclick = () => {
     const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = `daily-focus-backup-${ymd()}.json`; a.click(); URL.revokeObjectURL(a.href);
+    a.download = `quest-day-backup-${ymd()}.json`; a.click(); URL.revokeObjectURL(a.href);
   };
   $('importFile').onchange = async (e) => {
     const f = e.target.files[0]; if (!f) return;
@@ -686,16 +1153,21 @@
       if (!data || !Array.isArray(data.tasks)) throw new Error();
       if (!confirm('Replace everything in this browser with the backup?')) return;
       db = Object.assign(blank(), data); save(); location.reload();
-    } catch { toast('That file isn\'t a Daily Focus backup.'); }
+    } catch { toast('That file isn\'t a Quest Day backup.'); }
     e.target.value = '';
   };
 
-  function renderAll() { renderHome(); renderPlan(); renderFocus(); renderHabits(); renderHistory(); renderReminders(); }
+  function renderAll() {
+    G = compute();
+    renderHud(); renderHome(); renderQuests(); renderBattle(); renderHabits(); renderHistory(); renderShop(); renderReminders();
+    checkProgress();
+  }
 
+  G = compute();
   loadEntry();
   renderAll();
   let lastTab; try { lastTab = localStorage.getItem(KEY + '.tab'); } catch {}
-  if (lastTab) document.querySelector(`nav [data-tab="${lastTab}"]`)?.click();
+  if (lastTab && document.querySelector(`nav.tabs [data-tab="${lastTab}"]`)) goTab(lastTab);
   checkReminders();
   setInterval(checkReminders, 15000);
   // refresh "today" views when the date rolls over
