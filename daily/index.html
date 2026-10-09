@@ -3,507 +3,428 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Quest Day</title>
-  <meta name="description" content="Turn your day into a game: quests, boss battles, habits, an adventure log, reminders and a rewards shop. Everything is saved in this browser.">
-  <meta name="theme-color" content="#140f34">
+  <title>My Day Planner</title>
+  <meta name="description" content="A soft daily planner: timeline, to-do lists, habits, journal, focus timer and reminders. Everything is saved in this browser.">
+  <meta name="theme-color" content="#7a0f45">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #140f34;
-      --bg-2: #1d1648;
-      --card: #251d58;
-      --card-2: #2f2570;
-      --edge: #3c3088;
-      --shadow: #0d0926;
-      --text: #f6f3ff;
-      --muted: #b8b0e8;
-      --purple: #a78bfa;
-      --gold: #fbbf24;
-      --gold-dark: #b7860b;
-      --xp: #4ade80;
-      --xp-dark: #16a34a;
-      --easy: #34d399;
-      --normal: #facc15;
-      --hard: #f87171;
-      --hp: #fb7185;
+      --berry: #7a0f45;
+      --berry-2: #8c1752;
+      --magenta: #b0175f;
+      --pink: #c2185b;
+      --blush: #f9f1f4;
+      --blush-2: #f1e3e9;
+      --white: #ffffff;
+      --pistachio: #e6ebb3;
+      --pistachio-2: #eef1cd;
+      --pistachio-edge: #d2da86;
+      --ink: #3d1229;
+      --muted: #8d6a7b;
+      --line: #ead7df;
+      --on-berry: #fbe9f1;
       --radius: 18px;
-      color-scheme: dark;
+      color-scheme: light;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html { background: var(--bg); }
+    html, body { background: var(--berry); }
     body {
-      margin: 0; color: var(--text); min-height: 100vh;
-      font: 16px/1.45 Fredoka, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background:
-        radial-gradient(2px 2px at 20% 30%, #ffffff55 50%, transparent 51%),
-        radial-gradient(1.5px 1.5px at 70% 12%, #ffffff44 50%, transparent 51%),
-        radial-gradient(1.5px 1.5px at 85% 60%, #ffffff33 50%, transparent 51%),
-        radial-gradient(2px 2px at 40% 80%, #ffffff33 50%, transparent 51%),
-        radial-gradient(1200px 600px at 50% -10%, #3b2a8a 0%, transparent 60%),
-        var(--bg);
-      background-attachment: fixed;
+      margin: 0; color: var(--ink); min-height: 100vh;
+      font: 16px/1.45 Nunito, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
     button, input, select, textarea { font: inherit; color: inherit; }
-    .wrap { max-width: 760px; margin: 0 auto; padding: 12px 16px 110px; }
+    svg.i { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    .wrap { max-width: 560px; margin: 0 auto; padding: 0 16px 120px; }
 
-    /* ---------- HUD ---------- */
-    .hud {
-      position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
-      background: color-mix(in srgb, var(--bg) 85%, transparent); border-bottom: 1px solid var(--edge);
-    }
-    .hud-in { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
-    .avatar {
-      width: 54px; height: 54px; flex: none; border-radius: 16px; font-size: 32px; cursor: pointer;
-      background: linear-gradient(145deg, #7c5cff, #4a2fd1); border: 2px solid #b6a2ff;
-      box-shadow: 0 4px 0 var(--shadow); display: grid; place-items: center; position: relative;
-    }
-    .avatar .lv {
-      position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 700;
-      background: var(--gold); color: #3b2500; border-radius: 99px; padding: 0 7px; white-space: nowrap;
-    }
-    .hud-mid { flex: 1; min-width: 0; }
-    .hud-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .hud-name small { color: var(--purple); font-weight: 500; }
-    .xpbar { height: 14px; border-radius: 99px; background: var(--shadow); border: 2px solid var(--edge); overflow: hidden; margin-top: 4px; position: relative; }
-    .xpbar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--xp-dark), var(--xp)); transition: width .6s cubic-bezier(.2,.9,.3,1.2); }
-    .xpbar span { position: absolute; inset: 0; font-size: 10px; font-weight: 600; display: grid; place-items: center; text-shadow: 0 1px 2px #000; }
-    .pills { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
-    .pill { background: var(--card); border: 2px solid var(--edge); border-radius: 99px; padding: 1px 10px; font-weight: 600; font-size: 14px; white-space: nowrap; }
-    .pill.coin { color: var(--gold); }
-    .pill.fire { color: #fb923c; }
-
-    /* ---------- bottom tabs ---------- */
-    nav.tabs {
-      position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: center;
-      background: color-mix(in srgb, var(--bg-2) 92%, transparent); backdrop-filter: blur(10px);
-      border-top: 1px solid var(--edge); padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
-    }
-    nav.tabs .in { display: flex; width: 100%; max-width: 760px; }
-    nav.tabs button {
-      flex: 1; min-width: 0; background: none; border: 0; cursor: pointer; padding: 4px 0; border-radius: 12px;
-      display: flex; flex-direction: column; align-items: center; color: var(--muted); font-size: 11px;
-    }
-    nav.tabs button b { font-size: 22px; line-height: 1.2; transition: transform .15s; }
-    nav.tabs button[aria-selected="true"] { color: var(--text); background: var(--card); }
-    nav.tabs button[aria-selected="true"] b { transform: translateY(-2px) scale(1.15); }
+    /* top bar */
+    .top { display: flex; align-items: center; gap: 6px; padding: 14px 0 10px; color: var(--white); }
+    .top .hello { flex: 1; font-weight: 300; font-size: 15px; color: var(--on-berry); padding-left: 4px; }
+    .ibtn { background: none; border: 0; color: inherit; cursor: pointer; padding: 8px; border-radius: 12px; position: relative; display: grid; place-items: center; }
+    .ibtn:hover { background: #ffffff1a; }
+    .dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #ff9cc5; border: 2px solid var(--berry); }
+    .dot[hidden] { display: none; }
 
     section[hidden] { display: none; }
-    h1.page { font-size: 24px; margin: 8px 0 12px; }
-    .card {
-      background: var(--card); border: 2px solid var(--edge); border-radius: var(--radius);
-      padding: 16px; margin-bottom: 16px; box-shadow: 0 5px 0 var(--shadow);
+
+    /* affirmation & mood */
+    .affirm { background: var(--magenta); color: var(--white); border-radius: 4px 4px 18px 18px; padding: 14px 16px 12px; margin-bottom: 14px; box-shadow: 0 6px 16px #0000002e; }
+    .affirm .lbl { font-size: 13px; letter-spacing: .6px; text-transform: uppercase; opacity: .9; }
+    .affirm p { margin: 4px 0 0; font-weight: 300; font-size: 16px; }
+    .affirm .row { display: flex; align-items: flex-start; gap: 6px; }
+    .affirm .row > div { flex: 1; }
+    .mood { display: flex; align-items: center; gap: 8px; color: var(--on-berry); margin: 4px 4px 14px; font-size: 14px; }
+    .mood b { font-weight: 600; letter-spacing: .5px; }
+    .mood button { background: none; border: 0; color: var(--white); cursor: pointer; padding: 2px 6px; border-radius: 10px; font-weight: 300; font-size: 15px; }
+    .mood button:hover { background: #ffffff1a; }
+    .moodpick { display: flex; flex-wrap: wrap; gap: 6px; margin: -6px 0 14px; }
+    .moodpick[hidden] { display: none; }
+    .moodpick button { border: 1px solid #ffffff55; background: #ffffff12; color: var(--white); border-radius: 99px; padding: 4px 12px; cursor: pointer; font-size: 14px; }
+    .moodpick button[aria-pressed="true"] { background: var(--white); color: var(--berry); }
+
+    /* light cards */
+    .card { background: var(--blush); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; box-shadow: 0 6px 18px #00000030; }
+    .sec-head { display: flex; align-items: center; justify-content: space-between; color: var(--on-berry); margin: 18px 4px 8px; }
+    .sec-head h2 { margin: 0; font-size: 13px; letter-spacing: .8px; text-transform: uppercase; font-weight: 700; }
+    .sec-head .r { display: flex; align-items: center; gap: 2px; }
+    .sec-head small { font-size: 13px; opacity: .85; margin-right: 6px; }
+    .round-add { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--berry-2); color: var(--white); display: grid; place-items: center; cursor: pointer; box-shadow: inset 0 0 0 1.5px #ffffff40; }
+    .round-add svg { width: 18px; height: 18px; }
+
+    /* week strip */
+    .month { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 10px; }
+    .month b { font-size: 15px; letter-spacing: .6px; text-transform: uppercase; }
+    .month .ibtn { color: var(--muted); padding: 4px; }
+    .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .wd { border: 0; background: var(--white); border-radius: 10px; padding: 8px 0 7px; cursor: pointer; box-shadow: 0 3px 8px #7a0f4522; text-align: center; position: relative; }
+    .wd span { display: block; font-size: 13px; }
+    .wd strong { display: block; font-weight: 400; color: var(--muted); font-size: 15px; }
+    .wd.today { box-shadow: inset 0 0 0 2px var(--berry), 0 3px 8px #7a0f4522; }
+    .wd.sel { background: var(--pink); color: var(--white); }
+    .wd.sel strong { color: #ffd5e6; }
+    .wd.has::after { content: ""; position: absolute; bottom: 3px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--pistachio-edge); }
+    .wd.sel.has::after { background: #ffd5e6; }
+
+    /* timeline */
+    .timeline { padding: 12px 12px 10px 6px; }
+    .slot { display: grid; grid-template-columns: 74px 1fr; align-items: center; gap: 8px; margin-bottom: 9px; animation: rise .25s ease-out; }
+    .slot .t { font-size: 14px; color: var(--ink); text-align: right; white-space: nowrap; }
+    .slot .t::before { content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--pistachio-edge); margin-right: 6px; vertical-align: middle; }
+    .block {
+      background: linear-gradient(90deg, var(--pistachio-edge) 0 6px, var(--pistachio) 6px);
+      border-radius: 4px 12px 12px 4px; padding: 9px 10px 8px 18px; cursor: pointer; display: flex; gap: 6px; align-items: flex-start;
+      box-shadow: 0 2px 6px #6b6f2a22; transition: transform .12s;
     }
-    .card h2 { font-size: 18px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
-    .card h2 .r { margin-left: auto; font-size: 13px; color: var(--muted); font-weight: 500; }
-    .muted { color: var(--muted); font-size: 14px; }
-    .empty { color: var(--muted); font-size: 15px; padding: 8px 0; text-align: center; }
-    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .block:active { transform: scale(.98); }
+    .block .grow { flex: 1; min-width: 0; }
+    .block .ttl { font-size: 16px; overflow-wrap: anywhere; }
+    .block .tm { font-size: 13px; color: #5c5a3a; display: flex; align-items: center; gap: 6px; margin-top: 1px; }
+    .block .tm svg { width: 14px; height: 14px; }
+    .block.done { background: linear-gradient(90deg, var(--pistachio-edge) 0 6px, var(--pistachio-2) 6px); }
+    .block.done .ttl { text-decoration: line-through; color: #6f6b55; }
+    .block.now { box-shadow: 0 0 0 2px var(--pink), 0 2px 6px #6b6f2a22; }
+    .x { background: none; border: 0; cursor: pointer; color: #8a8660; padding: 2px; border-radius: 8px; display: grid; place-items: center; }
+    .x svg { width: 16px; height: 16px; }
+    .x:hover { background: #00000010; }
+    .empty { color: var(--muted); text-align: center; padding: 14px 8px; font-size: 15px; font-weight: 300; }
 
-    input, select, textarea {
-      background: var(--shadow); border: 2px solid var(--edge); border-radius: 12px; padding: 10px 12px; min-width: 0;
-    }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--purple); }
-    input[type="text"] { flex: 1 1 180px; }
-    textarea { width: 100%; min-height: 70px; resize: vertical; }
-    label.field { display: block; margin-bottom: 12px; }
-    label.field > span { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
-
-    .btn {
-      border: 0; border-radius: 14px; padding: 10px 18px; cursor: pointer; font-weight: 600;
-      background: var(--gold); color: #3b2500; box-shadow: 0 4px 0 var(--gold-dark);
-      transition: transform .08s, box-shadow .08s;
-    }
-    .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-dark); }
-    .btn:disabled { filter: grayscale(1) brightness(.7); cursor: not-allowed; }
-    .btn.purple { background: #7c5cff; color: #fff; box-shadow: 0 4px 0 #4a2fd1; }
-    .btn.ghost { background: var(--card-2); color: var(--text); box-shadow: 0 4px 0 var(--shadow); }
-    .btn.small { padding: 5px 11px; font-size: 14px; border-radius: 11px; }
-    .icon-btn { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 16px; padding: 6px; border-radius: 8px; }
-    .icon-btn:hover { color: var(--text); background: var(--card-2); }
-
-    /* difficulty picker */
-    .seg { display: flex; gap: 6px; }
-    .seg input { position: absolute; opacity: 0; pointer-events: none; }
-    .seg label {
-      cursor: pointer; padding: 7px 11px; border-radius: 12px; border: 2px solid var(--edge); background: var(--shadow);
-      font-size: 14px; font-weight: 600; white-space: nowrap;
-    }
-    .seg input:checked + label { border-color: currentColor; background: var(--card-2); }
-    .seg .easy { color: var(--easy); } .seg .normal { color: var(--normal); } .seg .hard { color: var(--hard); }
-
-    /* quests */
-    ul.list { list-style: none; margin: 0; padding: 0; }
-    .quest {
-      display: flex; align-items: center; gap: 10px; padding: 10px; margin-bottom: 8px;
-      background: var(--card-2); border-radius: 14px; border-left: 5px solid var(--normal);
-      animation: pop .25s ease-out;
-    }
-    .quest.easy { border-left-color: var(--easy); } .quest.hard { border-left-color: var(--hard); }
-    .quest .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-    .quest .meta { font-size: 12px; color: var(--muted); }
-    .quest.done { opacity: .55; }
-    .quest.done .title { text-decoration: line-through; }
-    .tick {
-      width: 34px; height: 34px; flex: none; border-radius: 50%; border: 3px solid var(--edge); background: var(--shadow);
-      cursor: pointer; color: #062e16; font-size: 17px; font-weight: 700; transition: transform .1s;
-    }
-    .tick:active { transform: scale(.85); }
-    .tick.on { background: var(--xp); border-color: var(--xp); }
-    .xp-tag { font-size: 12px; font-weight: 600; color: var(--xp); white-space: nowrap; }
-
-    /* challenges */
-    .chal { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--edge); }
-    .chal:last-child { border-bottom: 0; }
-    .chal .ic { font-size: 26px; width: 40px; height: 40px; display: grid; place-items: center; background: var(--card-2); border-radius: 12px; flex: none; }
-    .chal .grow { flex: 1; min-width: 0; }
-    .chal.done .ic { background: var(--xp-dark); }
-    .mini { height: 8px; background: var(--shadow); border-radius: 99px; overflow: hidden; margin-top: 5px; }
-    .mini i { display: block; height: 100%; background: var(--purple); transition: width .5s; }
-    .chal.done .mini i { background: var(--xp); }
-
-    /* stats & badges */
-    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    @media (min-width: 560px) { .stats { grid-template-columns: repeat(4, 1fr); } }
-    .stat { background: var(--card-2); border-radius: 14px; padding: 10px 12px; }
-    .stat b { display: block; font-size: 24px; }
-    .stat span { color: var(--muted); font-size: 13px; }
-    .badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
-    .badge { text-align: center; background: var(--card-2); border-radius: 14px; padding: 10px 6px; }
-    .badge b { display: block; font-size: 30px; }
-    .badge span { display: block; font-size: 12px; font-weight: 600; }
-    .badge small { display: block; font-size: 11px; color: var(--muted); line-height: 1.25; margin-top: 2px; }
-    .badge.locked b { filter: grayscale(1) brightness(.5); }
-    .badge.locked span { color: var(--muted); }
-
-    /* battle */
-    .arena { text-align: center; padding: 20px 16px; background: radial-gradient(circle at 50% 35%, #3a2b8f, var(--card) 70%); }
-    .boss { font-size: 96px; line-height: 1.1; display: inline-block; margin: 4px 0; }
-    .boss.running { animation: bob 1.6s ease-in-out infinite; }
-    .boss.hit { animation: hit .3s; }
-    .boss-name { font-weight: 700; font-size: 18px; }
-    .hpbar { height: 20px; border-radius: 99px; background: var(--shadow); border: 2px solid var(--edge); overflow: hidden; margin: 12px auto 6px; max-width: 420px; position: relative; }
-    .hpbar i { display: block; height: 100%; background: linear-gradient(90deg, #e11d48, var(--hp)); transition: width .5s linear; }
-    .hpbar.rest i { background: linear-gradient(90deg, #0ea5e9, #67e8f9); }
-    .hpbar span { position: absolute; inset: 0; font-size: 12px; font-weight: 700; display: grid; place-items: center; text-shadow: 0 1px 2px #000; }
-    .clock { font-size: 52px; font-weight: 700; font-variant-numeric: tabular-nums; margin: 4px 0 12px; }
+    /* to-do cards */
+    .lists { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 14px; margin: 0 -2px; scrollbar-width: none; }
+    .lists::-webkit-scrollbar { display: none; }
+    .tlist { flex: 0 0 82%; max-width: 360px; scroll-snap-align: start; background: var(--blush); border-radius: 14px; padding: 12px 12px 10px; box-shadow: 0 6px 18px #00000030; display: flex; flex-direction: column; }
+    .tlist.new { background: transparent; box-shadow: none; border: 2px dashed #ffffff55; color: var(--on-berry); align-items: center; justify-content: center; cursor: pointer; min-height: 150px; flex-basis: 45%; font-weight: 600; }
+    .tlist-h { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 4px; }
+    .tlist-h span { flex: 1; overflow-wrap: anywhere; }
+    .item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 15px; animation: rise .2s ease-out; }
+    .item span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .item.done span { text-decoration: line-through; color: var(--muted); }
+    .circ { width: 22px; height: 22px; flex: none; border-radius: 50%; border: 1.8px solid #cdb6c1; background: var(--white); cursor: pointer; display: grid; place-items: center; color: var(--white); padding: 0; transition: transform .12s; }
+    .circ svg { width: 13px; height: 13px; stroke-width: 2.6; }
+    .circ.on { background: var(--berry); border-color: var(--berry); animation: pop .3s; }
+    .circ:active { transform: scale(.85); }
+    .additem { display: flex; gap: 6px; margin-top: 8px; }
+    .additem input { flex: 1; min-width: 0; border: 0; background: var(--white); border-radius: 10px; padding: 7px 10px; font-size: 14px; }
+    .tlist-f { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; color: var(--pink); font-size: 13px; }
+    .link { background: none; border: 0; color: var(--pink); cursor: pointer; font-size: 13px; padding: 2px 4px; }
 
     /* habits */
-    .habit { padding: 12px 0; border-bottom: 1px dashed var(--edge); }
-    .habit:last-child { border-bottom: 0; }
-    .habit-head { display: flex; align-items: center; gap: 10px; }
-    .habit-head .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
-    .habit-icon { font-size: 26px; }
-    .week { display: flex; gap: 6px; margin: 10px 0 8px; }
-    .day { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; color: var(--muted); }
-    .day .tick { width: 36px; height: 36px; }
-    .day.today span { color: var(--gold); font-weight: 700; }
-    .heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 13px); gap: 3px; width: max-content; }
-    .heat i { width: 13px; height: 13px; border-radius: 3px; background: var(--shadow); }
-    .heat i.on { background: var(--xp); }
-    .heat i.future { background: transparent; }
-    .streak { font-size: 14px; font-weight: 600; color: #fb923c; white-space: nowrap; }
+    .habit { background: var(--white); border-radius: 14px; padding: 10px 10px 10px 8px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; box-shadow: 0 6px 18px #00000030; animation: rise .25s ease-out; }
+    .h-ic { width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--blush-2); display: grid; place-items: center; font-size: 22px; border: 0; cursor: pointer; }
+    .h-body { flex: 1; min-width: 0; }
+    .h-name { font-size: 14px; font-weight: 600; margin: 0 0 4px 2px; display: flex; gap: 8px; align-items: baseline; }
+    .h-name small { font-weight: 400; color: var(--muted); font-size: 12px; }
+    .h-days { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
+    .h-days div { font-size: 11px; line-height: 1.2; color: var(--ink); }
+    .h-days div em { display: block; font-style: normal; color: var(--muted); }
+    .h-days .circ { margin: 3px auto 0; width: 24px; height: 24px; border-color: var(--berry); }
+    .h-days .future { opacity: .35; }
+    .h-days .future .circ { cursor: default; }
 
     /* journal */
-    .moods { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-    .moods button { font-size: 26px; background: var(--shadow); border: 2px solid var(--edge); border-radius: 14px; padding: 4px 10px; cursor: pointer; transition: transform .1s; }
-    .moods button[aria-pressed="true"] { border-color: var(--gold); background: var(--card-2); transform: scale(1.1); }
-    details.entry { border-bottom: 1px dashed var(--edge); padding: 8px 0; }
-    details.entry summary { cursor: pointer; font-weight: 500; }
-    details.entry p { white-space: pre-wrap; margin: 6px 0; color: var(--muted); }
-    details.entry p b { color: var(--text); }
-
-    /* shop */
-    .shop { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-    .reward { background: var(--card-2); border-radius: 16px; padding: 14px 10px 12px; text-align: center; position: relative; display: flex; flex-direction: column; gap: 4px; }
-    .reward .em { font-size: 40px; }
-    .reward .nm { font-weight: 600; overflow-wrap: anywhere; flex: 1; }
-    .reward .cost { color: var(--gold); font-weight: 700; }
-    .reward .icon-btn { position: absolute; top: 2px; right: 2px; font-size: 13px; }
-    .reward .need { font-size: 12px; color: var(--muted); }
-
-    /* dialog, overlay, toast, fx */
-    dialog {
-      background: var(--card); color: var(--text); border: 2px solid var(--edge); border-radius: 20px;
-      padding: 18px; width: min(440px, calc(100% - 32px)); box-shadow: 0 6px 0 var(--shadow);
+    .paper { background: var(--white); border-radius: var(--radius); padding: 18px 16px; box-shadow: 0 6px 18px #00000030; margin-bottom: 14px; }
+    .paper h3 { margin: 0 0 4px; font-weight: 700; font-size: 20px; color: var(--berry); }
+    .field { display: block; margin-top: 14px; }
+    .field > span { display: block; font-size: 13px; letter-spacing: .5px; text-transform: uppercase; color: var(--pink); font-weight: 700; margin-bottom: 4px; }
+    textarea.lined {
+      width: 100%; border: 0; resize: vertical; min-height: 84px; padding: 0 2px; outline: none; color: var(--ink);
+      background: repeating-linear-gradient(transparent 0 27px, var(--line) 27px 28px); line-height: 28px; font-size: 16px;
     }
-    dialog::backdrop { background: #05031099; }
-    .avatars { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 12px; }
-    .avatars button { font-size: 26px; padding: 6px 0; background: var(--shadow); border: 2px solid var(--edge); border-radius: 12px; cursor: pointer; position: relative; }
-    .avatars button[aria-pressed="true"] { border-color: var(--gold); }
-    .avatars button:disabled { cursor: not-allowed; }
-    .avatars button:disabled span { filter: grayscale(1) brightness(.4); }
-    .avatars button small { position: absolute; inset: auto 0 1px; font-size: 9px; color: var(--muted); }
-    .overlay {
-      position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px; background: #05031099;
+    details.entry { border-bottom: 1px solid var(--line); padding: 10px 0; }
+    details.entry summary { cursor: pointer; font-weight: 600; }
+    details.entry p { white-space: pre-wrap; margin: 6px 0; font-weight: 300; }
+    details.entry p b { font-weight: 700; color: var(--pink); font-size: 13px; text-transform: uppercase; letter-spacing: .4px; }
+
+    /* focus */
+    .focus { text-align: center; padding: 22px 16px; }
+    .modes { display: inline-flex; background: var(--blush-2); border-radius: 99px; padding: 4px; gap: 2px; margin-bottom: 14px; }
+    .modes button { border: 0; background: none; padding: 6px 14px; border-radius: 99px; cursor: pointer; font-size: 14px; color: var(--muted); }
+    .modes button[aria-pressed="true"] { background: var(--white); color: var(--berry); font-weight: 700; box-shadow: 0 2px 6px #7a0f4522; }
+    .ring { position: relative; width: 230px; height: 230px; margin: 0 auto 14px; }
+    .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring circle { fill: none; stroke-width: 10; }
+    .ring .bg { stroke: var(--blush-2); }
+    .ring .fg { stroke: var(--pink); stroke-linecap: round; transition: stroke-dashoffset .5s linear; }
+    .ring .in { position: absolute; inset: 0; display: grid; place-content: center; }
+    .clock { font-size: 48px; font-weight: 300; font-variant-numeric: tabular-nums; color: var(--berry); line-height: 1; }
+    .ring .in small { color: var(--muted); margin-top: 6px; }
+
+    /* buttons & inputs */
+    .btn { border: 0; border-radius: 99px; padding: 10px 22px; background: var(--berry); color: var(--white); cursor: pointer; font-weight: 700; box-shadow: 0 4px 12px #7a0f4540; }
+    .btn.soft { background: var(--blush-2); color: var(--berry); box-shadow: none; }
+    .btn.small { padding: 6px 14px; font-size: 14px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .in-f { border: 1.5px solid var(--line); background: var(--white); border-radius: 12px; padding: 10px 12px; min-width: 0; color: var(--ink); }
+    .in-f:focus, .additem input:focus { outline: 2px solid #c2185b55; outline-offset: 0; }
+    label.f { display: block; margin-bottom: 10px; }
+    label.f > span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+    ul.plain { list-style: none; margin: 0; padding: 0; }
+    ul.plain li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+    ul.plain li:last-child { border-bottom: 0; }
+    ul.plain li .grow { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    ul.plain li small { color: var(--muted); }
+
+    /* bottom bar */
+    nav.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: center; pointer-events: none; }
+    nav.bar .in {
+      pointer-events: auto; width: 100%; max-width: 560px; background: var(--white); border-radius: 22px 22px 0 0;
+      display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; padding: 8px 8px calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -6px 20px #00000030;
     }
-    .overlay[hidden] { display: none; }
-    .levelup { text-align: center; max-width: 360px; animation: pop .4s cubic-bezier(.2,.9,.3,1.4); }
-    .levelup .big { font-size: 40px; font-weight: 700; color: var(--gold); text-shadow: 0 4px 0 var(--gold-dark); letter-spacing: 1px; }
-    .levelup .em { font-size: 80px; }
+    nav.bar button { background: none; border: 0; color: var(--berry); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; padding: 4px 0; opacity: .55; }
+    nav.bar button svg { width: 28px; height: 28px; stroke-width: 1.5; }
+    nav.bar button[aria-selected="true"] { opacity: 1; font-weight: 700; }
+    nav.bar .fab { opacity: 1; }
+    nav.bar .fab span { width: 62px; height: 62px; margin-top: -34px; border-radius: 50%; background: var(--berry); color: var(--white); display: grid; place-items: center; box-shadow: 0 6px 16px #7a0f4566; border: 4px solid var(--white); transition: transform .15s; }
+    nav.bar .fab:active span { transform: scale(.92); }
+
+    /* sheets */
+    dialog.sheet {
+      border: 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); width: 100%; max-width: 560px; margin: auto auto 0;
+      border-radius: 24px 24px 0 0; background: var(--blush); color: var(--ink); max-height: 88vh; overflow: auto;
+    }
+    dialog.sheet[open] { animation: up .25s ease-out; }
+    dialog.sheet::backdrop { background: #3d122966; }
+    .grab { width: 40px; height: 4px; border-radius: 4px; background: #d9c3cd; margin: -6px auto 12px; }
+    .sheet h3 { margin: 0 0 12px; color: var(--berry); font-size: 19px; }
+    .tabs2 { display: flex; background: var(--blush-2); border-radius: 99px; padding: 4px; margin-bottom: 14px; }
+    .tabs2 button { flex: 1; border: 0; background: none; padding: 7px 4px; border-radius: 99px; cursor: pointer; font-size: 14px; color: var(--muted); }
+    .tabs2 button[aria-pressed="true"] { background: var(--white); color: var(--berry); font-weight: 700; box-shadow: 0 2px 6px #7a0f4522; }
+    #addForm [hidden] { display: none; }
+    .emojis { display: flex; flex-wrap: wrap; gap: 6px; }
+    .emojis button { font-size: 22px; width: 42px; height: 42px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--white); cursor: pointer; }
+    .emojis button[aria-pressed="true"] { border-color: var(--pink); background: #fde6ef; }
+
     .toast {
-      position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%); z-index: 15;
-      background: var(--text); color: var(--bg); font-weight: 600; padding: 12px 18px; border-radius: 14px;
-      box-shadow: 0 5px 0 #0008; max-width: calc(100% - 32px); text-align: center; animation: toastIn .25s;
+      position: fixed; left: 50%; bottom: 104px; transform: translateX(-50%); z-index: 20; background: var(--white); color: var(--berry);
+      padding: 10px 18px; border-radius: 99px; font-weight: 600; box-shadow: 0 8px 24px #0000004d; max-width: calc(100% - 32px); text-align: center;
+      animation: toastIn .25s ease-out;
     }
     .toast[hidden] { display: none; }
-    .float {
-      position: fixed; z-index: 25; pointer-events: none; font-weight: 700; font-size: 20px; color: var(--xp);
-      text-shadow: 0 2px 0 #000; animation: floatUp 1.1s ease-out forwards; transform: translate(-50%, -50%);
-    }
-    #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 30; }
-    @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    @keyframes toastIn { from { transform: translateX(-50%) scale(.85); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
-    @keyframes floatUp { to { transform: translate(-50%, -140%); opacity: 0; } }
-    @keyframes bob { 50% { transform: translateY(-10px) rotate(-3deg); } }
-    @keyframes hit { 25% { transform: translateX(-8px); filter: brightness(2); } 75% { transform: translateX(8px); } }
+    .heart { position: fixed; z-index: 25; pointer-events: none; color: var(--pink); font-size: 18px; animation: float 1.1s ease-out forwards; }
+    @keyframes rise { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes pop { 50% { transform: scale(1.25); } }
+    @keyframes up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes toastIn { from { transform: translate(-50%, 10px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+    @keyframes float { to { transform: translate(var(--dx), -70px) scale(.6); opacity: 0; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   </style>
 </head>
 <body>
-
-<header class="hud">
-  <div class="hud-in">
-    <button class="avatar" id="avatarBtn" type="button" aria-label="Edit your hero"><span id="hudAvatar">🧙</span><span class="lv" id="hudLv">Lv 1</span></button>
-    <div class="hud-mid">
-      <div class="hud-name"><span id="hudName">Hero</span> <small id="hudTitle">Novice</small></div>
-      <div class="xpbar"><i id="xpFill"></i><span id="xpText">0 / 100 XP</span></div>
-    </div>
-    <div class="pills">
-      <span class="pill coin" title="Coins to spend in the shop">🪙 <span id="hudCoins">0</span></span>
-      <span class="pill fire" title="Days in a row you earned XP">🔥 <span id="hudStreak">0</span></span>
-    </div>
-  </div>
-</header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9.5 2.5h5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-journal" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 1-.2 1.9-.6 2.8"/><path d="m14 20 1-3.5 5.5-5.5a1.4 1.4 0 0 1 2 2L17 18.5z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.6-7.5 10-7.5 10z"/></symbol>
+</svg>
 
 <main class="wrap">
+  <div class="top">
+    <button class="ibtn" id="menuBtn" type="button" aria-label="Settings"><svg class="i"><use href="#i-menu"/></svg></button>
+    <div class="hello" id="hello">good morning ♡</div>
+    <button class="ibtn" id="bellBtn" type="button" aria-label="Reminders"><svg class="i"><use href="#i-bell"/></svg><span class="dot" id="bellDot" hidden></span></button>
+  </div>
 
   <!-- HOME -->
   <section id="tab-home">
-    <h1 class="page" id="greeting">Welcome, Hero!</h1>
-    <div class="card">
-      <h2>🎯 Daily challenges <span class="r" id="chalReset"></span></h2>
-      <div id="chalList"></div>
-    </div>
-    <div class="card">
-      <h2>📜 Today's quests <span class="r" id="homeQuestCount"></span></h2>
-      <form class="row" id="quickForm" style="margin-bottom:10px">
-        <input type="text" id="quickText" placeholder="Add a quest for today…" aria-label="Quick add quest">
-        <button class="btn small">+ Add</button>
-      </form>
-      <ul class="list" id="homeQuests"></ul>
-    </div>
-    <div class="card">
-      <h2>🌱 Today's habits <span class="r" id="homeHabitCount"></span></h2>
-      <ul class="list" id="homeHabits"></ul>
-    </div>
-    <div class="card">
-      <h2>📊 Hero stats</h2>
-      <div class="stats">
-        <div class="stat"><b id="stQuests">0</b><span>quests completed</span></div>
-        <div class="stat"><b id="stFocus">0h</b><span>focus time</span></div>
-        <div class="stat"><b id="stBattles">0</b><span>bosses defeated</span></div>
-        <div class="stat"><b id="stChal">0</b><span>challenges won</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <h2>🏅 Achievements <span class="r" id="badgeCount"></span></h2>
-      <div class="badges" id="badges"></div>
-    </div>
-  </section>
-
-  <!-- QUESTS -->
-  <section id="tab-quests" hidden>
-    <h1 class="page">📜 Quest board</h1>
-    <div class="card">
-      <h2>New quest</h2>
-      <form id="taskForm">
-        <div class="row" style="margin-bottom:10px">
-          <input type="text" id="taskText" placeholder="What's your mission?" required>
-        </div>
-        <div class="row" style="justify-content:space-between">
-          <div class="seg" role="radiogroup" aria-label="Difficulty">
-            <input type="radio" name="diff" id="dEasy" value="low"><label for="dEasy" class="easy">Easy +10</label>
-            <input type="radio" name="diff" id="dNorm" value="med" checked><label for="dNorm" class="normal">Normal +20</label>
-            <input type="radio" name="diff" id="dHard" value="high"><label for="dHard" class="hard">Hard +35</label>
-          </div>
-          <div class="row">
-            <input type="date" id="taskDate" aria-label="Date">
-            <button class="btn">Add quest</button>
-          </div>
-        </div>
-      </form>
-    </div>
-    <div class="card">
-      <h2>Quests for <input type="date" id="planDate" aria-label="Show date" style="padding:4px 8px"></h2>
-      <ul class="list" id="taskList"></ul>
-      <button class="btn ghost small" id="carryBtn" type="button" style="margin-top:6px">🛟 Rescue unfinished quests from earlier days</button>
-    </div>
-  </section>
-
-  <!-- BATTLE -->
-  <section id="tab-battle" hidden>
-    <h1 class="page">⚔️ Focus battle</h1>
-    <div class="card arena">
-      <div class="muted" id="modeLabel">Defeat the boss by focusing until the timer runs out</div>
-      <div class="boss" id="bossEmoji">👾</div>
-      <div class="boss-name" id="bossName">Procrastination Goblin</div>
-      <div class="hpbar" id="hpbar"><i id="hpFill" style="width:100%"></i><span id="hpText">HP 100%</span></div>
-      <div class="clock" id="clock">25:00</div>
-      <div class="row" style="justify-content:center">
-        <button class="btn" id="startBtn" type="button">⚔️ Attack</button>
-        <button class="btn ghost" id="skipBtn" type="button">🏳️ Retreat</button>
-        <button class="btn ghost" id="resetBtn" type="button">↺</button>
-      </div>
-      <p class="muted" id="focusTaskLabel" style="margin:14px 0 0"></p>
-    </div>
-    <div class="card">
-      <h2>Battle setup</h2>
-      <label class="field">
-        <span>Quest you're fighting for</span>
-        <select id="focusTask" style="width:100%"><option value="">— no quest —</option></select>
-      </label>
+    <div class="affirm">
       <div class="row">
-        <label class="field"><span>Battle (min)</span><input type="number" id="fMin" min="1" max="180" value="25" style="width:90px"></label>
-        <label class="field"><span>Short rest</span><input type="number" id="sMin" min="1" max="60" value="5" style="width:90px"></label>
-        <label class="field"><span>Long rest</span><input type="number" id="lMin" min="1" max="60" value="15" style="width:90px"></label>
+        <div><div class="lbl">today's affirmation</div><p id="affText"></p></div>
+        <button class="ibtn" id="affNext" type="button" aria-label="Show another affirmation" style="padding:2px 4px"><svg class="i"><use href="#i-dots"/></svg></button>
       </div>
-      <p class="muted" style="margin:0">Each focus minute earns 2 XP. A long rest comes after every 4th battle. Put your phone face down!</p>
+    </div>
+    <div class="mood"><b>MOOD:</b><button type="button" id="moodBtn">pick one ♡</button></div>
+    <div class="moodpick" id="moodPick" hidden></div>
+
+    <div class="card">
+      <div class="month">
+        <button class="ibtn" id="wkPrev" type="button" aria-label="Previous week"><svg class="i"><use href="#i-left"/></svg></button>
+        <b id="monthName"></b>
+        <button class="ibtn" id="wkNext" type="button" aria-label="Next week"><svg class="i"><use href="#i-right"/></svg></button>
+      </div>
+      <div class="week" id="week"></div>
+    </div>
+
+    <div class="sec-head">
+      <h2 id="dayLabel">today</h2>
+      <div class="r"><small id="dayCount"></small><button class="round-add" type="button" data-add="plan" aria-label="Add to timeline"><svg class="i"><use href="#i-plus"/></svg></button></div>
+    </div>
+    <div class="card timeline" id="timeline"></div>
+
+    <div class="sec-head">
+      <h2>to do</h2>
+      <div class="r"><button class="round-add" type="button" data-add="todo" aria-label="Add a to-do"><svg class="i"><use href="#i-plus"/></svg></button></div>
+    </div>
+    <div class="lists" id="lists"></div>
+
+    <div class="sec-head">
+      <h2>habits</h2>
+      <div class="r"><button class="round-add" type="button" data-add="habit" aria-label="Add a habit"><svg class="i"><use href="#i-plus"/></svg></button></div>
+    </div>
+    <div id="homeHabits"></div>
+  </section>
+
+  <!-- FOCUS -->
+  <section id="tab-focus" hidden>
+    <div class="sec-head" style="margin-top:4px"><h2>focus time</h2></div>
+    <div class="card focus">
+      <div class="modes" id="modes">
+        <button type="button" data-m="focus" aria-pressed="true">focus</button>
+        <button type="button" data-m="short" aria-pressed="false">short break</button>
+        <button type="button" data-m="long" aria-pressed="false">long break</button>
+      </div>
+      <div class="ring">
+        <svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" id="ringFg" cx="60" cy="60" r="52"/></svg>
+        <div class="in"><div class="clock" id="clock">25:00</div><small id="modeLabel">time to focus</small></div>
+      </div>
+      <div class="row" style="justify-content:center">
+        <button class="btn" id="startBtn" type="button">start</button>
+        <button class="btn soft" id="resetBtn" type="button">reset</button>
+        <button class="btn soft" id="skipBtn" type="button">skip</button>
+      </div>
+      <p style="color:var(--muted);margin:14px 0 0;font-weight:300" id="focusTaskLabel"></p>
     </div>
     <div class="card">
-      <h2>Today's battles</h2>
-      <ul class="list" id="sessionList"></ul>
+      <label class="f"><span>working on</span><select class="in-f" id="focusTask" style="width:100%"><option value="">— nothing specific —</option></select></label>
+      <div class="row">
+        <label class="f"><span>focus (min)</span><input class="in-f" type="number" id="fMin" min="1" max="180" style="width:96px"></label>
+        <label class="f"><span>short break</span><input class="in-f" type="number" id="sMin" min="1" max="60" style="width:96px"></label>
+        <label class="f"><span>long break</span><input class="in-f" type="number" id="lMin" min="1" max="60" style="width:96px"></label>
+      </div>
+      <p style="color:var(--muted);font-size:14px;margin:0">A long break comes after every 4th focus session. Phone face down, water nearby ♡</p>
+    </div>
+    <div class="sec-head"><h2>today's sessions</h2><div class="r"><small id="focusTotal"></small></div></div>
+    <div class="card"><ul class="plain" id="sessionList"></ul></div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section id="tab-journal" hidden>
+    <div class="sec-head" style="margin-top:4px"><h2>dear diary</h2><input type="date" id="jDate" class="in-f" style="padding:4px 8px;font-size:14px" aria-label="Journal date"></div>
+    <div class="paper">
+      <h3 id="jTitle"></h3>
+      <label class="field"><span>I'm grateful for</span><textarea class="lined" id="jGrateful"></textarea></label>
+      <label class="field"><span>today's little wins</span><textarea class="lined" id="jWins"></textarea></label>
+      <label class="field"><span>what I learned</span><textarea class="lined" id="jLessons"></textarea></label>
+      <label class="field"><span>thoughts</span><textarea class="lined" id="jNotes" style="min-height:140px"></textarea></label>
+      <p style="color:var(--muted);font-size:13px;margin:10px 0 0" id="jSaved">saves as you type</p>
+    </div>
+    <div class="sec-head"><h2>past entries</h2></div>
+    <div class="card">
+      <input type="text" class="in-f" id="jSearch" placeholder="search entries…" style="width:100%;margin-bottom:4px">
+      <div id="jHistory"></div>
     </div>
   </section>
 
   <!-- HABITS -->
   <section id="tab-habits" hidden>
-    <h1 class="page">🌱 Habit garden</h1>
-    <div class="card">
-      <h2>Plant a new habit</h2>
-      <form class="row" id="habitForm">
-        <input id="habitIcon" value="💧" aria-label="Icon (emoji)" maxlength="4" style="width:62px;text-align:center;font-size:20px">
-        <input type="text" id="habitName" placeholder="e.g. Drink 8 glasses of water" required>
-        <button class="btn">Plant</button>
-      </form>
-      <p class="muted" style="margin-bottom:0">Each tick earns 10 XP. Ideas: 📚 Read 20 pages · 🏃 Exercise · 🧘 Meditate · 📵 No phone after 10pm · 🌅 Wake up by 6</p>
-    </div>
-    <div class="card">
-      <h2>Your habits</h2>
-      <div id="habitList"></div>
-    </div>
-  </section>
-
-  <!-- JOURNAL -->
-  <section id="tab-journal" hidden>
-    <h1 class="page">📖 Adventure log</h1>
-    <div class="card">
-      <h2>Entry for <input type="date" id="jDate" aria-label="Journal date" style="padding:4px 8px"> <span class="r xp-tag" id="jXp"></span></h2>
-      <label class="field"><span>How are you feeling?</span></label>
-      <div class="moods" id="moods"></div>
-      <label class="field"><span>🙏 I'm grateful for…</span><textarea id="jGrateful"></textarea></label>
-      <label class="field"><span>🏆 Today's wins</span><textarea id="jWins"></textarea></label>
-      <label class="field"><span>💡 What I learned / what I'd do differently</span><textarea id="jLessons"></textarea></label>
-      <label class="field"><span>✍️ Free notes</span><textarea id="jNotes" style="min-height:110px"></textarea></label>
-      <p class="muted" id="jSaved" style="margin:0">Saves automatically as you type.</p>
-    </div>
-    <div class="card">
-      <h2>Past entries</h2>
-      <input type="text" id="jSearch" placeholder="Search entries…" style="width:100%;margin-bottom:8px">
-      <div id="jHistory"></div>
-    </div>
-  </section>
-
-  <!-- SHOP -->
-  <section id="tab-shop" hidden>
-    <h1 class="page">🎁 Reward shop</h1>
-    <div class="card">
-      <h2>Spend your coins <span class="r">You earn 1 🪙 per XP</span></h2>
-      <div class="shop" id="shopList"></div>
-    </div>
-    <div class="card">
-      <h2>Add your own reward</h2>
-      <form class="row" id="rewardForm">
-        <input id="rewardIcon" value="🍦" aria-label="Icon (emoji)" maxlength="4" style="width:62px;text-align:center;font-size:20px">
-        <input type="text" id="rewardName" placeholder="e.g. Ice cream" required>
-        <input type="number" id="rewardCost" min="1" value="150" aria-label="Cost in coins" style="width:100px">
-        <button class="btn">Add</button>
-      </form>
-      <p class="muted" style="margin-bottom:0">Pick treats you'd really enjoy. Expensive rewards are great long-term goals.</p>
-    </div>
-    <div class="card">
-      <h2>🎒 Loot bag</h2>
-      <ul class="list" id="lootList"></ul>
-    </div>
-  </section>
-
-  <!-- REMINDERS -->
-  <section id="tab-remind" hidden>
-    <h1 class="page">⏰ Reminders</h1>
-    <div class="card">
-      <h2>New reminder</h2>
-      <form class="row" id="remForm">
-        <input type="text" id="remText" placeholder="Remind me to…" required>
-        <input type="datetime-local" id="remAt" required aria-label="When">
-        <select id="remRepeat" aria-label="Repeat">
-          <option value="none">Once</option>
-          <option value="daily">Every day</option>
-          <option value="weekly">Every week</option>
-        </select>
-        <button class="btn">Add</button>
-      </form>
-      <p class="muted" id="notifState"></p>
-      <button class="btn ghost small" id="notifBtn" type="button">Turn on notifications</button>
-    </div>
-    <div class="card">
-      <h2>Upcoming</h2>
-      <ul class="list" id="remList"></ul>
-    </div>
+    <div class="sec-head" style="margin-top:4px"><h2>my habits</h2><div class="r"><button class="round-add" type="button" data-add="habit" aria-label="Add a habit"><svg class="i"><use href="#i-plus"/></svg></button></div></div>
+    <div id="habitList"></div>
+    <p style="color:var(--on-berry);font-size:14px;font-weight:300;margin:4px">Tap a circle to tick off a day. Tap a habit's icon to remove it.</p>
   </section>
 </main>
 
-<nav class="tabs" role="tablist">
-  <div class="in">
-    <button role="tab" data-tab="home" aria-selected="true"><b>🏠</b>Home</button>
-    <button role="tab" data-tab="quests"><b>📜</b>Quests</button>
-    <button role="tab" data-tab="battle"><b>⚔️</b>Battle</button>
-    <button role="tab" data-tab="habits"><b>🌱</b>Habits</button>
-    <button role="tab" data-tab="journal"><b>📖</b>Log</button>
-    <button role="tab" data-tab="shop"><b>🎁</b>Shop</button>
-    <button role="tab" data-tab="remind"><b>⏰</b>Alerts</button>
+<nav class="bar">
+  <div class="in" role="tablist">
+    <button type="button" role="tab" data-tab="home" aria-selected="true"><svg class="i"><use href="#i-home"/></svg>home</button>
+    <button type="button" role="tab" data-tab="focus"><svg class="i"><use href="#i-timer"/></svg>focus</button>
+    <button type="button" class="fab" id="fab" aria-label="Add"><span><svg class="i"><use href="#i-plus"/></svg></span></button>
+    <button type="button" role="tab" data-tab="journal"><svg class="i"><use href="#i-journal"/></svg>journal</button>
+    <button type="button" role="tab" data-tab="habits"><svg class="i"><use href="#i-check"/></svg>habits</button>
   </div>
 </nav>
 
-<dialog id="heroDlg">
-  <form method="dialog">
-    <h2 style="margin:0 0 12px">🧙 Your hero</h2>
-    <label class="field"><span>Hero name</span><input type="text" id="heroName" maxlength="24" style="width:100%"></label>
-    <label class="field"><span>Avatar (more unlock as you level up)</span></label>
-    <div class="avatars" id="avatarGrid"></div>
-    <label class="row" style="margin-bottom:14px;cursor:pointer"><input type="checkbox" id="soundOn"> Sound effects</label>
-    <p class="muted" style="margin:0 0 8px">Your progress lives only in this browser. Export a backup now and then, and import it to move to another device.</p>
-    <div class="row" style="justify-content:space-between">
-      <div class="row">
-        <button class="btn ghost small" id="exportBtn" type="button">Export</button>
-        <label class="btn ghost small" style="cursor:pointer">Import<input type="file" id="importFile" accept="application/json" hidden></label>
-      </div>
-      <button class="btn">Done</button>
+<!-- add sheet -->
+<dialog class="sheet" id="addSheet">
+  <div class="grab"></div>
+  <h3>add something</h3>
+  <div class="tabs2" id="addTabs">
+    <button type="button" data-k="plan">timeline</button>
+    <button type="button" data-k="todo">to-do</button>
+    <button type="button" data-k="habit">habit</button>
+    <button type="button" data-k="remind">reminder</button>
+  </div>
+  <form id="addForm">
+    <label class="f"><span id="addNameLbl">what's the plan?</span><input class="in-f" id="addName" required style="width:100%" autocomplete="off"></label>
+    <div data-for="plan" class="row">
+      <label class="f"><span>day</span><input class="in-f" type="date" id="addDate"></label>
+      <label class="f"><span>from</span><input class="in-f" type="time" id="addStart"></label>
+      <label class="f"><span>to</span><input class="in-f" type="time" id="addEnd"></label>
+    </div>
+    <div data-for="todo">
+      <label class="f"><span>list</span><select class="in-f" id="addList" style="width:100%"></select></label>
+    </div>
+    <div data-for="habit">
+      <label class="f"><span>icon</span></label>
+      <div class="emojis" id="habitEmojis" style="margin-bottom:12px"></div>
+    </div>
+    <div data-for="remind" class="row">
+      <label class="f"><span>when</span><input class="in-f" type="datetime-local" id="addAt"></label>
+      <label class="f"><span>repeat</span><select class="in-f" id="addRepeat"><option value="none">once</option><option value="daily">every day</option><option value="weekly">every week</option></select></label>
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:4px">
+      <button class="btn soft" type="button" id="addCancel">cancel</button>
+      <button class="btn">add</button>
     </div>
   </form>
 </dialog>
 
-<div class="overlay" id="levelUp" hidden>
-  <div class="card levelup">
-    <div class="em" id="luAvatar">🧙</div>
-    <div class="big">LEVEL UP!</div>
-    <p style="font-size:18px;margin:6px 0" id="luText">You reached level 2</p>
-    <p class="muted" id="luUnlock"></p>
-    <button class="btn" id="luClose" type="button">Awesome!</button>
-  </div>
-</div>
+<!-- reminders sheet -->
+<dialog class="sheet" id="remSheet">
+  <div class="grab"></div>
+  <div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0">reminders</h3><button class="btn small" type="button" id="remAdd">+ new</button></div>
+  <p style="color:var(--muted);font-size:14px;margin:4px 0 8px" id="notifState"></p>
+  <button class="btn soft small" id="notifBtn" type="button" style="margin-bottom:8px">turn on notifications</button>
+  <ul class="plain" id="remList"></ul>
+  <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn soft" type="button" data-close>close</button></div>
+</dialog>
 
-<canvas id="confetti"></canvas>
+<!-- settings sheet -->
+<dialog class="sheet" id="menuSheet">
+  <div class="grab"></div>
+  <h3>settings</h3>
+  <label class="f"><span>your name</span><input class="in-f" id="nameIn" maxlength="24" placeholder="so I can say hi ♡" style="width:100%"></label>
+  <label class="row" style="margin:6px 0 14px;cursor:pointer"><input type="checkbox" id="soundOn"> soft sounds</label>
+  <label class="f"><span>my own affirmations (one per line, mixed in with the built-in ones)</span><textarea class="in-f" id="myAff" rows="3" style="width:100%;resize:vertical"></textarea></label>
+  <p style="color:var(--muted);font-size:14px;margin:6px 0 8px">Everything is saved in this browser only. Export a backup now and then, and import it to move to another device.</p>
+  <div class="row" style="justify-content:space-between">
+    <div class="row">
+      <button class="btn soft small" id="exportBtn" type="button">export</button>
+      <label class="btn soft small" style="cursor:pointer">import<input type="file" id="importFile" accept="application/json" hidden></label>
+    </div>
+    <button class="btn" type="button" data-close>done</button>
+  </div>
+</dialog>
+
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -512,344 +433,361 @@
   const $ = (id) => document.getElementById(id);
   const pad = (n) => String(n).padStart(2, '0');
   const ymd = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const parseDay = (s) => new Date(s + 'T00:00');
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const monday = (d) => { const x = addDays(d, -((d.getDay() + 6) % 7)); x.setHours(0, 0, 0, 0); return x; };
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  const icon = (n) => `<svg class="i"><use href="#i-${n}"/></svg>`;
+  const fmtTime = (hm) => {
+    if (!hm) return '';
+    const [h, m] = hm.split(':').map(Number);
+    return `${((h + 11) % 12) + 1}:${pad(m)}${h < 12 ? 'am' : 'pm'}`;
+  };
 
   // ---------- storage ----------
-  const DEFAULT_REWARDS = [
-    { icon: '☕', name: 'Fancy coffee', cost: 150 },
-    { icon: '📺', name: 'One episode of a show', cost: 200 },
-    { icon: '🎮', name: '30 min of gaming', cost: 300 },
-    { icon: '🍕', name: 'Pizza night', cost: 800 },
-    { icon: '🛍️', name: 'Buy something nice', cost: 1500 },
-    { icon: '🏖️', name: 'A full day off', cost: 3000 },
-  ];
   const blank = () => ({ tasks: [], journal: {}, reminders: [], sessions: [], habits: [], settings: { f: 25, s: 5, l: 15, sound: true } });
   let db;
   try { db = Object.assign(blank(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch { db = blank(); }
-  if (!db.rewards) db.rewards = DEFAULT_REWARDS.map((r) => ({ id: uid(), ...r }));
-  if (!db.purchases) db.purchases = [];
-  if (!db.game) db.game = { name: 'Hero', avatar: '🧙', lastLevel: null, seen: [] };
+  if (!db.lists) db.lists = ['personal 🎀', 'work 💼'];
+  if (!db.profile) db.profile = { name: db.game?.name && db.game.name !== 'Hero' ? db.game.name : '', affirmations: '' };
+  if (!db.moods) db.moods = {};
+  if (!db.affPick) db.affPick = {};
   if (db.settings.sound === undefined) db.settings.sound = true;
+  // tasks without a time slot from older versions become to-dos
+  db.tasks.forEach((t) => { if (!t.start && !t.list) t.list = db.lists[0]; });
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {} };
+  save();
 
-  // ---------- sound ----------
+  // ---------- little joys ----------
   let actx;
-  function tone(freqs, { gap = 0.09, len = 0.16, type = 'square', vol = 0.06, force = false } = {}) {
+  function chime(freqs = [880, 1175], vol = 0.05, force = false) {
     if (!db.settings.sound && !force) return;
     try {
       actx ||= new (window.AudioContext || window.webkitAudioContext)();
       freqs.forEach((f, i) => {
-        const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * gap;
-        o.type = type; o.frequency.value = f; o.connect(g); g.connect(actx.destination);
-        g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-        o.start(t); o.stop(t + len);
+        const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * 0.1;
+        o.type = 'sine'; o.frequency.value = f; o.connect(g); g.connect(actx.destination);
+        g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+        o.start(t); o.stop(t + 0.5);
       });
     } catch {}
   }
-  const sfx = {
-    coin: () => tone([988, 1319]),
-    undo: () => tone([440, 330], { type: 'triangle' }),
-    level: () => tone([523, 659, 784, 1047, 1319], { gap: 0.12, len: 0.25 }),
-    badge: () => tone([784, 988, 1175, 1568], { gap: 0.08 }),
-    win: () => tone([392, 523, 659, 784, 659, 784], { gap: 0.11, len: 0.2 }),
-    buy: () => tone([1319, 1047, 1568], { gap: 0.07 }),
-    alarm: () => tone([880, 880, 880], { gap: 0.35, len: 0.3, type: 'sine', vol: 0.2, force: true }),
-  };
-
-  // ---------- effects ----------
   let toastTimer;
   function toast(msg) {
     const t = $('toast'); t.textContent = msg; t.hidden = false;
     t.style.animation = 'none'; void t.offsetWidth; t.style.animation = '';
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 3800);
-  }
-  function floatText(x, y, text, color) {
-    const el = document.createElement('div'); el.className = 'float'; el.textContent = text;
-    el.style.left = x + 'px'; el.style.top = y + 'px'; if (color) el.style.color = color;
-    document.body.appendChild(el); setTimeout(() => el.remove(), 1200);
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 3200);
   }
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const cv = $('confetti'), cx = cv.getContext('2d'); let parts = [], raf = 0;
-  function confetti(x = innerWidth / 2, y = innerHeight / 3, n = 60) {
-    if (reduced) return;
-    const colors = ['#fbbf24', '#4ade80', '#a78bfa', '#f87171', '#38bdf8', '#f472b6'];
+  function hearts(el, n = 5) {
+    chime();
+    if (reduced || !el) return;
+    const r = el.getBoundingClientRect();
     for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2, s = 3 + Math.random() * 7;
-      parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 4, r: 3 + Math.random() * 4, c: colors[i % colors.length], rot: Math.random() * 6, life: 70 + Math.random() * 40 });
+      const h = document.createElement('div'); h.className = 'heart'; h.textContent = '♥';
+      h.style.left = r.left + r.width / 2 - 8 + 'px'; h.style.top = r.top + 'px';
+      h.style.setProperty('--dx', `${(Math.random() - 0.5) * 70}px`);
+      h.style.animationDelay = `${i * 60}ms`; h.style.fontSize = `${12 + Math.random() * 10}px`;
+      document.body.appendChild(h); setTimeout(() => h.remove(), 1400);
     }
-    if (!raf) loop();
-  }
-  function loop() {
-    cv.width = innerWidth; cv.height = innerHeight; cx.clearRect(0, 0, cv.width, cv.height);
-    parts = parts.filter((p) => p.life-- > 0 && p.y < cv.height + 20);
-    parts.forEach((p) => {
-      p.vy += 0.25; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.rot += 0.2;
-      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.fillStyle = p.c; cx.globalAlpha = Math.min(1, p.life / 30);
-      cx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r); cx.restore();
-    });
-    raf = parts.length ? requestAnimationFrame(loop) : (cx.clearRect(0, 0, cv.width, cv.height), 0);
-  }
-  const centerOf = (el) => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
-  function reward(el, xp) { // little celebration at the clicked element
-    const [x, y] = centerOf(el); floatText(x, y, `+${xp} XP`); confetti(x, y, 18); sfx.coin();
   }
   function notify(title, body) {
-    sfx.alarm(); toast(`${title}: ${body}`);
+    chime([880, 880, 1175], 0.15, true); toast(`${title} · ${body}`);
     if ('Notification' in window && Notification.permission === 'granted') {
       try { new Notification(title, { body }); } catch {}
     }
   }
 
-  // ---------- game rules ----------
-  const DIFF = {
-    low: { name: 'Easy', xp: 10, cls: 'easy' },
-    med: { name: 'Normal', xp: 20, cls: 'normal' },
-    high: { name: 'Hard', xp: 35, cls: 'hard' },
-  };
-  const XP = { focusMin: 2, habit: 10, journal: 25 };
-  const CHALLENGES = [
-    { id: 'q3', grp: 'q', icon: '📜', text: 'Complete 3 quests', goal: 3, xp: 40, val: (s) => s.done },
-    { id: 'q5', grp: 'q', icon: '🏹', text: 'Complete 5 quests', goal: 5, xp: 60, val: (s) => s.done },
-    { id: 'hard', grp: 'h', icon: '🔴', text: 'Defeat a Hard quest', goal: 1, xp: 40, val: (s) => s.hard },
-    { id: 'f50', grp: 'f', icon: '⏳', text: 'Focus for 50 minutes', goal: 50, xp: 50, val: (s) => s.focus },
-    { id: 'b2', grp: 'f', icon: '⚔️', text: 'Win 2 focus battles', goal: 2, xp: 40, val: (s) => s.battles },
-    { id: 'h3', grp: 'g', icon: '🌱', text: 'Tick off 3 habits', goal: 3, xp: 30, val: (s) => s.habits },
-    { id: 'j', grp: 'j', icon: '📖', text: 'Write in your adventure log', goal: 1, xp: 30, val: (s) => +s.journal },
-    { id: 'mood', grp: 'j', icon: '😊', text: 'Check in with your mood', goal: 1, xp: 15, val: (s) => +s.mood },
-    { id: 'p4', grp: 'p', icon: '🗺️', text: 'Plan 4 quests for the day', goal: 4, xp: 25, val: (s) => s.planned },
+  // ---------- greeting & affirmation ----------
+  const AFFIRMATIONS = [
+    'I attract positive energy and repel negativity.', 'I am allowed to take up space.', 'I am becoming the best version of myself.',
+    'Small steps every day add up to big things.', 'I am proud of how far I have come.', 'I trust myself to figure it out.',
+    'My peace is my priority.', 'I am calm, focused and capable.', 'Good things are coming my way.', 'I choose progress over perfection.',
+    'I deserve rest as much as I deserve success.', 'I am worthy of the life I want.', 'I am doing better than I think.',
+    'I radiate confidence and kindness.', 'Today I will be gentle with myself.', 'I can do hard things.', 'My dreams are valid.',
+    'I am grateful for this moment.', 'I let go of what I can\'t control.', 'I bloom at my own pace.', 'My energy is precious and I protect it.',
+    'I am exactly where I need to be.', 'I believe in the person I am becoming.', 'I finish what I start.', 'Every day I grow a little more.',
   ];
-  function challengesFor(day) { // same 3 challenges for a given date, every time
-    let h = 2166136261; for (const ch of day) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
-    const rand = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) ^ Math.imul(h ^ (h >>> 13), 3266489909)) >>> 0) / 4294967296;
-    const pool = CHALLENGES.slice(), out = [], grps = new Set();
-    while (out.length < 3 && pool.length) {
-      const c = pool.splice(Math.floor(rand() * pool.length), 1)[0];
-      if (!grps.has(c.grp)) { grps.add(c.grp); out.push(c); }
-    }
-    return out;
+  const allAff = () => AFFIRMATIONS.concat((db.profile.affirmations || '').split('\n').map((s) => s.trim()).filter(Boolean));
+  function dayHash(s) { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; }
+  const endOfToday = () => { const d = new Date(); d.setHours(23, 59, 59, 999); return d.getTime(); };
+  function renderTop() {
+    const hr = new Date().getHours();
+    const part = hr < 12 ? 'good morning' : hr < 17 ? 'good afternoon' : 'good evening';
+    $('hello').textContent = `${part}${db.profile.name ? ', ' + db.profile.name : ''} ♡`;
+    const list = allAff(), today = ymd();
+    const idx = db.affPick[today] ?? dayHash(today) % list.length;
+    $('affText').textContent = list[idx % list.length];
+    $('bellDot').hidden = !db.reminders.some((r) => r.at <= endOfToday());
   }
-  const TITLES = [[1, 'Novice'], [3, 'Apprentice'], [5, 'Adventurer'], [8, 'Knight'], [12, 'Champion'], [16, 'Hero'], [20, 'Legend'], [30, 'Mythic']];
-  const titleFor = (lv) => TITLES.filter(([l]) => lv >= l).pop()[1];
-  const AVATARS = [['🧙', 1], ['🦸', 1], ['🧝', 1], ['🐱', 1], ['🥷', 2], ['🦊', 3], ['🧚', 4], ['🐼', 5], ['🤖', 6], ['🧛', 7], ['🦁', 8], ['🧜', 10], ['🦄', 12], ['🐲', 15], ['👑', 20], ['🌟', 25], ['🐉', 30], ['🔮', 35]];
-  function levelInfo(xp) {
-    let lv = 1, need = 100, rest = xp;
-    while (rest >= need) { rest -= need; lv++; need = 100 + (lv - 1) * 50; }
-    return { lv, into: rest, need };
+  $('affNext').onclick = () => {
+    const list = allAff(), today = ymd(), cur = db.affPick[today] ?? dayHash(today) % list.length;
+    db.affPick = { [today]: (cur + 1) % list.length }; save(); renderTop();
+  };
+
+  // ---------- mood ----------
+  const MOODS = ['happy ☀️', 'calm 🌿', 'whimsical 🌙', 'motivated ✨', 'productive 💪', 'loved 💗', 'tired 😴', 'anxious 🌧️', 'sad 💧', 'meh 🫧'];
+  function renderMood() {
+    const m = db.moods[ymd()];
+    $('moodBtn').textContent = m || 'pick one ♡';
+    $('moodPick').innerHTML = MOODS.map((x) => `<button type="button" aria-pressed="${x === m}">${x}</button>`).join('');
+    $('moodPick').querySelectorAll('button').forEach((b) => (b.onclick = () => {
+      db.moods[ymd()] = b.textContent === m ? '' : b.textContent; save(); $('moodPick').hidden = true; renderMood();
+    }));
   }
-  const hasText = (e) => e && !!(e.grateful || e.wins || e.lessons || e.notes);
+  $('moodBtn').onclick = () => ($('moodPick').hidden = !$('moodPick').hidden);
+
+  // ---------- week strip & timeline ----------
+  let sel = ymd(), weekStart = monday(new Date());
+  $('wkPrev').onclick = () => { weekStart = addDays(weekStart, -7); renderWeek(); };
+  $('wkNext').onclick = () => { weekStart = addDays(weekStart, 7); renderWeek(); };
+  const planFor = (d) => db.tasks.filter((t) => t.start && t.date === d).sort((a, b) => a.start.localeCompare(b.start));
+  function renderWeek() {
+    const mid = addDays(weekStart, 3);
+    $('monthName').textContent = mid.toLocaleDateString(undefined, { month: 'long' }) + (mid.getFullYear() !== new Date().getFullYear() ? ' ' + mid.getFullYear() : '');
+    $('week').innerHTML = Array.from({ length: 7 }, (_, i) => {
+      const d = addDays(weekStart, i), k = ymd(d);
+      const cls = ['wd', k === ymd() && 'today', k === sel && 'sel', planFor(k).length && 'has'].filter(Boolean).join(' ');
+      return `<button type="button" class="${cls}" data-d="${k}" aria-pressed="${k === sel}"><span>${d.toLocaleDateString(undefined, { weekday: 'short' })}</span><strong>${d.getDate()}</strong></button>`;
+    }).join('');
+    $('week').querySelectorAll('.wd').forEach((b) => (b.onclick = () => { sel = b.dataset.d; renderHome(); }));
+  }
+  function renderTimeline() {
+    const items = planFor(sel), now = new Date(), hm = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const d = parseDay(sel), diff = Math.round((d - parseDay(ymd())) / 864e5);
+    $('dayLabel').textContent = diff === 0 ? 'today' : diff === 1 ? 'tomorrow' : diff === -1 ? 'yesterday' : d.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' });
+    $('dayCount').textContent = items.length ? `${items.filter((t) => t.done).length}/${items.length} done` : '';
+    const box = $('timeline'); box.innerHTML = '';
+    if (!items.length) { box.innerHTML = '<div class="empty">nothing planned yet ♡<br>tap + to add a time block</div>'; return; }
+    items.forEach((t) => {
+      const isNow = sel === ymd() && !t.done && t.start <= hm && !!t.end && hm < t.end;
+      const el = document.createElement('div'); el.className = 'slot';
+      el.innerHTML = `<div class="t">${fmtTime(t.start)}</div>
+        <div class="block${t.done ? ' done' : ''}${isNow ? ' now' : ''}" role="button" tabindex="0" aria-pressed="${!!t.done}">
+          <div class="grow"><div class="ttl">${esc(t.text)}</div>
+          <div class="tm">${icon('clock')}${fmtTime(t.start)}${t.end ? ' - ' + fmtTime(t.end) : ''}</div></div>
+          <button class="x" type="button" aria-label="Delete">${icon('x')}</button>
+        </div>`;
+      const blk = el.querySelector('.block');
+      blk.onclick = (e) => {
+        if (e.target.closest('.x')) return;
+        t.done = !t.done; save(); if (t.done) hearts(blk); renderHome(); checkAllDone();
+      };
+      blk.onkeydown = (e) => { if (e.target === blk && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); blk.click(); } };
+      el.querySelector('.x').onclick = () => { if (confirm(`Remove "${t.text}"?`)) { db.tasks = db.tasks.filter((x) => x !== t); save(); renderHome(); } };
+      box.appendChild(el);
+    });
+  }
+  function checkAllDone() {
+    const items = planFor(sel);
+    if (sel === ymd() && items.length > 1 && items.every((t) => t.done)) toast('all done for today · so proud of you ♡');
+  }
+
+  // ---------- to-do lists ----------
+  function renderLists() {
+    const box = $('lists'), scroll = box.scrollLeft; box.innerHTML = '';
+    db.lists.forEach((name, li) => {
+      const items = db.tasks.filter((t) => !t.start && t.list === name).sort((a, b) => a.done - b.done);
+      const card = document.createElement('div'); card.className = 'tlist';
+      card.innerHTML = `<div class="tlist-h"><span>${esc(name)}</span>${items.length ? '' : `<button class="x" type="button" aria-label="Delete list">${icon('x')}</button>`}</div>
+        <div class="items"></div>
+        <form class="additem"><input placeholder="add an item…" aria-label="Add to ${esc(name)}"></form>
+        <div class="tlist-f"><span>${items.filter((t) => !t.done).length} left</span>${items.some((t) => t.done) ? '<button class="link" type="button">clear done</button>' : ''}</div>`;
+      const list = card.querySelector('.items');
+      if (!items.length) list.innerHTML = '<div class="empty" style="padding:10px 0">empty ♡</div>';
+      items.forEach((t) => {
+        const it = document.createElement('div'); it.className = 'item' + (t.done ? ' done' : '');
+        it.innerHTML = `<span>${esc(t.text)}</span><button type="button" class="circ ${t.done ? 'on' : ''}" aria-pressed="${!!t.done}" aria-label="Done">${t.done ? icon('tick') : ''}</button>`;
+        it.querySelector('.circ').onclick = (e) => { t.done = !t.done; save(); if (t.done) hearts(e.currentTarget, 3); renderLists(); };
+        list.appendChild(it);
+      });
+      card.querySelector('form').onsubmit = (e) => {
+        e.preventDefault(); const v = e.target.querySelector('input').value.trim(); if (!v) return;
+        db.tasks.push({ id: uid(), text: v, list: name, date: ymd(), pri: 'med', done: false }); save(); renderLists();
+        $('lists').querySelectorAll('.tlist')[li]?.querySelector('input')?.focus();
+      };
+      const del = card.querySelector('.tlist-h .x');
+      if (del) del.onclick = () => { db.lists = db.lists.filter((l) => l !== name); save(); renderLists(); };
+      const clr = card.querySelector('.link');
+      if (clr) clr.onclick = () => { db.tasks = db.tasks.filter((t) => !(t.list === name && !t.start && t.done)); save(); renderLists(); };
+      box.appendChild(card);
+    });
+    const nw = document.createElement('button'); nw.type = 'button'; nw.className = 'tlist new'; nw.textContent = '+ new list';
+    nw.onclick = () => {
+      const n = (prompt('Name your list (an emoji is cute ♡)', 'home 🏡') || '').trim();
+      if (n && !db.lists.includes(n)) { db.lists.push(n); save(); renderLists(); }
+    };
+    box.appendChild(nw);
+    box.scrollLeft = scroll;
+  }
+
+  // ---------- habits ----------
+  const HABIT_EMOJIS = ['🧘‍♀️', '💧', '🧴', '💊', '🏃‍♀️', '📚', '🥗', '😴', '✍️', '🌸', '🚶‍♀️', '🪥', '☀️', '📵', '🎨', '🎧'];
   function habitStreak(h) {
     let n = 0, d = new Date();
-    if (!h.days[ymd(d)]) d = addDays(d, -1); // not ticked yet today doesn't break the streak
+    if (!h.days[ymd(d)]) d = addDays(d, -1);
     while (h.days[ymd(d)]) { n++; d = addDays(d, -1); }
     return n;
   }
-  function bestStreak(h) {
-    let best = 0, run = 0, prev = null;
-    Object.keys(h.days).sort().forEach((d) => {
-      run = prev && ymd(addDays(prev + 'T00:00', 1)) === d ? run + 1 : 1;
-      best = Math.max(best, run); prev = d;
-    });
-    return best;
-  }
-  const BADGES = [
-    { id: 'first', icon: '🌱', name: 'First Step', desc: 'Complete a quest', ok: (g) => g.totalDone >= 1 },
-    { id: 'q25', icon: '📜', name: 'Quest Hunter', desc: 'Complete 25 quests', ok: (g) => g.totalDone >= 25 },
-    { id: 'q100', icon: '💯', name: 'Centurion', desc: 'Complete 100 quests', ok: (g) => g.totalDone >= 100 },
-    { id: 'hard10', icon: '🗡️', name: 'Boss Slayer', desc: 'Defeat 10 Hard quests', ok: (g) => g.totalHard >= 10 },
-    { id: 'battle1', icon: '⚔️', name: 'First Victory', desc: 'Win a focus battle', ok: (g) => g.totalBattles >= 1 },
-    { id: 'focus10', icon: '⏳', name: 'Deep Diver', desc: '10 hours of focus', ok: (g) => g.focusMin >= 600 },
-    { id: 'log7', icon: '📖', name: 'Storyteller', desc: '7 log entries', ok: (g) => g.journalDays >= 7 },
-    { id: 'habit7', icon: '🌿', name: 'Habit Builder', desc: '7-day habit streak', ok: (g) => g.bestHabit >= 7 },
-    { id: 'habit30', icon: '🌳', name: 'Habit Master', desc: '30-day habit streak', ok: (g) => g.bestHabit >= 30 },
-    { id: 'fire7', icon: '🔥', name: 'On Fire', desc: '7-day XP streak', ok: (g) => g.streak >= 7 },
-    { id: 'fire30', icon: '☄️', name: 'Unstoppable', desc: '30-day XP streak', ok: (g) => g.streak >= 30 },
-    { id: 'chal10', icon: '🎯', name: 'Challenger', desc: 'Win 10 daily challenges', ok: (g) => g.challengesDone >= 10 },
-    { id: 'buy1', icon: '🎁', name: 'Treat Yourself', desc: 'Claim a reward', ok: (g) => db.purchases.length >= 1 },
-    { id: 'lv5', icon: '🛡️', name: 'Adventurer', desc: 'Reach level 5', ok: (g) => g.lv >= 5 },
-    { id: 'lv10', icon: '👑', name: 'Royalty', desc: 'Reach level 10', ok: (g) => g.lv >= 10 },
-  ];
-
-  // Everything is worked out from your data, so unticking something takes its XP back.
-  function compute() {
-    const days = {};
-    const day = (d) => (days[d] ||= { done: 0, hard: 0, planned: 0, focus: 0, battles: 0, habits: 0, journal: false, mood: false, taskXp: 0 });
-    db.tasks.forEach((t) => {
-      const s = day(t.date); s.planned++;
-      if (t.done) { s.done++; s.taskXp += DIFF[t.pri].xp; if (t.pri === 'high') s.hard++; }
-    });
-    db.sessions.forEach((x) => { const s = day(x.date); s.focus += x.min; if (x.min >= 10) s.battles++; });
-    db.habits.forEach((h) => Object.keys(h.days).forEach((d) => day(d).habits++));
-    Object.entries(db.journal).forEach(([d, e]) => { if (hasText(e)) day(d).journal = true; if (e.mood) day(d).mood = true; });
-
-    const g = { days, xpByDay: {}, xp: 0, challengesDone: 0, totalDone: 0, totalHard: 0, totalBattles: 0, focusMin: 0, journalDays: 0 };
-    Object.entries(days).forEach(([d, s]) => {
-      let x = s.taskXp + s.focus * XP.focusMin + s.habits * XP.habit + (s.journal ? XP.journal : 0);
-      challengesFor(d).forEach((c) => { if (c.val(s) >= c.goal) { x += c.xp; g.challengesDone++; } });
-      g.xpByDay[d] = x; g.xp += x;
-      g.totalDone += s.done; g.totalHard += s.hard; g.totalBattles += s.battles; g.focusMin += s.focus; g.journalDays += +s.journal;
-    });
-    g.spent = db.purchases.reduce((a, p) => a + p.cost, 0);
-    g.coins = g.xp - g.spent;
-    Object.assign(g, levelInfo(g.xp));
-    let n = 0, d = new Date();
-    if (!g.xpByDay[ymd(d)]) d = addDays(d, -1);
-    while (g.xpByDay[ymd(d)]) { n++; d = addDays(d, -1); }
-    g.streak = n;
-    g.bestHabit = Math.max(0, ...db.habits.map(bestStreak));
-    g.today = days[ymd()] || day(ymd());
-    return g;
-  }
-
-  let G;
-  function checkProgress() {
-    const gm = db.game;
-    if (gm.lastLevel === null) { // first run: don't celebrate what's already there
-      gm.lastLevel = G.lv; gm.seen = BADGES.filter((b) => b.ok(G)).map((b) => b.id); save(); return;
+  function habitRow(h, withName) {
+    const el = document.createElement('div'); el.className = 'habit';
+    const start = monday(new Date()), today = ymd(), streak = habitStreak(h);
+    el.innerHTML = `<button type="button" class="h-ic" aria-label="${withName ? 'Remove ' + esc(h.name) : esc(h.name)}" title="${esc(h.name)}">${esc(h.icon)}</button>
+      <div class="h-body">${withName ? `<div class="h-name">${esc(h.name)}<small>${streak ? streak + ' day streak ♡' : ''}</small></div>` : ''}<div class="h-days"></div></div>`;
+    const days = el.querySelector('.h-days');
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(start, i), k = ymd(d), on = !!h.days[k], fut = k > today;
+      const c = document.createElement('div'); if (fut) c.className = 'future';
+      c.innerHTML = `${d.toLocaleDateString(undefined, { weekday: 'short' })}<em>${d.getDate()}</em>
+        <button type="button" class="circ ${on ? 'on' : ''}" aria-pressed="${on}" aria-label="${esc(h.name)} on ${k}" ${fut ? 'disabled' : ''}>${on ? icon('tick') : ''}</button>`;
+      c.querySelector('button').onclick = (e) => {
+        if (h.days[k]) delete h.days[k]; else { h.days[k] = true; hearts(e.currentTarget, 3); }
+        save(); renderHabitsAll();
+        if (k === today && h.days[k] && db.habits.length > 1 && db.habits.every((x) => x.days[today])) toast('every habit done today ♡');
+      };
+      days.appendChild(c);
     }
-    const fresh = BADGES.filter((b) => b.ok(G) && !gm.seen.includes(b.id));
-    if (fresh.length) {
-      gm.seen.push(...fresh.map((b) => b.id));
-      setTimeout(() => { toast(`🏅 Achievement unlocked: ${fresh.map((b) => b.icon + ' ' + b.name).join(', ')}`); sfx.badge(); confetti(innerWidth / 2, innerHeight / 2, 50); }, 500);
-    }
-    if (G.lv > gm.lastLevel) {
-      const unlocked = AVATARS.filter(([, l]) => l > gm.lastLevel && l <= G.lv).map(([a]) => a);
-      $('luAvatar').textContent = gm.avatar;
-      $('luText').textContent = `You reached level ${G.lv} — ${titleFor(G.lv)}!`;
-      $('luUnlock').textContent = unlocked.length ? `New avatar${unlocked.length > 1 ? 's' : ''} unlocked: ${unlocked.join(' ')}` : 'Keep going, hero.';
-      setTimeout(() => { $('levelUp').hidden = false; sfx.level(); confetti(innerWidth / 2, innerHeight / 3, 140); }, 350);
-    }
-    gm.lastLevel = G.lv;
-    save();
-  }
-  $('luClose').onclick = () => ($('levelUp').hidden = true);
-  $('levelUp').onclick = (e) => { if (e.target.id === 'levelUp') $('levelUp').hidden = true; };
-
-  // ---------- HUD & hero ----------
-  function renderHud() {
-    $('hudAvatar').textContent = db.game.avatar;
-    $('hudName').textContent = db.game.name;
-    $('hudTitle').textContent = titleFor(G.lv);
-    $('hudLv').textContent = `Lv ${G.lv}`;
-    $('xpFill').style.width = `${(G.into / G.need) * 100}%`;
-    $('xpText').textContent = `${G.into} / ${G.need} XP`;
-    $('hudCoins').textContent = G.coins;
-    $('hudStreak').textContent = G.streak;
-  }
-  $('avatarBtn').onclick = () => {
-    $('heroName').value = db.game.name; $('soundOn').checked = db.settings.sound;
-    renderAvatarGrid(); $('heroDlg').showModal();
-  };
-  function renderAvatarGrid() {
-    $('avatarGrid').innerHTML = AVATARS.map(([a, l]) => `<button type="button" data-a="${a}" aria-pressed="${a === db.game.avatar}" ${G.lv < l ? 'disabled' : ''} aria-label="${G.lv < l ? 'Unlocks at level ' + l : a}"><span>${a}</span>${G.lv < l ? `<small>🔒Lv${l}</small>` : ''}</button>`).join('');
-    $('avatarGrid').querySelectorAll('button:not(:disabled)').forEach((b) => (b.onclick = () => { db.game.avatar = b.dataset.a; save(); renderAvatarGrid(); renderHud(); }));
-  }
-  $('heroName').oninput = () => { db.game.name = $('heroName').value.trim() || 'Hero'; save(); renderHud(); renderHome(); };
-  $('soundOn').onchange = () => { db.settings.sound = $('soundOn').checked; save(); if (db.settings.sound) sfx.coin(); };
-
-  // tabs
-  document.querySelectorAll('nav.tabs button').forEach((b) => {
-    b.onclick = () => {
-      document.querySelectorAll('nav.tabs button').forEach((x) => x.setAttribute('aria-selected', x === b));
-      document.querySelectorAll('section[id^="tab-"]').forEach((s) => (s.hidden = s.id !== 'tab-' + b.dataset.tab));
-      try { localStorage.setItem(KEY + '.tab', b.dataset.tab); } catch {}
-      scrollTo(0, 0); renderAll();
+    el.querySelector('.h-ic').onclick = () => {
+      if (withName) { if (confirm(`Remove the habit "${h.name}" and its history?`)) { db.habits = db.habits.filter((x) => x !== h); save(); renderHabitsAll(); } }
+      else toast(`${h.icon} ${h.name}${streak ? ` · ${streak} day streak` : ''}`);
     };
-  });
-  const goTab = (t) => document.querySelector(`nav.tabs [data-tab="${t}"]`).click();
-
-  // ---------- QUESTS ----------
-  const priRank = { high: 0, med: 1, low: 2 };
-  $('taskDate').value = ymd();
-  $('planDate').value = ymd();
-  function addQuest(text, pri, date) {
-    db.tasks.push({ id: uid(), text, pri, date, done: false }); save(); renderAll();
+    return el;
   }
-  $('taskForm').onsubmit = (e) => {
+  function renderHabitsAll() {
+    ['homeHabits', 'habitList'].forEach((id) => {
+      const box = $(id); box.innerHTML = '';
+      if (!db.habits.length) box.innerHTML = '<div class="card empty">no habits yet · tap + to start one small habit ♡</div>';
+      db.habits.forEach((h) => box.appendChild(habitRow(h, id === 'habitList')));
+    });
+  }
+
+  // ---------- add sheet ----------
+  let addKind = 'plan', habitEmoji = HABIT_EMOJIS[0];
+  const LABELS = { plan: "what's the plan?", todo: 'what do you need to do?', habit: 'habit name', remind: 'remind me to…' };
+  const PH = { plan: 'e.g. morning routine ☀️', todo: 'e.g. grocery run', habit: 'e.g. drink 8 glasses of water', remind: 'e.g. call mom' };
+  function showKind(kind) {
+    addKind = kind;
+    $('addTabs').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.k === kind));
+    document.querySelectorAll('#addForm [data-for]').forEach((s) => (s.hidden = s.dataset.for !== kind));
+    $('addNameLbl').textContent = LABELS[kind]; $('addName').placeholder = PH[kind];
+    $('habitEmojis').innerHTML = HABIT_EMOJIS.map((e) => `<button type="button" aria-pressed="${e === habitEmoji}">${e}</button>`).join('');
+    $('habitEmojis').querySelectorAll('button').forEach((b) => (b.onclick = () => { habitEmoji = b.textContent; showKind('habit'); }));
+  }
+  function openAdd(kind) {
+    $('addDate').value = sel;
+    if (!$('addStart').value) {
+      const h = Math.min(22, new Date().getHours() + 1);
+      $('addStart').value = `${pad(h)}:00`; $('addEnd').value = `${pad(h + 1)}:00`;
+    }
+    $('addList').innerHTML = db.lists.map((l) => `<option>${esc(l)}</option>`).join('');
+    const at = new Date(Date.now() + 36e5); at.setMinutes(0, 0, 0);
+    $('addAt').value = `${ymd(at)}T${pad(at.getHours())}:00`;
+    showKind(kind);
+    if (!$('addSheet').open) $('addSheet').showModal();
+    $('addName').focus();
+  }
+  const currentTab = () => document.querySelector('nav.bar [aria-selected="true"]').dataset.tab;
+  $('fab').onclick = () => openAdd(currentTab() === 'habits' ? 'habit' : 'plan');
+  document.querySelectorAll('[data-add]').forEach((b) => (b.onclick = () => openAdd(b.dataset.add)));
+  $('addTabs').querySelectorAll('button').forEach((b) => (b.onclick = () => { showKind(b.dataset.k); $('addName').focus(); }));
+  $('addCancel').onclick = () => $('addSheet').close();
+  $('addStart').onchange = () => {
+    const [h, m] = $('addStart').value.split(':').map(Number);
+    if (!$('addEnd').value || $('addEnd').value <= $('addStart').value) $('addEnd').value = `${pad(Math.min(23, h + 1))}:${pad(m)}`;
+  };
+  $('addForm').onsubmit = (e) => {
     e.preventDefault();
-    const text = $('taskText').value.trim(); if (!text) return;
-    addQuest(text, document.querySelector('input[name="diff"]:checked').value, $('taskDate').value || ymd());
-    $('taskText').value = ''; toast('📜 Quest added to the board');
+    const text = $('addName').value.trim(); if (!text) return;
+    if (addKind === 'plan') {
+      if (!$('addStart').value) { $('addStart').focus(); return; }
+      const day = $('addDate').value || sel, start = $('addStart').value, end = $('addEnd').value > start ? $('addEnd').value : '';
+      db.tasks.push({ id: uid(), text, date: day, start, end, pri: 'med', done: false });
+      sel = day; weekStart = monday(parseDay(day));
+      // the next block starts where this one ended
+      if (end) { $('addStart').value = end; $('addEnd').value = ''; $('addStart').onchange(); }
+      toast('added to your day ♡');
+    } else if (addKind === 'todo') {
+      db.tasks.push({ id: uid(), text, list: $('addList').value, date: ymd(), pri: 'med', done: false }); toast('added to ' + $('addList').value);
+    } else if (addKind === 'habit') {
+      db.habits.push({ id: uid(), name: text, icon: habitEmoji, days: {} }); toast('new habit · you got this ♡');
+    } else {
+      const at = new Date($('addAt').value).getTime(); if (isNaN(at)) return;
+      db.reminders.push({ id: uid(), text, at, repeat: $('addRepeat').value }); askNotif(); toast('reminder set ⏰');
+    }
+    $('addName').value = ''; save(); $('addSheet').close(); renderAll();
   };
-  $('quickForm').onsubmit = (e) => {
-    e.preventDefault();
-    const text = $('quickText').value.trim(); if (!text) return;
-    addQuest(text, 'med', ymd()); $('quickText').value = '';
-  };
-  $('planDate').onchange = renderAll;
-  $('carryBtn').onclick = () => {
-    let n = 0;
-    db.tasks.forEach((t) => { if (!t.done && t.date < ymd()) { t.date = ymd(); n++; } });
-    save(); $('planDate').value = ymd(); renderAll();
-    toast(n ? `🛟 Rescued ${plural(n, 'quest')} to today` : 'No unfinished quests left behind. Nice!');
-  };
-  const tasksFor = (d) => db.tasks.filter((t) => t.date === d).sort((a, b) => a.done - b.done || priRank[a.pri] - priRank[b.pri]);
 
-  function questItem(t, full) {
-    const d = DIFF[t.pri], li = document.createElement('li');
-    li.className = `quest ${d.cls}${t.done ? ' done' : ''}`;
-    li.innerHTML = `<button type="button" class="tick ${t.done ? 'on' : ''}" aria-pressed="${t.done}" aria-label="Complete quest">${t.done ? '✓' : ''}</button>
-      <span class="grow"><span class="title">${esc(t.text)}</span><br><span class="meta">${d.name} · <span class="xp-tag">+${d.xp} XP</span></span></span>
-      ${t.done ? '' : '<button class="btn ghost small" data-act="fight" type="button" title="Start a focus battle for this quest">⚔️</button>'}
-      ${full ? '<button class="icon-btn" data-act="del" type="button" aria-label="Delete quest">✕</button>' : ''}`;
-    li.querySelector('.tick').onclick = (e) => {
-      t.done = !t.done; save();
-      if (t.done) reward(e.currentTarget, d.xp); else sfx.undo();
-      renderAll();
-      if (t.done && tasksFor(t.date).every((x) => x.done)) setTimeout(() => { toast('🏆 Quest board cleared!'); confetti(innerWidth / 2, innerHeight / 3, 90); }, 300);
-    };
-    const fight = li.querySelector('[data-act="fight"]');
-    if (fight) fight.onclick = () => { timer.taskId = t.id; goTab('battle'); };
-    const del = li.querySelector('[data-act="del"]');
-    if (del) del.onclick = () => { db.tasks = db.tasks.filter((x) => x !== t); save(); renderAll(); };
-    return li;
+  // ---------- sheets ----------
+  document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d || e.target.closest('[data-close]')) d.close(); }));
+  $('bellBtn').onclick = () => { renderReminders(); $('remSheet').showModal(); };
+  $('remAdd').onclick = () => { $('remSheet').close(); openAdd('remind'); };
+  $('menuBtn').onclick = () => { $('nameIn').value = db.profile.name; $('soundOn').checked = db.settings.sound; $('myAff').value = db.profile.affirmations || ''; $('menuSheet').showModal(); };
+  $('nameIn').oninput = () => { db.profile.name = $('nameIn').value.trim(); save(); renderTop(); };
+  $('soundOn').onchange = () => { db.settings.sound = $('soundOn').checked; save(); chime(); };
+  $('myAff').oninput = () => { db.profile.affirmations = $('myAff').value; save(); renderTop(); };
+
+  // ---------- reminders ----------
+  function askNotif() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().then(renderNotif); }
+  function renderNotif() {
+    if (!('Notification' in window)) { $('notifState').textContent = 'This browser can\'t show notifications; you\'ll hear a soft chime while this page is open.'; $('notifBtn').hidden = true; return; }
+    const p = Notification.permission;
+    $('notifState').textContent = p === 'granted' ? 'Notifications are on. Keep this tab open (it can be in the background) so reminders can reach you.'
+      : p === 'denied' ? 'Notifications are blocked in your browser settings. You\'ll still hear a chime while this page is open.'
+      : 'Turn on notifications so reminders reach you in other tabs too.';
+    $('notifBtn').hidden = p !== 'default';
   }
-  function renderQuests() {
-    const list = $('taskList'); list.innerHTML = '';
-    const items = tasksFor($('planDate').value || ymd());
-    if (!items.length) list.innerHTML = '<li class="empty">No quests on the board for this day. Add one above!</li>';
-    items.forEach((t) => list.appendChild(questItem(t, true)));
+  $('notifBtn').onclick = askNotif;
+  function renderReminders() {
+    const list = $('remList'); list.innerHTML = '';
+    const items = db.reminders.slice().sort((a, b) => a.at - b.at);
+    if (!items.length) list.innerHTML = '<li class="empty" style="display:block">no reminders yet</li>';
+    items.forEach((r) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span style="color:var(--pink)">${icon('bell')}</span><span class="grow">${esc(r.text)}<br><small>${new Date(r.at).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}${r.repeat !== 'none' ? ' · ' + (r.repeat === 'daily' ? 'every day' : 'every week') : ''}</small></span>
+        <button class="x" type="button" aria-label="Delete reminder">${icon('x')}</button>`;
+      li.querySelector('.x').onclick = () => { db.reminders = db.reminders.filter((x) => x !== r); save(); renderReminders(); renderTop(); };
+      list.appendChild(li);
+    });
+    renderNotif();
+  }
+  function checkReminders() {
+    const now = Date.now(); let changed = false;
+    db.reminders.slice().forEach((r) => {
+      if (r.at > now) return;
+      notify('reminder ♡', r.text); changed = true;
+      if (r.repeat === 'none') db.reminders = db.reminders.filter((x) => x !== r);
+      else { const step = (r.repeat === 'daily' ? 1 : 7) * 864e5; while (r.at <= now) r.at += step; }
+    });
+    if (changed) { save(); renderAll(); }
   }
 
-  // ---------- BATTLE ----------
-  const BOSSES = [
-    ['👾', 'Procrastination Goblin'], ['🐉', 'Distraction Dragon'], ['🧟', 'Scroll Zombie'], ['👻', 'Ghost of Doubt'],
-    ['🦑', 'Chaos Kraken'], ['🧌', 'Lazy Troll'], ['🕷️', 'Notification Spider'], ['🦇', 'Midnight Snack Bat'], ['🤡', 'Excuse Clown'],
-  ];
-  const timer = { mode: 'focus', left: 0, total: 0, endAt: 0, running: false, count: 0, taskId: '', tick: null, boss: BOSSES[0], lastPct: 100 };
+  // ---------- focus ----------
   const S = db.settings;
   $('fMin').value = S.f; $('sMin').value = S.s; $('lMin').value = S.l;
   ['fMin', 'sMin', 'lMin'].forEach((id) => ($(id).onchange = () => {
     S.f = +$('fMin').value || 25; S.s = +$('sMin').value || 5; S.l = +$('lMin').value || 15; save();
     if (!timer.running) setMode(timer.mode);
   }));
+  const timer = { mode: 'focus', left: 0, total: 0, endAt: 0, running: false, count: 0, taskId: '', tick: null };
+  const CIRC = 2 * Math.PI * 52;
+  $('ringFg').style.strokeDasharray = CIRC;
   const minutesFor = (m) => (m === 'focus' ? S.f : m === 'short' ? S.s : S.l);
   function setMode(m) {
-    timer.mode = m; timer.total = timer.left = minutesFor(m) * 60; timer.running = false; timer.lastPct = 100;
-    if (m === 'focus') timer.boss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
+    timer.mode = m; timer.total = timer.left = minutesFor(m) * 60; timer.running = false;
     clearInterval(timer.tick); drawTimer();
   }
+  $('modes').querySelectorAll('button').forEach((b) => (b.onclick = () => setMode(b.dataset.m)));
   function drawTimer() {
-    const s = Math.max(0, Math.round(timer.left)), focus = timer.mode === 'focus';
-    const pct = Math.max(0, Math.round((timer.left / timer.total) * 100));
+    const s = Math.max(0, Math.round(timer.left));
     $('clock').textContent = `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
-    $('bossEmoji').textContent = focus ? timer.boss[0] : '🏕️';
-    $('bossName').textContent = focus ? timer.boss[1] : timer.mode === 'long' ? 'Long rest at the campfire' : 'Short rest at the campfire';
-    $('modeLabel').textContent = focus ? (timer.running ? 'Keep focusing — every second is a hit!' : 'Focus until the timer runs out to defeat the boss') : 'Stretch, drink water, look away from the screen';
-    $('hpbar').classList.toggle('rest', !focus);
-    $('hpFill').style.width = `${pct}%`;
-    $('hpText').textContent = focus ? `BOSS HP ${pct}%` : `Rest ${100 - pct}%`;
-    $('bossEmoji').classList.toggle('running', timer.running);
-    if (focus && timer.running && pct <= timer.lastPct - 5) { // shake the boss every 5% of damage
-      timer.lastPct = pct; const b = $('bossEmoji'); b.classList.remove('hit'); void b.offsetWidth; b.classList.add('hit');
-    }
-    $('startBtn').textContent = timer.running ? '⏸ Pause' : focus ? '⚔️ Attack' : '▶ Rest';
-    $('skipBtn').textContent = focus ? '🏳️ Retreat' : '⏭ Skip rest';
-    document.title = timer.running ? `${$('clock').textContent} · ${focus ? timer.boss[1] : 'Rest'}` : 'Quest Day';
+    $('modeLabel').textContent = { focus: timer.running ? 'you\'re doing great' : 'time to focus', short: 'little break ☕', long: 'long break 🌿' }[timer.mode];
+    $('ringFg').style.strokeDashoffset = CIRC * (1 - timer.left / timer.total);
+    $('modes').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.m === timer.mode));
+    $('startBtn').textContent = timer.running ? 'pause' : timer.left < timer.total ? 'resume' : 'start';
+    document.title = timer.running ? `${$('clock').textContent} · ${timer.mode === 'focus' ? 'focus' : 'break'}` : 'My Day Planner';
     const t = db.tasks.find((x) => x.id === timer.taskId);
-    $('focusTaskLabel').textContent = t ? `Fighting for: ${t.text}` : 'Tip: pick the quest you are fighting for below.';
+    $('focusTaskLabel').textContent = t ? `working on: ${t.text}` : 'one thing at a time ♡';
   }
   function finish(skipped) {
     clearInterval(timer.tick); timer.running = false;
@@ -859,292 +797,79 @@
       const min = Math.round((timer.total - Math.max(0, timer.left)) / 60);
       if (min > 0) db.sessions.push({ date: ymd(), at: Date.now(), min, task: t ? t.text : '' });
       save();
-      if (!skipped) {
-        notify('Victory!', `You defeated the ${timer.boss[1]}. +${min * XP.focusMin} XP. Time to rest.`);
-        sfx.win(); confetti(...centerOf($('bossEmoji')), 120);
-      } else toast(min > 0 ? `🏳️ Retreated, but you still earned ${min * XP.focusMin} XP` : '🏳️ You retreated. The boss got away this time!');
+      if (!skipped) notify('focus session done', 'beautiful work. time for a little break ♡');
       setMode(timer.count % 4 === 0 ? 'long' : 'short');
     } else {
-      if (!skipped) notify('Rest is over', 'A new boss appears. Ready to fight?');
+      if (!skipped) notify('break is over', 'ready when you are ♡');
       setMode('focus');
     }
-    renderAll();
+    renderFocus();
   }
   $('startBtn').onclick = () => {
-    if (timer.running) {
-      timer.running = false; clearInterval(timer.tick);
-    } else {
+    if (timer.running) { timer.running = false; clearInterval(timer.tick); }
+    else {
       if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
       timer.running = true; timer.endAt = Date.now() + timer.left * 1000;
-      timer.tick = setInterval(() => {
-        timer.left = (timer.endAt - Date.now()) / 1000;
-        if (timer.left <= 0) finish(); else drawTimer();
-      }, 250);
+      timer.tick = setInterval(() => { timer.left = (timer.endAt - Date.now()) / 1000; if (timer.left <= 0) finish(); else drawTimer(); }, 250);
     }
     drawTimer();
   };
   $('resetBtn').onclick = () => setMode(timer.mode);
   $('skipBtn').onclick = () => finish(true);
   $('focusTask').onchange = (e) => { timer.taskId = e.target.value; drawTimer(); };
-  function renderBattle() {
-    const sel = $('focusTask');
-    sel.innerHTML = '<option value="">— no quest —</option>' +
-      tasksFor(ymd()).filter((t) => !t.done || t.id === timer.taskId)
-        .map((t) => `<option value="${t.id}">${esc(t.text)}</option>`).join('');
-    sel.value = timer.taskId;
-    const list = $('sessionList'); list.innerHTML = '';
+  function renderFocus() {
+    const open = db.tasks.filter((t) => !t.done && (t.start ? t.date === ymd() : true));
+    $('focusTask').innerHTML = '<option value="">— nothing specific —</option>' + open.map((t) => `<option value="${t.id}">${esc(t.text)}</option>`).join('');
+    $('focusTask').value = open.some((t) => t.id === timer.taskId) ? timer.taskId : '';
     const today = db.sessions.filter((s) => s.date === ymd());
-    if (!today.length) list.innerHTML = '<li class="empty">No battles yet today. A boss awaits!</li>';
+    const total = today.reduce((a, s) => a + s.min, 0);
+    $('focusTotal').textContent = total ? `${total} min total` : '';
+    const list = $('sessionList'); list.innerHTML = '';
+    if (!today.length) list.innerHTML = '<li class="empty" style="display:block">no sessions yet today</li>';
     today.slice().reverse().forEach((s) => {
-      const li = document.createElement('li'); li.className = 'quest';
-      li.innerHTML = `<span style="font-size:22px">${s.min >= 10 ? '🏆' : '🏳️'}</span><span class="grow">${esc(s.task || 'Focus battle')}<br>
-        <span class="meta">${s.min} min · ${new Date(s.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></span>
-        <span class="xp-tag">+${s.min * XP.focusMin} XP</span>`;
+      const li = document.createElement('li');
+      li.innerHTML = `<span style="color:var(--pink)">${icon('heart')}</span><span class="grow">${esc(s.task || 'focus session')}</span><small>${s.min} min · ${new Date(s.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</small>`;
       list.appendChild(li);
     });
     drawTimer();
   }
   setMode('focus');
 
-  // ---------- HABITS ----------
-  $('habitForm').onsubmit = (e) => {
-    e.preventDefault();
-    const name = $('habitName').value.trim(); if (!name) return;
-    db.habits.push({ id: uid(), name, icon: $('habitIcon').value.trim() || '✅', days: {} });
-    $('habitName').value = ''; save(); renderAll(); toast('🌱 Habit planted. Water it daily!');
-  };
-  function toggleHabit(h, day, el) {
-    if (h.days[day]) { delete h.days[day]; sfx.undo(); } else { h.days[day] = true; reward(el, XP.habit); }
-    save(); renderAll();
-    if (day === ymd() && h.days[day]) {
-      const n = habitStreak(h);
-      if (db.habits.length > 1 && db.habits.every((x) => x.days[ymd()])) { toast('🌳 All habits done today! Your garden is thriving.'); confetti(innerWidth / 2, innerHeight / 3, 80); }
-      else if (n > 1) toast(`${h.icon} ${n}-day streak — keep it going!`);
-    }
-  }
-  function renderHabits() {
-    const box = $('habitList'); box.innerHTML = '';
-    if (!db.habits.length) { box.innerHTML = '<div class="empty">No habits yet. Start with one small habit.</div>'; return; }
-    const today = new Date();
-    db.habits.forEach((h) => {
-      const el = document.createElement('div'); el.className = 'habit';
-      const done30 = Array.from({ length: 30 }, (_, i) => ymd(addDays(today, -i))).filter((d) => h.days[d]).length;
-      const best = bestStreak(h);
-      el.innerHTML = `<div class="habit-head">
-          <span class="habit-icon">${esc(h.icon)}</span><span class="grow">${esc(h.name)}</span>
-          <span class="streak">🔥 ${habitStreak(h)}</span>
-          <button class="icon-btn" type="button" aria-label="Delete habit">✕</button>
-        </div>
-        <div class="week"></div>
-        <div style="overflow-x:auto"><div class="heat"></div></div>
-        <p class="muted" style="margin:6px 0 0">Best streak ${plural(best, 'day')} · ${done30} of the last 30 days</p>`;
-      el.querySelector('.habit-head button').onclick = () => {
-        if (confirm(`Delete "${h.name}" and its history? You'll lose the XP it earned.`)) { db.habits = db.habits.filter((x) => x !== h); save(); renderAll(); }
-      };
-      const week = el.querySelector('.week');
-      for (let i = 6; i >= 0; i--) {
-        const d = addDays(today, -i), key = ymd(d), on = !!h.days[key];
-        const cell = document.createElement('div'); cell.className = 'day' + (i === 0 ? ' today' : '');
-        cell.innerHTML = `<button type="button" class="tick ${on ? 'on' : ''}" aria-pressed="${on}" aria-label="${key}">${on ? '✓' : ''}</button>
-          <span>${i === 0 ? 'Today' : d.toLocaleDateString(undefined, { weekday: 'short' })}</span>`;
-        cell.querySelector('button').onclick = (e) => toggleHabit(h, key, e.currentTarget);
-        week.appendChild(cell);
-      }
-      // 12-week grid: columns are weeks starting Monday, last column is this week
-      const heat = el.querySelector('.heat');
-      const start = addDays(today, -((today.getDay() + 6) % 7) - 7 * 11);
-      for (let i = 0; i < 84; i++) {
-        const d = addDays(start, i), key = ymd(d), c = document.createElement('i');
-        if (d > today) c.className = 'future'; else if (h.days[key]) c.className = 'on';
-        c.title = `${key}${h.days[key] ? ' ✓' : ''}`;
-        heat.appendChild(c);
-      }
-      box.appendChild(el);
-    });
-  }
-
-  // ---------- JOURNAL ----------
-  const MOODS = ['😞', '😕', '😐', '🙂', '😄'];
+  // ---------- journal ----------
   const jFields = { jGrateful: 'grateful', jWins: 'wins', jLessons: 'lessons', jNotes: 'notes' };
   $('jDate').value = ymd();
-  MOODS.forEach((m, i) => {
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = m; b.dataset.i = i + 1;
-    b.onclick = () => { const e = entry(); e.mood = e.mood === i + 1 ? 0 : i + 1; touch(); loadEntry(); };
-    $('moods').appendChild(b);
-  });
-  const entry = () => (db.journal[$('jDate').value] ||= { mood: 0, grateful: '', wins: '', lessons: '', notes: '' });
-  function touch() {
-    const had = G.days[$('jDate').value]?.journal;
-    save(); $('jSaved').textContent = 'Saved ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    renderAll();
-    if (!had && hasText(db.journal[$('jDate').value])) { const [x, y] = centerOf($('jXp')); floatText(x, y, `+${XP.journal} XP`); sfx.coin(); }
-  }
+  const entry = () => (db.journal[$('jDate').value] ||= { grateful: '', wins: '', lessons: '', notes: '' });
+  const hasText = (e) => e && (e.grateful || e.wins || e.lessons || e.notes);
   function loadEntry() {
     const e = db.journal[$('jDate').value] || {};
     Object.entries(jFields).forEach(([f, k]) => ($(f).value = e[k] || ''));
-    $('moods').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.i === e.mood));
-    renderJournalXp();
+    $('jTitle').textContent = parseDay($('jDate').value).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
   }
-  function renderJournalXp() {
-    const done = hasText(db.journal[$('jDate').value]);
-    $('jXp').textContent = done ? `✓ +${XP.journal} XP earned` : `+${XP.journal} XP for writing`;
-    $('jXp').style.color = done ? 'var(--xp)' : 'var(--muted)';
-  }
-  Object.entries(jFields).forEach(([f, k]) => ($(f).oninput = () => { entry()[k] = $(f).value; touch(); }));
-  $('jDate').onchange = loadEntry;
+  Object.entries(jFields).forEach(([f, k]) => ($(f).oninput = () => {
+    entry()[k] = $(f).value; save();
+    $('jSaved').textContent = 'saved ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' ♡';
+    renderHistory();
+  }));
+  $('jDate').onchange = () => { if (!$('jDate').value) $('jDate').value = ymd(); loadEntry(); };
   $('jSearch').oninput = renderHistory;
+  const OLD_MOODS = ['😞', '😕', '😐', '🙂', '😄'];
   function renderHistory() {
     const q = $('jSearch').value.toLowerCase();
-    const days = Object.keys(db.journal).filter((d) => hasText(db.journal[d]) || db.journal[d].mood).sort().reverse()
+    const days = Object.keys(db.journal).filter((d) => hasText(db.journal[d])).sort().reverse()
       .filter((d) => !q || JSON.stringify(db.journal[d]).toLowerCase().includes(q));
     $('jHistory').innerHTML = days.length ? days.map((d) => {
-      const e = db.journal[d];
-      const part = (label, v) => (v ? `<p><b>${label}:</b> ${esc(v)}</p>` : '');
-      return `<details class="entry"><summary>${e.mood ? MOODS[e.mood - 1] + ' ' : ''}${new Date(d + 'T00:00').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</summary>
-        ${part('Grateful', e.grateful)}${part('Wins', e.wins)}${part('Lessons', e.lessons)}${part('Notes', e.notes)}</details>`;
-    }).join('') : '<div class="empty">No entries yet. Your story starts today.</div>';
-    renderJournalXp();
-  }
-
-  // ---------- SHOP ----------
-  $('rewardForm').onsubmit = (e) => {
-    e.preventDefault();
-    const name = $('rewardName').value.trim(), cost = Math.max(1, Math.round(+$('rewardCost').value || 0));
-    if (!name) return;
-    db.rewards.push({ id: uid(), icon: $('rewardIcon').value.trim() || '🎁', name, cost });
-    $('rewardName').value = ''; save(); renderAll();
-  };
-  function renderShop() {
-    const box = $('shopList'); box.innerHTML = '';
-    if (!db.rewards.length) box.innerHTML = '<div class="empty">No rewards yet. Add one below.</div>';
-    db.rewards.slice().sort((a, b) => a.cost - b.cost).forEach((r) => {
-      const can = G.coins >= r.cost, el = document.createElement('div'); el.className = 'reward';
-      el.innerHTML = `<button class="icon-btn" type="button" aria-label="Remove reward">✕</button>
-        <span class="em">${esc(r.icon)}</span><span class="nm">${esc(r.name)}</span><span class="cost">🪙 ${r.cost}</span>
-        <button class="btn small ${can ? '' : 'ghost'}" type="button" ${can ? '' : 'disabled'}>${can ? 'Claim' : 'Locked'}</button>
-        ${can ? '' : `<span class="need">${r.cost - G.coins} more coins</span>`}`;
-      el.querySelector('.icon-btn').onclick = () => { if (confirm(`Remove "${r.name}" from the shop?`)) { db.rewards = db.rewards.filter((x) => x !== r); save(); renderAll(); } };
-      el.querySelector('.btn').onclick = (e) => {
-        if (G.coins < r.cost) return;
-        db.purchases.push({ id: uid(), icon: r.icon, name: r.name, cost: r.cost, at: Date.now() });
-        const [x, y] = centerOf(e.currentTarget);
-        save(); floatText(x, y, `-${r.cost} 🪙`, 'var(--gold)'); sfx.buy(); confetti(x, y, 70);
-        toast(`${r.icon} Enjoy your ${r.name}! You earned it.`); renderAll();
-      };
-      box.appendChild(el);
-    });
-    const loot = $('lootList'); loot.innerHTML = '';
-    if (!db.purchases.length) loot.innerHTML = '<li class="empty">Nothing claimed yet. Finish quests to earn coins!</li>';
-    db.purchases.slice().reverse().slice(0, 15).forEach((p) => {
-      const li = document.createElement('li'); li.className = 'quest';
-      li.innerHTML = `<span style="font-size:22px">${esc(p.icon)}</span><span class="grow">${esc(p.name)}<br>
-        <span class="meta">${new Date(p.at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}</span></span><span class="cost" style="color:var(--gold)">🪙 ${p.cost}</span>`;
-      loot.appendChild(li);
-    });
-  }
-
-  // ---------- REMINDERS ----------
-  function defaultRemTime() { const d = new Date(Date.now() + 60 * 60 * 1000); d.setMinutes(0, 0, 0); return d; }
-  const toLocalInput = (d) => `${ymd(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  $('remAt').value = toLocalInput(defaultRemTime());
-  $('remForm').onsubmit = (e) => {
-    e.preventDefault();
-    const at = new Date($('remAt').value).getTime();
-    if (!$('remText').value.trim() || isNaN(at)) return;
-    db.reminders.push({ id: uid(), text: $('remText').value.trim(), at, repeat: $('remRepeat').value });
-    $('remText').value = ''; $('remAt').value = toLocalInput(defaultRemTime());
-    save(); renderAll(); askNotif(); toast('⏰ Reminder set');
-  };
-  function askNotif() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().then(renderNotif); }
-  function renderNotif() {
-    if (!('Notification' in window)) { $('notifState').textContent = 'This browser can\'t show notifications; you\'ll get a sound and a pop-up while this page is open.'; $('notifBtn').hidden = true; return; }
-    const p = Notification.permission;
-    $('notifState').textContent = p === 'granted' ? 'Notifications are on. Keep this tab open (it can be in the background) for reminders to fire.'
-      : p === 'denied' ? 'Notifications are blocked in browser settings. You\'ll still get a sound and pop-up while this page is open.'
-      : 'Turn on notifications so reminders reach you while you\'re in another tab.';
-    $('notifBtn').hidden = p !== 'default';
-  }
-  $('notifBtn').onclick = askNotif;
-  const fmtWhen = (ms) => new Date(ms).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-  function renderReminders() {
-    const list = $('remList'); list.innerHTML = '';
-    const items = db.reminders.slice().sort((a, b) => a.at - b.at);
-    if (!items.length) list.innerHTML = '<li class="empty">No reminders set.</li>';
-    items.forEach((r) => {
-      const li = document.createElement('li'); li.className = 'quest';
-      li.innerHTML = `<span style="font-size:22px">⏰</span><span class="grow">${esc(r.text)}<br><span class="meta">${fmtWhen(r.at)}${r.repeat !== 'none' ? ' · ' + r.repeat : ''}</span></span>
-        <button class="icon-btn" type="button" aria-label="Delete reminder">✕</button>`;
-      li.querySelector('button').onclick = () => { db.reminders = db.reminders.filter((x) => x !== r); save(); renderAll(); };
-      list.appendChild(li);
-    });
-    renderNotif();
-  }
-  function checkReminders() {
-    const now = Date.now(); let changed = false;
-    db.reminders.slice().forEach((r) => {
-      if (r.at > now) return;
-      notify('⏰ Reminder', r.text); changed = true;
-      if (r.repeat === 'none') db.reminders = db.reminders.filter((x) => x !== r);
-      else {
-        const step = (r.repeat === 'daily' ? 1 : 7) * 864e5;
-        while (r.at <= now) r.at += step;
-      }
-    });
-    if (changed) { save(); renderAll(); }
-  }
-
-  // ---------- HOME ----------
-  function renderHome() {
-    const hr = new Date().getHours();
-    const part = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
-    $('greeting').textContent = `${part}, ${db.game.name}! ${G.xpByDay[ymd()] ? `+${G.xpByDay[ymd()]} XP today ✨` : 'Ready for today\'s adventure?'}`;
-
-    const ch = challengesFor(ymd()), s = G.today;
-    const midnight = addDays(new Date(new Date().setHours(0, 0, 0, 0)), 1), hrsLeft = Math.ceil((midnight - Date.now()) / 36e5);
-    $('chalReset').textContent = `new ones in ${plural(hrsLeft, 'hour')}`;
-    $('chalList').innerHTML = ch.map((c) => {
-      const v = Math.min(c.goal, c.val(s)), done = v >= c.goal;
-      return `<div class="chal ${done ? 'done' : ''}"><span class="ic">${done ? '✅' : c.icon}</span>
-        <div class="grow"><div>${c.text}</div><div class="mini"><i style="width:${(v / c.goal) * 100}%"></i></div></div>
-        <span class="xp-tag" style="${done ? '' : 'color:var(--muted)'}">${done ? '✓ ' : ''}+${c.xp} XP<br><span class="muted" style="font-size:12px">${v}/${c.goal}</span></span></div>`;
-    }).join('');
-
-    const t = tasksFor(ymd());
-    $('homeQuestCount').textContent = t.length ? `${t.filter((x) => x.done).length}/${t.length} done` : '';
-    const hq = $('homeQuests'); hq.innerHTML = '';
-    const open = t.filter((x) => !x.done);
-    if (!t.length) hq.innerHTML = '<li class="empty">No quests yet. What will you conquer today?</li>';
-    else if (!open.length) hq.innerHTML = '<li class="empty">🏆 All quests complete! Legendary.</li>';
-    open.slice(0, 5).forEach((x) => hq.appendChild(questItem(x, false)));
-    if (open.length > 5) hq.insertAdjacentHTML('beforeend', `<li class="empty">+${open.length - 5} more on the quest board</li>`);
-
-    const hh = $('homeHabits'); hh.innerHTML = '';
-    $('homeHabitCount').textContent = db.habits.length ? `${db.habits.filter((h) => h.days[ymd()]).length}/${db.habits.length} done` : '';
-    if (!db.habits.length) hh.innerHTML = '<li class="empty">No habits yet. Plant some in the Habits tab.</li>';
-    db.habits.forEach((h) => {
-      const on = !!h.days[ymd()], li = document.createElement('li'); li.className = 'quest easy' + (on ? ' done' : '');
-      li.innerHTML = `<button type="button" class="tick ${on ? 'on' : ''}" aria-pressed="${on}" aria-label="Done today">${on ? '✓' : ''}</button>
-        <span class="grow"><span class="title">${esc(h.icon)} ${esc(h.name)}</span><br><span class="meta"><span class="xp-tag">+${XP.habit} XP</span></span></span><span class="streak">🔥 ${habitStreak(h)}</span>`;
-      li.querySelector('button').onclick = (e) => toggleHabit(h, ymd(), e.currentTarget);
-      hh.appendChild(li);
-    });
-
-    $('stQuests').textContent = G.totalDone;
-    $('stFocus').textContent = G.focusMin >= 60 ? `${(G.focusMin / 60).toFixed(1)}h` : `${G.focusMin}m`;
-    $('stBattles').textContent = G.totalBattles;
-    $('stChal').textContent = G.challengesDone;
-
-    const seen = db.game.seen || [];
-    const unlocked = (b) => b.ok(G) || seen.includes(b.id);
-    $('badgeCount').textContent = `${BADGES.filter(unlocked).length}/${BADGES.length}`;
-    $('badges').innerHTML = BADGES.map((b) => `<div class="badge ${unlocked(b) ? '' : 'locked'}"><b>${unlocked(b) ? b.icon : '🔒'}</b><span>${b.name}</span><small>${b.desc}</small></div>`).join('');
+      const e = db.journal[d], mood = db.moods[d] || (e.mood ? OLD_MOODS[e.mood - 1] : '');
+      const part = (label, v) => (v ? `<p><b>${label}</b><br>${esc(v)}</p>` : '');
+      return `<details class="entry"><summary>${parseDay(d).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}${mood ? ' · ' + esc(mood) : ''}</summary>
+        ${part('grateful for', e.grateful)}${part('little wins', e.wins)}${part('learned', e.lessons)}${part('thoughts', e.notes)}</details>`;
+    }).join('') : '<div class="empty">your first entry is waiting ♡</div>';
   }
 
   // ---------- backup ----------
   $('exportBtn').onclick = () => {
     const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = `quest-day-backup-${ymd()}.json`; a.click(); URL.revokeObjectURL(a.href);
+    a.download = `my-day-planner-backup-${ymd()}.json`; a.click(); URL.revokeObjectURL(a.href);
   };
   $('importFile').onchange = async (e) => {
     const f = e.target.files[0]; if (!f) return;
@@ -1152,27 +877,35 @@
       const data = JSON.parse(await f.text());
       if (!data || !Array.isArray(data.tasks)) throw new Error();
       if (!confirm('Replace everything in this browser with the backup?')) return;
-      db = Object.assign(blank(), data); save(); location.reload();
-    } catch { toast('That file isn\'t a Quest Day backup.'); }
+      localStorage.setItem(KEY, JSON.stringify(data)); location.reload();
+    } catch { toast('that file isn\'t a planner backup'); }
     e.target.value = '';
   };
 
-  function renderAll() {
-    G = compute();
-    renderHud(); renderHome(); renderQuests(); renderBattle(); renderHabits(); renderHistory(); renderShop(); renderReminders();
-    checkProgress();
-  }
+  // ---------- tabs ----------
+  document.querySelectorAll('nav.bar [data-tab]').forEach((b) => (b.onclick = () => {
+    document.querySelectorAll('nav.bar [data-tab]').forEach((x) => x.setAttribute('aria-selected', x === b));
+    document.querySelectorAll('section[id^="tab-"]').forEach((s) => (s.hidden = s.id !== 'tab-' + b.dataset.tab));
+    try { localStorage.setItem(KEY + '.tab', b.dataset.tab); } catch {}
+    scrollTo(0, 0); renderAll();
+  }));
 
-  G = compute();
+  function renderHome() { renderWeek(); renderTimeline(); }
+  function renderAll() { renderTop(); renderMood(); renderHome(); renderLists(); renderHabitsAll(); renderFocus(); renderHistory(); }
+
   loadEntry();
   renderAll();
   let lastTab; try { lastTab = localStorage.getItem(KEY + '.tab'); } catch {}
-  if (lastTab && document.querySelector(`nav.tabs [data-tab="${lastTab}"]`)) goTab(lastTab);
+  const tabBtn = lastTab && document.querySelector(`nav.bar [data-tab="${lastTab}"]`);
+  if (tabBtn) tabBtn.click();
   checkReminders();
   setInterval(checkReminders, 15000);
-  // refresh "today" views when the date rolls over
+  // keep "today" and the current time block fresh
   let day = ymd();
-  setInterval(() => { if (ymd() !== day) { day = ymd(); $('planDate').value = $('taskDate').value = $('jDate').value = day; loadEntry(); renderAll(); } }, 60000);
+  setInterval(() => {
+    if (ymd() !== day) { if (sel === day) sel = ymd(); day = ymd(); weekStart = monday(new Date()); $('jDate').value = day; loadEntry(); renderAll(); }
+    else renderTimeline();
+  }, 60000);
 })();
 </script>
 </body>
