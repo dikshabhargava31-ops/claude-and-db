@@ -8,6 +8,6 @@ A single static page: `index.html`, plus `assets/`. There is no build step. It's
 
 ## My Day Planner
 
-`daily/index.html` is a separate personal planner page in a soft berry-and-blush style. Home has a daily affirmation, a mood check-in, a week strip, a time-block timeline for the chosen day, swipeable to-do lists and this week's habits. Other tabs hold a focus timer, a journal and a full habits view. The bell holds reminders, and the menu holds settings and backup.
+`daily/index.html` is a separate personal planner page in a soft pastel style, with a phone layout and a laptop layout (sidebar and two columns). Home has a daily affirmation, a mood check-in, a week strip, a time-block timeline for the chosen day, swipeable to-do lists and this week's habits. Other tabs hold a focus timer, a journal and a full habits view. The bell holds reminders, and the menu holds settings and backup.
 
 Open it in a browser; there is no build step. Data is saved in that browser's local storage. Use **Export** / **Import** in the menu to back it up or move it to another device.
