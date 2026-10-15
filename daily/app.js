@@ -48,6 +48,8 @@
       { id: 'nb3', name: 'Learning & Knowledge', icon: '📚', art: '📚 🧁 💡' },
       { id: 'nb4', name: 'Personal Notes', icon: '💌', art: '💌 🌸 🕊️' },
     ];
+    const DEFAULT_ILLO = { a1: 'personal', a2: 'health', a3: 'finance', a4: 'work', a5: 'love', nb1: 'folders', nb2: 'pencil', nb3: 'books', nb4: 'letter' };
+    [...d.areas, ...d.notebooks].forEach((x) => { if (x.illo === undefined && DEFAULT_ILLO[x.id]) x.illo = DEFAULT_ILLO[x.id]; });
     d.topics ||= [{ id: 'tp1', name: 'Productivity' }, { id: 'tp2', name: 'Organization' }, { id: 'tp3', name: 'Self Development' }];
     // to-do lists from the previous version become projects
     const listNames = [...new Set(d.tasks.filter((t) => t.list).map((t) => t.list))];
@@ -153,7 +155,9 @@
   // ---------- small components ----------
   const tag = (txt, c = 'gray') => `<span class="tag t-${c}">${txt}</span>`;
   const prog = (pct, cls = '') => `<div class="prog ${cls}"><i style="width:${pct}%"></i></div>`;
-  const cover = (x, i) => { const [a, b, c] = art(x); return `<div class="gcover bg-${i % 6}"><span class="a">${esc(a)}</span>${b ? `<span class="b">${esc(b)}</span>` : ''}${c ? `<span class="c">${esc(c)}</span>` : ''}</div>`; };
+  const illo = (k) => (window.ILLO && k ? window.ILLO.svg(k) : '');
+  const ILLO_OPTS = () => [['', 'emoji cover'], ...(window.ILLO ? window.ILLO.keys.map((k) => [k, window.ILLO.names[k]]) : [])];
+  const cover = (x, i) => { if (illo(x.illo)) return `<div class="gcover illo bg-${i % 6}">${illo(x.illo)}</div>`; const [a, b, c] = art(x); return `<div class="gcover bg-${i % 6}"><span class="a">${esc(a)}</span>${b ? `<span class="b">${esc(b)}</span>` : ''}${c ? `<span class="c">${esc(c)}</span>` : ''}</div>`; };
   const chk = (on, act, id, extra = '') => `<button type="button" class="chk ${on ? 'on' : ''} ${extra}" data-act="${act}" data-id="${id}" aria-pressed="${!!on}" aria-label="Done">${on ? icon('tick') : ''}</button>`;
   const btnNew = (ent, label, p = {}, cls = 'btn sm') => `<button type="button" class="${cls}" data-act="new" data-ent="${ent}" data-p="${attr(p)}">${label}</button>`;
   const label = (txt, right = '') => `<div class="label">${txt}<span class="r">${right}</span></div>`;
@@ -353,15 +357,15 @@
 
   function pDash() {
     const methods = [
-      ['para', 'PARA', 'Projects · Areas · Resources · Archive', '🗃️ 🧁 🎀', 0],
-      ['tasks/inbox', 'GTD', 'Capture to the inbox, then sort and finish', '📥 🍵 ✨', 1],
-      ['tasks/matrix', 'MATRIX', 'Urgent vs important: what to do first', '🧭 🍩 🍓', 3],
+      ['para', 'PARA', 'Projects · Areas · Resources · Archive', 'para', 0],
+      ['tasks/inbox', 'GTD', 'Capture to the inbox, then sort and finish', 'gtd', 1],
+      ['tasks/matrix', 'MATRIX', 'Urgent vs important: what to do first', 'matrix', 3],
     ];
     const goals = live(db.goals).filter((g) => g.status !== 'achieved').slice(0, 4);
     const projs = live(db.projects).filter((p) => p.status !== 'done').slice(0, 5);
     const reading = db.books.filter((b) => b.status === 'reading');
     const m = db.moods[today()];
-    return `<div class="cover"><div class="art"><span>🧠</span><span>☕</span><span>📚</span><span>🌷</span><span>🗂️</span><span>🍰</span><span>✨</span></div></div>
+    return `<div class="cover">${window.ILLO ? window.ILLO.hero() : '<div class="art"><span>🧠</span><span>☕</span><span>📚</span><span>🌷</span></div>'}</div>
       <div class="phead"><div class="ic">🧠</div></div>
       <h1 style="margin-top:6px">Second Brain</h1>
       <p class="sub">Goals. Projects. Tasks. Notes. Resources. Books. <span class="hand">capture it once, find it again ♡</span></p>
@@ -375,7 +379,7 @@
         </div>
       </div>
       ${label('Productivity-Methods')}
-      <div class="grid g3 methods">${methods.map(([to, t, d, a, i]) => `<div class="gcard method" data-act="go" data-to="${to}">${cover({ art: a }, i)}<div class="gbody"><div class="gtitle">${t}</div><div class="meta">${d}</div></div></div>`).join('')}</div>
+      <div class="grid g3 methods">${methods.map(([to, t, d, a, i]) => `<div class="gcard method" data-act="go" data-to="${to}">${cover({ illo: a, art: '✨' }, i)}<div class="gbody"><div class="gtitle">${t}</div><div class="meta">${d}</div></div></div>`).join('')}</div>
       ${label('Life-Areas', `<a class="btn ghost sm" href="#/areas">open</a>`)}
       <div class="gal cov">${db.areas.map(areaCard).join('')}</div>
       <div class="grid g2" style="margin-top:16px">${wheelCard()}
@@ -502,7 +506,7 @@
     const gs = live(db.goals).filter((g) => g.areaId === a.id), ps = live(db.projects).filter((p) => projArea(p) === a.id);
     const ns = live(db.notes).filter((n) => n.areaId === a.id), rs = live(db.resources).filter((r) => r.areaId === a.id), s = areaStats(a);
     const [x, y, z] = art(a);
-    return `<div class="cover small"><div class="art"><span>${esc(x)}</span><span>${esc(y || x)}</span><span>${esc(z || x)}</span></div></div>
+    return `<div class="cover small">${illo(a.illo) ? `<div class="illo-banner">${illo(a.illo)}</div>` : `<div class="art"><span>${esc(x)}</span><span>${esc(y || x)}</span><span>${esc(z || x)}</span></div>`}</div>
       <div class="phead"><div class="ic">${esc(a.icon)}</div></div><h1 style="margin-top:6px">${esc(a.name)}</h1>
       <div style="max-width:420px;margin:8px 0">${prog(s.pct)}<div class="meta" style="margin-top:4px">${s.pct}% progress · wheel of life rating ${a.rating || 0}/10</div></div>
       <button class="btn sm" data-act="edit" data-ent="area" data-id="${a.id}">✎ Edit area</button>
@@ -518,7 +522,7 @@
     list = list.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.updated || 0) - (a.updated || 0));
     const nb = notebook(ui.notebook);
     return head('📓', 'Notes', 'Notebooks → notes + topics → resources. Keep notebooks for organizing your notes.', `<button class="btn pri" data-act="newNote">+ New note</button>`) +
-      `${label('My-Notebooks', btnNew('notebook', '+ notebook', { icon: '📒', art: '📒 🍪' }, 'btn ghost sm'))}
+      `${label('My-Notebooks', btnNew('notebook', '+ notebook', { icon: '📒', art: '📒 🍪', illo: 'pencil' }, 'btn ghost sm'))}
       <div class="gal cov">${db.notebooks.map((n, i) => `<div class="gcard" data-act="openNotebook" data-id="${n.id}" style="${ui.notebook === n.id ? 'outline:2px solid var(--accent)' : ''}">${cover(n, i + 2)}<div class="gbody"><div class="gtitle">${esc(n.icon)} ${esc(n.name)}</div><div class="meta"><span class="k">Total notes:</span> ${all.filter((x) => x.notebookId === n.id).length}</div></div></div>`).join('')}</div>
       ${label(nb ? `${esc(nb.icon)} ${esc(nb.name)}` : 'My-Notes', nb ? `<button class="btn ghost sm" data-act="edit" data-ent="notebook" data-id="${nb.id}">✎ notebook</button><button class="btn ghost sm" data-act="openNotebook" data-id="">show all</button>` : '')}
       <div class="tabs">${[['all', 'All notes'], ['pinned', '📌 Pinned']].map(([k, l]) => `<button class="${ui.noteTab === k ? 'on' : ''}" data-act="noteTab" data-v="${k}">${l}</button>`).join('')}</div>
@@ -726,7 +730,7 @@
     area: { coll: 'areas', label: 'life area', make: () => ({}), fields: () => [
       { k: 'name', l: 'Area name', t: 'text', req: 1 },
       { row: [{ k: 'icon', l: 'Icon', t: 'text' }, { k: 'rating', l: 'Wheel of life rating (0–10)', t: 'number', min: 0, max: 10 }] },
-      { k: 'art', l: 'Cover emojis (separate with spaces)', t: 'text' }], defaults: { icon: '✨', art: '✨ 🌷', rating: 5 } },
+      { row: [{ k: 'illo', l: 'Cover illustration', t: 'select', o: ILLO_OPTS() }, { k: 'art', l: 'Or cover emojis', t: 'text' }] }], defaults: { icon: '✨', art: '✨ 🌷', rating: 5, illo: 'personal' } },
     resource: { coll: 'resources', label: 'resource', make: () => ({ created: Date.now() }), fields: () => [
       { k: 'title', l: 'Title', t: 'text', req: 1 }, { k: 'url', l: 'Link', t: 'url' },
       { row: [{ k: 'type', l: 'Type', t: 'select', o: Object.keys(RES_TYPES).map((k) => [k, `${RES_TYPES[k]} ${k}`]) }, { k: 'status', l: 'Status', t: 'select', o: Object.keys(RES_ST).map((k) => [k, k]) }] },
@@ -740,7 +744,7 @@
       post: (v) => { v.rating = v.rating ? +v.rating : 0; if (v.status === 'reading' && !v.started) v.started = today(); if (v.status === 'finished') { v.finished ||= today(); if (v.pages) v.pagesRead = v.pages; } } },
     highlight: { coll: 'highlights', label: 'highlight', make: () => ({ created: Date.now() }), fields: () => [
       { k: 'bookId', l: 'Book', t: 'select', o: db.books.map((b) => [b.id, b.title]), req: 1 }, { k: 'text', l: 'Quote or note', t: 'textarea', req: 1 }, { k: 'page', l: 'Page', t: 'number', min: 0 }] },
-    notebook: { coll: 'notebooks', label: 'notebook', make: () => ({}), fields: () => [{ k: 'name', l: 'Notebook name', t: 'text', req: 1 }, { row: [{ k: 'icon', l: 'Icon', t: 'text' }, { k: 'art', l: 'Cover emojis', t: 'text' }] }], defaults: { icon: '📒', art: '📒 🍪' } },
+    notebook: { coll: 'notebooks', label: 'notebook', make: () => ({}), fields: () => [{ k: 'name', l: 'Notebook name', t: 'text', req: 1 }, { row: [{ k: 'icon', l: 'Icon', t: 'text' }, { k: 'illo', l: 'Cover illustration', t: 'select', o: ILLO_OPTS() }, { k: 'art', l: 'Or cover emojis', t: 'text' }] }], defaults: { icon: '📒', art: '📒 🍪', illo: 'pencil' } },
     topic: { coll: 'topics', label: 'topic', make: () => ({}), fields: () => [{ k: 'name', l: 'Topic name', t: 'text', req: 1 }] },
     habit: { coll: 'habits', label: 'habit', make: () => ({ days: {} }), fields: () => [{ k: 'name', l: 'Habit', t: 'text', req: 1 }, { k: 'icon', l: 'Icon', t: 'text' }], defaults: { icon: '🌱' } },
     reminder: { coll: 'reminders', label: 'reminder', make: () => ({}), fields: () => [{ k: 'text', l: 'Remind me to…', t: 'text', req: 1 }, { row: [{ k: 'at', l: 'When', t: 'datetime-local', req: 1 }, { k: 'repeat', l: 'Repeat', t: 'select', o: [['none', 'Once'], ['daily', 'Every day'], ['weekly', 'Every week']] }] }],
