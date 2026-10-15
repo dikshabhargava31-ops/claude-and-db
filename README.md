@@ -6,8 +6,14 @@ A single static page: `index.html`, plus `assets/`. There is no build step. It's
 - **Promo video:** YouTube `WNVaQFqKj3o`. To change it, replace that ID in the `iframe` in `index.html`. It appears twice in the URL.
 - **Logo mark:** `assets/parthu-mark.png`.
 
-## My Day Planner
+## My Second Brain
 
-`daily/index.html` is a separate personal planner page in a soft pastel style, with a phone layout and a laptop layout (sidebar and two columns). Home has a daily affirmation, a mood check-in, a week strip, a time-block timeline for the chosen day, swipeable to-do lists and this week's habits. Other tabs hold a focus timer, a journal and a full habits view. The bell holds reminders, and the menu holds settings and backup.
+`daily/` is a separate personal dashboard (`index.html`, `style.css`, `app.js`, no build step). It covers:
 
-Open it in a browser; there is no build step. Data is saved in that browser's local storage. Use **Export** / **Import** in the menu to back it up or move it to another device.
+- **Dashboard:** a daily report (today's to-dos, overdue, coming up, habits, focus, reading), quick capture, affirmation and mood, life areas, the wheel of life, life goals, today's schedule, habits, a weekly overview, projects in progress, currently reading and notebooks.
+- **Plan:** tasks (today, this week, GTD inbox, Eisenhower matrix with drag and drop, all open, completed), projects linked to goals, life goals linked to areas, and life areas with progress.
+- **Knowledge:** notebooks, notes and topics; resources with type, topic and status; and a library with a book board, genres, highlights and a reading report.
+- **Wellbeing:** habits, journal and a focus timer.
+- **Systems:** a PARA overview and an archive. Search with `/` (or Ctrl+K), and quick capture with `N`.
+
+Data is saved in the browser's local storage. Use **Settings & backup** to export or import it. Data from the earlier planner versions carries over.
