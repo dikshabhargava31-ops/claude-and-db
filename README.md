@@ -29,3 +29,7 @@ Data is saved in the browser's local storage. Use **Settings & backup** to expor
 - **Work log:** editors can delete entries. Deleting a "Done" entry keeps the task done.
 - **Back up / Restore:** download a copy of the board, or replace it for everyone from a copy.
 - **Files:** GitHub Pages can't store uploads, so add work as links (for example Google Drive).
+
+## Video studio
+
+Claude Code makes videos here with HyperFrames (skills in `.claude/skills/`). Each video lives in `videos/<name>/`. `CLAUDE.md` maps trending styles (vertical reels, word-by-word captions, kinetic type, beat-synced edits, launch promos) to the right tool. `scripts/setup-video-tools.sh` installs auto-editor, PySceneDetect and yt-dlp (`--full` adds Demucs); cloud sessions run it automatically. To control DaVinci Resolve or transcribe locally, see `docs/local-video-setup.md`.
