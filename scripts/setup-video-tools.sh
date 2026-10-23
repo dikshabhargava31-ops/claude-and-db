@@ -9,14 +9,31 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VENV="$ROOT/.venv-video"
 
-for tool in python3 ffmpeg ffprobe node; do
+for tool in ffmpeg ffprobe node; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     echo "Missing $tool. Install it first (macOS: brew install ${tool/ffprobe/ffmpeg})." >&2
     exit 1
   fi
 done
 
-[ -x "$VENV/bin/python" ] || python3 -m venv "$VENV"
+# macOS ships Python 3.9 as python3; the tools need 3.10+, so prefer a newer one by name.
+PYTHON=""
+for candidate in python3.12 python3.11 python3.10 python3.13 python3; do
+  if command -v "$candidate" >/dev/null 2>&1 &&
+     "$candidate" -c 'import sys; sys.exit(sys.version_info < (3, 10))'; then
+    PYTHON="$candidate"
+    break
+  fi
+done
+if [ -z "$PYTHON" ]; then
+  echo "Need Python 3.10 or newer (macOS: brew install python@3.12)." >&2
+  exit 1
+fi
+
+if [ -x "$VENV/bin/python" ] && ! "$VENV/bin/python" -c 'import sys; sys.exit(sys.version_info < (3, 10))'; then
+  rm -rf "$VENV"
+fi
+[ -x "$VENV/bin/python" ] || "$PYTHON" -m venv "$VENV"
 "$VENV/bin/pip" install -q --upgrade pip
 "$VENV/bin/pip" install -q auto-editor scenedetect opencv-python-headless yt-dlp
 
