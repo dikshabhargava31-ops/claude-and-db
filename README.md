@@ -20,11 +20,12 @@ Data is saved in the browser's local storage. Use **Settings & backup** to expor
 
 ## IPA Priority Board
 
-`priority/` is the IPA Priority Board (`index.html` plus `data.json`, no build step). It has the projects gallery, "Do this now", tasks (Kanban, by day, by project, calendar), a timeline, a folder for each project with notes, links and a work log, and idle-project reminders.
+`priority/index.html` is the IPA Priority Board (no build step). It has the projects gallery, "Do this now", tasks (Kanban, by day, by project, calendar), a timeline, a folder for each project with notes, links and a work log, and idle-project reminders.
 
-- **Shared data:** everyone sees the board stored in `priority/data.json` on `main`. Anyone with the link can view it.
-- **Editing:** click **Sign in to edit** and enter your name and a GitHub [fine-grained token](https://github.com/settings/personal-access-tokens/new) for only this repository, with **Contents: Read and write**. Each editor must be a collaborator on the repository (Settings → Collaborators). The token is kept only in that browser.
-- **Names:** every change is saved as a commit with the editor's name. Tasks show who they're assigned to, who added them and who finished them. The work log and links show who added each entry. Use **Show tasks for** to see one person's tasks. The repository's commit history for `priority/data.json` is the full change history.
+- **Private data:** the board's data is `data.json` in the private repository `dikshabhargava31-ops/ipa-priority-board-data`, not in this public repository. The page has no data of its own, so anyone who isn't signed in sees nothing.
+- **Access:** add each person to `ipa-priority-board-data` (Settings → Collaborators). They never need access to this repository, so their token can't change the website.
+- **Signing in:** each person enters their name and a [classic token](https://github.com/settings/tokens/new?scopes=repo&description=IPA%20Priority%20Board) with the `repo` box ticked. The token is kept only in that browser. Signing out removes it and the browser's copy of the board.
+- **Names:** every change is saved as a commit in the data repository with the editor's name. Tasks show who they're assigned to, who added them and who finished them. The work log and links show who added each entry. Use **Show tasks for** to see one person's tasks.
 - **Work log:** editors can delete entries. Deleting a "Done" entry keeps the task done.
 - **Back up / Restore:** download a copy of the board, or replace it for everyone from a copy.
 - **Files:** GitHub Pages can't store uploads, so add work as links (for example Google Drive).
