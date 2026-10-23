@@ -47,6 +47,8 @@ sfx += [("sfx-green", "impact-bass-1", round(EV["green"] - 0.04, 2), 2.12, 0.45)
 audio = "\n".join(f'      <audio id="{i}" class="clip" src="assets/sfx/{f}.mp3" data-start="{s}" data-duration="{d}" data-track-index="{10 + k % 3}" data-volume="{v}"></audio>'
                   for k, (i, f, s, d, v) in enumerate(sfx))
 voice = f'      <audio id="voice" class="clip" src="{VOICE}" data-start="0" data-duration="{VOICE_LEN}" data-track-index="9" data-volume="1"></audio>\n' if VOICE else ""
+# original music bed with cut transitions and ducking baked in (tools/music.py, run after this build)
+voice += f'      <audio id="bgm" class="clip" src="assets/bgm/track.m4a" data-start="0" data-duration="{END}" data-track-index="8" data-volume="1"></audio>\n'
 (ROOT / "index.html").write_text(f"""<!doctype html>
 <html lang="hi" data-resolution="portrait">
   <head>
@@ -216,9 +218,9 @@ subs = [x for x in subs if x[1] < EV["endcard"]]
 (ROOT / "compositions" / "captions.html").write_text(f"""<template>
   <style>
     #root {{ position: absolute; inset: 0; pointer-events: none; font-family: "Inter", sans-serif; }}
-    .sub {{ position: absolute; left: 0; top: 1205px; width: 1080px; padding: 0 100px; text-align: center; opacity: 0; visibility: hidden; }}
+    .sub {{ position: absolute; left: 0; top: 1500px; width: 1080px; padding: 0 100px; text-align: center; opacity: 0; visibility: hidden; }}
     .sub span {{ display: inline; padding: 6px 16px; border-radius: 14px; background: rgba(8, 12, 26, 0.72); box-decoration-break: clone; -webkit-box-decoration-break: clone;
-      font-size: 54px; font-weight: 800; line-height: 1.42; color: #fff; letter-spacing: -0.01em; }}
+      font-size: 52px; font-weight: 800; line-height: 1.55; color: #fff; letter-spacing: 0.005em; word-spacing: 0.08em; }}
     .sub b {{ color: #fbb524; font-weight: 800; }}
   </style>
   <div id="root" data-composition-id="captions" data-width="1080" data-height="1920"><div id="cap-box"></div></div>

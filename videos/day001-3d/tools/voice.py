@@ -60,13 +60,16 @@ for f, a, b in [("raw/vo-part1.wav", 0, 91.8), ("raw/vo-part2.wav", 0, 11.6)]:
         for u0, u1 in segments(piece, 0.15) if len(piece) > SR else [[0, len(piece) / SR]]:
             speech.append([t0 + u0, t0 + u1, f.endswith("part2.wav")])
 fade = int(0.05 * SR); y[:fade] *= np.linspace(0, 1, fade); y[-fade:] *= np.linspace(1, 0, fade)
-# one fixed gain to -16 LUFS (two-pass loudnorm, linear), so there is no pumping between phrases
+# voice polish: rumble cut, a little warmth and presence, gentle de-essing and compression,
+# then one fixed gain to -14 LUFS (two-pass loudnorm, linear) so it sits loud and steady over the music
 enc = ["-f", "f32le", "-ar", str(SR), "-ac", "1", "-i", "-"]
-m = subprocess.run(["ffmpeg", "-hide_banner", *enc, "-af", "loudnorm=I=-16:TP=-1.5:LRA=11:print_format=json", "-f", "null", "-"], input=y.tobytes(), capture_output=True, text=False).stderr.decode()
+POLISH = ("highpass=f=85,equalizer=f=180:t=q:w=1:g=2,equalizer=f=3200:t=q:w=1.2:g=3.5,equalizer=f=10000:t=q:w=1:g=1.5,"
+          "deesser=i=0.35,acompressor=threshold=-22dB:ratio=3:attack=6:release=90:makeup=2")
+m = subprocess.run(["ffmpeg", "-hide_banner", *enc, "-af", POLISH + ",loudnorm=I=-14:TP=-3:LRA=9:print_format=json", "-f", "null", "-"], input=y.tobytes(), capture_output=True).stderr.decode()
 import json as _j
 mj = _j.loads(m[m.rindex("{"): m.rindex("}") + 1])
-ln = f"loudnorm=I=-16:TP=-1.5:LRA=11:measured_I={mj['input_i']}:measured_TP={mj['input_tp']}:measured_LRA={mj['input_lra']}:measured_thresh={mj['input_thresh']}:offset={mj['target_offset']}:linear=true"
-subprocess.run(["ffmpeg", "-v", "error", "-y", *enc, "-af", ln, "-ar", "48000", "-c:a", "aac", "-b:a", "160k", str(ROOT / "raw/voice.m4a")], input=y.tobytes(), check=True)
+ln = f"loudnorm=I=-14:TP=-3:LRA=9:measured_I={mj['input_i']}:measured_TP={mj['input_tp']}:measured_LRA={mj['input_lra']}:measured_thresh={mj['input_thresh']}:offset={mj['target_offset']}:linear=true"
+subprocess.run(["ffmpeg", "-v", "error", "-y", *enc, "-af", POLISH + "," + ln, "-ar", "48000", "-c:a", "aac", "-b:a", "192k", str(ROOT / "raw/voice.m4a")], input=y.tobytes(), check=True)
 VOICE_LEN = round(len(y) / SR, 2)
 
 # fit lines 1-13 to recording-1 segments, line 14 to recording 2: boundaries fall at pauses,
