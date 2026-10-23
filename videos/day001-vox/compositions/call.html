@@ -1,0 +1,107 @@
+<template>
+  <style>
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-devanagari-800-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-devanagari-700-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    #root { position: absolute; inset: 0; font-family: "Mukta", sans-serif; color: #14213d; }
+    .sheet { position: absolute; inset: 0; background: #efe9dc url("assets/paper.jpg") center / cover; box-shadow: 0 0 70px rgba(0, 0, 0, 0.35); overflow: hidden; }
+    .h { position: absolute; left: 100px; font-weight: 800; font-size: 84px; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    .hand { font-family: "Kalam", cursive; font-weight: 700; }
+    .mark { position: relative; display: inline-block; }
+    .mark-bar { position: absolute; left: -10px; right: -10px; top: 22%; bottom: 4%; background: #ffc93c; border-radius: 6px; transform-origin: 0 50%; }
+    .mark-t { position: relative; }
+    .stamp { position: absolute; font-weight: 800; letter-spacing: 0.08em; border: 7px solid currentColor; border-radius: 12px; padding: 6px 20px 0; line-height: 1.05; mix-blend-mode: multiply; white-space: nowrap; }
+    .pen { position: absolute; overflow: visible; }
+    .pen path { fill: none; stroke: #d7263d; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+    .fig { position: absolute; }
+    .fig-in { position: absolute; inset: 0; transform-origin: 50% 100%; filter: drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 4px 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(8px 14px 10px rgba(0, 0, 0, 0.28)); }
+    .fig img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+    .slip { position: absolute; background: #fbf8f0; box-shadow: 4px 8px 14px rgba(0, 0, 0, 0.22); clip-path: polygon(0 4%, 6% 0, 13% 5%, 21% 1%, 30% 4%, 38% 0, 47% 5%, 55% 1%, 64% 4%, 72% 0, 81% 5%, 89% 1%, 100% 4%, 100% 96%, 92% 100%, 84% 95%, 75% 99%, 66% 96%, 57% 100%, 48% 95%, 39% 99%, 30% 96%, 21% 100%, 12% 95%, 4% 99%, 0 96%); }
+
+    #cal-h1 { top: 196px; }
+    #cal-h2 { top: 300px; }
+    #cal-tag { position: absolute; left: 330px; top: 430px; width: 420px; height: 120px; background: #fff; border-radius: 18px 60px 60px 18px; box-shadow: 4px 8px 14px rgba(0, 0, 0, 0.2); font-size: 58px; line-height: 128px; text-align: center; color: #14213d; }
+    #cal-x { left: 340px; top: 405px; width: 400px; height: 170px; }
+    #cal-pad { position: absolute; left: 80px; top: 186px; width: 920px; height: 330px; background: #fff4b8 repeating-linear-gradient(180deg, transparent 0 95px, rgba(20, 33, 61, 0.12) 95px 97px); box-shadow: 6px 12px 22px rgba(0, 0, 0, 0.2); }
+    .cal-q { position: absolute; left: 34px; display: flex; align-items: center; gap: 26px; font-size: 52px; line-height: 1; color: #14213d; white-space: nowrap; }
+    .cal-qn { flex: 0 0 64px; height: 64px; border: 5px solid #d7263d; border-radius: 50%; color: #d7263d; text-align: center; line-height: 62px; font-size: 44px; }
+    #cal-line { left: 0; top: 0; width: 1080px; height: 1920px; }
+    #cal-line path { stroke: #14213d; stroke-width: 6; stroke-dasharray: 4 22; }
+
+  </style>
+  <div id="root" data-composition-id="call" data-width="1080" data-height="1920">
+    <div id="call-sheet" class="sheet">
+
+      <div id="cal-h1" class="h">Fees se pehle,</div>
+      <div id="cal-h2" class="h"><span class="mark"><i id="cal-m" class="mark-bar"></i><span class="mark-t">3 sawaal</span></span> poochho</div>
+      <div id="cal-tag" class="hand">Fees: ₹ ? ? ?</div>
+      <svg id="cal-x" class="pen" viewBox="0 0 400 170"><path id="cal-x1" pathLength="1" stroke-dasharray="1" d="M20 20 L380 150"/><path id="cal-x2" pathLength="1" stroke-dasharray="1" d="M380 20 L20 150"/></svg>
+      <svg id="cal-line" class="pen" viewBox="0 0 1080 1920"><path id="cal-line-p" d="M290 650 C420 520 640 520 800 640"/></svg>
+      <div id="cal-papa" class="fig" style="left: 20px; top: 580px; width: 350px; height: 612px"><div id="cal-papa-in" class="fig-in"><div style="position: absolute; inset: 0"><div style="position: absolute; inset: 0"><img src="raw/cutouts/papa-phone-body.png" alt="" /><img id="cal-papa-head" src="raw/cutouts/papa-phone-head.png" alt="" style="transform-origin: 59.1% 33.8%" /></div></div></div></div>
+      <div id="cal-teach" class="fig" style="left: 720px; top: 560px; width: 330px; height: 631px"><div id="cal-teach-in" class="fig-in"><div style="position: absolute; inset: 0"><div style="position: absolute; inset: 0"><img src="raw/cutouts/teacher-phone-body.png" alt="" /><img id="cal-teach-head" src="raw/cutouts/teacher-phone-head.png" alt="" style="transform-origin: 59.7% 34.4%" /></div></div></div></div>
+      <div id="cal-pad"><div id="cal-q1" class="cal-q hand" style="top: 36px"><span class="cal-qn">1</span><span id="cal-q1-t" class="cal-qt">Kab se join karna hai?</span></div><div id="cal-q2" class="cal-q hand" style="top: 132px"><span class="cal-qn">2</span><span id="cal-q2-t" class="cal-qt">Bacche ko kya dikkat hai?</span></div><div id="cal-q3" class="cal-q hand" style="top: 228px"><span class="cal-qn">3</span><span id="cal-q3-t" class="cal-qt">Is hafte centre aa sakte hain?</span></div></div>
+
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const T0 = 7.6;
+    const g = (t) => +(t - T0).toFixed(3);
+    const tl = gsap.timeline({ paused: true });
+    // the sheet arrives like a page slid onto the desk
+    tl.fromTo("#call-sheet", { y: 1950, rotation: 4 }, { x: 0, y: 0, rotation: 0, duration: 0.5, ease: "power3.out" }, 0);
+    const pop = (sel, t, from) => tl.fromTo(sel, Object.assign({ opacity: 0, scale: 0.3, rotation: -8 }, from || {}), { opacity: 1, scale: 1, rotation: 0, duration: 0.38, ease: "back.out(1.8)" }, g(t));
+    const blurIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, g(t));
+    const markIn = (sel, t) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, g(t));
+    const draw = (sel, t, d) => tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d || 0.45, ease: "power2.inOut" }, g(t));
+    const stamp = (sel, t, rot) => tl.fromTo(sel, { opacity: 0, scale: 2.2, rotation: rot - 10 }, { opacity: 0.92, scale: 1, rotation: rot, duration: 0.28, ease: "power4.in" }, g(t));
+    // cutout puppets: enter, nod, hop, sway
+    const enter = (id, t, dx, dy) => tl.fromTo("#" + id, { x: dx || 0, y: dy === undefined ? 500 : dy, rotation: dx ? (dx > 0 ? 10 : -10) : 0 }, { x: 0, y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.5)" }, g(t));
+    const nod = (id, t, amp) => { amp = amp || 7; tl.to("#" + id + "-head", { rotation: -amp, duration: 0.16, ease: "power2.out" }, g(t)); tl.to("#" + id + "-head", { rotation: amp * 0.55, duration: 0.2, ease: "power2.inOut" }, g(t) + 0.16); tl.to("#" + id + "-head", { rotation: 0, duration: 0.28, ease: "power2.out" }, g(t) + 0.36); };
+    const hop = (id, t, n) => { for (let k = 0; k < (n || 1); k++) { const s = g(t) + k * 0.42; tl.to("#" + id + "-in", { y: -46, scaleY: 1.04, duration: 0.18, ease: "power2.out" }, s); tl.to("#" + id + "-in", { y: 0, scaleY: 0.94, duration: 0.15, ease: "power2.in" }, s + 0.18); tl.to("#" + id + "-in", { scaleY: 1, duration: 0.09, ease: "power1.out" }, s + 0.33); } };
+    const sway = (id, t0, t1, amp, per) => { per = per || 1.3; let s = g(t0), dir = 1; while (s + per <= g(t1)) { tl.to("#" + id + "-in", { rotation: amp * dir, duration: per, ease: "sine.inOut" }, s); s += per; dir = -dir; } tl.to("#" + id + "-in", { rotation: 0, duration: 0.4, ease: "sine.out" }, s); };
+    const talk = (id, t0, t1) => { let s = g(t0), k = 0; while (s + 0.26 <= g(t1)) { tl.to("#" + id + "-head", { rotation: k % 2 ? 2.5 : -2.5, y: k % 2 ? 0 : -3, duration: 0.26, ease: "sine.inOut" }, s); s += 0.26; k++; } tl.to("#" + id + "-head", { rotation: 0, y: 0, duration: 0.2 }, s); };
+
+
+    tl.set("#cal-m", { scaleX: 0 }, 0);
+    blurIn("#cal-h1", 8.0);
+    blurIn("#cal-h2", 10.2);
+    markIn("#cal-m", 10.35);
+    tl.set("#cal-tag", { opacity: 0 }, 0);
+    pop("#cal-tag", 8.4, { rotation: 6 });
+    draw("#cal-x1", 9.1, 0.22);
+    draw("#cal-x2", 9.33, 0.22);
+    enter("cal-papa", 7.95, -500, 0);
+    enter("cal-teach", 8.15, 500, 0);
+    tl.set("#cal-line", { opacity: 0 }, 0);
+    tl.to("#cal-line", { opacity: 1, duration: 0.3 }, g(8.6));
+    tl.fromTo("#cal-line-p", { strokeDashoffset: 0 }, { strokeDashoffset: -312, duration: g(21.4) - g(8.6), ease: "none" }, g(8.6));
+    tl.to(["#cal-h1", "#cal-h2", "#cal-tag", "#cal-x"], { opacity: 0, y: -30, duration: 0.18, ease: "power3.in" }, g(12.0));
+    tl.fromTo("#cal-pad", { opacity: 0, y: -380, rotation: -3 }, { opacity: 1, y: 0, rotation: -1, duration: 0.45, ease: "back.out(1.3)" }, g(12.05));
+    tl.set(".cal-q", { opacity: 0 }, 0);
+    talk("cal-teach", 8.0, 11.6);
+
+    tl.set("#cal-q1", { opacity: 1 }, g(12.4));
+    tl.fromTo("#cal-q1 .cal-qn", { scale: 1.8, rotation: -20 }, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2)" }, g(12.4));
+    tl.fromTo("#cal-q1-t", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.8, ease: "steps(14)" }, g(12.4) + 0.1);
+    nod("cal-teach", 12.4, 6);
+    talk("cal-teach", 12.4 + 0.5, 12.4 + 1.9);
+    nod("cal-papa", 12.4 + 2.0, 8);
+    tl.set("#cal-q2", { opacity: 1 }, g(15.45));
+    tl.fromTo("#cal-q2 .cal-qn", { scale: 1.8, rotation: -20 }, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2)" }, g(15.45));
+    tl.fromTo("#cal-q2-t", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.8, ease: "steps(14)" }, g(15.45) + 0.1);
+    nod("cal-teach", 15.45, 6);
+    talk("cal-teach", 15.45 + 0.5, 15.45 + 1.9);
+    nod("cal-papa", 15.45 + 2.0, 8);
+    tl.set("#cal-q3", { opacity: 1 }, g(18.35));
+    tl.fromTo("#cal-q3 .cal-qn", { scale: 1.8, rotation: -20 }, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2)" }, g(18.35));
+    tl.fromTo("#cal-q3-t", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.8, ease: "steps(14)" }, g(18.35) + 0.1);
+    nod("cal-teach", 18.35, 6);
+    talk("cal-teach", 18.35 + 0.5, 18.35 + 1.9);
+    nod("cal-papa", 18.35 + 2.0, 8);
+    sway("cal-papa", 8.6, 21.3, 1.6, 1.4);
+
+    window.__timelines["call"] = tl;
+  </script>
+</template>

@@ -1,0 +1,108 @@
+<template>
+  <style>
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-devanagari-800-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-devanagari-700-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    #root { position: absolute; inset: 0; font-family: "Mukta", sans-serif; color: #14213d; }
+    .sheet { position: absolute; inset: 0; background: #efe9dc url("assets/paper.jpg") center / cover; box-shadow: 0 0 70px rgba(0, 0, 0, 0.35); overflow: hidden; }
+    .h { position: absolute; left: 100px; font-weight: 800; font-size: 84px; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    .hand { font-family: "Kalam", cursive; font-weight: 700; }
+    .mark { position: relative; display: inline-block; }
+    .mark-bar { position: absolute; left: -10px; right: -10px; top: 22%; bottom: 4%; background: #ffc93c; border-radius: 6px; transform-origin: 0 50%; }
+    .mark-t { position: relative; }
+    .stamp { position: absolute; font-weight: 800; letter-spacing: 0.08em; border: 7px solid currentColor; border-radius: 12px; padding: 6px 20px 0; line-height: 1.05; mix-blend-mode: multiply; white-space: nowrap; }
+    .pen { position: absolute; overflow: visible; }
+    .pen path { fill: none; stroke: #d7263d; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+    .fig { position: absolute; }
+    .fig-in { position: absolute; inset: 0; transform-origin: 50% 100%; filter: drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 4px 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(8px 14px 10px rgba(0, 0, 0, 0.28)); }
+    .fig img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+    .slip { position: absolute; background: #fbf8f0; box-shadow: 4px 8px 14px rgba(0, 0, 0, 0.22); clip-path: polygon(0 4%, 6% 0, 13% 5%, 21% 1%, 30% 4%, 38% 0, 47% 5%, 55% 1%, 64% 4%, 72% 0, 81% 5%, 89% 1%, 100% 4%, 100% 96%, 92% 100%, 84% 95%, 75% 99%, 66% 96%, 57% 100%, 48% 95%, 39% 99%, 30% 96%, 21% 100%, 12% 95%, 4% 99%, 0 96%); }
+
+    #cen-h1 { top: 196px; font-size: 78px; }
+    #cen-h2 { top: 196px; font-size: 96px; }
+    #cen-phone { position: absolute; left: 330px; top: 330px; width: 420px; height: 700px; border-radius: 56px; background: #14213d; box-shadow: 8px 16px 28px rgba(0, 0, 0, 0.3); }
+    #cen-screen { position: absolute; left: 22px; top: 60px; right: 22px; bottom: 60px; border-radius: 28px; background: #fbf8f0; padding: 34px 30px; }
+    .cen-line { font-size: 40px; line-height: 1.6; color: #14213d; white-space: nowrap; }
+    #cen-x { left: 300px; top: 380px; width: 480px; height: 600px; }
+    #cen-x path { stroke-width: 12; }
+    #cen-photo { position: absolute; left: 470px; top: 330px; width: 560px; }
+    #cen-house { position: absolute; left: 80px; top: 900px; width: 200px; height: 180px; overflow: visible; }
+    #cen-path { left: 0; top: 0; width: 1080px; height: 1920px; }
+    #cen-path path { stroke: #14213d; stroke-width: 6; }
+    #cen-clock { position: absolute; left: 110px; top: 360px; width: 240px; text-align: center; color: #d7263d; }
+    #cen-clock-face { position: relative; width: 200px; height: 200px; margin: 0 auto; border: 9px solid #14213d; border-radius: 50%; background: #fff; }
+    #cen-hand { position: absolute; left: 91px; top: 22px; width: 8px; height: 76px; border-radius: 4px; background: #d7263d; transform-origin: 50% 100%; }
+    #cen-hub { position: absolute; left: 83px; top: 83px; width: 24px; height: 24px; border-radius: 50%; background: #14213d; }
+    #cen-cl-t { font-size: 50px; line-height: 1.1; margin-top: 8px; }
+
+  </style>
+  <div id="root" data-composition-id="centre" data-width="1080" data-height="1920">
+    <div id="centre-sheet" class="sheet">
+
+      <div id="cen-h1" class="h">Phone pe sab mat batao</div>
+      <div id="cen-h2" class="h"><span class="mark"><i id="cen-m" class="mark-bar"></i><span class="mark-t">Centre bulao!</span></span></div>
+      <div id="cen-phone"><div id="cen-screen" class="hand"><div class="cen-line">Fees …</div><div class="cen-line">Timing …</div><div class="cen-line">Syllabus …</div><div class="cen-line">Teachers …</div><div class="cen-line">Result …</div><div class="cen-line">Discount …</div></div></div>
+      <svg id="cen-x" class="pen" viewBox="0 0 480 600"><path id="cen-x1" pathLength="1" stroke-dasharray="1" d="M30 40 L450 560"/><path id="cen-x2" pathLength="1" stroke-dasharray="1" d="M450 40 L30 560"/></svg>
+      <img id="cen-photo" src="raw/cutouts/centre-photo.png" alt="" />
+      <svg id="cen-house" viewBox="0 0 200 180"><path d="M20 80 L100 14 L180 80 L180 170 L20 170 Z" fill="#fbf8f0" stroke="#14213d" stroke-width="8" stroke-linejoin="round"/><rect x="80" y="105" width="40" height="65" fill="#ffc93c" stroke="#14213d" stroke-width="6"/><text x="100" y="72" text-anchor="middle" font-family="Kalam" font-weight="700" font-size="30" fill="#14213d">ghar</text></svg>
+      <svg id="cen-path" class="pen" viewBox="0 0 1080 1920"><path id="cen-path-p" pathLength="1" stroke-dasharray="1" d="M270 1050 C380 1110 560 990 690 830"/></svg>
+      <div id="cen-papa" class="fig" style="left: 150px; top: 732px; width: 130px; height: 348px"><div id="cen-papa-in" class="fig-in"><div style="position: absolute; inset: 0"><div style="position: absolute; inset: 0"><img src="raw/cutouts/papa-body.png" alt="" /><img id="cen-papa-head" src="raw/cutouts/papa-head.png" alt="" style="transform-origin: 57.5% 28.2%" /></div></div></div></div>
+      <div id="cen-kid" class="fig" style="left: 240px; top: 771px; width: 108px; height: 319px"><div id="cen-kid-in" class="fig-in"><div style="position: absolute; inset: 0"><div style="position: absolute; inset: 0"><img src="raw/cutouts/kid-body.png" alt="" /><img id="cen-kid-head" src="raw/cutouts/kid-head.png" alt="" style="transform-origin: 34.9% 31.3%" /></div></div></div></div>
+      <div id="cen-clock" class="hand"><div id="cen-clock-face"><i id="cen-hand"></i><i id="cen-hub"></i></div><div id="cen-cl-t">10 min mein samjhao</div></div>
+
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const T0 = 25.3;
+    const g = (t) => +(t - T0).toFixed(3);
+    const tl = gsap.timeline({ paused: true });
+    // the sheet arrives like a page slid onto the desk
+    tl.fromTo("#centre-sheet", { x: 1150, rotation: 6 }, { x: 0, y: 0, rotation: 0, duration: 0.5, ease: "power3.out" }, 0);
+    const pop = (sel, t, from) => tl.fromTo(sel, Object.assign({ opacity: 0, scale: 0.3, rotation: -8 }, from || {}), { opacity: 1, scale: 1, rotation: 0, duration: 0.38, ease: "back.out(1.8)" }, g(t));
+    const blurIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, g(t));
+    const markIn = (sel, t) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, g(t));
+    const draw = (sel, t, d) => tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d || 0.45, ease: "power2.inOut" }, g(t));
+    const stamp = (sel, t, rot) => tl.fromTo(sel, { opacity: 0, scale: 2.2, rotation: rot - 10 }, { opacity: 0.92, scale: 1, rotation: rot, duration: 0.28, ease: "power4.in" }, g(t));
+    // cutout puppets: enter, nod, hop, sway
+    const enter = (id, t, dx, dy) => tl.fromTo("#" + id, { x: dx || 0, y: dy === undefined ? 500 : dy, rotation: dx ? (dx > 0 ? 10 : -10) : 0 }, { x: 0, y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.5)" }, g(t));
+    const nod = (id, t, amp) => { amp = amp || 7; tl.to("#" + id + "-head", { rotation: -amp, duration: 0.16, ease: "power2.out" }, g(t)); tl.to("#" + id + "-head", { rotation: amp * 0.55, duration: 0.2, ease: "power2.inOut" }, g(t) + 0.16); tl.to("#" + id + "-head", { rotation: 0, duration: 0.28, ease: "power2.out" }, g(t) + 0.36); };
+    const hop = (id, t, n) => { for (let k = 0; k < (n || 1); k++) { const s = g(t) + k * 0.42; tl.to("#" + id + "-in", { y: -46, scaleY: 1.04, duration: 0.18, ease: "power2.out" }, s); tl.to("#" + id + "-in", { y: 0, scaleY: 0.94, duration: 0.15, ease: "power2.in" }, s + 0.18); tl.to("#" + id + "-in", { scaleY: 1, duration: 0.09, ease: "power1.out" }, s + 0.33); } };
+    const sway = (id, t0, t1, amp, per) => { per = per || 1.3; let s = g(t0), dir = 1; while (s + per <= g(t1)) { tl.to("#" + id + "-in", { rotation: amp * dir, duration: per, ease: "sine.inOut" }, s); s += per; dir = -dir; } tl.to("#" + id + "-in", { rotation: 0, duration: 0.4, ease: "sine.out" }, s); };
+    const talk = (id, t0, t1) => { let s = g(t0), k = 0; while (s + 0.26 <= g(t1)) { tl.to("#" + id + "-head", { rotation: k % 2 ? 2.5 : -2.5, y: k % 2 ? 0 : -3, duration: 0.26, ease: "sine.inOut" }, s); s += 0.26; k++; } tl.to("#" + id + "-head", { rotation: 0, y: 0, duration: 0.2 }, s); };
+
+
+    tl.set("#cen-m", { scaleX: 0 }, 0);
+    blurIn("#cen-h1", 25.7);
+    tl.fromTo("#cen-phone", { opacity: 0, y: 200, rotation: 8 }, { opacity: 1, y: 0, rotation: -4, duration: 0.5, ease: "back.out(1.4)" }, g(25.75));
+    draw("#cen-x1", 26.7, 0.25);
+    draw("#cen-x2", 26.95, 0.25);
+    tl.to(["#cen-phone", "#cen-x"], { x: -900, rotation: -20, duration: 0.4, ease: "power3.in" }, g(28.2));
+    tl.to("#cen-h1", { opacity: 0, y: -30, duration: 0.18, ease: "power3.in" }, g(28.4));
+    tl.set("#cen-h2", { opacity: 0 }, 0);
+    pop("#cen-h2", 28.65, { rotation: -3 });
+    markIn("#cen-m", 28.9);
+    tl.fromTo("#cen-photo", { opacity: 0, y: -300, rotation: -10 }, { opacity: 1, y: 0, rotation: 3, duration: 0.5, ease: "back.out(1.3)" }, g(28.6));
+    tl.fromTo("#cen-house", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, g(28.75));
+    draw("#cen-path-p", 28.9, 1.4);
+    // papa and Rohan walk from home to the centre
+    tl.set(["#cen-papa", "#cen-kid"], { opacity: 0 }, 0);
+    tl.set(["#cen-papa", "#cen-kid"], { opacity: 1 }, g(29.0));
+    tl.fromTo("#cen-papa", { x: 0, y: 0, scale: 1 }, { x: 430, y: -230, scale: 0.78, duration: 2.6, ease: "none" }, g(29.0));
+    tl.fromTo("#cen-kid", { x: 0, y: 0, scale: 1 }, { x: 420, y: -240, scale: 0.78, duration: 2.6, ease: "none" }, g(29.15));
+    ["#cen-papa-in", "#cen-kid-in"].forEach((el, k) => {
+      for (let s = 0; s < 10; s++) {
+        const t = g(29.0 + k * 0.15) + s * 0.26;
+        tl.to(el, { y: -12, rotation: s % 2 ? 4 : -4, duration: 0.13, ease: "power1.out" }, t);
+        tl.to(el, { y: 0, duration: 0.13, ease: "power1.in" }, t + 0.13);
+      }
+      tl.to(el, { rotation: 0, duration: 0.2 }, g(31.75 + k * 0.15));
+    });
+    tl.set("#cen-clock", { opacity: 0 }, 0);
+    pop("#cen-clock", 31.05);
+    tl.fromTo("#cen-hand", { rotation: 0 }, { rotation: 300, duration: 1.4, ease: "power2.inOut" }, g(31.3));
+
+    window.__timelines["centre"] = tl;
+  </script>
+</template>

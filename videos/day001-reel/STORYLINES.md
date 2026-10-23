@@ -25,3 +25,10 @@ All copy is from the original cards, verbatim (Hinglish). Every storyline crops 
 - Beats: "Phone pe sab bata do" ✗ → "Centre bulao" ✓ / "Roz call karke pressure" ✗ → "Har 3–4 din value do" ✓ / "Cold ko bhool jao" ✗ → "Mahine mein 1 message" ✓ / "Number bas save" ✗ → "H / W / C / ADM tag" ✓ → claim → end card.
 - Look: full-bleed colour fields (navy / red / amber) that switch on the beat.
 - Sound: punchy percussion, with a buzzer on ✗ and a ding on ✓. Length 30–40 s.
+
+## D. "Enquiry register" (Vox-style collage, proposed after draft 1)
+- Device / form: one object that explains it, a coaching centre's enquiry register, built and annotated like a Vox explainer. The camera pushes across a paper desk, and each idea is a stop on that desk.
+- First 2 s: a ruled register page with 15 names. Red pen strikes out 12 and circles 3 as the voice says "admission sirf teen?".
+- Beats: 15 → 3 struck out → the rows tear out as slips and sort into HOT / WARM / COLD piles, each stamped → Rohan's slip, with a clay cutout of him beside it, travels on → the teacher cutout on a notepad, with the 3 questions typed and then highlighted → HOT stamp and ticks → a phone icon crossed out, then a dotted path to the centre cutout → a calendar page torn off with the date circled → a contact card where the H is highlighted and flips to ADM → the recap as a diagram that grows → the end card on paper.
+- Look: newsprint paper with grain and halftone, torn-paper edges, amber highlighter swipes, red-pen circles, navy ink, sans type (no serif). The characters are clay cutouts from the original reel, used as stickers with a white edge and a drop shadow, so they can move freely: slide in, bounce, tilt and react.
+- Sound: the same voice cut (56 s), with paper rustle, pen scratch on the circles and stamp thuds, and no music unless a track is supplied.

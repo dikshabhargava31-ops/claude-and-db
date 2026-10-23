@@ -1,0 +1,83 @@
+<template>
+  <style>
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-devanagari-800-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-devanagari-700-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    #root { position: absolute; inset: 0; font-family: "Mukta", sans-serif; color: #14213d; }
+    .sheet { position: absolute; inset: 0; background: #efe9dc url("assets/paper.jpg") center / cover; box-shadow: 0 0 70px rgba(0, 0, 0, 0.35); overflow: hidden; }
+    .h { position: absolute; left: 100px; font-weight: 800; font-size: 84px; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    .hand { font-family: "Kalam", cursive; font-weight: 700; }
+    .mark { position: relative; display: inline-block; }
+    .mark-bar { position: absolute; left: -10px; right: -10px; top: 22%; bottom: 4%; background: #ffc93c; border-radius: 6px; transform-origin: 0 50%; }
+    .mark-t { position: relative; }
+    .stamp { position: absolute; font-weight: 800; letter-spacing: 0.08em; border: 7px solid currentColor; border-radius: 12px; padding: 6px 20px 0; line-height: 1.05; mix-blend-mode: multiply; white-space: nowrap; }
+    .pen { position: absolute; overflow: visible; }
+    .pen path { fill: none; stroke: #d7263d; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+    .fig { position: absolute; }
+    .fig-in { position: absolute; inset: 0; transform-origin: 50% 100%; filter: drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 4px 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(8px 14px 10px rgba(0, 0, 0, 0.28)); }
+    .fig img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+    .slip { position: absolute; background: #fbf8f0; box-shadow: 4px 8px 14px rgba(0, 0, 0, 0.22); clip-path: polygon(0 4%, 6% 0, 13% 5%, 21% 1%, 30% 4%, 38% 0, 47% 5%, 55% 1%, 64% 4%, 72% 0, 81% 5%, 89% 1%, 100% 4%, 100% 96%, 92% 100%, 84% 95%, 75% 99%, 66% 96%, 57% 100%, 48% 95%, 39% 99%, 30% 96%, 21% 100%, 12% 95%, 4% 99%, 0 96%); }
+
+    #rec-k { position: absolute; left: 100px; top: 196px; color: #d7263d; font-size: 60px; }
+    .rec-box { position: absolute; left: 100px; width: 560px; height: 130px; background: #fff; box-shadow: 5px 10px 18px rgba(0, 0, 0, 0.18); font-size: 76px; font-weight: 800; line-height: 140px; text-align: center; white-space: nowrap; }
+    #rec-b1 { top: 310px; }
+    #rec-b3 { top: 800px; }
+    #rec-row { position: absolute; left: 100px; top: 560px; width: 560px; height: 130px; }
+    #rec-row .stamp { top: 26px; font-size: 44px; }
+    .rec-ar { left: 340px; width: 80px; height: 100px; }
+    .rec-ar path { stroke: #14213d; stroke-width: 8; }
+    #rec-a1 { top: 450px; }
+    #rec-a2 { top: 690px; }
+
+  </style>
+  <div id="root" data-composition-id="recap" data-width="1080" data-height="1920">
+    <div id="recap-sheet" class="sheet">
+
+      <div id="rec-k" class="hand">Yaad rakho —</div>
+      <div id="rec-b1" class="rec-box">3 sawaal</div>
+      <svg id="rec-a1" class="pen rec-ar" viewBox="0 0 80 100"><path id="rec-a1p" pathLength="1" stroke-dasharray="1" d="M40 6 L40 88 M14 62 L40 90 L66 62"/></svg>
+      <div id="rec-row"><div id="rec-s1" class="stamp" style="left: 0; color: #e5383b">HOT</div><div id="rec-s2" class="stamp" style="left: 170px; color: #d99a00">WARM</div><div id="rec-s3" class="stamp" style="left: 380px; color: #1a9fb0">COLD</div></div>
+      <svg id="rec-a2" class="pen rec-ar" viewBox="0 0 80 100"><path id="rec-a2p" pathLength="1" stroke-dasharray="1" d="M40 6 L40 88 M14 62 L40 90 L66 62"/></svg>
+      <div id="rec-b3" class="rec-box"><span class="mark"><i id="rec-m" class="mark-bar"></i><span class="mark-t">alag follow-up</span></span></div>
+      <div id="rec-t" class="fig" style="left: 680px; top: 610px; width: 380px; height: 570px"><div id="rec-t-in" class="fig-in"><div style="position: absolute; inset: 0"><div style="position: absolute; inset: 0" style="transform: scaleX(-1)"><img src="raw/cutouts/teacher-point.png" alt="" /></div></div></div></div>
+
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const T0 = 44.05;
+    const g = (t) => +(t - T0).toFixed(3);
+    const tl = gsap.timeline({ paused: true });
+    // the sheet arrives like a page slid onto the desk
+    tl.fromTo("#recap-sheet", { x: -1150, rotation: -6 }, { x: 0, y: 0, rotation: 0, duration: 0.5, ease: "power3.out" }, 0);
+    const pop = (sel, t, from) => tl.fromTo(sel, Object.assign({ opacity: 0, scale: 0.3, rotation: -8 }, from || {}), { opacity: 1, scale: 1, rotation: 0, duration: 0.38, ease: "back.out(1.8)" }, g(t));
+    const blurIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, g(t));
+    const markIn = (sel, t) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, g(t));
+    const draw = (sel, t, d) => tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d || 0.45, ease: "power2.inOut" }, g(t));
+    const stamp = (sel, t, rot) => tl.fromTo(sel, { opacity: 0, scale: 2.2, rotation: rot - 10 }, { opacity: 0.92, scale: 1, rotation: rot, duration: 0.28, ease: "power4.in" }, g(t));
+    // cutout puppets: enter, nod, hop, sway
+    const enter = (id, t, dx, dy) => tl.fromTo("#" + id, { x: dx || 0, y: dy === undefined ? 500 : dy, rotation: dx ? (dx > 0 ? 10 : -10) : 0 }, { x: 0, y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.5)" }, g(t));
+    const nod = (id, t, amp) => { amp = amp || 7; tl.to("#" + id + "-head", { rotation: -amp, duration: 0.16, ease: "power2.out" }, g(t)); tl.to("#" + id + "-head", { rotation: amp * 0.55, duration: 0.2, ease: "power2.inOut" }, g(t) + 0.16); tl.to("#" + id + "-head", { rotation: 0, duration: 0.28, ease: "power2.out" }, g(t) + 0.36); };
+    const hop = (id, t, n) => { for (let k = 0; k < (n || 1); k++) { const s = g(t) + k * 0.42; tl.to("#" + id + "-in", { y: -46, scaleY: 1.04, duration: 0.18, ease: "power2.out" }, s); tl.to("#" + id + "-in", { y: 0, scaleY: 0.94, duration: 0.15, ease: "power2.in" }, s + 0.18); tl.to("#" + id + "-in", { scaleY: 1, duration: 0.09, ease: "power1.out" }, s + 0.33); } };
+    const sway = (id, t0, t1, amp, per) => { per = per || 1.3; let s = g(t0), dir = 1; while (s + per <= g(t1)) { tl.to("#" + id + "-in", { rotation: amp * dir, duration: per, ease: "sine.inOut" }, s); s += per; dir = -dir; } tl.to("#" + id + "-in", { rotation: 0, duration: 0.4, ease: "sine.out" }, s); };
+    const talk = (id, t0, t1) => { let s = g(t0), k = 0; while (s + 0.26 <= g(t1)) { tl.to("#" + id + "-head", { rotation: k % 2 ? 2.5 : -2.5, y: k % 2 ? 0 : -3, duration: 0.26, ease: "sine.inOut" }, s); s += 0.26; k++; } tl.to("#" + id + "-head", { rotation: 0, y: 0, duration: 0.2 }, s); };
+
+
+    tl.set("#rec-m", { scaleX: 0 }, 0);
+    tl.set("#rec-k", { opacity: 0 }, 0);
+    pop("#rec-k", 44.5, { rotation: -6 });
+    enter("rec-t", 44.6, 500, 0);
+    tl.fromTo("#rec-b1", { opacity: 0, scale: 1.4, rotation: -4 }, { opacity: 1, scale: 1, rotation: -1, duration: 0.4, ease: "back.out(1.6)" }, g(45.55));
+    draw("#rec-a1p", 46.6, 0.3);
+    stamp("#rec-s1", 46.95, -6);
+    stamp("#rec-s2", 47.2, 4);
+    stamp("#rec-s3", 47.45, -3);
+    draw("#rec-a2p", 48.3, 0.3);
+    tl.fromTo("#rec-b3", { opacity: 0, scale: 1.4, rotation: 4 }, { opacity: 1, scale: 1, rotation: 1, duration: 0.4, ease: "back.out(1.6)" }, g(48.75));
+    markIn("#rec-m", 49.1);
+    sway("rec-t", 45.2, 51.2, 2.2, 1.0);
+
+    window.__timelines["recap"] = tl;
+  </script>
+</template>

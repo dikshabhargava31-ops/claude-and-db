@@ -1,0 +1,88 @@
+<template>
+  <style>
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-devanagari-800-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-devanagari-700-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    #root { position: absolute; inset: 0; font-family: "Mukta", sans-serif; color: #14213d; }
+    .sheet { position: absolute; inset: 0; background: #efe9dc url("assets/paper.jpg") center / cover; box-shadow: 0 0 70px rgba(0, 0, 0, 0.35); overflow: hidden; }
+    .h { position: absolute; left: 100px; font-weight: 800; font-size: 84px; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    .hand { font-family: "Kalam", cursive; font-weight: 700; }
+    .mark { position: relative; display: inline-block; }
+    .mark-bar { position: absolute; left: -10px; right: -10px; top: 22%; bottom: 4%; background: #ffc93c; border-radius: 6px; transform-origin: 0 50%; }
+    .mark-t { position: relative; }
+    .stamp { position: absolute; font-weight: 800; letter-spacing: 0.08em; border: 7px solid currentColor; border-radius: 12px; padding: 6px 20px 0; line-height: 1.05; mix-blend-mode: multiply; white-space: nowrap; }
+    .pen { position: absolute; overflow: visible; }
+    .pen path { fill: none; stroke: #d7263d; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+    .fig { position: absolute; }
+    .fig-in { position: absolute; inset: 0; transform-origin: 50% 100%; filter: drop-shadow(4px 0 0 #fff) drop-shadow(-4px 0 0 #fff) drop-shadow(0 4px 0 #fff) drop-shadow(0 -4px 0 #fff) drop-shadow(8px 14px 10px rgba(0, 0, 0, 0.28)); }
+    .fig img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+    .slip { position: absolute; background: #fbf8f0; box-shadow: 4px 8px 14px rgba(0, 0, 0, 0.22); clip-path: polygon(0 4%, 6% 0, 13% 5%, 21% 1%, 30% 4%, 38% 0, 47% 5%, 55% 1%, 64% 4%, 72% 0, 81% 5%, 89% 1%, 100% 4%, 100% 96%, 92% 100%, 84% 95%, 75% 99%, 66% 96%, 57% 100%, 48% 95%, 39% 99%, 30% 96%, 21% 100%, 12% 95%, 4% 99%, 0 96%); }
+
+    #reg-h1 { top: 196px; font-size: 104px; }
+    #reg-h2 { top: 196px; font-size: 92px; }
+    #reg-page { position: absolute; left: 110px; top: 340px; width: 860px; height: 790px; background: #fbf8f0 repeating-linear-gradient(180deg, transparent 0 44px, #c9d8e8 44px 45px) 0 92px / 100% 700px no-repeat; box-shadow: 6px 12px 24px rgba(0, 0, 0, 0.22); }
+    #reg-page::before { content: ""; position: absolute; left: 86px; top: 0; bottom: 0; width: 3px; background: #e8a0a0; }
+    #reg-title { position: absolute; left: 110px; top: 22px; font-size: 40px; color: #14213d; }
+    .reg-row { position: absolute; left: 104px; font-size: 34px; line-height: 45px; color: #2b3a67; white-space: nowrap; }
+    .reg-n { display: inline-block; width: 52px; color: #5d6782; }
+    .reg-strike { position: absolute; left: 150px; width: 330px; height: 5px; border-radius: 3px; background: #d7263d; transform-origin: 0 50%; }
+    .reg-keep { position: absolute; left: 146px; width: 340px; height: 36px; border-radius: 5px; background: rgba(255, 201, 60, 0.75); mix-blend-mode: multiply; transform-origin: 0 50%; }
+    #reg-three { position: absolute; left: 690px; top: 470px; width: 240px; text-align: center; color: #d7263d; }
+    #reg-3 { font-size: 230px; line-height: 1; }
+    #reg-adm { font-size: 46px; line-height: 1; }
+    #reg-circle { left: 680px; top: 455px; width: 260px; height: 260px; }
+
+  </style>
+  <div id="root" data-composition-id="register" data-width="1080" data-height="1920">
+    <div id="register-sheet" class="sheet">
+
+      <div id="reg-h1" class="h">15 enquiry,</div>
+      <div id="reg-h2" class="h">admission sirf <span class="mark"><i id="reg-m3" class="mark-bar"></i><span class="mark-t">3?</span></span></div>
+      <div id="reg-page">
+        <div id="reg-title" class="hand">Enquiry Register · is mahine</div>
+        <div class="reg-row hand" style="top: 92px"><span class="reg-n">1.</span> Sneha · 11th</div><i id="reg-k0" class="reg-keep" style="top: 98px"></i><div class="reg-row hand" style="top: 137px"><span class="reg-n">2.</span> Kabir · 9th</div><i id="reg-x1" class="reg-strike" style="top: 161px"></i><div class="reg-row hand" style="top: 182px"><span class="reg-n">3.</span> Ananya · 10th</div><i id="reg-x2" class="reg-strike" style="top: 206px"></i><div class="reg-row hand" style="top: 227px"><span class="reg-n">4.</span> Arjun · 12th</div><i id="reg-x3" class="reg-strike" style="top: 251px"></i><div class="reg-row hand" style="top: 272px"><span class="reg-n">5.</span> Isha · 8th</div><i id="reg-x4" class="reg-strike" style="top: 296px"></i><div class="reg-row hand" style="top: 317px"><span class="reg-n">6.</span> Dev · 9th</div><i id="reg-k5" class="reg-keep" style="top: 323px"></i><div class="reg-row hand" style="top: 362px"><span class="reg-n">7.</span> Meera · 11th</div><i id="reg-x6" class="reg-strike" style="top: 386px"></i><div class="reg-row hand" style="top: 407px"><span class="reg-n">8.</span> Kunal · 10th</div><i id="reg-x7" class="reg-strike" style="top: 431px"></i><div class="reg-row hand" style="top: 452px"><span class="reg-n">9.</span> Riya · 9th</div><i id="reg-x8" class="reg-strike" style="top: 476px"></i><div class="reg-row hand" style="top: 497px"><span class="reg-n">10.</span> Yash · 12th</div><i id="reg-k9" class="reg-keep" style="top: 503px"></i><div class="reg-row hand" style="top: 542px"><span class="reg-n">11.</span> Tanvi · 8th</div><i id="reg-x10" class="reg-strike" style="top: 566px"></i><div class="reg-row hand" style="top: 587px"><span class="reg-n">12.</span> Vivaan · 10th</div><i id="reg-x11" class="reg-strike" style="top: 611px"></i><div class="reg-row hand" style="top: 632px"><span class="reg-n">13.</span> Neha · 9th</div><i id="reg-x12" class="reg-strike" style="top: 656px"></i><div class="reg-row hand" style="top: 677px"><span class="reg-n">14.</span> Om · 11th</div><i id="reg-x13" class="reg-strike" style="top: 701px"></i><div class="reg-row hand" style="top: 722px"><span class="reg-n">15.</span> Zoya · 10th</div><i id="reg-x14" class="reg-strike" style="top: 746px"></i>
+      </div>
+      <div id="reg-three" class="hand"><div id="reg-3">3</div><div id="reg-adm">admission?</div></div>
+      <svg id="reg-circle" class="pen" viewBox="0 0 260 260"><path id="reg-circle-p" pathLength="1" stroke-dasharray="1" d="M150 18 C70 10 18 70 22 140 C26 215 100 250 165 238 C230 226 252 160 240 100 C230 50 190 20 130 22"/></svg>
+
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const T0 = 0;
+    const g = (t) => +(t - T0).toFixed(3);
+    const tl = gsap.timeline({ paused: true });
+    // the sheet arrives like a page slid onto the desk
+    tl.fromTo("#register-sheet", { opacity: 1 }, { x: 0, y: 0, rotation: 0, duration: 0.5, ease: "power3.out" }, 0);
+    const pop = (sel, t, from) => tl.fromTo(sel, Object.assign({ opacity: 0, scale: 0.3, rotation: -8 }, from || {}), { opacity: 1, scale: 1, rotation: 0, duration: 0.38, ease: "back.out(1.8)" }, g(t));
+    const blurIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, g(t));
+    const markIn = (sel, t) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power2.inOut" }, g(t));
+    const draw = (sel, t, d) => tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d || 0.45, ease: "power2.inOut" }, g(t));
+    const stamp = (sel, t, rot) => tl.fromTo(sel, { opacity: 0, scale: 2.2, rotation: rot - 10 }, { opacity: 0.92, scale: 1, rotation: rot, duration: 0.28, ease: "power4.in" }, g(t));
+    // cutout puppets: enter, nod, hop, sway
+    const enter = (id, t, dx, dy) => tl.fromTo("#" + id, { x: dx || 0, y: dy === undefined ? 500 : dy, rotation: dx ? (dx > 0 ? 10 : -10) : 0 }, { x: 0, y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.5)" }, g(t));
+    const nod = (id, t, amp) => { amp = amp || 7; tl.to("#" + id + "-head", { rotation: -amp, duration: 0.16, ease: "power2.out" }, g(t)); tl.to("#" + id + "-head", { rotation: amp * 0.55, duration: 0.2, ease: "power2.inOut" }, g(t) + 0.16); tl.to("#" + id + "-head", { rotation: 0, duration: 0.28, ease: "power2.out" }, g(t) + 0.36); };
+    const hop = (id, t, n) => { for (let k = 0; k < (n || 1); k++) { const s = g(t) + k * 0.42; tl.to("#" + id + "-in", { y: -46, scaleY: 1.04, duration: 0.18, ease: "power2.out" }, s); tl.to("#" + id + "-in", { y: 0, scaleY: 0.94, duration: 0.15, ease: "power2.in" }, s + 0.18); tl.to("#" + id + "-in", { scaleY: 1, duration: 0.09, ease: "power1.out" }, s + 0.33); } };
+    const sway = (id, t0, t1, amp, per) => { per = per || 1.3; let s = g(t0), dir = 1; while (s + per <= g(t1)) { tl.to("#" + id + "-in", { rotation: amp * dir, duration: per, ease: "sine.inOut" }, s); s += per; dir = -dir; } tl.to("#" + id + "-in", { rotation: 0, duration: 0.4, ease: "sine.out" }, s); };
+    const talk = (id, t0, t1) => { let s = g(t0), k = 0; while (s + 0.26 <= g(t1)) { tl.to("#" + id + "-head", { rotation: k % 2 ? 2.5 : -2.5, y: k % 2 ? 0 : -3, duration: 0.26, ease: "sine.inOut" }, s); s += 0.26; k++; } tl.to("#" + id + "-head", { rotation: 0, y: 0, duration: 0.2 }, s); };
+
+
+    tl.set("#reg-page", { rotation: -1.5 }, 0);
+    tl.fromTo("#reg-page", { scale: 1 }, { scale: 1.04, duration: 4.6, ease: "none" }, 0);
+    tl.fromTo("#reg-h1", { scale: 1.08, transformOrigin: "0% 50%" }, { scale: 1, duration: 0.5, ease: "expo.out" }, 0);
+    tl.set(".reg-strike, .reg-keep", { scaleX: 0 }, 0);
+    tl.set("#reg-m3", { scaleX: 0 }, 0);
+    // the old way: 12 of 15 struck out, 3 survive
+    tl.to(".reg-strike", { scaleX: 1, duration: 0.14, ease: "power2.out", stagger: 0.085 }, 2.75);
+    tl.to(".reg-keep", { scaleX: 1, duration: 0.25, ease: "power2.out", stagger: 0.12 }, 3.6);
+    tl.to("#reg-h1", { opacity: 0, y: -40, duration: 0.18, ease: "power3.in" }, 2.6);
+    blurIn("#reg-h2", 2.78);
+    tl.set("#reg-three", { opacity: 0 }, 0);
+    pop("#reg-three", 3.95);
+    draw("#reg-circle-p", 4.0, 0.4);
+    markIn("#reg-m3", 4.0);
+
+    window.__timelines["register"] = tl;
+  </script>
+</template>
