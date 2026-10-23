@@ -1,0 +1,30 @@
+<template>
+  <style>
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-devanagari-800-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Mukta"; font-weight: 700; src: url("assets/fonts/mukta-devanagari-700-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 700; src: url("assets/fonts/mukta-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    #root { position: absolute; inset: 0; font-family: "Mukta", sans-serif; color: #fff; }
+    .kicker { position: absolute; left: 108px; top: 214px; height: 46px; padding: 0 18px; border-radius: 10px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; }
+    .head { position: absolute; left: 108px; width: 864px; font-size: 84px; font-weight: 800; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    #tri-l1 { top: 290px; }
+    #tri-l2 { top: 386px; }
+    #tri-stamp { position: absolute; left: 150px; top: 520px; display: flex; align-items: center; gap: 22px; padding: 18px 34px 12px; border-radius: 22px; background: #fbb524; color: #0b1226; font-size: 76px; font-weight: 800; line-height: 1; white-space: nowrap; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35); }
+  </style>
+  <div id="root" data-composition-id="trial" data-width="1080" data-height="1920">
+    <div id="tri-kicker" class="kicker">HOT · AGLA STEP</div>
+    <div id="tri-l1" class="head">Jaane se pehle</div>
+    <div id="tri-l2" class="head">agla step fix:</div>
+    <div id="tri-stamp"><svg width="70" height="70" viewBox="0 0 70 70"><rect x="5" y="11" width="60" height="54" rx="10" fill="#0b1226"/><rect x="5" y="11" width="60" height="16" rx="8" fill="#ef4444"/><rect x="17" y="3" width="8" height="16" rx="4" fill="#0b1226"/><rect x="45" y="3" width="8" height="16" rx="4" fill="#0b1226"/><path d="M21 45l9 9 19-21" stroke="#fbb524" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Trial ki date</span></div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#tri-kicker", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, 0.05);
+    tl.fromTo("#tri-l1", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 0.15);
+    tl.fromTo("#tri-l2", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 1.35);
+    tl.fromTo("#tri-stamp", { opacity: 0, scale: 1.7, rotation: -9 }, { opacity: 1, scale: 1, rotation: -3, duration: 0.38, ease: "back.out(1.6)" }, 3.2);
+    tl.to(["#tri-kicker", "#tri-l1", "#tri-l2", "#tri-stamp"], { opacity: 0, duration: 0.15, ease: "power3.in" }, 4.2);
+    window.__timelines["trial"] = tl;
+  </script>
+</template>

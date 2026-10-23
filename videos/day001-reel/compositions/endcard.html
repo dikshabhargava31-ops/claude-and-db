@@ -1,0 +1,41 @@
+<template>
+  <style>
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-devanagari-800-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Mukta"; font-weight: 700; src: url("assets/fonts/mukta-devanagari-700-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 700; src: url("assets/fonts/mukta-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    #root { position: absolute; inset: 0; font-family: "Mukta", sans-serif; color: #fff; }
+    #end-bg { position: absolute; inset: 0; background: #0b1226; }
+    .c { position: absolute; left: 108px; width: 864px; text-align: center; white-space: nowrap; }
+    #end-badge { position: absolute; left: 470px; top: 430px; width: 140px; height: 140px; border-radius: 30px; background: #fbb524; color: #0b1226; font-size: 76px; font-weight: 800; line-height: 152px; text-align: center; }
+    #end-name { top: 600px; font-size: 76px; font-weight: 800; line-height: 1; }
+    #end-handle-w { top: 700px; }
+    #end-handle { display: inline-block; padding: 6px 30px 0; border-radius: 40px; background: #22d3ee; color: #0b1226; font-size: 44px; font-weight: 800; line-height: 64px; }
+    #end-day { top: 850px; font-size: 150px; font-weight: 800; line-height: 1; color: #fbb524; letter-spacing: -0.02em; }
+    #end-q { top: 1010px; font-size: 64px; font-weight: 800; line-height: 1.1; }
+    #end-btn-w { top: 1150px; }
+    #end-btn { display: inline-block; padding: 10px 56px 2px; border-radius: 24px; background: #fbb524; color: #0b1226; font-size: 64px; font-weight: 800; line-height: 1.2; }
+  </style>
+  <div id="root" data-composition-id="endcard" data-width="1080" data-height="1920">
+    <div id="end-bg"></div>
+    <div id="end-badge">KS</div>
+    <div id="end-name" class="c">Coaching Ka System</div>
+    <div id="end-handle-w" class="c"><span id="end-handle">@coachingkasystem</span></div>
+    <div id="end-day" class="c">Day 002</div>
+    <div id="end-q" class="c">Fees time pe kaise aaye?</div>
+    <div id="end-btn-w" class="c"><span id="end-btn">Follow karo</span></div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    // the navy ground comes down over the last shot, behind the final whoosh
+    tl.fromTo("#end-bg", { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power3.inOut" }, 0);
+    tl.fromTo("#end-badge", { opacity: 0, scale: 0.3, rotation: -15 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.45, ease: "back.out(1.7)" }, 0.35);
+    tl.fromTo("#end-name", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.55);
+    tl.fromTo("#end-handle", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.75);
+    tl.fromTo("#end-day", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.5)" }, 1.7);
+    tl.fromTo("#end-q", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 1.95);
+    tl.fromTo("#end-btn", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 4.7);
+    window.__timelines["endcard"] = tl;
+  </script>
+</template>

@@ -1,0 +1,23 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; }
+    #bd-panel {
+      position: absolute; left: 0; top: 0; width: 1080px; height: 640px;
+      background: linear-gradient(180deg, #0b1226 0%, #0b1226 73%, rgba(11, 18, 38, 0.82) 82%, rgba(11, 18, 38, 0) 100%);
+    }
+    #bd-foot {
+      position: absolute; left: 0; bottom: 0; width: 1080px; height: 900px;
+      background: linear-gradient(0deg, rgba(5, 9, 20, 0.72) 0%, rgba(5, 9, 20, 0.45) 45%, rgba(5, 9, 20, 0) 100%);
+    }
+  </style>
+  <div id="root" data-composition-id="backdrop" data-width="1080" data-height="1920">
+    <div id="bd-panel"></div>
+    <div id="bd-foot"></div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    tl.set("#bd-panel", { opacity: 1 }, 0);
+    window.__timelines["backdrop"] = tl;
+  </script>
+</template>

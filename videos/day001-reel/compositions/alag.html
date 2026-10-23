@@ -1,0 +1,37 @@
+<template>
+  <style>
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-devanagari-800-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Mukta"; font-weight: 700; src: url("assets/fonts/mukta-devanagari-700-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    @font-face { font-family: "Mukta"; font-weight: 700; src: url("assets/fonts/mukta-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    #root { position: absolute; inset: 0; font-family: "Mukta", sans-serif; color: #fff; }
+    .kicker { position: absolute; left: 108px; top: 214px; height: 46px; padding: 0 18px; border-radius: 10px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; }
+    .head { position: absolute; left: 108px; width: 864px; font-size: 88px; font-weight: 800; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    #alag-head { top: 282px; }
+    #alag-chips { position: absolute; left: 108px; top: 386px; width: 864px; display: flex; gap: 22px; }
+    .chip { display: inline-block; padding: 6px 26px 2px; border-radius: 18px; font-size: 64px; font-weight: 800; line-height: 1.1; color: #0b1226; }
+    #alag-hot { background: #ef4444; color: #fff; }
+    #alag-warm { background: #facc15; }
+    #alag-cold { background: #22d3ee; }
+  </style>
+  <div id="root" data-composition-id="alag" data-width="1080" data-height="1920">
+    <div id="alag-kicker" class="kicker">HAR ENQUIRY ALAG</div>
+    <div id="alag-head" class="head">Har enquiry <span style="color: #fbb524">alag</span> hai</div>
+    <div id="alag-chips">
+      <span id="alag-hot" class="chip">HOT</span>
+      <span id="alag-warm" class="chip">WARM</span>
+      <span id="alag-cold" class="chip">COLD</span>
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#alag-kicker", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "power2.out" }, 0.25);
+    tl.fromTo("#alag-head", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.4);
+    [["#alag-hot", 2.0], ["#alag-warm", 2.35], ["#alag-cold", 2.75]].forEach(([el, t]) => {
+      tl.fromTo(el, { opacity: 0, scale: 0.2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, t);
+    });
+    tl.to(["#alag-kicker", "#alag-head", "#alag-chips"], { opacity: 0, duration: 0.15, ease: "power3.in" }, 3.25);
+    window.__timelines["alag"] = tl;
+  </script>
+</template>

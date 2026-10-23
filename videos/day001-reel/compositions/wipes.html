@@ -1,0 +1,24 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    .wipe { position: absolute; left: 0; top: -100px; width: 1700px; height: 2120px; background: #fbb524; }
+    .wipe.navy { background: #0b1226; }
+  </style>
+  <div id="root" data-composition-id="wipes" data-width="1080" data-height="1920" data-layout-allow-overflow>
+    <div id="wp-1" class="wipe"></div>
+    <div id="wp-2" class="wipe navy"></div>
+    <div id="wp-3" class="wipe"></div>
+    <div id="wp-4" class="wipe navy"></div>
+    <div id="wp-5" class="wipe"></div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    tl.set(".wipe", { x: -2000, skewX: -12 }, 0);
+    // each band covers the frame exactly at its cut: 4.5, 21.2, 25.6, 37.1, 44.35
+    [["#wp-1", 4.5], ["#wp-2", 21.2], ["#wp-3", 25.6], ["#wp-4", 37.1], ["#wp-5", 44.35]].forEach(([el, cut]) => {
+      tl.fromTo(el, { x: -2000, skewX: -12 }, { x: 1400, skewX: -12, duration: 0.56, ease: "power3.inOut" }, cut - 0.28);
+    });
+    window.__timelines["wipes"] = tl;
+  </script>
+</template>

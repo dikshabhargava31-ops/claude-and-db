@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="hi" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0b1226;
+      }
+      #cam {
+        position: absolute;
+        inset: 0;
+        transform-origin: 50% 100%;
+      }
+      #cam video {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="57.6"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- Picture: shots from the original reel, punched in so the old burned-in cards leave the frame -->
+      <div id="cam" data-layout-allow-overflow>
+        <video id="v01" class="clip" src="raw/picture.mp4" muted playsinline data-start="0" data-duration="2.55" data-media-start="0.3" data-track-index="0"></video>
+        <video id="v02" class="clip" src="raw/picture.mp4" muted playsinline data-start="2.55" data-duration="1.95" data-media-start="2.55" data-track-index="0"></video>
+        <video id="v03" class="clip" src="raw/picture.mp4" muted playsinline data-start="4.5" data-duration="3.4" data-media-start="4.6" data-track-index="0"></video>
+        <video id="v04" class="clip" src="raw/picture.mp4" muted playsinline data-start="7.9" data-duration="3.6" data-media-start="9.45" data-track-index="0"></video>
+        <video id="v05" class="clip" src="raw/picture.mp4" muted playsinline data-start="11.5" data-duration="3.95" data-media-start="13.2" data-track-index="0"></video>
+        <video id="v06" class="clip" src="raw/picture.mp4" muted playsinline data-start="15.45" data-duration="2.9" data-media-start="17.15" data-track-index="0"></video>
+        <video id="v07" class="clip" src="raw/picture.mp4" muted playsinline data-start="18.35" data-duration="2.85" data-media-start="20.05" data-track-index="0"></video>
+        <video id="v08" class="clip" src="raw/picture.mp4" muted playsinline data-start="21.2" data-duration="4.4" data-media-start="27.0" data-track-index="0"></video>
+        <video id="v09" class="clip" src="raw/picture.mp4" muted playsinline data-start="25.6" data-duration="3.05" data-media-start="44.0" data-track-index="0"></video>
+        <video id="v10" class="clip" src="raw/picture.mp4" muted playsinline data-start="28.65" data-duration="4.1" data-media-start="47.05" data-track-index="0"></video>
+        <video id="v11" class="clip" src="raw/picture.mp4" muted playsinline data-start="32.75" data-duration="4.35" data-media-start="55.6" data-track-index="0"></video>
+        <video id="v12" class="clip" src="raw/picture.mp4" muted playsinline data-start="37.1" data-duration="4.2" data-media-start="87.0" data-track-index="0"></video>
+        <video id="v13" class="clip" src="raw/picture.mp4" muted playsinline data-start="41.3" data-duration="3.05" data-media-start="91.2" data-track-index="0"></video>
+        <video id="v14" class="clip" src="raw/picture.mp4" muted playsinline data-start="44.35" data-duration="2.65" data-media-start="103.6" data-track-index="0"></video>
+        <video id="v15" class="clip" src="raw/picture.mp4" muted playsinline data-start="47.0" data-duration="4.6" data-media-start="106.25" data-track-index="0"></video>
+      </div>
+
+      <!-- Graphics: one scene per beat -->
+      <div id="backdrop" data-composition-id="backdrop" data-composition-src="compositions/backdrop.html" data-start="0" data-duration="51.6" data-track-index="1" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 2"></div>
+      <div id="hook" data-composition-id="hook" data-composition-src="compositions/hook.html" data-start="0" data-duration="4.6" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 3"></div>
+      <div id="alag" data-composition-id="alag" data-composition-src="compositions/alag.html" data-start="4.5" data-duration="3.45" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 3"></div>
+      <div id="call" data-composition-id="call" data-composition-src="compositions/call.html" data-start="7.9" data-duration="13.35" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 3"></div>
+      <div id="hot" data-composition-id="hot" data-composition-src="compositions/hot.html" data-start="21.2" data-duration="4.45" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 3"></div>
+      <div id="centre" data-composition-id="centre" data-composition-src="compositions/centre.html" data-start="25.6" data-duration="7.2" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 3"></div>
+      <div id="trial" data-composition-id="trial" data-composition-src="compositions/trial.html" data-start="32.75" data-duration="4.4" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 3"></div>
+      <div id="track" data-composition-id="track" data-composition-src="compositions/track.html" data-start="37.1" data-duration="7.3" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 3"></div>
+      <div id="recap" data-composition-id="recap" data-composition-src="compositions/recap.html" data-start="44.35" data-duration="6.7" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 3"></div>
+      <div id="captions" data-composition-id="captions" data-composition-src="compositions/captions.html" data-start="0" data-duration="51.0" data-track-index="3" data-track-kind="captions" data-width="1080" data-height="1920" style="z-index: 4"></div>
+      <div id="wipes" data-composition-id="wipes" data-composition-src="compositions/wipes.html" data-start="0" data-duration="51.0" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 6"></div>
+      <div id="endcard" data-composition-id="endcard" data-composition-src="compositions/endcard.html" data-start="50.75" data-duration="6.85" data-track-index="5" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index: 5"></div>
+
+      <!-- Sound: the original voice, cut at its pauses, plus effects on visible actions -->
+      <audio id="vo" class="clip" src="raw/vo.m4a" data-start="0" data-duration="56.1" data-track-index="6" data-volume="1"></audio>
+      <audio id="sfx-whoosh-1" class="clip" src="assets/sfx/whoosh.mp3" data-start="4.37" data-duration="0.57" data-track-index="7" data-volume="0.45"></audio>
+      <audio id="sfx-whoosh-2" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="21.07" data-duration="0.57" data-track-index="7" data-volume="0.45"></audio>
+      <audio id="sfx-whoosh-3" class="clip" src="assets/sfx/whoosh.mp3" data-start="25.47" data-duration="0.57" data-track-index="7" data-volume="0.45"></audio>
+      <audio id="sfx-whoosh-4" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="36.97" data-duration="0.57" data-track-index="7" data-volume="0.45"></audio>
+      <audio id="sfx-whoosh-5" class="clip" src="assets/sfx/whoosh.mp3" data-start="44.22" data-duration="0.57" data-track-index="7" data-volume="0.45"></audio>
+      <audio id="sfx-whoosh-end" class="clip" src="assets/sfx/whoosh-cinematic.mp3" data-start="48.53" data-duration="4.0" data-track-index="7" data-volume="0.3" data-fade-out="0.8"></audio>
+      <audio id="sfx-pop-3" class="clip" src="assets/sfx/pop.mp3" data-start="3.86" data-duration="0.72" data-track-index="8" data-volume="0.5"></audio>
+      <audio id="sfx-pop-hot" class="clip" src="assets/sfx/pop.mp3" data-start="6.41" data-duration="0.72" data-track-index="8" data-volume="0.45"></audio>
+      <audio id="sfx-pop-warm" class="clip" src="assets/sfx/click-soft.mp3" data-start="6.81" data-duration="0.37" data-track-index="9" data-volume="0.55"></audio>
+      <audio id="sfx-pop-cold" class="clip" src="assets/sfx/pop.mp3" data-start="7.16" data-duration="0.72" data-track-index="8" data-volume="0.45"></audio>
+      <audio id="sfx-q1" class="clip" src="assets/sfx/click-soft.mp3" data-start="12.36" data-duration="0.37" data-track-index="8" data-volume="0.5"></audio>
+      <audio id="sfx-q2" class="clip" src="assets/sfx/click-soft.mp3" data-start="15.41" data-duration="0.37" data-track-index="8" data-volume="0.5"></audio>
+      <audio id="sfx-q3" class="clip" src="assets/sfx/click-soft.mp3" data-start="18.31" data-duration="0.37" data-track-index="8" data-volume="0.5"></audio>
+      <audio id="sfx-stamp-hot" class="clip" src="assets/sfx/pop.mp3" data-start="21.31" data-duration="0.72" data-track-index="8" data-volume="0.5"></audio>
+      <audio id="sfx-stamp-trial" class="clip" src="assets/sfx/pop.mp3" data-start="35.86" data-duration="0.72" data-track-index="8" data-volume="0.5"></audio>
+      <audio id="sfx-adm" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="42.81" data-duration="2.12" data-track-index="8" data-volume="0.55"></audio>
+      <audio id="sfx-follow" class="clip" src="assets/sfx/pop.mp3" data-start="55.36" data-duration="0.72" data-track-index="8" data-volume="0.5"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      // Camera: base scale per shot hides the old card (origin bottom centre); punch-ins are hard cuts
+      const shots = [
+        [0, 1.15, 0],
+        [2.55, 1.35, -180],
+        [4.5, 1.15, 0],
+        [7.9, 1.15, 0],
+        [11.5, 1.22, 0],
+        [12.4, 1.32, 0],
+        [15.45, 1.4, 0],
+        [18.35, 1.26, 0],
+        [21.2, 1.28, 0],
+        [23.7, 1.38, 0],
+        [25.6, 1.22, 0],
+        [28.65, 1.4, 0],
+        [32.75, 1.16, 0],
+        [35.95, 1.26, 0],
+        [37.1, 1.3, 0],
+        [41.3, 1.45, 0],
+        [44.35, 1.16, 0],
+        [47.0, 1.3, 0],
+      ];
+      shots.forEach(([t, s, x]) => tl.set("#cam", { scale: s, x: x }, t));
+      // slow push on the opening shot only, so frame 0 already reads
+      tl.fromTo("#cam", { scale: 1.15 }, { scale: 1.22, duration: 2.5, ease: "none" }, 0.02);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
