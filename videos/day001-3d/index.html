@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/vendor/three.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0f1a3a; }
+      #stage { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="6" data-width="1080" data-height="1920">
+      <!-- 3D test shot: a low-poly classroom at night; the camera dollies in as the parent and Rohan walk in and the teacher waves -->
+      <canvas id="stage" width="1080" height="1920"></canvas>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+
+      const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("stage"), antialias: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1);
+      renderer.setSize(1080, 1920, false);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color("#0f1a3a");
+      scene.fog = new THREE.Fog("#0f1a3a", 12, 26);
+      const camera = new THREE.PerspectiveCamera(42, 1080 / 1920, 0.1, 100);
+
+      const mat = (c, r = 0.75) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: 0 });
+      const mesh = (geo, m, x = 0, y = 0, z = 0, cast = true) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = cast; o.receiveShadow = true; return o; };
+
+      // light: warm key from the lamp side, cool rim from the window, a soft night fill
+      scene.add(new THREE.HemisphereLight("#9fb4ff", "#3a2a22", 1.25));
+      const fill = new THREE.DirectionalLight("#fff1e0", 1.1); fill.position.set(0, 3, 10); scene.add(fill);
+      const key = new THREE.DirectionalLight("#ffd9b0", 2.6);
+      key.position.set(4, 7, 5); key.castShadow = true;
+      key.shadow.mapSize.set(1024, 1024);
+      Object.assign(key.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8 });
+      scene.add(key);
+      const rim = new THREE.DirectionalLight("#7aa2ff", 1.3); rim.position.set(-5, 5, -6); scene.add(rim);
+      const lamp = new THREE.PointLight("#ffb05c", 6, 6, 1.6); lamp.position.set(-2.2, 1.9, -1.2); scene.add(lamp);
+
+      // the room
+      scene.add(mesh(new THREE.BoxGeometry(14, 0.2, 14), mat("#6a4a35", 0.85), 0, -0.1, 0, false));
+      scene.add(mesh(new THREE.BoxGeometry(14, 6, 0.2), mat("#1d2b58"), 0, 3, -4.2, false));
+      scene.add(mesh(new THREE.BoxGeometry(0.2, 6, 14), mat("#1a2650"), -6, 3, 0, false));
+      scene.add(mesh(new THREE.BoxGeometry(4.2, 1.9, 0.08), mat("#3a3f4a", 0.5), 0.6, 2.6, -4.05, false));
+      scene.add(mesh(new THREE.BoxGeometry(4.0, 1.7, 0.1), mat("#f1efe8", 0.35), 0.6, 2.6, -4.0, false));
+      const win = mesh(new THREE.BoxGeometry(0.1, 1.8, 2.4), new THREE.MeshStandardMaterial({ color: "#26407f", emissive: "#2a4b9a", emissiveIntensity: 0.6 }), -5.88, 2.6, -1.2, false);
+      scene.add(win);
+      const moon = mesh(new THREE.SphereGeometry(0.22, 24, 16), new THREE.MeshStandardMaterial({ color: "#fff", emissive: "#e8eeff", emissiveIntensity: 1.2 }), -5.8, 3.1, -0.6, false);
+      scene.add(moon);
+
+      // desks and chairs, plus the teacher's desk with a lamp
+      const deskTop = mat("#b37b48", 0.6), leg = mat("#3b2a1e"), chair = mat("#22305c", 0.6);
+      const desk = (x, z) => {
+        const g = new THREE.Group();
+        g.add(mesh(new THREE.BoxGeometry(1.3, 0.08, 0.7), deskTop, 0, 0.78, 0));
+        [[-0.58, -0.28], [0.58, -0.28], [-0.58, 0.28], [0.58, 0.28]].forEach(([a, b]) => g.add(mesh(new THREE.BoxGeometry(0.06, 0.78, 0.06), leg, a, 0.39, b)));
+        g.add(mesh(new THREE.BoxGeometry(0.6, 0.06, 0.5), chair, 0, 0.46, 0.65));
+        g.add(mesh(new THREE.BoxGeometry(0.6, 0.55, 0.06), chair, 0, 0.74, 0.9));
+        g.position.set(x, 0, z); scene.add(g);
+      };
+      [[-2.4, 1.2], [0.2, 1.2], [2.8, 1.2], [-2.4, 3.0], [0.2, 3.0], [2.8, 3.0]].forEach(([x, z]) => desk(x, z));
+      scene.add(mesh(new THREE.BoxGeometry(2.0, 0.9, 0.9), mat("#6e4528", 0.6), -2.4, 0.45, -1.6));
+      scene.add(mesh(new THREE.BoxGeometry(0.5, 0.06, 0.36), mat("#b4232f", 0.5), -2.0, 0.93, -1.5));
+      const lampArm = mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.6), mat("#222"), -2.9, 1.2, -1.6); scene.add(lampArm);
+      const shade = mesh(new THREE.ConeGeometry(0.2, 0.25, 20, 1, true), new THREE.MeshStandardMaterial({ color: "#2b2b2b", emissive: "#ffb05c", emissiveIntensity: 0.4, side: THREE.DoubleSide }), -2.8, 1.55, -1.5); shade.rotation.z = 0.6; scene.add(shade);
+
+      // people built from soft primitives: matte clay-like materials, blank faces, KGP-style
+      const skin = mat("#f0bf8f", 0.55);
+      function person({ top, pants, hair, scale = 1, glasses = false, bag = false, greyHair = false }) {
+        const g = new THREE.Group(), p = {};
+        const legGeo = new THREE.CapsuleGeometry(0.11, 0.55, 6, 12);
+        p.hipL = new THREE.Group(); p.hipL.position.set(-0.14, 0.9, 0);
+        p.hipR = new THREE.Group(); p.hipR.position.set(0.14, 0.9, 0);
+        p.hipL.add(mesh(legGeo, mat(pants), 0, -0.42, 0)); p.hipR.add(mesh(legGeo, mat(pants), 0, -0.42, 0));
+        p.hipL.add(mesh(new THREE.BoxGeometry(0.22, 0.12, 0.34), mat("#2a1d16"), 0, -0.84, 0.06));
+        p.hipR.add(mesh(new THREE.BoxGeometry(0.22, 0.12, 0.34), mat("#2a1d16"), 0, -0.84, 0.06));
+        p.body = new THREE.Group(); p.body.position.y = 0.9;
+        const torso = mesh(new THREE.CapsuleGeometry(0.42, 0.32, 8, 24), mat(top), 0, 0.42, 0); torso.scale.set(1, 1, 0.85); p.body.add(torso);
+        p.body.add(mesh(new THREE.TorusGeometry(0.17, 0.05, 8, 20), mat("#f3eee4"), 0, 0.86, 0.04));
+        const armGeo = new THREE.CapsuleGeometry(0.12, 0.36, 6, 12);
+        p.shL = new THREE.Group(); p.shL.position.set(-0.5, 0.74, 0);
+        p.shR = new THREE.Group(); p.shR.position.set(0.5, 0.74, 0);
+        p.shL.add(mesh(armGeo, mat(top), 0, -0.28, 0)); p.shR.add(mesh(armGeo, mat(top), 0, -0.28, 0));
+        p.shL.add(mesh(new THREE.SphereGeometry(0.1, 16, 12), skin, 0, -0.58, 0)); p.shR.add(mesh(new THREE.SphereGeometry(0.1, 16, 12), skin, 0, -0.58, 0));
+        p.body.add(p.shL, p.shR);
+        p.head = new THREE.Group(); p.head.position.y = 1.0;
+        p.head.add(mesh(new THREE.SphereGeometry(0.46, 40, 30), skin, 0, 0.42, 0));
+        const hairM = mesh(new THREE.SphereGeometry(0.48, 40, 30, 0, Math.PI * 2, 0, Math.PI * 0.42), mat(hair, 0.9), 0, 0.43, -0.03); hairM.rotation.x = -0.55; p.head.add(hairM);
+        if (greyHair) { [-1, 1].forEach((s) => { const sb = mesh(new THREE.SphereGeometry(0.16, 16, 12), mat("#a7a7a7", 0.9), s * 0.4, 0.48, -0.08); sb.scale.set(0.45, 1, 1); p.head.add(sb); }); }
+        // simple eyes give each figure a face
+        [-0.16, 0.16].forEach((x) => { const e = mesh(new THREE.SphereGeometry(0.05, 12, 10), mat("#1b1410", 0.3), x, 0.43, 0.43); e.scale.set(0.8, 1.25, 0.5); p.head.add(e); });
+        if (glasses) {
+          const gm = mat("#111", 0.4);
+          [-0.17, 0.17].forEach((x) => { const r = mesh(new THREE.TorusGeometry(0.115, 0.024, 8, 24), gm, x, 0.42, 0.43); p.head.add(r); });
+          p.head.add(mesh(new THREE.BoxGeometry(0.11, 0.025, 0.025), gm, 0, 0.43, 0.45));
+        }
+        p.body.add(p.head);
+        if (bag) p.body.add(mesh(new THREE.BoxGeometry(0.6, 0.66, 0.26), mat("#1f2f63"), 0, 0.42, -0.45));
+        g.add(p.hipL, p.hipR, p.body);
+        g.scale.setScalar(scale);
+        scene.add(g);
+        return { g, p };
+      }
+      const teacher = person({ top: "#7a5638", pants: "#3c3a37", hair: "#2a2420", glasses: true, greyHair: true });
+      const papa = person({ top: "#7c1f2c", pants: "#5d1a22", hair: "#1c1612" });
+      const kid = person({ top: "#eeeae2", pants: "#e6e2da", hair: "#3a2a20", scale: 0.72, bag: true });
+
+      const ease = (a) => (a <= 0 ? 0 : a >= 1 ? 1 : a * a * (3 - 2 * a));
+      const lerp = (a, b, k) => a + (b - a) * k;
+      function pose(who, t, walking, faceY) {
+        const { p } = who;
+        const s = walking ? Math.sin(t * 9) : 0;
+        p.hipL.rotation.x = s * 0.55; p.hipR.rotation.x = -s * 0.55;
+        p.shL.rotation.x = -s * 0.45; p.shR.rotation.x = s * 0.45;
+        p.body.position.y = 0.9 + (walking ? Math.abs(Math.cos(t * 9)) * 0.05 : Math.sin(t * 2.2) * 0.008);
+        who.g.rotation.y = faceY;
+      }
+
+      function renderAt(t) {
+        // camera: a slow dolly in from the back of the room to the conversation
+        const k = ease(t / 6);
+        camera.position.set(lerp(1.4, 0.2, k), lerp(3.4, 2.9, k), lerp(11.5, 7.9, k));
+        camera.lookAt(lerp(0, -0.05, k), lerp(1.5, 1.25, k), lerp(0, -0.8, k));
+
+        // teacher stands by the desk, waves the visitors in, then nods
+        teacher.g.position.set(-1.25, 0, -0.9);
+        pose(teacher, t, false, lerp(0.2, 0.75, ease((t - 1.5) / 1)));
+        const wave = t > 1.2 && t < 3.4 ? Math.sin((t - 1.2) * 9) : 0;
+        teacher.p.shR.rotation.z = t > 1.2 && t < 3.4 ? 2.4 + wave * 0.35 : lerp(2.4, 0.08, ease((t - 3.4) / 0.4)) * (t >= 3.4 ? 1 : 0) + (t <= 1.2 ? 0.08 : 0);
+        teacher.p.shL.rotation.z = -0.08;
+        teacher.p.head.rotation.x = t > 3.8 && t < 4.6 ? Math.sin((t - 3.8) * 8) * 0.18 : 0;
+
+        // papa and Rohan walk in from the right and stop in front of the teacher
+        const w = ease((t - 0.3) / 3.2);
+        papa.g.position.set(lerp(4.6, 0.25, w), 0, lerp(0.6, -0.6, w));
+        kid.g.position.set(lerp(5.4, 1.1, w), 0, lerp(0.9, -0.15, w));
+        const walking = t > 0.3 && t < 3.5;
+        pose(papa, t, walking, walking ? -1.3 : lerp(-1.3, -0.9, ease((t - 3.5) / 0.4)));
+        pose(kid, t + 0.3, walking, walking ? -1.3 : lerp(-1.3, -0.8, ease((t - 3.5) / 0.4)));
+        // Rohan gives a little hop when he arrives
+        const hop = t > 4.4 && t < 4.9 ? Math.sin(((t - 4.4) / 0.5) * Math.PI) * 0.22 : 0;
+        kid.g.position.y = hop;
+        papa.p.head.rotation.x = t > 4.0 && t < 4.8 ? Math.sin((t - 4.0) * 8) * 0.15 : 0;
+
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      renderAt(0);
+    </script>
+  </body>
+</html>
