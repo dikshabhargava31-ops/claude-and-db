@@ -1,0 +1,82 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Inter", sans-serif; color: #fff; }
+    #cd-top { position: absolute; left: 0; top: 0; width: 1080px; height: 230px; background: linear-gradient(180deg, rgba(11, 18, 38, 0.92) 0%, rgba(11, 18, 38, 0.6) 60%, rgba(11, 18, 38, 0) 100%); }
+    #cd-dot { position: absolute; left: 62px; top: 124px; width: 12px; height: 12px; border-radius: 50%; background: #fbb524; }
+    #cd-series { position: absolute; left: 86px; top: 110px; font-size: 28px; font-weight: 700; white-space: nowrap; }
+    #cd-day { position: absolute; left: 86px; top: 146px; font-size: 28px; font-weight: 500; color: #b9c3dc; white-space: nowrap; }
+    #cd-logo { position: absolute; left: 960px; top: 108px; width: 60px; height: 60px; border-radius: 14px; background: #fbb524; color: #0b1226; font-size: 28px; font-weight: 800; line-height: 62px; text-align: center; }
+    .card { position: absolute; left: 50px; top: 230px; width: 980px; padding: 26px 40px 32px; border-radius: 30px; background: rgba(13, 21, 44, 0.9); border: 2px solid rgba(255, 255, 255, 0.1); box-shadow: 0 22px 50px rgba(0, 0, 0, 0.4); opacity: 0; }
+    .pill { display: inline-block; height: 46px; padding: 0 18px; border-radius: 23px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; white-space: nowrap; }
+    .pill.hot { background: rgba(239, 68, 68, 0.2); color: #ff8a8a; }
+    .pill.ok { background: rgba(34, 197, 94, 0.18); color: #4ade80; }
+    .pill.warm { background: rgba(250, 204, 21, 0.18); color: #facc15; }
+    .ln { margin-top: 14px; font-size: 50px; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; white-space: nowrap; display: flex; align-items: center; gap: 14px; }
+    .ln.sm { font-size: 36px; font-weight: 600; color: #c7cfe0; }
+    .big { margin-top: 10px; font-size: 76px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; white-space: nowrap; }
+    .kw { color: #fbb524; } .red { color: #ff7272; } .dim { color: #6b7591; }
+    .quote { margin-top: 14px; padding-left: 22px; border-left: 6px solid #4ade80; font-size: 44px; font-weight: 700; line-height: 1.25; font-style: italic; color: #e6ffe9; }
+    .quote.sm { margin-top: 0; font-size: 40px; border-color: #facc15; color: #fff7cc; }
+    .row3 { margin-top: 16px; display: flex; gap: 22px; }
+    .it { margin-top: 12px; display: flex; align-items: center; gap: 12px; font-size: 42px; font-weight: 700; white-space: nowrap; opacity: 0; }
+    .row3 .it { margin-top: 0; }
+    .qn { flex: 0 0 52px; height: 52px; border-radius: 14px; background: #fbb524; color: #0b1226; font-size: 32px; font-weight: 800; line-height: 54px; text-align: center; }
+    .day { display: inline-block; padding: 2px 16px; border-radius: 12px; background: #facc15; color: #0b1226; font-size: 34px; font-weight: 800; }
+    #split { position: absolute; left: 537px; top: 0; width: 6px; height: 1920px; background: #0b1226; opacity: 0; }
+    #end { position: absolute; inset: 0; background: #0b1226; opacity: 0; }
+    #end-lock { position: absolute; left: 0; top: 620px; width: 1080px; display: flex; justify-content: center; align-items: center; gap: 28px; }
+    #end-logo { width: 128px; height: 128px; border-radius: 30px; background: #fbb524; color: #0b1226; font-size: 62px; font-weight: 800; line-height: 132px; text-align: center; }
+    #end-name { font-size: 70px; font-weight: 800; white-space: nowrap; }
+    .c { position: absolute; left: 0; width: 1080px; text-align: center; white-space: nowrap; }
+    #end-handle { display: inline-block; padding: 8px 30px 6px; border-radius: 40px; background: #fbb524; color: #0b1226; font-size: 36px; font-weight: 800; }
+    #end-cta { display: inline-block; padding: 16px 40px 12px; border-radius: 22px; border: 4px solid #fbb524; font-size: 50px; font-weight: 800; }
+  </style>
+  <div id="root" data-composition-id="cards" data-width="1080" data-height="1920">
+    <div id="split"></div>
+    <div id="cd-top"></div><i id="cd-dot"></i>
+    <div id="cd-series">Coaching System Design</div><div id="cd-day">Day 001 · Enquiry → Admission</div><div id="cd-logo">KS</div>
+    <div id="c0" class="card"><span class="pill ">01 · SABSE IMPORTANT NUMBER</span><div class="ln">Enquiry → <span class="kw">Admission</span> ratio</div><div id="ratio" class="big"><span id="r-a">15</span> <span class="dim">→</span> <span id="r-b" class="kw">3</span></div></div>
+    <div id="c1" class="card"><span class="pill ">02 · KEY</span><div class="ln">Ratio badhane ki key:</div><div class="big kw">Centre visit</div></div>
+    <div id="c2" class="card"><span class="pill ">03 · KYUN?</span><div class="ln">Phone pe parent sirf</div><div class="big">fees <span class="kw">compare</span> karta hai</div></div>
+    <div id="c3" class="card"><span class="pill ">03 · KYUN?</span><div class="ln">Centre aakar dekhta hai:</div><div class="row3"><div class="it" data-at="21.815"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#22c55e"/><path d="M9 18l5 5 11-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Classroom</div><div class="it" data-at="24.203"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#22c55e"/><path d="M9 18l5 5 11-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Teacher</div><div class="it" data-at="26.59"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#22c55e"/><path d="M9 18l5 5 11-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Students</div></div></div>
+    <div id="c4" class="card"><span class="pill ">03 · KYUN?</span><div class="big"><span class="kw">Trust</span> yahin banta hai</div><div class="ln sm">Jo time nikaal ke aaya, wo serious hai</div></div>
+    <div id="c5" class="card"><span class="pill hot">04 · MISTAKE</span><div class="ln"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#ef4444"/><path d="M11 11l12 12M23 11l-12 12" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg> Phone pe hi <span class="red">fees bata di</span></div></div>
+    <div id="c6" class="card"><span class="pill hot">04 · MISTAKE</span><div class="ln">"Soch ke batate hain…"</div><div class="ln sm"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#ef4444"/><path d="M11 11l12 12M23 11l-12 12" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg> aur koi follow-up nahi</div></div>
+    <div id="c7" class="card"><span class="pill ok">05 · SAHI TAREEKA</span><div class="ln">Phone pe sab mat batao.</div><div class="quote">"Ek baar centre aa jaiye,<br/>bacche se bhi mil lenge."</div></div>
+    <div id="c8" class="card"><span class="pill ok">05 · SAHI TAREEKA</span><div class="ln"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#22c55e"/><path d="M9 18l5 5 11-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> Date-time <span class="kw">wahin fix</span></div></div>
+    <div id="c9" class="card"><span class="pill ">06 · VISIT PE 3 THINGS</span><div class="it" data-at="73.323"><span class="qn">1</span>Classroom dikhao</div><div class="it" data-at="75.66"><span class="qn">2</span>Teacher se milwao</div><div class="it" data-at="77.717"><span class="qn">3</span>Trial class ki date fix</div></div>
+    <div id="c10" class="card"><span class="pill warm">07 · JO NAHI AAYE</span><div class="it" data-at="80.998"><span class="day">Day 2</span> Message</div><div class="it" data-at="82.757"><span class="day">Week 1</span> Call</div><div class="it" data-at="85.817"><span class="quote sm">"Kab aa sakte hain?"</span></div></div>
+    <div id="c11" class="card"><span class="pill ">08 · EXCEL SHEET</span><div class="ln">Har enquiry = <span class="kw">1 row</span></div><div class="ln sm">Naam · Class · Phone · Date · Visit · Admission</div></div>
+    <div id="c12" class="card"><span class="pill ">09 · HAR WEEK COUNT</span><div class="ln">Enquiries → Visits → <span class="kw">Admissions</span></div></div>
+    <div id="c13" class="card"><span class="pill ">10 · FOCUS</span><div class="ln">Fees pe nahi,</div><div class="big kw">visit pe focus</div></div>
+    <div id="end">
+      <div id="end-lock"><div id="end-logo">KS</div><div id="end-name">Coaching Ka System</div></div>
+      <div class="c" style="top: 800px"><span id="end-handle">@coachingkasystem</span></div>
+      <div class="c" style="top: 930px"><span id="end-cta">Comment <span style="color: #fbb524">ENQUIRY</span></span></div>
+      <div class="c" style="top: 1060px; font-size: 36px; font-weight: 600; color: #c7cfe0">Ready messages ke liye</div>
+      <div class="c" style="top: 1140px; font-size: 48px; font-weight: 800; color: #fbb524">Follow for Day 002</div>
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    const T = {"lines": [{"s": 0.4, "e": 5.35}, {"s": 5.5, "e": 11.55}, {"s": 12.05, "e": 18.55}, {"s": 18.95, "e": 28.5}, {"s": 29.15, "e": 36.65}, {"s": 37.05, "e": 45.9}, {"s": 47.25, "e": 53.15}, {"s": 53.9, "e": 66.05}, {"s": 66.75, "e": 69.6}, {"s": 70.05, "e": 79.4}, {"s": 79.85, "e": 87.5}, {"s": 87.8, "e": 98.25}, {"s": 99.98, "e": 104.62}, {"s": 105.12, "e": 110.67}], "shots": [{"n": "desk", "a": 0, "b": 5.2}, {"n": "street", "a": 5.2, "b": 11.75}, {"n": "home", "a": 11.75, "b": 18.65}, {"n": "class", "a": 18.65, "b": 28.85}, {"n": "shake", "a": 28.85, "b": 36.75}, {"n": "deskcall", "a": 36.75, "b": 46.95}, {"n": "home2", "a": 46.95, "b": 53.6}, {"n": "call", "a": 53.6, "b": 69.75}, {"n": "tour", "a": 69.75, "b": 79.55}, {"n": "mum", "a": 79.55, "b": 87.5}, {"n": "sheet", "a": 87.5, "b": 99.68}, {"n": "chart", "a": 99.68, "b": 104.82}, {"n": "bye", "a": 104.82, "b": 112.87}], "ev": {"bubbles": [0.4, 0.665, 0.93, 1.196, 1.461, 1.726, 1.991, 2.256, 2.521, 2.787, 3.052, 3.317, 3.582, 3.847, 4.112], "green": 4.756, "tags": [14.975, 15.95, 16.925], "see": [21.815, 24.203, 26.59], "shake": 30.65, "fee": 43.422, "soch": 48.43, "grey": 51.38, "cal": 67.605, "three": [73.323, 75.66, 77.717], "msg": 80.998, "ring": 82.757, "kab": 85.817, "rows": [90.935, 92.293, 93.652, 95.01, 96.369], "bars": [101.372, 102.532, 103.692], "endcard": 107.451}, "end": 112.87};
+    const L = T.lines;
+    // one card per line, in with the voice, out just before the next line
+    L.forEach((l, k) => {
+      const until = k + 1 < L.length ? L[k + 1].s - 0.2 : T.ev.endcard;
+      tl.fromTo("#c" + k, { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, Math.max(0.05, l.s - 0.15));
+      tl.to("#c" + k, { opacity: 0, y: -16, duration: 0.18, ease: "power3.in" }, until - 0.18);
+    });
+    // items land on the words that say them
+    document.querySelectorAll("[data-at]").forEach((el) => tl.fromTo(el, { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, +el.dataset.at));
+    // the ratio: 15 enquiries, 3 admissions
+    tl.fromTo("#r-b", { opacity: 0, scale: 2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, T.ev.green);
+    const call = T.shots.find((s) => s.n === "call");
+    tl.set("#split", { opacity: 1 }, call.a); tl.set("#split", { opacity: 0 }, call.b);
+    tl.fromTo("#end", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.inOut" }, T.ev.endcard);
+    tl.fromTo("#end-lock", { scale: 0.85 }, { scale: 1, duration: 0.5, ease: "expo.out" }, T.ev.endcard + 0.2);
+    tl.fromTo("#end-cta", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, T.ev.endcard + 0.6);
+    window.__timelines["cards"] = tl;
+  </script>
+</template>
