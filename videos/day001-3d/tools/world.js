@@ -34,6 +34,8 @@
       const box = (w, h, d, c, x, y, z, parent, r) => mesh(new THREE.BoxGeometry(w, h, d), typeof c === "string" ? mat(c, r) : c, x, y, z, parent);
       const clamp = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
       const ease = (a) => { a = clamp(a); return a * a * (3 - 2 * a); };
+      // camera moves keep drifting to the cut (an ease-out that never stops), so no shot freezes before the next
+      const drift = (a) => { a = clamp(a); return 0.5 * a + 0.5 * (1 - (1 - a) * (1 - a)); };
       const lerp = (a, b, k) => a + (b - a) * k;
       const backOut = (a) => { a = clamp(a); const c = 1.9; return 1 + (c + 1) * Math.pow(a - 1, 3) + c * Math.pow(a - 1, 2); };
       const room = (ox, floor, wall, w = 12, d = 10) => {
@@ -308,7 +310,7 @@
               }
             });
             [0, 5, 10].forEach((k, j) => { const s = w.notesG[k]; s.position.set(S.office - 1.05 + j * 1.05, 2.45 - (j % 2) * 0.42, -0.4); popSprite(s, t, E.green + j * 0.15); s.scale.set(s.userData.base[0] * 0.85 * (s.scale.x / s.userData.base[0]), s.userData.base[1] * 0.85 * (s.scale.y / s.userData.base[1]), 1); });
-            look(cam, mix([S.office + 0.2, 2.9, 8.6], [S.office + 0.25, 2.5, 6.6], ease(u)), [S.office + 0.1, 1.55, -1.1]);
+            look(cam, mix([S.office + 0.2, 2.9, 8.6], [S.office + 0.25, 2.5, 6.6], drift(u)), [S.office + 0.1, 1.55, -1.1]);
             break;
           }
           case "street": {
@@ -316,7 +318,7 @@
             const k = ease(u * 1.1);
             pose(w.papaS, { x: lerp(S.street + 3.8, S.street + 0.35, k), z: lerp(3.4, -1.0, k), walk: u < 0.9, face: -2.4 }, t);
             pose(w.kidS, { x: lerp(S.street + 4.5, S.street + 1.0, k), z: lerp(3.8, -0.8, k), walk: u < 0.9, face: -2.4, seed: 1 }, t);
-            look(cam, mix([S.street + 0.6, 2.8, 19], [S.street + 0.3, 2.3, 10.5], ease(u)), [S.street, lerp(2.2, 1.9, u), -1.6]);
+            look(cam, mix([S.street + 0.6, 2.8, 19], [S.street + 0.3, 2.3, 10.5], drift(u)), [S.street, lerp(2.2, 1.9, u), -1.6]);
             break;
           }
           case "home": case "home2": {
@@ -327,7 +329,7 @@
             else { popSprite(w.soch, t, E.soch, E.grey - E.soch); popSprite(w.sochG, t, E.grey); w.sochG.scale.set(1.35, 0.4, 1); }
             const p0 = sh.n === "home" ? [S.home + 0.6, 2.4, 8.4] : [S.home - 0.9, 2.3, 8.0];
             const p1 = sh.n === "home" ? [S.home + 0.3, 2.2, 6.6] : [S.home - 0.4, 2.2, 6.6];
-            look(cam, mix(p0, p1, ease(u)), [S.home + 0.1, 1.55, -0.6]);
+            look(cam, mix(p0, p1, drift(u)), [S.home + 0.1, 1.55, -0.6]);
             break;
           }
           case "class": case "shake": case "tour": case "bye": {
@@ -346,7 +348,7 @@
               pose(w.teacherC, { x: S.class + 0.55, z: 0.4, face: Math.PI / 2 - 0.35, shake: s, nod: s ? Math.sin(s * 6) * 0.08 : 0 }, t);
               pose(w.papaC, { x: S.class + 1.75, z: 0.5, face: -Math.PI / 2 + 0.35, shake: s }, t);
               pose(w.kidC, { x: S.class + 2.5, z: 0.95, face: -Math.PI / 2 + 0.6, hop: t > E.shake + 0.6 && t < E.shake + 1.1 ? Math.sin(((t - E.shake - 0.6) / 0.5) * Math.PI) * 0.2 : 0 }, t);
-              look(cam, mix([S.class + 1.15, 2.4, 8.2], [S.class + 1.15, 2.2, 6.8], ease(u)), [S.class + 1.15, 1.35, 0.4]);
+              look(cam, mix([S.class + 1.15, 2.4, 8.2], [S.class + 1.15, 2.2, 6.8], drift(u)), [S.class + 1.15, 1.35, 0.4]);
             } else if (sh.n === "tour") {
               const k = ease(u / 0.45);
               pose(w.papaC, { x: lerp(S.class + 4.6, S.class + 1.6, k), z: lerp(3.4, 0.5, k), walk: u < 0.45, face: k < 1 ? -2.4 : -1.9 }, t);
@@ -354,12 +356,12 @@
               const s = t > E.three[1] && t < E.three[1] + 1.4 ? t - E.three[1] : undefined;
               pose(w.teacherC, { x: S.class + 0.6, z: 0.2, face: s !== undefined ? 1.2 : 0.5, point: t > E.three[0] && t < E.three[1], wave: t > E.three[2] ? t : undefined }, t);
               popSprite(w.calC, t, E.three[2]);
-              look(cam, mix([S.class + 3.6, 3.2, 10.5], [S.class + 1.6, 2.6, 8.2], ease(u)), [S.class + 1.4, 1.3, -0.4]);
+              look(cam, mix([S.class + 3.6, 3.2, 10.5], [S.class + 1.6, 2.6, 8.2], drift(u)), [S.class + 1.4, 1.3, -0.4]);
             } else {
               pose(w.teacherC, { x: S.class, z: 0.8, face: 0, wave: t }, t);
               pose(w.papaC, { x: S.class - 1.3, z: 0.6, face: 0.3 }, t);
               pose(w.kidC, { x: S.class + 1.2, z: 0.9, face: -0.3, hop: Math.max(0, Math.sin(t * 5)) * 0.12, seed: 1 }, t);
-              look(cam, mix([S.class, 2.6, 9.2], [S.class, 2.3, 7.6], ease(u)), [S.class, 1.3, 0.6]);
+              look(cam, mix([S.class, 2.6, 9.2], [S.class, 2.3, 7.6], drift(u)), [S.class, 1.3, 0.6]);
             }
             break;
           }
@@ -367,7 +369,7 @@
             lightFor(S.office, [0.85, 1.6, -1.0]);
             pose(w.teacherA, { x: S.office, z: -1.9, sit: true, phone: true, nod: Math.sin(t * 4) * 0.05 }, t);
             popSprite(w.fee, t, E.fee);
-            look(cam, mix([S.office + 0.9, 2.6, 7.2], [S.office + 0.5, 2.3, 5.8], ease(u)), [S.office, 1.55, -1.6]);
+            look(cam, mix([S.office + 0.9, 2.6, 7.2], [S.office + 0.5, 2.3, 5.8], drift(u)), [S.office, 1.55, -1.6]);
             break;
           }
           case "call": {
@@ -387,7 +389,7 @@
             popSprite(w.msg, t, E.msg, E.ring - E.msg);
             popSprite(w.ring, t, E.ring, E.kab - E.ring);
             popSprite(w.kab, t, E.kab);
-            const a = lerp(-0.25, 0.25, ease(u));
+            const a = lerp(-0.25, 0.25, drift(u));
             look(cam, [S.mum + Math.sin(a) * 6.8, 2.3, -1.6 + Math.cos(a) * 6.8], [S.mum, 1.45, -1.6]);
             break;
           }
@@ -395,7 +397,7 @@
             lightFor(S.sheet, [0, 3.4, 1.0]);
             const n = E.rows.filter((r) => t >= r).length;
             w.screen.material.map = w.sheetTex[n];
-            look(cam, mix([S.sheet + 0.3, 2.5, 7.8], [S.sheet + 0.05, 2.2, 6.4], ease(u)), [S.sheet, 1.75, -1.5]);
+            look(cam, mix([S.sheet + 0.3, 2.5, 7.8], [S.sheet + 0.05, 2.2, 6.4], drift(u)), [S.sheet, 1.75, -1.5]);
             break;
           }
           case "chart": {
@@ -407,7 +409,7 @@
               b.num.visible = t >= E.bars[k]; b.num.position.set(b.num.userData.x, h + 0.3, 0);
             });
             w.exampleTag.visible = true;
-            look(cam, mix([S.chart + 0.8, 1.9, 15.5], [S.chart, 1.6, 13.5], ease(u)), [S.chart, 0.55, 0]);
+            look(cam, mix([S.chart + 0.8, 1.9, 15.5], [S.chart, 1.6, 13.5], drift(u)), [S.chart, 0.55, 0]);
             break;
           }
         }

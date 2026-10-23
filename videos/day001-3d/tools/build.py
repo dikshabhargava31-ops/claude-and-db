@@ -7,9 +7,9 @@ pauses, paste them into SPANS, set VOICE to the file, and run  python3 tools/bui
 import json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-VOICE_LEN = 100.4  # seconds in raw/voice.m4a (built by tools/voice.py)
-VOICE = "raw/voice.m4a"  # the person's recording: recording 1 to 91.8 s + recording 2, pauses cut to 0.3 s
-SPANS = [[0.22, 5.09], [5.39, 9.2], [9.44, 12.22], [12.44, 20.5], [20.89, 29.27], [29.47, 35.89], [36.09, 40.87], [41.09, 51.58], [51.86, 53.87], [54.05, 63.57], [63.84, 71.62], [71.96, 85.21], [85.49, 89.47], [89.71, 100.24]]  # fitted by tools/voice.py (lines 1–13 in recording 1, 14 in recording 2)
+VOICE_LEN = 100.45  # seconds in raw/voice.m4a (built by tools/voice.py)
+VOICE = "raw/voice.m4a"  # the person's recording: recording 1 to 91.8 s + recording 2, pauses cut to 0.3 s of room tone
+SPANS = [[0.26, 5.13], [5.43, 9.15], [9.47, 12.26], [12.47, 20.54], [20.85, 28.17], [28.47, 35.7], [35.91, 40.83], [41.12, 51.54], [51.89, 53.9], [54.08, 63.45], [63.87, 71.65], [71.99, 85.17], [85.53, 89.5], [89.73, 100.2]]  # fitted by tools/voice.py (lines 1–13 in recording 1, 14 in recording 2)
 
 TEXT = [re.sub(r"^\d+\.\s*", "", l).strip() for l in (ROOT / "SCRIPT.md").read_text().splitlines() if re.match(r"^\d+\.\s", l)]
 assert len(TEXT) == 14, len(TEXT)
