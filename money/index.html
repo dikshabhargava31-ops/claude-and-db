@@ -410,6 +410,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     <div class="panel">
       <div class="panel-head"><h2>Back up or move your data</h2><span class="small muted">Use this to keep a copy or move to another device</span></div>
       <div class="row"><button class="btn" id="exportBtn" type="button">Show backup</button><button class="btn" id="copyBtn" type="button" hidden>Copy backup</button><button class="btn" id="importBtn" type="button">Restore from pasted backup</button><button class="btn danger" id="resetBtn" type="button">Delete everything</button></div>
+      <label class="field"><span>Restore from a backup file (.json)</span><input type="file" id="backupFile" accept=".json,application/json,text/plain"></label>
       <textarea id="backupText" placeholder="Your backup appears here. To restore, paste a backup here and choose Restore." aria-label="Backup data"></textarea>
       <p class="small" id="resetConfirm" hidden><b>Delete all transactions, budgets and bills?</b> <button class="btn sm danger" id="resetYes" type="button">Yes, delete</button> <button class="btn sm" id="resetNo" type="button">Cancel</button></p>
     </div>
@@ -422,15 +423,17 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
   "use strict";
   var KEY = "spend-coach-v1";
   var CURRENCIES = { INR: "en-IN", USD: "en-US", EUR: "de-DE", GBP: "en-GB", AED: "en-AE", CAD: "en-CA", AUD: "en-AU", SGD: "en-SG" };
-  var EXCLUDED = { "Income": 1, "Transfers": 1 };
+  var EXCLUDED = { "Income": 1, "Transfers": 1, "Investments": 1 };
   var RULES = [
     ["Income", /salary|payroll|interest credit|int\.? ?cr|dividend|refund|cashback|reversal/i],
-    ["Transfers", /self transfer|own account|to savings|credit card payment|cc payment|bill ?desk.*card|neft.*self|sip|mutual fund|zerodha|groww|ppf|recurring deposit/i],
+    ["Transfers", /self transfer|own account|to savings|credit card payment|cc payment|bill ?desk.*card|neft.*self/i],
+    ["Investments", /nach-mut|\bsip\b|mutual fund|\bcams\b|zerodha|groww|hdfc securities|hsl sec|ppf|recurring deposit/i],
     ["Rent", /\brent\b|landlord|nobroker|house rent/i],
     ["Groceries", /bigbasket|blinkit|zepto|instamart|dmart|d-mart|grocer|supermarket|reliance fresh|more retail|jiomart|walmart|whole foods|tesco|aldi|lidl|kirana|vegetable|milk|dairy/i],
     ["Food & dining", /swiggy|zomato|restaurant|cafe|café|starbucks|mcdonald|domino|pizza|kfc|burger|chaayos|haldiram|eats|doordash|deliveroo|bakery|dine/i],
     ["Transport", /uber|\bola\b|rapido|metro|petrol|fuel|diesel|hpcl|bpcl|indian oil|shell|irctc|fastag|lyft|parking|toll|redbus|indigo|air india|vistara/i],
     ["Bills & utilities", /electric|bescom|tata power|adani|msedcl|airtel|\bjio\b|vodafone|\bvi\b|bsnl|broadband|recharge|water bill|gas bill|piped gas|insurance|lic\b|premium|emi\b|loan/i],
+    ["Subscriptions", /netflix|spotify|prime video|hotstar|apple media|apple services|apple\.com|google play|youtube premium|adobe|openai|chatgpt|anthropic|claude|grok|xai|descript|canva|notion/i],
     ["Entertainment", /netflix|spotify|prime video|hotstar|disney|bookmyshow|cinema|pvr|inox|youtube|apple\.com|sonyliv|zee5|steam|playstation/i],
     ["Health", /pharm|apollo|medplus|hospital|clinic|1mg|netmeds|practo|diagnostic|lab|gym|cult\.?fit|doctor/i],
     ["Shopping", /amazon|flipkart|myntra|ajio|meesho|nykaa|tata cliq|croma|reliance digital|decathlon|ikea|zara|h&m|mall|target|ebay/i]
@@ -605,8 +608,11 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     (state.wishlist || []).forEach(function (w) {
       if (iso(TODAY) >= w.revisit) out.push({ lvl: "good", t: "Cooling-off done: " + w.item, d: "You waited " + daysBetween(parseIso(w.added), TODAY) + " days. Ask the coach again to see if it fits now.", coach: w.id });
     });
-    if (M.streak >= 2) out.push({ lvl: "good", t: M.streak + " no-spend days in a row", d: "Nice. Every no-spend day adds " + fmt(M.safePerDay) + " to the rest of your month." });
-    if (state.sample || !M.tx.length) out.push({ lvl: "info", t: "Bring in your real numbers", d: "Import a statement from your bank once a week so these reminders reflect your spending.", link: "#bank" });
+    var subs = state.bills.filter(function (b) { return b.cat === "Subscriptions"; }).reduce(function (a, b) { return a + b.amount; }, 0);
+    if (M.income && subs > M.income * 0.1) out.push({ lvl: "warn", t: "Subscriptions cost " + fmt(subs) + " a month", d: "That's " + Math.round(subs / M.income * 100) + "% of your income. Cancel the ones you haven't opened this week.", link: "#plan", linkText: "Review bills" });
+    if (M.streak >= 2 && M.tx.length) out.push({ lvl: "good", t: M.streak + " no-spend days in a row", d: "Nice. Every no-spend day adds " + fmt(M.safePerDay) + " to the rest of your month." });
+    if (!state.sample && !M.tx.length) out.push({ lvl: "warn", t: "No transactions for " + TODAY.toLocaleDateString(undefined, { month: "long" }) + " yet", d: "Until you import this month's statement, safe-to-spend assumes you've spent nothing so far.", link: "#bank" });
+    else if (state.sample) out.push({ lvl: "info", t: "Bring in your real numbers", d: "Import a statement from your bank once a week so these reminders reflect your spending.", link: "#bank" });
     var order = { bad: 0, warn: 1, info: 2, good: 3 };
     return out.sort(function (a, b) { return order[a.lvl] - order[b.lvl]; });
   }
@@ -714,7 +720,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     var N = nudges(M);
     document.getElementById("nudgeCount").textContent = N.filter(function (n) { return n.lvl === "bad" || n.lvl === "warn"; }).length + " need attention";
     document.getElementById("nudges").innerHTML = N.map(function (n) {
-      var extra = n.coach ? ' <button class="btn sm" type="button" data-recheck="' + n.coach + '">Ask the coach</button>' : n.link ? ' <a class="small" href="' + n.link + '">Import now</a>' : "";
+      var extra = n.coach ? ' <button class="btn sm" type="button" data-recheck="' + n.coach + '">Ask the coach</button>' : n.link ? ' <a class="small" href="' + n.link + '">' + (n.linkText || "Import now") + '</a>' : "";
       return '<li class="nudge ' + n.lvl + '"><div><b>' + esc(n.t) + "</b><span class=\"small muted\">" + esc(n.d) + "</span>" + extra + "</div></li>";
     }).join("");
 
@@ -1009,6 +1015,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     var cCredit = find(/credit|deposit|cr\b|paid in|money in/i, /card/);
     var cAmt = find(/^amount|amount$|amt\b|^value$/i, /balance/);
     var cType = find(/^type$|dr\/cr|cr\/dr|debit\/credit/i);
+    var cCat = find(/categor/i);
     if (cDate < 0 || (cAmt < 0 && cDebit < 0 && cCredit < 0)) return { error: "Found a header but no amount columns. Columns seen: " + H.join(", ") };
     var body = rows.slice(hi + 1);
     var order = "DMY";
@@ -1026,7 +1033,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
       if (cType >= 0 && amt != null && !isNaN(amt)) { var ty = (r[cType] || "").toLowerCase(); if (/^d|debit|dr/.test(ty)) amt = -Math.abs(amt); else if (/^c|credit|cr/.test(ty)) amt = Math.abs(amt); }
       if (amt == null || isNaN(amt) || amt === 0) { skipped++; return; }
       var desc = (cDesc >= 0 ? r[cDesc] : "") || "Transaction";
-      out.push({ date: d, desc: desc.replace(/\s+/g, " ").slice(0, 120), amount: Math.round(amt * 100) / 100, cat: categorize(desc, amt) });
+      out.push({ date: d, desc: desc.replace(/\s+/g, " ").slice(0, 120), amount: Math.round(amt * 100) / 100, cat: cCat >= 0 && r[cCat] ? r[cCat] : categorize(desc, amt) });
     });
     return { rows: out, skipped: skipped };
   }
@@ -1082,6 +1089,12 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
       state = d; commit(); toast("Restored " + d.tx.length + " transactions.");
     } catch (e) { toast("That isn't a Spend Coach backup. Paste the full text from Show backup."); }
   };
+  document.getElementById("backupFile").addEventListener("change", function () {
+    var f = this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () { document.getElementById("backupText").value = rd.result; document.getElementById("importBtn").click(); location.hash = "overview"; };
+    rd.readAsText(f);
+  });
   document.getElementById("resetBtn").onclick = function () { document.getElementById("resetConfirm").hidden = false; };
   document.getElementById("resetNo").onclick = function () { document.getElementById("resetConfirm").hidden = true; };
   document.getElementById("resetYes").onclick = function () {
