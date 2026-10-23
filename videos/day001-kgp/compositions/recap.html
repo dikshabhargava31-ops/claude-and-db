@@ -1,0 +1,51 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Inter", sans-serif; color: #fff; }
+    .pill { position: absolute; left: 92px; top: 262px; height: 46px; padding: 0 18px; border-radius: 23px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; white-space: nowrap; }
+    .ln { position: absolute; left: 92px; width: 900px; font-size: 66px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; }
+    .kw { color: #fbb524; }
+    .sub { position: absolute; left: 92px; width: 900px; font-size: 40px; font-weight: 600; line-height: 1.2; color: #c7cfe0; white-space: nowrap; }
+    .chip { display: inline-block; padding: 4px 22px 2px; border-radius: 14px; font-size: 48px; font-weight: 800; line-height: 1.2; letter-spacing: 0.02em; }
+    .hot { background: #ef4444; color: #fff; }
+    .warm { background: #facc15; color: #0b1226; }
+    .cold { background: #22d3ee; color: #0b1226; }
+    .adm { background: #22c55e; color: #0b1226; }
+
+    .line { position: absolute; left: 92px; display: flex; align-items: center; gap: 16px; white-space: nowrap; }
+    #rc-l1 { top: 330px; }
+    #rc-l2 { top: 424px; }
+    .big { font-size: 64px; font-weight: 800; letter-spacing: -0.02em; }
+    .ar { font-size: 56px; font-weight: 800; color: #fbb524; }
+    #rc-l1 .chip { font-size: 36px; }
+    #rc-a1, #rc-a2 { opacity: 0; }
+
+  </style>
+  <div id="root" data-composition-id="recap" data-width="1080" data-height="1920">
+
+    <div id="rc-pill" class="pill">08 · YAAD RAKHO</div>
+    <div id="rc-l1" class="line"><span id="rc-3" class="big">3 sawaal</span><span id="rc-a1" class="ar">→</span><span id="rc-h" class="chip hot">HOT</span><span id="rc-w" class="chip warm">WARM</span><span id="rc-c" class="chip cold">COLD</span></div>
+    <div id="rc-l2" class="line"><span id="rc-a2" class="ar">→</span><span id="rc-f" class="big kw">alag follow-up</span></div>
+
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const T0 = 44.35;
+    const g = (t) => +(t - T0).toFixed(3);
+    const tl = gsap.timeline({ paused: true });
+    // KGP-style text: lines type in, chips and tags pop, old lines leave quickly
+    const type = (sel, t, n) => tl.fromTo(sel, { clipPath: "inset(-30% 100% -30% 0)" }, { clipPath: "inset(-30% 0% -30% 0)", duration: Math.max(0.25, n * 0.03), ease: "steps(" + n + ")" }, g(t));
+    const pop = (sel, t) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, g(t));
+    const blurIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, g(t));
+    const out = (sel, t) => tl.to(sel, { opacity: 0, y: -16, duration: 0.16, ease: "power3.in" }, g(t));
+
+
+    blurIn("#rc-pill", 44.5);
+    type("#rc-3", 45.55, 8);
+    tl.to("#rc-a1", { opacity: 1, duration: 0.2 }, g(46.8));
+    pop("#rc-h", 46.95); pop("#rc-w", 47.2); pop("#rc-c", 47.45);
+    tl.to("#rc-a2", { opacity: 1, duration: 0.2 }, g(48.6));
+    type("#rc-f", 48.75, 14);
+
+    window.__timelines["recap"] = tl;
+  </script>
+</template>

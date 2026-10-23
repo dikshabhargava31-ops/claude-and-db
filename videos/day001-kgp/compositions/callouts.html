@@ -1,0 +1,34 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Inter", sans-serif; }
+    #co-lines { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
+    .co { position: absolute; display: flex; align-items: center; gap: 12px; padding: 10px 22px 10px 16px; border-radius: 26px; border: 3px solid; background: rgba(11, 18, 38, 0.9); color: #fff; font-size: 32px; font-weight: 700; white-space: nowrap; }
+    .co, #co-lines g { opacity: 0; }
+    .co i { display: inline-block; width: 14px; height: 14px; border-radius: 50%; }
+  </style>
+  <div id="root" data-composition-id="callouts" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <svg id="co-lines" viewBox="0 0 1080 1920"><g id="co1-l"><line x1="100" y1="718" x2="270" y2="840" stroke="#fbb524" stroke-width="3"/><circle cx="270" cy="840" r="9" fill="#fbb524" stroke="#fff" stroke-width="3"/></g><g id="co2-l"><line x1="750" y1="908" x2="672" y2="985" stroke="#fbb524" stroke-width="3"/><circle cx="672" cy="985" r="9" fill="#fbb524" stroke="#fff" stroke-width="3"/></g><g id="co3-l"><line x1="590" y1="828" x2="760" y2="995" stroke="#ef4444" stroke-width="3"/><circle cx="760" cy="995" r="9" fill="#ef4444" stroke="#fff" stroke-width="3"/></g><g id="co4-l"><line x1="70" y1="1078" x2="200" y2="930" stroke="#fbb524" stroke-width="3"/><circle cx="200" cy="930" r="9" fill="#fbb524" stroke="#fff" stroke-width="3"/></g><g id="co5-l"><line x1="410" y1="1098" x2="410" y2="975" stroke="#fbb524" stroke-width="3"/><circle cx="410" cy="975" r="9" fill="#fbb524" stroke="#fff" stroke-width="3"/></g><g id="co6-l"><line x1="530" y1="1068" x2="430" y2="950" stroke="#22c55e" stroke-width="3"/><circle cx="430" cy="950" r="9" fill="#22c55e" stroke="#fff" stroke-width="3"/></g><g id="co7-l"><line x1="670" y1="908" x2="545" y2="990" stroke="#ef4444" stroke-width="3"/><circle cx="545" cy="990" r="9" fill="#ef4444" stroke="#fff" stroke-width="3"/></g><g id="co8-l"><line x1="670" y1="908" x2="545" y2="990" stroke="#22c55e" stroke-width="3"/><circle cx="545" cy="990" r="9" fill="#22c55e" stroke="#fff" stroke-width="3"/></g></svg>
+    <div id="co1" class="co" style="left: 70px; top: 690px; border-color: #fbb524"><i style="background: #fbb524"></i>Enquiry #15</div><div id="co2" class="co" style="left: 720px; top: 880px; border-color: #fbb524"><i style="background: #fbb524"></i>Papa ka call</div><div id="co3" class="co" style="left: 560px; top: 800px; border-color: #ef4444"><i style="background: #ef4444"></i>Rohan · HOT</div><div id="co4" class="co" style="left: 40px; top: 1050px; border-color: #fbb524"><i style="background: #fbb524"></i>Rohan ke papa</div><div id="co5" class="co" style="left: 380px; top: 1070px; border-color: #fbb524"><i style="background: #fbb524"></i>Rohan</div><div id="co6" class="co" style="left: 500px; top: 1040px; border-color: #22c55e"><i style="background: #22c55e"></i>Trial fix</div><div id="co7" class="co" style="left: 640px; top: 880px; border-color: #ef4444"><i style="background: #ef4444"></i>H · Rohan 9th</div><div id="co8" class="co" style="left: 640px; top: 880px; border-color: #22c55e"><i style="background: #22c55e"></i>ADM · Rohan 9th</div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo(["#co1", "#co1-l"], { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 0.4);
+    tl.to(["#co1", "#co1-l"], { opacity: 0, duration: 0.15, ease: "power2.in" }, 2.35);
+    tl.fromTo(["#co2", "#co2-l"], { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 12.6);
+    tl.to(["#co2", "#co2-l"], { opacity: 0, duration: 0.15, ease: "power2.in" }, 20.85);
+    tl.fromTo(["#co3", "#co3-l"], { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 21.5);
+    tl.to(["#co3", "#co3-l"], { opacity: 0, duration: 0.15, ease: "power2.in" }, 25.25);
+    tl.fromTo(["#co4", "#co4-l"], { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 25.9);
+    tl.to(["#co4", "#co4-l"], { opacity: 0, duration: 0.15, ease: "power2.in" }, 28.400000000000002);
+    tl.fromTo(["#co5", "#co5-l"], { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 26.1);
+    tl.to(["#co5", "#co5-l"], { opacity: 0, duration: 0.15, ease: "power2.in" }, 28.400000000000002);
+    tl.fromTo(["#co6", "#co6-l"], { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 35.95);
+    tl.to(["#co6", "#co6-l"], { opacity: 0, duration: 0.15, ease: "power2.in" }, 36.85);
+    tl.fromTo(["#co7", "#co7-l"], { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 40.1);
+    tl.to(["#co7", "#co7-l"], { opacity: 0, duration: 0.15, ease: "power2.in" }, 42.7);
+    tl.fromTo(["#co8", "#co8-l"], { opacity: 0, scale: 0.6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 42.85);
+    tl.to(["#co8", "#co8-l"], { opacity: 0, duration: 0.15, ease: "power2.in" }, 44.15);
+    window.__timelines["callouts"] = tl;
+  </script>
+</template>

@@ -1,0 +1,63 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Inter", sans-serif; color: #fff; }
+    .pill { position: absolute; left: 92px; top: 262px; height: 46px; padding: 0 18px; border-radius: 23px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; white-space: nowrap; }
+    .ln { position: absolute; left: 92px; width: 900px; font-size: 66px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; }
+    .kw { color: #fbb524; }
+    .sub { position: absolute; left: 92px; width: 900px; font-size: 40px; font-weight: 600; line-height: 1.2; color: #c7cfe0; white-space: nowrap; }
+    .chip { display: inline-block; padding: 4px 22px 2px; border-radius: 14px; font-size: 48px; font-weight: 800; line-height: 1.2; letter-spacing: 0.02em; }
+    .hot { background: #ef4444; color: #fff; }
+    .warm { background: #facc15; color: #0b1226; }
+    .cold { background: #22d3ee; color: #0b1226; }
+    .adm { background: #22c55e; color: #0b1226; }
+
+    #cl-l1 { top: 330px; }
+    #cl-l2 { top: 410px; }
+    .q { position: absolute; left: 92px; display: flex; align-items: center; gap: 22px; white-space: nowrap; }
+    .qn { flex: 0 0 56px; height: 56px; border-radius: 14px; background: #fbb524; color: #0b1226; font-size: 34px; font-weight: 800; line-height: 58px; text-align: center; }
+    .qt { font-size: 46px; font-weight: 700; color: #fff; }
+    .q { opacity: 0; }
+    .qt b { color: #fbb524; font-weight: 800; }
+
+  </style>
+  <div id="root" data-composition-id="call" data-width="1080" data-height="1920">
+
+    <div id="cl-pill" class="pill">03 · PEHLA CALL · ROHAN, 9th</div>
+    <div id="cl-l1" class="ln">Fees se pehle,</div>
+    <div id="cl-l2" class="ln"><span class="kw">3 sawaal</span> poochho</div>
+    <div id="cl-q1" class="q" style="top: 336px"><span class="qn">1</span><span id="cl-q1-t" class="qt">Kab se join karna hai?</span></div><div id="cl-q2" class="q" style="top: 412px"><span class="qn">2</span><span id="cl-q2-t" class="qt">Bacche ko kya <b>dikkat</b> hai?</span></div><div id="cl-q3" class="q" style="top: 488px"><span class="qn">3</span><span id="cl-q3-t" class="qt">Is hafte <b>centre aa sakte</b> hain?</span></div>
+
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const T0 = 7.9;
+    const g = (t) => +(t - T0).toFixed(3);
+    const tl = gsap.timeline({ paused: true });
+    // KGP-style text: lines type in, chips and tags pop, old lines leave quickly
+    const type = (sel, t, n) => tl.fromTo(sel, { clipPath: "inset(-30% 100% -30% 0)" }, { clipPath: "inset(-30% 0% -30% 0)", duration: Math.max(0.25, n * 0.03), ease: "steps(" + n + ")" }, g(t));
+    const pop = (sel, t) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, g(t));
+    const blurIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, g(t));
+    const out = (sel, t) => tl.to(sel, { opacity: 0, y: -16, duration: 0.16, ease: "power3.in" }, g(t));
+
+
+    blurIn("#cl-pill", 8.0);
+    type("#cl-l1", 8.05, 14);
+    type("#cl-l2", 10.2, 16);
+    out(["#cl-l1", "#cl-l2"], 12.1);
+
+    tl.set("#cl-q1", { opacity: 1 }, g(12.4));
+    tl.fromTo("#cl-q1 .qn", { scale: 1.8, rotation: -15 }, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2)" }, g(12.4));
+    type("#cl-q1-t", 12.4 + 0.08, 26);
+    tl.set("#cl-q2", { opacity: 1 }, g(15.45));
+    tl.fromTo("#cl-q2 .qn", { scale: 1.8, rotation: -15 }, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2)" }, g(15.45));
+    type("#cl-q2-t", 15.45 + 0.08, 26);
+    tl.to("#cl-q1", { opacity: 0.45, duration: 0.2 }, g(15.45));
+    tl.set("#cl-q3", { opacity: 1 }, g(18.35));
+    tl.fromTo("#cl-q3 .qn", { scale: 1.8, rotation: -15 }, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2)" }, g(18.35));
+    type("#cl-q3-t", 18.35 + 0.08, 26);
+    tl.to("#cl-q2", { opacity: 0.45, duration: 0.2 }, g(18.35));
+    out(["#cl-pill", ".q"], 21.05);
+
+    window.__timelines["call"] = tl;
+  </script>
+</template>

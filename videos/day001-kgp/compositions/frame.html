@@ -1,0 +1,33 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Inter", sans-serif; }
+    #fr-top { position: absolute; left: 0; top: 0; width: 1080px; height: 340px; background: linear-gradient(180deg, #0b1226 0%, #0b1226 64%, rgba(11, 18, 38, 0) 100%); }
+    #fr-band { position: absolute; left: 0; top: 190px; width: 1080px; height: 371px; background: #0b1226; }
+    #fr-card { position: absolute; left: 50px; top: 236px; width: 980px; height: 365px; border-radius: 30px; background: #0f1830; border: 2px solid rgba(255, 255, 255, 0.08); box-shadow: 0 22px 50px rgba(0, 0, 0, 0.45); }
+    #fr-dot { position: absolute; left: 62px; top: 124px; width: 12px; height: 12px; border-radius: 50%; background: #fbb524; }
+    #fr-series { position: absolute; left: 86px; top: 110px; font-size: 28px; font-weight: 700; color: #fff; white-space: nowrap; }
+    #fr-day { position: absolute; left: 86px; top: 146px; font-size: 28px; font-weight: 500; color: #93a0bd; white-space: nowrap; }
+    #fr-logo { position: absolute; left: 960px; top: 108px; width: 60px; height: 60px; border-radius: 14px; background: #fbb524; color: #0b1226; font-size: 28px; font-weight: 800; line-height: 62px; text-align: center; }
+    #fr-prog-bg { position: absolute; left: 0; top: 0; width: 1080px; height: 6px; background: rgba(255, 255, 255, 0.12); }
+    #fr-prog { position: absolute; left: 0; top: 0; width: 1080px; height: 6px; background: #fbb524; transform-origin: 0 50%; }
+  </style>
+  <div id="root" data-composition-id="frame" data-width="1080" data-height="1920">
+    <div id="fr-top"></div>
+    <div id="fr-band"></div>
+    <div id="fr-card"></div>
+    <i id="fr-dot"></i>
+    <div id="fr-series">Coaching System Design</div>
+    <div id="fr-day">Day 001 · Enquiry handling</div>
+    <div id="fr-logo">KS</div>
+    <div id="fr-prog-bg"></div>
+    <div id="fr-prog"></div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    // the card always covers the old burned-in card of the shot underneath (edges measured per shot)
+    [[0, 365], [11.5, 420], [21.2, 360], [25.6, 480], [32.75, 365], [37.1, 585], [44.35, 365]].forEach(([t, h]) => { tl.set("#fr-card", { height: h }, t); tl.set("#fr-band", { height: h + 46 }, t); });
+    tl.fromTo("#fr-prog", { scaleX: 0 }, { scaleX: 1, duration: 51.0, ease: "none" }, 0);
+    window.__timelines["frame"] = tl;
+  </script>
+</template>

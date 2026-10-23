@@ -1,0 +1,64 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Inter", sans-serif; color: #fff; }
+    .pill { position: absolute; left: 92px; top: 262px; height: 46px; padding: 0 18px; border-radius: 23px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; white-space: nowrap; }
+    .ln { position: absolute; left: 92px; width: 900px; font-size: 66px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; }
+    .kw { color: #fbb524; }
+    .sub { position: absolute; left: 92px; width: 900px; font-size: 40px; font-weight: 600; line-height: 1.2; color: #c7cfe0; white-space: nowrap; }
+    .chip { display: inline-block; padding: 4px 22px 2px; border-radius: 14px; font-size: 48px; font-weight: 800; line-height: 1.2; letter-spacing: 0.02em; }
+    .hot { background: #ef4444; color: #fff; }
+    .warm { background: #facc15; color: #0b1226; }
+    .cold { background: #22d3ee; color: #0b1226; }
+    .adm { background: #22c55e; color: #0b1226; }
+
+    #tk-l1 { top: 330px; }
+    #tk-row { position: absolute; left: 92px; top: 420px; width: 600px; height: 96px; display: flex; align-items: center; gap: 22px; padding: 0 20px; border-radius: 20px; background: #fff; color: #0b1226; }
+    #tk-tags { position: relative; flex: 0 0 120px; height: 64px; }
+    .tg { position: absolute; inset: 0; border-radius: 12px; font-size: 40px; font-weight: 800; line-height: 66px; text-align: center; }
+    #tk-name { font-size: 54px; font-weight: 800; white-space: nowrap; }
+    #tk-chain { position: absolute; left: 92px; top: 548px; display: flex; align-items: center; gap: 12px; }
+    #tk-chain .chip { font-size: 36px; opacity: 0.45; }
+    #tk-chain .ar { font-size: 36px; font-weight: 800; color: #93a0bd; }
+    #tk-ring { position: absolute; left: 0; top: 0; width: 96px; height: 70px; border: 4px solid #fff; border-radius: 16px; }
+    #tk-done { position: absolute; left: 92px; top: 640px; font-size: 40px; font-weight: 800; color: #22c55e; white-space: nowrap; }
+    #tk-row, #tk-chain, #tk-done { opacity: 0; }
+
+  </style>
+  <div id="root" data-composition-id="track" data-width="1080" data-height="1920">
+
+    <div id="tk-pill" class="pill">07 · TRACK</div>
+    <div id="tk-l1" class="ln">Number aise <span class="kw">save</span> karo</div>
+    <div id="tk-row"><div id="tk-tags" data-layout-allow-overlap><div id="tk-h" class="tg hot">H</div><div id="tk-adm" class="tg adm">ADM</div></div><div id="tk-name">Rohan 9th</div></div>
+    <div id="tk-chain" data-layout-allow-overlap><span id="tk-c" class="chip cold">C</span><span class="ar">→</span><span id="tk-w" class="chip warm">W</span><span class="ar">→</span><span id="tk-hh" class="chip hot">H</span><span class="ar">→</span><span id="tk-a" class="chip adm">ADM</span></div>
+    <div id="tk-done">Admission ho gaya</div>
+
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const T0 = 37.1;
+    const g = (t) => +(t - T0).toFixed(3);
+    const tl = gsap.timeline({ paused: true });
+    // KGP-style text: lines type in, chips and tags pop, old lines leave quickly
+    const type = (sel, t, n) => tl.fromTo(sel, { clipPath: "inset(-30% 100% -30% 0)" }, { clipPath: "inset(-30% 0% -30% 0)", duration: Math.max(0.25, n * 0.03), ease: "steps(" + n + ")" }, g(t));
+    const pop = (sel, t) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, g(t));
+    const blurIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, g(t));
+    const out = (sel, t) => tl.to(sel, { opacity: 0, y: -16, duration: 0.16, ease: "power3.in" }, g(t));
+
+
+    blurIn("#tk-pill", 37.2);
+    type("#tk-l1", 38.5, 21);
+    tl.fromTo("#tk-row", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, g(40.05));
+    tl.fromTo("#tk-chain", { opacity: 0 }, { opacity: 1, duration: 0.3 }, g(40.3));
+    tl.to("#tk-hh", { opacity: 1, scale: 1.15, duration: 0.25, ease: "back.out(2)" }, g(40.35));
+    tl.set("#tk-adm", { scaleY: 0 }, 0);
+    // the payoff: H flips to ADM, in the row and along the chain
+    tl.to("#tk-h", { scaleY: 0, duration: 0.12, ease: "power3.in" }, g(42.7));
+    tl.to("#tk-adm", { scaleY: 1, duration: 0.3, ease: "back.out(2)" }, g(42.85));
+    tl.to("#tk-hh", { opacity: 0.45, scale: 1, duration: 0.2 }, g(42.85));
+    tl.to("#tk-a", { opacity: 1, scale: 1.2, duration: 0.3, ease: "back.out(2)" }, g(42.85));
+    pop("#tk-done", 43.0);
+    out(["#tk-pill", "#tk-l1", "#tk-row", "#tk-chain", "#tk-done"], 44.2);
+
+    window.__timelines["track"] = tl;
+  </script>
+</template>

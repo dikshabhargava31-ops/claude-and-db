@@ -1,0 +1,59 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Inter", sans-serif; color: #fff; }
+    .pill { position: absolute; left: 92px; top: 262px; height: 46px; padding: 0 18px; border-radius: 23px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; white-space: nowrap; }
+    .ln { position: absolute; left: 92px; width: 900px; font-size: 66px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; }
+    .kw { color: #fbb524; }
+    .sub { position: absolute; left: 92px; width: 900px; font-size: 40px; font-weight: 600; line-height: 1.2; color: #c7cfe0; white-space: nowrap; }
+    .chip { display: inline-block; padding: 4px 22px 2px; border-radius: 14px; font-size: 48px; font-weight: 800; line-height: 1.2; letter-spacing: 0.02em; }
+    .hot { background: #ef4444; color: #fff; }
+    .warm { background: #facc15; color: #0b1226; }
+    .cold { background: #22d3ee; color: #0b1226; }
+    .adm { background: #22c55e; color: #0b1226; }
+
+    #ec-bg { position: absolute; inset: 0; background: #0b1226; }
+    #ec-lock { position: absolute; left: 0; top: 700px; width: 1080px; display: flex; justify-content: center; align-items: center; gap: 28px; }
+    #ec-logo { width: 128px; height: 128px; border-radius: 30px; background: #fbb524; color: #0b1226; font-size: 62px; font-weight: 800; line-height: 132px; text-align: center; }
+    #ec-name { font-size: 70px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; }
+    .c { position: absolute; left: 0; width: 1080px; text-align: center; white-space: nowrap; }
+    #ec-hw { top: 880px; }
+    #ec-handle { display: inline-block; padding: 8px 30px 6px; border-radius: 40px; background: #fbb524; color: #0b1226; font-size: 36px; font-weight: 800; }
+    #ec-series { top: 966px; font-size: 28px; font-weight: 500; color: #93a0bd; }
+    #ec-next { top: 1060px; font-size: 52px; font-weight: 800; color: #fbb524; }
+    #ec-q { top: 1130px; font-size: 40px; font-weight: 700; color: #fff; }
+
+  </style>
+  <div id="root" data-composition-id="endcard" data-width="1080" data-height="1920">
+
+    <div id="ec-bg"></div>
+    <div id="ec-lock"><div id="ec-logo">KS</div><div id="ec-name">Coaching Ka System</div></div>
+    <div id="ec-hw" class="c"><span id="ec-handle">@coachingkasystem</span></div>
+    <div id="ec-series" class="c">Coaching System Design · Day 001</div>
+    <div id="ec-next" class="c">Follow for Day 002</div>
+    <div id="ec-q" class="c">Fees time pe kaise aaye?</div>
+
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const T0 = 50.75;
+    const g = (t) => +(t - T0).toFixed(3);
+    const tl = gsap.timeline({ paused: true });
+    // KGP-style text: lines type in, chips and tags pop, old lines leave quickly
+    const type = (sel, t, n) => tl.fromTo(sel, { clipPath: "inset(-30% 100% -30% 0)" }, { clipPath: "inset(-30% 0% -30% 0)", duration: Math.max(0.25, n * 0.03), ease: "steps(" + n + ")" }, g(t));
+    const pop = (sel, t) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, g(t));
+    const blurIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, g(t));
+    const out = (sel, t) => tl.to(sel, { opacity: 0, y: -16, duration: 0.16, ease: "power3.in" }, g(t));
+
+
+    tl.fromTo("#ec-bg", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.inOut" }, 0);
+    tl.set(["#ec-lock", "#ec-handle", "#ec-series", "#ec-next", "#ec-q"], { opacity: 0 }, 0);
+    tl.fromTo("#ec-lock", { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5, ease: "expo.out" }, g(51.1));
+    pop("#ec-handle", 51.5);
+    blurIn("#ec-series", 51.7);
+    blurIn("#ec-next", 52.45);
+    type("#ec-q", 52.6, 24);
+    tl.set("#ec-q", { opacity: 1 }, g(52.6));
+
+    window.__timelines["endcard"] = tl;
+  </script>
+</template>

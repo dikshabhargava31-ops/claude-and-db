@@ -1,0 +1,51 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Inter", sans-serif; color: #fff; }
+    .pill { position: absolute; left: 92px; top: 262px; height: 46px; padding: 0 18px; border-radius: 23px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; white-space: nowrap; }
+    .ln { position: absolute; left: 92px; width: 900px; font-size: 66px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; white-space: nowrap; }
+    .kw { color: #fbb524; }
+    .sub { position: absolute; left: 92px; width: 900px; font-size: 40px; font-weight: 600; line-height: 1.2; color: #c7cfe0; white-space: nowrap; }
+    .chip { display: inline-block; padding: 4px 22px 2px; border-radius: 14px; font-size: 48px; font-weight: 800; line-height: 1.2; letter-spacing: 0.02em; }
+    .hot { background: #ef4444; color: #fff; }
+    .warm { background: #facc15; color: #0b1226; }
+    .cold { background: #22d3ee; color: #0b1226; }
+    .adm { background: #22c55e; color: #0b1226; }
+
+    #ht-row { position: absolute; left: 92px; top: 330px; display: flex; align-items: center; gap: 22px; }
+    #ht-name { font-size: 66px; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; }
+    .why { position: absolute; left: 92px; display: flex; align-items: center; gap: 14px; font-size: 40px; font-weight: 700; white-space: nowrap; }
+    #ht-w1 { top: 424px; }
+    #ht-w2 { top: 480px; }
+    #ht-w1, #ht-w2 { opacity: 0; }
+
+  </style>
+  <div id="root" data-composition-id="hot" data-width="1080" data-height="1920">
+
+    <div id="ht-pill" class="pill">04 · JAWAB SE DECIDE</div>
+    <div id="ht-row"><span id="ht-tag" class="chip hot">HOT</span><span id="ht-name">Rohan · 9th</span></div>
+    <div id="ht-w1" class="why"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#22c55e"/><path d="M11 21l6 6 12-14" stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>2 hafte mein join</span></div>
+    <div id="ht-w2" class="why"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#22c55e"/><path d="M11 21l6 6 12-14" stroke="#fff" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Centre aane ko <span class="kw">haan</span></span></div>
+
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const T0 = 21.2;
+    const g = (t) => +(t - T0).toFixed(3);
+    const tl = gsap.timeline({ paused: true });
+    // KGP-style text: lines type in, chips and tags pop, old lines leave quickly
+    const type = (sel, t, n) => tl.fromTo(sel, { clipPath: "inset(-30% 100% -30% 0)" }, { clipPath: "inset(-30% 0% -30% 0)", duration: Math.max(0.25, n * 0.03), ease: "steps(" + n + ")" }, g(t));
+    const pop = (sel, t) => tl.fromTo(sel, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, g(t));
+    const blurIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, g(t));
+    const out = (sel, t) => tl.to(sel, { opacity: 0, y: -16, duration: 0.16, ease: "power3.in" }, g(t));
+
+
+    blurIn("#ht-pill", 21.25);
+    type("#ht-name", 21.25, 11);
+    tl.fromTo("#ht-tag", { opacity: 0, scale: 2, rotation: -12 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.3, ease: "back.out(1.6)" }, g(21.35));
+    tl.set("#ht-w1", { opacity: 1 }, g(22.0)); type("#ht-w1", 22.0, 18);
+    tl.set("#ht-w2", { opacity: 1 }, g(23.7)); type("#ht-w2", 23.7, 20);
+    out(["#ht-pill", "#ht-row", "#ht-w1", "#ht-w2"], 25.45);
+
+    window.__timelines["hot"] = tl;
+  </script>
+</template>
