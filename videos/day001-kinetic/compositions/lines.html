@@ -1,58 +1,154 @@
 <template>
   <style>
     #root { position: absolute; inset: 0; background: #0a0a0a; color: #fff; font-family: "League Gothic", sans-serif; }
-    .scr { position: absolute; inset: 0; }
+    .scr { position: absolute; inset: 0; overflow: hidden; }
     .scr.inv { background: #d4ff3a; color: #0a0a0a; }
     .ln { position: absolute; left: 84px; white-space: nowrap; line-height: 0.9; }
     .w { display: inline-block; }
-    .tag { position: absolute; left: 90px; font-family: "Archivo Black", sans-serif; font-size: 44px; letter-spacing: 0.12em; color: #8a8a8a; white-space: nowrap; }
+    .tag { position: absolute; left: 90px; font-family: "Archivo Black", sans-serif; font-size: 40px; letter-spacing: 0.12em; color: #8a8a8a; white-space: nowrap; }
     .lime { color: #d4ff3a; }
-    .bar { position: absolute; height: 18px; background: #d4ff3a; transform-origin: 0 50%; }
+    .bar { position: absolute; height: 16px; background: #d4ff3a; transform-origin: 0 50%; }
+
+    /* app screens */
+    .ui { font-family: "Roboto", sans-serif; }
+    .note { position: absolute; left: 70px; width: 940px; height: 132px; border-radius: 30px; background: rgba(245, 245, 245, 0.96); color: #111; display: flex; align-items: center; gap: 24px; padding: 0 28px; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.4); }
+    .note i { flex: 0 0 76px; height: 76px; border-radius: 20px; background: #25d366; position: relative; }
+    .note i::after { content: ""; position: absolute; left: 20px; top: 18px; width: 36px; height: 36px; border: 5px solid #fff; border-radius: 50%; }
+    .note b { display: block; font-size: 34px; font-weight: 700; }
+    .note span { display: block; font-size: 32px; color: #333; margin-top: 2px; white-space: nowrap; }
+    .note em { position: absolute; right: 28px; top: 22px; font-style: normal; font-size: 26px; color: #777; }
+    #s1-badge { position: absolute; z-index: 5; left: 900px; top: 540px; width: 150px; height: 150px; border-radius: 50%; background: #d4ff3a; color: #0a0a0a; font-size: 96px; line-height: 160px; text-align: center; }
+    .chat { position: absolute; left: 60px; top: 700px; width: 960px; height: 720px; border-radius: 40px; background: #efeae2; overflow: hidden; }
+    .chat-h { height: 110px; background: #008069; color: #fff; font-size: 38px; font-weight: 500; line-height: 110px; padding-left: 36px; }
+    .bub { position: absolute; max-width: 640px; padding: 16px 22px 36px; border-radius: 20px; font-size: 36px; line-height: 1.25; color: #111b21; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.13); white-space: nowrap; }
+    .bub small { position: absolute; right: 16px; bottom: 4px; font-size: 28px; color: #667781; }
+    .bin { left: 26px; background: #fff; }
+    .bout { right: 26px; background: #d9fdd3; }
+    .fwd { display: block; font-size: 28px; font-style: italic; color: #667781; margin-bottom: 4px; }
+    #s3-x3 { position: absolute; left: 520px; top: 1380px; padding: 10px 26px 4px; border-radius: 16px; background: #d4ff3a; color: #0a0a0a; font-size: 64px; white-space: nowrap; }
+    .phone { position: absolute; left: 270px; top: 760px; width: 540px; height: 1000px; border-radius: 70px; background: #1c1c1e; border: 10px solid #333; overflow: hidden; }
+    #s4-ava { position: absolute; left: 180px; top: 120px; width: 160px; height: 160px; border-radius: 50%; background: #3a3a3c; color: #fff; font-size: 64px; font-weight: 700; line-height: 160px; text-align: center; }
+    #s4-name { position: absolute; left: 0; top: 310px; width: 520px; text-align: center; font-size: 44px; font-weight: 500; color: #fff; }
+    #s4-sub { position: absolute; left: 0; top: 372px; width: 520px; text-align: center; font-size: 30px; color: #a1a1a6; }
+    .cbtn { position: absolute; top: 470px; width: 120px; height: 120px; border-radius: 50%; }
+    .ring { position: absolute; left: 180px; top: 120px; width: 160px; height: 160px; border-radius: 50%; border: 6px solid #d4ff3a; }
+
+    /* flat illustrations */
+    .kid { position: absolute; width: 120px; height: 150px; }
+    .kid i { position: absolute; left: 34px; top: 0; width: 52px; height: 52px; border-radius: 50%; background: currentColor; }
+    .kid b { position: absolute; left: 14px; top: 60px; width: 92px; height: 86px; border-radius: 46px 46px 14px 14px; background: currentColor; }
+    .qcard { position: absolute; left: 84px; width: 912px; height: 150px; border-radius: 30px; background: #0a0a0a; color: #fff; display: flex; align-items: center; gap: 30px; padding: 0 34px; font-family: "Inter", sans-serif; font-size: 50px; font-weight: 800; white-space: nowrap; }
+    .qcard svg { flex: 0 0 86px; }
+    .qn { font-family: "League Gothic", sans-serif; font-size: 96px; color: #d4ff3a; font-weight: 400; }
   </style>
   <div id="root" data-composition-id="lines" data-width="1080" data-height="1920">
-    <!-- 1: hook -->
-    <div id="s1" class="scr clip" data-start="0" data-duration="1.7">
-      <div class="tag" style="top: 690px">HAR MAHINE</div>
-      <div id="s1-a" class="ln" style="top: 750px; font-size: 300px">15 ENQUIRY.</div>
+    <!-- 1: enquiries pour in -->
+    <div id="s1" class="scr clip" data-start="0" data-duration="1.8">
+      <div class="tag" style="top: 200px">HAR MAHINE</div>
+      <div id="s1-a" class="ln" style="top: 250px; font-size: 280px">15 ENQUIRY.</div>
+      <div class="ui">
+        <div id="n6" class="note" style="top: 1335px"><i></i><div><b>Dev ki Mummy</b><span>Fees kitni hai sir?</span></div><em>now</em></div>
+        <div id="n5" class="note" style="top: 1185px"><i></i><div><b>Kabir ke Papa</b><span>10th ka batch kab se?</span></div><em>now</em></div>
+        <div id="n4" class="note" style="top: 1035px"><i></i><div><b>Sneha</b><span>Demo class milegi?</span></div><em>now</em></div>
+        <div id="n3" class="note" style="top: 885px"><i></i><div><b>Aman ke Papa</b><span>Timing kya hai?</span></div><em>now</em></div>
+        <div id="n2" class="note" style="top: 735px"><i></i><div><b>Priya ki Mummy</b><span>Admission open hai?</span></div><em>now</em></div>
+        <div id="n1" class="note" style="top: 585px" data-layout-allow-overlap><i></i><div><b>Rohan ke Papa</b><span>Sir, 9th ki fees kitni hai?</span></div></div>
+      </div>
+      <div id="s1-badge" data-layout-allow-overlap>15</div>
     </div>
-    <div id="s2" class="scr clip" data-start="1.7" data-duration="1.7">
-      <div id="s2-a" class="ln" style="top: 520px; font-size: 200px">ADMISSION</div>
-      <div id="s2-b" class="ln" style="top: 700px; font-size: 200px">SIRF</div>
-      <div id="s2-c" class="ln lime" style="top: 900px; left: 84px; font-size: 560px">3?</div>
+    <!-- 2: only 3 join -->
+    <div id="s2" class="scr clip" data-start="1.8" data-duration="1.6">
+      <div id="s2-a" class="ln" style="top: 230px; font-size: 220px">ADMISSION</div>
+      <div id="s2-b" class="ln" style="top: 430px; font-size: 220px">SIRF <span class="lime">3?</span></div>
+      <div id="s2-kids"></div>
     </div>
-    <!-- 2: the mistake -->
+    <!-- 3: the same copy-paste reply to everyone -->
     <div id="s3" class="scr clip" data-start="3.4" data-duration="2.2">
-      <div class="tag lime" style="top: 640px">GALTI</div>
-      <div class="ln" style="top: 700px; font-size: 230px"><span id="s3-w1" class="w">HAR</span> <span id="s3-w2" class="w">ENQUIRY</span></div>
-      <div class="ln" style="top: 910px; font-size: 230px"><span id="s3-w3" class="w">EK</span> <span id="s3-w4" class="w">JAISI?</span></div>
+      <div class="tag lime" style="top: 200px">GALTI</div>
+      <div class="ln" style="top: 250px; font-size: 210px"><span id="s3-w1" class="w">HAR</span> <span id="s3-w2" class="w">ENQUIRY</span></div>
+      <div class="ln" style="top: 445px; font-size: 210px"><span id="s3-w3" class="w">EK</span> <span id="s3-w4" class="w lime">JAISI?</span></div>
+      <div class="chat ui">
+        <div class="chat-h">Enquiries</div>
+        <div id="c1" class="bub bin" style="top: 140px">Sir fees kitni hai?<small>9:41</small></div>
+        <div id="c2" class="bub bout" style="top: 250px"><span class="fwd">Forwarded</span>Fees ₹2,500 / month.<small>9:41 ✓✓</small></div>
+        <div id="c3" class="bub bin" style="top: 400px">Bacche ko maths mein dikkat hai…<small>9:42</small></div>
+        <div id="c4" class="bub bout" style="top: 510px"><span class="fwd">Forwarded</span>Fees ₹2,500 / month.<small>9:42 ✓✓</small></div>
+      </div>
+      <div id="s3-x3">COPY-PASTE ×15</div>
     </div>
-    <!-- 3: the fix -->
+    <!-- 4: don't give the fees on the first call -->
     <div id="s4" class="scr clip" data-start="5.6" data-duration="2.3">
-      <div id="s4-a" class="ln" style="top: 600px; font-size: 170px">PEHLI CALL PE</div>
-      <div id="s4-b" class="ln" style="top: 760px; font-size: 300px">FEES</div>
-      <div id="s4-x" class="bar" style="left: 70px; top: 880px; width: 420px"></div>
-      <div id="s4-c" class="ln" style="top: 1030px; font-size: 170px">MAT BATAO.</div>
+      <div id="s4-a" class="ln" style="top: 200px; font-size: 150px">PEHLI CALL PE</div>
+      <div id="s4-b" class="ln" style="top: 340px; font-size: 230px">FEES</div>
+      <div id="s4-x" class="bar" style="left: 70px; top: 440px; width: 330px"></div>
+      <div id="s4-c" class="ln lime" style="top: 560px; font-size: 200px">MAT BATAO.</div>
+      <div class="phone ui" style="top: 820px">
+        <i id="r1" class="ring"></i><i id="r2" class="ring"></i>
+        <div id="s4-ava">RP</div>
+        <div id="s4-name">Rohan ke Papa</div>
+        <div id="s4-sub">Incoming call…</div>
+        <i class="cbtn" style="left: 80px; background: #ff3b30"></i>
+        <i id="s4-ok" class="cbtn" style="left: 320px; background: #34c759"></i>
+      </div>
     </div>
+    <!-- 5: ask 3 questions first -->
     <div id="s5" class="scr inv clip" data-start="7.9" data-duration="2.6">
-      <div id="s5-a" class="ln" style="top: 560px; font-size: 200px">PEHLE</div>
-      <div id="s5-b" class="ln" style="top: 730px; font-size: 560px">3</div>
-      <div id="s5-c" class="ln" style="top: 1230px; font-size: 230px">SAWAAL.</div>
+      <div id="s5-a" class="ln" style="top: 200px; font-size: 180px">PEHLE</div>
+      <div id="s5-b" class="ln" style="top: 360px; font-size: 300px">3 SAWAAL.</div>
+      <div id="q1" class="qcard" style="top: 740px"><span class="qn">1</span><svg width="86" height="86" viewBox="0 0 86 86"><rect x="8" y="14" width="70" height="64" rx="12" fill="#d4ff3a"/><rect x="8" y="14" width="70" height="20" rx="10" fill="#fff"/><rect x="22" y="4" width="10" height="20" rx="5" fill="#fff"/><rect x="54" y="4" width="10" height="20" rx="5" fill="#fff"/></svg>Kab se join karna hai?</div>
+      <div id="q2" class="qcard" style="top: 910px"><span class="qn">2</span><svg width="86" height="86" viewBox="0 0 86 86"><path d="M10 18 Q26 10 43 18 Q60 10 76 18 L76 72 Q60 64 43 72 Q26 64 10 72 Z" fill="#d4ff3a"/><path d="M43 18 L43 72" stroke="#0a0a0a" stroke-width="4"/></svg>Bacche ko kya dikkat hai?</div>
+      <div id="q3" class="qcard" style="top: 1080px"><span class="qn">3</span><svg width="86" height="86" viewBox="0 0 86 86"><path d="M43 80 C20 52 14 42 14 32 A29 29 0 0 1 72 32 C72 42 66 52 43 80 Z" fill="#d4ff3a"/><circle cx="43" cy="32" r="11" fill="#0a0a0a"/></svg>Is hafte centre aa sakte?</div>
     </div>
   </div>
   <script>
     window.__timelines = window.__timelines || {};
     const tl = gsap.timeline({ paused: true });
-    // every word slams in: large, then lands dead still; screens change on hard cuts
+    // words slam in large and land dead still; visuals move underneath; screens change on hard cuts
     const slam = (sel, t, from) => tl.fromTo(sel, Object.assign({ opacity: 0, scale: 1.35, transformOrigin: "0% 60%" }, from || {}), { opacity: 1, scale: 1, rotation: 0, duration: 0.14, ease: "power4.out" }, t);
-    tl.fromTo("#s1-a", { scale: 1.12, transformOrigin: "0% 60%" }, { scale: 1, duration: 0.3, ease: "power4.out" }, 0);
-    slam("#s2-a", 1.7); slam("#s2-b", 2.05);
-    slam("#s2-c", 2.45, { scale: 2.2, rotation: -8 });
-    tl.fromTo("#s2-c", { x: 0 }, { keyframes: [{ x: -10, duration: 0.04 }, { x: 8, duration: 0.04 }, { x: -4, duration: 0.04 }, { x: 0, duration: 0.04 }] }, 2.6);
+    const pop = (sel, t) => tl.fromTo(sel, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, t);
+
+    // 1: frame 0 reads; notifications keep dropping in, the badge counts up
+    tl.fromTo("#s1-a", { scale: 1.1, transformOrigin: "0% 60%" }, { scale: 1, duration: 0.3, ease: "power4.out" }, 0);
+    ["#n2", "#n3", "#n4", "#n5", "#n6"].forEach((n, k) => tl.fromTo(n, { opacity: 0, y: -120 }, { opacity: 1, y: 0, duration: 0.22, ease: "power3.out" }, 0.15 + k * 0.22));
+    tl.fromTo("#s1-badge", { scale: 0.6, rotation: -10 }, { scale: 1, rotation: 0, duration: 0.3, ease: "back.out(2)" }, 0.1);
+
+    // 2: fifteen students; twelve fade, three stay lime
+    const box = document.getElementById("s2-kids");
+    for (let k = 0; k < 15; k++) {
+      const d = document.createElement("div");
+      d.className = "kid"; d.id = "kid" + k;
+      d.style.left = 90 + (k % 5) * 186 + "px"; d.style.top = 760 + Math.floor(k / 5) * 190 + "px"; d.style.color = "#fff";
+      d.innerHTML = "<i></i><b></b>";
+      box.appendChild(d);
+    }
+    slam("#s2-a", 1.8); slam("#s2-b", 2.15);
+    for (let k = 0; k < 15; k++) tl.fromTo("#kid" + k, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.2, ease: "power3.out" }, 1.85 + k * 0.025);
+    const keep = [3, 7, 11];
+    for (let k = 0; k < 15; k++) {
+      if (keep.includes(k)) tl.to("#kid" + k, { color: "#d4ff3a", scale: 1.18, duration: 0.2, ease: "back.out(2)" }, 2.6);
+      else tl.to("#kid" + k, { opacity: 0.18, duration: 0.25 }, 2.5 + (k % 5) * 0.02);
+    }
+
+    // 3: the same forwarded fees reply to every parent
     slam("#s3-w1", 3.45); slam("#s3-w2", 3.8); slam("#s3-w3", 4.35); slam("#s3-w4", 4.65, { scale: 1.6 });
+    tl.fromTo("#c1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.2 }, 3.5);
+    pop("#c2", 3.85);
+    tl.fromTo("#c3", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.2 }, 4.3);
+    pop("#c4", 4.6);
+    tl.fromTo("#s3-x3", { opacity: 0, scale: 2, rotation: -12 }, { opacity: 1, scale: 1, rotation: -4, duration: 0.25, ease: "back.out(1.6)" }, 4.95);
+
+    // 4: the call comes in; the phone rings
     slam("#s4-a", 5.65); slam("#s4-b", 6.1, { scale: 1.6 });
     tl.fromTo("#s4-x", { scaleX: 0 }, { scaleX: 1, duration: 0.22, ease: "power3.inOut" }, 6.75);
     slam("#s4-c", 7.1);
-    slam("#s5-a", 7.95); slam("#s5-b", 8.3, { scale: 1.8, rotation: -6 }); slam("#s5-c", 8.6);
+    tl.fromTo(".phone", { y: 300 }, { y: 0, duration: 0.45, ease: "power3.out" }, 5.6);
+    ["#r1", "#r2"].forEach((r, k) => { for (let p = 0; p < 4; p++) tl.fromTo(r, { scale: 1, opacity: 0.9 }, { scale: 1.8, opacity: 0, duration: 0.55, ease: "power1.out", immediateRender: false }, 5.8 + p * 0.55 + k * 0.27); });
+    for (let p = 0; p < 8; p++) tl.to(".phone", { rotation: p % 2 ? 2 : -2, duration: 0.05, ease: "none" }, 6.0 + Math.floor(p / 4) * 0.9 + (p % 4) * 0.05);
+    tl.to(".phone", { rotation: 0, duration: 0.05 }, 7.5);
+
+    // 5: three questions, one card each
+    slam("#s5-a", 7.95); slam("#s5-b", 8.25, { scale: 1.6, rotation: -4 });
+    ["#q1", "#q2", "#q3"].forEach((q, k) => tl.fromTo(q, { opacity: 0, x: 300 }, { opacity: 1, x: 0, duration: 0.3, ease: "power4.out" }, 8.65 + k * 0.3));
     window.__timelines["lines"] = tl;
   </script>
 </template>
