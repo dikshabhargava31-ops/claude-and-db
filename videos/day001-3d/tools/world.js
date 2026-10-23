@@ -116,14 +116,17 @@
         s.scale.set(w, h, 1); s.renderOrder = 10; s.visible = false; scene.add(s); s.userData.base = [w, h]; return s;
       }
       function bubble(text, { bg = "#ffffff", fg = "#111b21", sub, w = 900, size = 52, tail = "left" } = {}) {
-        const h = sub ? 230 : 170;
+        const lines = text.split("\n"), lh = Math.round(size * 1.32);
+        const h = (sub ? 110 : 40) + lines.length * lh + (sub ? 20 : 40);
         return tex(w, h + 30, (g) => {
           g.shadowColor = "rgba(0,0,0,0.35)"; g.shadowBlur = 18; g.shadowOffsetY = 8;
           rr(g, 10, 10, w - 20, h - 10, 40, bg); g.shadowColor = "transparent";
           g.beginPath(); const tx0 = tail === "left" ? 70 : w - 70; g.moveTo(tx0 - 26, h - 2); g.lineTo(tx0, h + 26); g.lineTo(tx0 + 26, h - 2); g.fillStyle = bg; g.fill();
           g.fillStyle = fg; g.textBaseline = "middle";
-          if (sub) { g.font = "600 34px Inter"; g.globalAlpha = 0.7; g.fillText(sub, 46, 62); g.globalAlpha = 1; g.font = `700 ${size}px Inter`; g.fillText(text, 46, 140); }
-          else { g.font = `700 ${size}px Inter`; g.fillText(text, 46, (h + 10) / 2); }
+          let y0 = (h + 10) / 2 - ((lines.length - 1) * lh) / 2;
+          if (sub) { g.font = "600 34px Inter"; g.globalAlpha = 0.7; g.fillText(sub, 46, 62); g.globalAlpha = 1; y0 = 140; }
+          g.font = `${lines.length > 1 ? 600 : 700} ${size}px Inter`;
+          lines.forEach((ln, i) => g.fillText(ln, 46, y0 + i * lh));
         });
       }
       const label = (text, { bg = "#0b1226", fg = "#ffffff", w = 520, size = 60 } = {}) => tex(w, 130, (g) => {
@@ -227,9 +230,11 @@
         box(0.08, 1.7, 0.08, "#222", o + 1.9, 0.85, -2.0); mesh(new THREE.ConeGeometry(0.3, 0.35, 20, 1, true), mat("#e9d8b8", 0.5, "#ffcf8a"), o + 1.9, 1.8, -2.0);
         box(1.4, 1.0, 0.06, mat("#26407f", 0.5, "#2a4b9a"), o - 1.6, 2.4, -3.06);
         w.mumH = person({ top: "#1f8a7a", pants: "#6b2350", hair: "#1a1210", longHair: true });
-        w.msg = sprite(bubble("Namaste ji! Centre kab aa sakte hain?", { bg: "#d9fdd3", sub: "Day 2 · Coaching Ka System", w: 1040, size: 46 }), 1.55, 0.42); w.msg.position.set(o + 0.1, 2.45, -1.0);
+        // the Day 2 follow-up: a professional message from the institute
+        const msgTex = bubble("Namaste ji, Coaching Ka System se.\nAapne Class 9 ke admission ki enquiry ki thi.\nEk baar centre visit kar lijiye: classroom\ndekh lenge aur teachers se bhi mil lenge.\nKya is Saturday, 5 PM aapke liye theek rahega?", { bg: "#d9fdd3", sub: "Coaching Ka System · Day 2", w: 1060, size: 40 });
+        w.msg = sprite(msgTex, 1.86, 1.86 * msgTex.image.height / msgTex.image.width); w.msg.position.set(o - 0.1, 2.15, -0.2);
         w.ring = sprite(tex(700, 200, (g) => { rr(g, 10, 10, 680, 180, 90, "#22c55e"); g.fillStyle = "#fff"; g.font = "800 60px Inter"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("Week 1 · Incoming call", 350, 102); }), 1.2, 0.34); w.ring.position.set(o - 0.75, 1.5, -0.4);
-        w.kab = sprite(bubble("\"Kab aa sakte hain?\"", { bg: "#fbb524", w: 760, size: 60, tail: "right" }), 1.2, 0.33); w.kab.position.set(o + 0.25, 2.05, -0.8);
+        w.kab = sprite(bubble("\"Is hafte centre kab aa sakte hain?\"", { bg: "#fbb524", w: 1000, size: 52, tail: "right" }), 1.45, 0.3); w.kab.position.set(o + 0.2, 1.45, -0.3);
 
         // SHEET: the tracker on a laptop
         o = S.sheet;
