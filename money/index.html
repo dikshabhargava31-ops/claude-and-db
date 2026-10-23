@@ -190,6 +190,10 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
 .steps { margin: 0; padding-left: 1.2rem; display: grid; gap: 6px; }
 .prose { max-width: 68ch; display: grid; gap: 10px; }
 .empty { padding: 14px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-size: .9rem; }
+details summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: .9rem; }
+details[open] summary { margin-bottom: 10px; }
+td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .88rem; }
+.inv-name { min-width: 190px; }
 .toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-weight: 600; z-index: 20; max-width: calc(100% - 32px); }
 @media (prefers-reduced-motion: no-preference) { .bar i, .meter i { transition: width .4s ease, left .4s ease; } }
 </style>
@@ -200,6 +204,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     <span class="allow-pill" id="allowPill">Today: …</span>
     <nav class="tabs" aria-label="Sections">
       <a href="#overview" data-view="overview">Overview</a>
+      <a href="#savings" data-view="savings">Savings</a>
       <a href="#coach" data-view="coach">Should I buy it?</a>
       <a href="#transactions" data-view="transactions">Transactions</a>
       <a href="#plan" data-view="plan">Budget &amp; bills</a>
@@ -246,6 +251,60 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
         <div class="panel-head"><h2>Bills coming up</h2><a href="#plan" class="small">Edit bills</a></div>
         <ul class="list" id="upcoming"></ul>
       </div>
+    </div>
+  </section>
+
+  <!-- SAVINGS -->
+  <section class="view" id="v-savings" hidden>
+    <div class="panel">
+      <div class="hero">
+        <div class="safe">
+          <span class="label" id="svLabel">Saved</span>
+          <span class="big num" id="svBig">–</span>
+          <span class="muted small" id="svSub"></span>
+          <span id="svTrend"></span>
+        </div>
+        <div class="stats" id="svStats"></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div><h2>Saved each month</h2><p class="small muted">Money in minus spending. The percentage is your savings rate.</p></div>
+        <div class="chart" id="svChart"></div>
+      </div>
+      <div class="panel">
+        <h2>Month by month</h2>
+        <div class="table-wrap"><table id="svTable"></table></div>
+        <p class="small muted">Saved = invested + what stayed in your bank and cash. SIPs and moving money between your own accounts don't count as spending.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>My investments</h2><span class="small muted" id="invTotal"></span></div>
+      <p class="small muted">Bank statements don't show scheme names. Type each name once and every payment after that is matched to it by amount and date.</p>
+      <div class="table-wrap"><table id="invTable"></table></div>
+      <div id="invUnmatched"></div>
+      <details>
+        <summary>Add an investment</summary>
+        <form id="invForm">
+          <div class="fields">
+            <label class="field"><span>Scheme name</span><input type="text" id="iName" placeholder="Parag Parikh Flexi Cap Fund" required></label>
+            <label class="field"><span>Type</span><select id="iKind"><option value="sip">SIP</option><option value="payout">Payout from a fund (SWP)</option><option value="shares">Shares</option><option value="other">Other</option></select></label>
+            <label class="field"><span>Monthly amount</span><input type="number" id="iAmt" min="0" step="1" placeholder="5000"></label>
+            <label class="field"><span>Usually on day</span><input type="number" id="iDay" min="1" max="31" step="1" placeholder="7"></label>
+            <label class="field"><span>Statement shows</span><input type="text" id="iMatch" placeholder="nach-mut"></label>
+          </div>
+          <p class="small muted">"Statement shows" is a word from the bank's description, like <span class="num">nach-mut</span>, <span class="num">kotakmf</span> or <span class="num">nippon</span>. Separate several with commas.</p>
+          <div class="row"><button class="btn primary" type="submit">Add investment</button></div>
+        </form>
+      </details>
+      <details>
+        <summary>Where to find your scheme names</summary>
+        <ol class="steps small">
+          <li><b>MF Central</b> (mfcentral.com) or <b>CAMS</b> (camsonline.com): request a Consolidated Account Statement with your PAN. It lists every scheme, folio and SIP amount, and arrives by email in minutes.</li>
+          <li><b>Emails or SMS</b> from the fund house after each SIP: they name the scheme and the amount.</li>
+          <li><b>The app you started the SIP in</b> (Groww, Zerodha Coin, Kuvera, Paytm Money or your bank's app): open your SIPs or mandates.</li>
+        </ol>
+      </details>
     </div>
   </section>
 
@@ -447,6 +506,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
 
   var TODAY = new Date();
   var state = load() || sampleState();
+  state.investments = state.investments || [];
   var view = "overview";
 
   // ---------- storage ----------
@@ -479,12 +539,13 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
         { id: uid(), name: "Health insurance", amount: 1450, day: 27, cat: "Bills & utilities" },
         { id: uid(), name: "Netflix", amount: 649, day: 28, cat: "Entertainment" }
       ],
-      tx: [], wishlist: [], skipped: []
+      tx: [], wishlist: [], skipped: [],
+      investments: [{ id: uid(), name: "Example: Flexi Cap Fund SIP", kind: "sip", amount: 5000, day: 5, match: "nach-mut" }]
     };
     var y = TODAY.getFullYear(), m = TODAY.getMonth();
     var lines = [
       [1, "Salary credit - ACME TECH PVT LTD", 85000], [3, "NEFT - House rent - landlord", -22000],
-      [2, "UPI-SWIGGY", -486], [4, "UPI-BLINKIT", -1240], [5, "UPI-UBER INDIA", -312], [6, "UPI-ZOMATO", -612],
+      [2, "UPI-SWIGGY", -486], [5, "NACH-MUT-DR SIP", -5000], [4, "UPI-BLINKIT", -1240], [5, "UPI-UBER INDIA", -312], [6, "UPI-ZOMATO", -612],
       [7, "AMAZON PAY - Shopping", -2399], [8, "UPI-DMART", -2860], [9, "UPI-STARBUCKS", -420], [10, "UPI-RAPIDO", -148],
       [11, "UPI-SWIGGY", -538], [12, "BOOKMYSHOW", -760], [13, "UPI-ZEPTO", -894], [14, "APOLLO PHARMACY", -655],
       [15, "UPI-SWIGGY", -402], [15, "MYNTRA", -1899], [16, "UPI-UBER INDIA", -286], [17, "UPI-ZOMATO", -710],
@@ -709,6 +770,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     renderCoachSide(M);
     renderTx();
     renderPlan();
+    renderSavings();
   }
 
   function renderOverview(M) {
@@ -783,6 +845,113 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     var dot = '<circle cx="' + x(M.day) + '" cy="' + y(c) + '" r="4.5" fill="var(--chart-line)"/>';
     var lbl = '<text x="' + Math.min(x(M.day) + 8, W - R - 80) + '" y="' + (y(c) - 8) + '" style="fill:var(--ink)">' + fmt(c) + "</text>";
     document.getElementById("chart").innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Cumulative spending this month: ' + fmt(c) + " by day " + M.day + " of " + M.dim + '">' + g + area + pace + line + dot + lbl + "</svg>";
+  }
+
+  // ---------- savings and investments ----------
+  function keys(s) { return (s.match || "").toLowerCase().split(",").map(function (k) { return k.trim(); }).filter(Boolean); }
+  function schemeOf(t) {
+    if (t.cat !== "Investments") return null;
+    var list = state.investments || [];
+    if (t.scheme) return list.find(function (s) { return s.id === t.scheme; }) || null;
+    var d = t.desc.toLowerCase(), day = +t.date.slice(8, 10), best = null, bestScore = 1e9;
+    list.forEach(function (s) {
+      var k = keys(s);
+      if (k.length && !k.some(function (x) { return d.indexOf(x) >= 0; })) return;
+      if ((s.kind === "payout") !== (t.amount > 0)) return;
+      var score = 0;
+      if (s.amount && Math.abs(Math.abs(t.amount) - s.amount) > 1) score += 1000;
+      if (s.day) score += Math.min(Math.abs(day - s.day), 31 - Math.abs(day - s.day));
+      if (score < bestScore) { best = s; bestScore = score; }
+    });
+    return bestScore < 1000 ? best : null;
+  }
+  function monthTotals() {
+    var by = {};
+    state.tx.forEach(function (t) {
+      var k = t.date.slice(0, 7), m = by[k] || (by[k] = { key: k, in: 0, spent: 0, invested: 0 });
+      if (t.cat === "Income") m.in += t.amount;
+      else if (t.cat === "Investments") m.invested -= t.amount;
+      else if (!EXCLUDED[t.cat]) m.spent -= t.amount;
+    });
+    return Object.keys(by).sort().slice(-6).map(function (k) {
+      var m = by[k]; m.saved = m.in - m.spent; m.kept = m.saved - m.invested; m.rate = m.in > 0 ? m.saved / m.in : 0;
+      var p = k.split("-"); m.d = new Date(+p[0], +p[1] - 1, 1);
+      m.short = m.d.toLocaleDateString(undefined, { month: "short" }); m.current = k === monthKey(TODAY);
+      return m;
+    });
+  }
+  function pct(v) { return Math.round(v * 100) + "%"; }
+  function signed(v) { return (v < 0 ? "−" : "+") + fmt(Math.abs(v)); }
+
+  function renderSavings() {
+    var ms = monthTotals();
+    var done = ms.filter(function (m) { return !m.current; });
+    var use = done.length ? done : ms;
+    var T = use.reduce(function (a, m) { a.in += m.in; a.spent += m.spent; a.invested += m.invested; a.saved += m.saved; a.kept += m.kept; return a; }, { in: 0, spent: 0, invested: 0, saved: 0, kept: 0 });
+    var span = use.length ? (use.length === 1 ? use[0].d.toLocaleDateString(undefined, { month: "long" }) : use[0].short + " to " + use[use.length - 1].short) : "";
+    document.getElementById("svLabel").textContent = use.length ? "Saved, " + span : "Saved";
+    document.getElementById("svBig").textContent = fmt(T.saved);
+    document.getElementById("svBig").style.color = T.saved < 0 ? "var(--bad)" : "var(--accent)";
+    document.getElementById("svSub").textContent = use.length ? pct(T.in ? T.saved / T.in : 0) + " of the " + fmt(T.in) + " that came in · about " + fmt(T.saved / use.length) + " a month" : "Import a statement to see how much you save.";
+    var rising = use.length > 1 && use.every(function (m, i) { return !i || m.rate > use[i - 1].rate; });
+    document.getElementById("svTrend").innerHTML = use.length > 1 ? '<span class="chip ' + (rising ? "good" : "info") + '">' + (rising ? "Rising every month: " : "Savings rate: ") + use.map(function (m) { return pct(m.rate); }).join(" → ") + "</span>" : "";
+    document.getElementById("svStats").innerHTML = [
+      ["Money in", fmt(T.in), "all income"],
+      ["Spent", fmt(T.spent), T.in ? pct(T.spent / T.in) + " of money in" : ""],
+      ["Invested", fmt(T.invested), "new money, after payouts"],
+      ["Kept in bank and cash", signed(T.kept), ""]
+    ].map(function (s) { return '<div class="stat"><span class="label">' + s[0] + '</span><span class="v">' + s[1] + '</span><span class="small muted">' + s[2] + "</span></div>"; }).join("");
+
+    // chart
+    var W = 460, H = 230, L = 56, R = 10, Tp = 24, B = 26;
+    var hi = Math.max.apply(null, ms.map(function (m) { return m.saved; }).concat([1])), lo = Math.min.apply(null, ms.map(function (m) { return m.saved; }).concat([0]));
+    var nice = function (v) { if (v <= 0) return 0; var p = Math.pow(10, Math.floor(Math.log10(v))), n = v / p; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 4 ? 4 : n <= 8 ? 8 : 10) * p; };
+    var top = nice(hi * 1.15), bot = lo < 0 ? -nice(-lo * 1.15) : 0;
+    var y = function (v) { return Tp + (H - Tp - B) * (top - v) / (top - bot); };
+    var g = "", ticks = 4;
+    for (var i = 0; i <= ticks; i++) { var v = bot + (top - bot) * i / ticks; g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--line)"/><text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + fmt(v, { notation: "compact", maximumFractionDigits: 1 }) + "</text>"; }
+    var band = (W - L - R) / Math.max(ms.length, 1), w = Math.min(56, band * .5);
+    ms.forEach(function (m, i) {
+      var cx = L + band * i + band / 2, y0 = y(0), y1 = y(m.saved), neg = m.saved < 0;
+      g += '<rect x="' + (cx - w / 2) + '" y="' + Math.min(y0, y1) + '" width="' + w + '" height="' + Math.max(1, Math.abs(y1 - y0)) + '" rx="3" fill="' + (neg ? "var(--bad)" : "var(--chart-line)") + '" opacity="' + (m.current ? .45 : 1) + '"><title>' + m.short + ": saved " + fmt(m.saved) + " (" + pct(m.rate) + ")</title></rect>";
+      g += '<text x="' + cx + '" y="' + (neg ? y1 + 14 : y1 - 7) + '" text-anchor="middle" style="fill:var(--ink)">' + fmt(m.saved, { notation: "compact", maximumFractionDigits: 1 }) + " · " + pct(m.rate) + "</text>";
+      g += '<text x="' + cx + '" y="' + (H - 6) + '" text-anchor="middle">' + m.short + (m.current ? " (so far)" : "") + "</text>";
+    });
+    g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(0) + '" y2="' + y(0) + '" stroke="var(--muted)" stroke-width="1"/>';
+    document.getElementById("svChart").innerHTML = ms.length ? '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Saved per month">' + g + "</svg>" : '<div class="empty">No transactions yet.</div>';
+
+    document.getElementById("svTable").innerHTML = "<thead><tr><th>Month</th><th class=\"amt\">In</th><th class=\"amt\">Spent</th><th class=\"amt\">Invested</th><th class=\"amt\">Saved</th><th class=\"amt\">Rate</th></tr></thead><tbody>" +
+      ms.slice().reverse().map(function (m) { return "<tr><td>" + m.short + (m.current ? ' <span class="small muted">so far</span>' : "") + '</td><td class="amt">' + fmt(m.in) + '</td><td class="amt">' + fmt(m.spent) + '</td><td class="amt">' + fmt(m.invested) + '</td><td class="amt">' + fmt(m.saved) + '</td><td class="amt">' + pct(m.rate) + "</td></tr>"; }).join("") + "</tbody>";
+
+    // investments
+    var inv = state.investments || [], stats = {}, unmatched = [];
+    inv.forEach(function (s) { stats[s.id] = { n: 0, total: 0, last: null, thisMonth: null }; });
+    state.tx.forEach(function (t) {
+      if (t.cat !== "Investments") return;
+      var s = schemeOf(t);
+      if (!s) { unmatched.push(t); return; }
+      var st = stats[s.id]; st.n++; st.total += Math.abs(t.amount);
+      if (!st.last || t.date > st.last) st.last = t.date;
+      if (t.date.slice(0, 7) === monthKey(TODAY)) st.thisMonth = t.date;
+    });
+    var KIND = { sip: "SIP", payout: "Payout", shares: "Shares", other: "Other" };
+    var sipMonthly = inv.filter(function (s) { return s.kind === "sip"; }).reduce(function (a, s) { return a + (+s.amount || 0); }, 0);
+    var payMonthly = inv.filter(function (s) { return s.kind === "payout"; }).reduce(function (a, s) { return a + (+s.amount || 0); }, 0);
+    document.getElementById("invTotal").textContent = sipMonthly ? "SIPs " + fmt(sipMonthly) + " a month" + (payMonthly ? " · " + fmt(sipMonthly - payMonthly) + " after payouts" : "") : "";
+    var dd = function (iso) { return parseIso(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" }); };
+    document.getElementById("invTable").innerHTML = inv.length ? "<thead><tr><th>Scheme</th><th>Type</th><th class=\"amt\">Amount</th><th>Day</th><th class=\"amt\">So far</th><th>This month</th><th></th></tr></thead><tbody>" +
+      inv.map(function (s) {
+        var st = stats[s.id], chip;
+        if (st.thisMonth) chip = '<span class="chip good">' + (s.kind === "payout" ? "Received " : "Paid ") + dd(st.thisMonth) + "</span>";
+        else if (s.kind === "shares" || s.kind === "other") chip = st.last ? '<span class="small muted">Last ' + dd(st.last) + "</span>" : '<span class="small muted">–</span>';
+        else if (s.day && s.day > TODAY.getDate()) chip = '<span class="chip info">Due on ' + s.day + "</span>";
+        else chip = '<span class="chip warn">Not in statements yet</span>';
+        return '<tr><td><input type="text" class="inv-name" data-inv="' + s.id + '" data-field="name" value="' + esc(s.name) + '" aria-label="Scheme name"></td><td>' + KIND[s.kind] + '</td><td class="amt">' + (s.amount ? fmt(s.amount) : "–") + "</td><td>" + (s.day || "–") +
+          '</td><td class="amt">' + fmt(st.total) + ' <span class="small muted">(' + st.n + ")</span></td><td>" + chip + '</td><td><button class="btn sm ghost" type="button" data-rminv="' + s.id + '" aria-label="Remove ' + esc(s.name) + '">✕</button></td></tr>';
+      }).join("") + "</tbody>" : '<tbody><tr><td class="muted">No investments yet. Add your SIPs below.</td></tr></tbody>';
+    var opts = inv.map(function (s) { return '<option value="' + s.id + '">' + esc(s.name) + "</option>"; }).join("");
+    document.getElementById("invUnmatched").innerHTML = unmatched.length ? '<p class="small"><b>' + unmatched.length + " investment payment" + (unmatched.length === 1 ? "" : "s") + " not linked to a scheme</b></p><ul class=\"list\">" +
+      unmatched.slice(-8).reverse().map(function (t) { return '<li><span class="grow small">' + dd(t.date) + " · " + esc(t.desc) + '</span><span class="num">' + fmt(Math.abs(t.amount)) + '</span><select data-assign="' + t.id + '" aria-label="Link to scheme"><option value="">Link to…</option>' + opts + "</select></li>"; }).join("") + "</ul>" : "";
   }
 
   function renderCoachSide(M) {
@@ -889,7 +1058,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
   function commit() { save(); render(); }
   function leaveSample() {
     if (!state.sample) return;
-    state = { sample: false, settings: state.settings, budgets: state.budgets, bills: state.bills, tx: [], wishlist: [], skipped: [] };
+    state = { sample: false, settings: state.settings, budgets: state.budgets, bills: state.bills, tx: [], wishlist: [], skipped: [], investments: [] };
   }
   function addTx(t) { state.tx.push(Object.assign({ id: uid() }, t)); commit(); }
   function toast(msg) {
@@ -951,6 +1120,13 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     var n = document.getElementById("newCat").value.trim(); if (!n || state.budgets[n] != null) return;
     state.budgets[n] = 0; document.getElementById("newCat").value = ""; commit();
   };
+  document.getElementById("invForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var kind = document.getElementById("iKind").value;
+    state.investments = state.investments || [];
+    state.investments.push({ id: uid(), name: document.getElementById("iName").value.trim(), kind: kind, amount: +document.getElementById("iAmt").value || 0, day: Math.min(31, +document.getElementById("iDay").value || 0), match: document.getElementById("iMatch").value.trim() || (kind === "sip" ? "nach-mut,mutual fund,sip,cams,kfin" : "") });
+    e.target.reset(); commit(); toast("Investment added.");
+  });
   document.getElementById("billForm").addEventListener("submit", function (e) {
     e.preventDefault();
     state.bills.push({ id: uid(), name: document.getElementById("bName").value.trim(), amount: +document.getElementById("bAmt").value, day: Math.min(31, Math.max(1, +document.getElementById("bDay").value)), cat: document.getElementById("bCat").value });
@@ -958,6 +1134,8 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
   });
 
   document.addEventListener("click", function (e) {
+    var ri = e.target.closest("[data-rminv]");
+    if (ri) { var rid = ri.getAttribute("data-rminv"); state.investments = state.investments.filter(function (x) { return x.id !== rid; }); state.tx.forEach(function (x) { if (x.scheme === rid) delete x.scheme; }); commit(); return; }
     var t = e.target.closest("[data-del],[data-rmcat],[data-rmbill],[data-recheck],[data-bought],[data-letgo]"); if (!t) return;
     var id;
     if ((id = t.getAttribute("data-del"))) { state.tx = state.tx.filter(function (x) { return x.id !== id; }); commit(); }
@@ -982,6 +1160,10 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     }
   });
   document.addEventListener("change", function (e) {
+    var inv = e.target.getAttribute && e.target.getAttribute("data-inv");
+    if (inv) { var s = state.investments.find(function (x) { return x.id === inv; }); if (s && e.target.value.trim()) { s.name = e.target.value.trim(); commit(); toast("Saved."); } return; }
+    var as = e.target.getAttribute && e.target.getAttribute("data-assign");
+    if (as) { var tx = state.tx.find(function (x) { return x.id === as; }); if (tx && e.target.value) { tx.scheme = e.target.value; commit(); toast("Linked."); } return; }
     var id = e.target.getAttribute && e.target.getAttribute("data-cat"); if (!id) return;
     var t = state.tx.find(function (x) { return x.id === id; }); if (t) { t.cat = e.target.value; commit(); }
   });
@@ -1104,7 +1286,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     try {
       var d = JSON.parse(document.getElementById("backupText").value);
       if (!d || !d.settings || !Array.isArray(d.tx)) throw new Error("bad");
-      d.wishlist = d.wishlist || []; d.skipped = d.skipped || []; d.bills = d.bills || []; d.budgets = d.budgets || {};
+      d.wishlist = d.wishlist || []; d.investments = d.investments || []; d.skipped = d.skipped || []; d.bills = d.bills || []; d.budgets = d.budgets || {};
       state = d; commit(); toast("Restored " + d.tx.length + " transactions.");
     } catch (e) { toast("That isn't a Spend Coach backup. Paste the full text from Show backup."); }
   };
@@ -1117,13 +1299,13 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
   document.getElementById("resetBtn").onclick = function () { document.getElementById("resetConfirm").hidden = false; };
   document.getElementById("resetNo").onclick = function () { document.getElementById("resetConfirm").hidden = true; };
   document.getElementById("resetYes").onclick = function () {
-    state = { sample: false, settings: { currency: state.settings.currency, income: 0, payday: 1, savings: 0 }, budgets: Object.assign({}, DEFAULT_BUDGETS), bills: [], tx: [], wishlist: [], skipped: [] };
+    state = { sample: false, settings: { currency: state.settings.currency, income: 0, payday: 1, savings: 0 }, budgets: Object.assign({}, DEFAULT_BUDGETS), bills: [], tx: [], wishlist: [], skipped: [], investments: [] };
     Object.keys(state.budgets).forEach(function (k) { state.budgets[k] = 0; });
     document.getElementById("resetConfirm").hidden = true; commit(); toast("Everything deleted. Start with Budget & bills."); location.hash = "plan";
   };
 
   // ---------- views ----------
-  var VIEWS = ["overview", "coach", "transactions", "plan", "bank"];
+  var VIEWS = ["overview", "savings", "coach", "transactions", "plan", "bank"];
   function show(v) {
     if (VIEWS.indexOf(v) < 0) v = "overview";
     view = v;
