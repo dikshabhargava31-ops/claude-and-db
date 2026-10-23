@@ -170,72 +170,80 @@ blocks = "\n".join(f'    <div id="c{k}" class="card"><span class="pill {cls}">{p
 </template>
 """)
 
-# ---------------------------------------------------------------- captions.html: the script, karaoke style
-words, groups = [], []
-for s, e, text in LINES:
-    toks = text.split(); w = [len(t) + 2 for t in toks]; t0 = s; idx = []
-    for tok, n in zip(toks, w):
-        d = (e - s) * n / sum(w); words.append([tok, round(t0, 3), round(t0 + d, 3)]); idx.append(len(words) - 1); t0 += d
-    n = len(idx); k = -(-n // 3); size = -(-n // k)
-    for c in range(0, n, size):
-        g = idx[c:c + size]; groups.append([g[0], g[-1]])
-G = []
-for gi, (a, b) in enumerate(groups):
-    st = max(0.12, words[a][1] - 0.05)
-    nxt = words[groups[gi + 1][0]][1] - 0.05 if gi + 1 < len(groups) else EV["endcard"]
-    G.append([a, b, round(st, 3), round(min(words[b][2] + 0.35, nxt - 0.02, EV["endcard"]), 3)])
-G = [g for g in G if g[2] < EV["endcard"]]
-fonts = """    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-devanagari-800-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
-    @font-face { font-family: "Mukta"; font-weight: 800; src: url("assets/fonts/mukta-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }"""
+# ---------------------------------------------------------------- captions.html: English subtitles over the Hindi voice
+# One English line per script line; *stars* mark the key phrase shown in amber.
+EN = [
+    "What's the most important number in coaching? Your *enquiry-to-admission ratio.*",
+    "So how do you improve it? The key is a *centre visit.*",
+    "Why? Because on the phone, a parent only *compares fees.*",
+    "But at the centre, they see the classroom, meet the teacher, and watch other students learn.",
+    "That's where *trust* is built. And a parent who makes time to visit is already more serious.",
+    "So what's the mistake most institutes make? They share the *fees on the phone.*",
+    "The parent says, \"We'll think about it,\" and then there's *no follow-up.*",
+    "So don't explain everything on the phone. Say politely: \"It's hard to cover it all on a call. Please visit the centre once, and we'll meet your child too.\"",
+    "And fix the *date and time* right then.",
+    "When the parent visits, do 3 things: show the classroom, introduce the teacher, and fix a *trial class date* before they leave.",
+    "And those who don't come? A message after 2 days, a call after 1 week. Always the same question: *\"When can you visit?\"*",
+    "Also, track everything in an *Excel sheet.* One row per enquiry: name, class, phone, enquiry date, visited or not, admitted or not.",
+    "Every week, count: how many enquiries, how many visits, how many *admissions.*",
+    "So focus on the *visit,* not the fees. Want ready-made messages? Comment *ENQUIRY.* And follow.",
+]
+assert len(EN) == len(LINES)
+subs = []  # [html, start, end]
+for (s0, e0, _), line in zip(LINES, EN):
+    # chunk at punctuation, at most 6 words a chunk
+    toks, chunks, cur = line.split(), [], []
+    for tk in toks:
+        cur.append(tk)
+        if len(cur) >= 6 or (len(cur) >= 3 and tk.rstrip("*\"").endswith((",", ".", "?", ":"))):
+            chunks.append(cur); cur = []
+    if cur:
+        if chunks and len(cur) <= 2: chunks[-1] += cur
+        else: chunks.append(cur)
+    lens = [len(" ".join(c)) for c in chunks]; t = s0
+    hot = False
+    for c, n in zip(chunks, lens):
+        d = (e0 - s0) * n / sum(lens)
+        html = []
+        for tk in c:  # *stars* can open in one word and close in a later one
+            starts, ends = tk.startswith("*") or tk.startswith("\"*"), tk.rstrip(".,?:\"").endswith("*")
+            word = tk.replace("*", "").replace("<", "&lt;")
+            if starts: hot = True
+            html.append(f'<b>{word}</b>' if hot else word)
+            if ends: hot = False
+        subs.append([" ".join(html), round(t, 3), round(min(t + d, EV["endcard"]), 3)]); t += d
+subs = [x for x in subs if x[1] < EV["endcard"]]
 (ROOT / "compositions" / "captions.html").write_text(f"""<template>
   <style>
-{fonts}
-    #root {{ position: absolute; inset: 0; pointer-events: none; font-family: "Mukta", sans-serif; }}
-    #cap-box {{ position: absolute; inset: 0; }}
-    .cap-group {{ position: absolute; left: 0; top: 1215px; width: 1080px; padding: 0 108px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 10px; opacity: 0; visibility: hidden; }}
-    .cap-word {{ position: relative; display: inline-block; padding: 10px 14px 0; font-weight: 800; line-height: 1.25; color: #fff; text-shadow: 0 4px 0 rgba(0, 0, 0, 0.6), 0 0 22px rgba(0, 0, 0, 0.6); }}
-    .cap-bg {{ position: absolute; inset: 0; border-radius: 14px; background: #fbb524; opacity: 0; transform-origin: 0% 50%; }}
-    .cap-t {{ position: relative; }}
+    #root {{ position: absolute; inset: 0; pointer-events: none; font-family: "Inter", sans-serif; }}
+    .sub {{ position: absolute; left: 0; top: 1205px; width: 1080px; padding: 0 100px; text-align: center; opacity: 0; visibility: hidden; }}
+    .sub span {{ display: inline; padding: 6px 16px; border-radius: 14px; background: rgba(8, 12, 26, 0.72); box-decoration-break: clone; -webkit-box-decoration-break: clone;
+      font-size: 54px; font-weight: 800; line-height: 1.42; color: #fff; letter-spacing: -0.01em; }}
+    .sub b {{ color: #fbb524; font-weight: 800; }}
   </style>
   <div id="root" data-composition-id="captions" data-width="1080" data-height="1920"><div id="cap-box"></div></div>
   <script>
     (function () {{
       window.__timelines = window.__timelines || {{}};
-      // the person's script, verbatim; word times are spread over each line's span by length
-      const WORDS = {json.dumps(words, ensure_ascii=False)};
-      const GROUPS = {json.dumps(G)};
+      // English subtitles of the Hindi voiceover, one chunk at a time within each spoken line
+      const SUBS = {json.dumps(subs, ensure_ascii=False)};
       const box = document.getElementById("cap-box");
       const tl = gsap.timeline({{ paused: true }});
-      const SH = "0 4px 0 rgba(0,0,0,0.6), 0 0 22px rgba(0,0,0,0.6)";
-      GROUPS.forEach(([a, b, st, en], gi) => {{
-        const grp = document.createElement("div");
-        grp.className = "cap-group"; grp.id = "cap-g" + gi;
-        const text = WORDS.slice(a, b + 1).map((w) => w[0]).join(" ");
-        const {{ fontSize }} = window.__hyperframes.fitTextFontSize(text, {{ fontFamily: "Mukta", fontWeight: 800, maxWidth: 820, baseFontSize: 76, minFontSize: 48 }});
-        for (let i = a; i <= b; i++) {{
-          const w = document.createElement("span");
-          w.className = "cap-word"; w.style.fontSize = fontSize + "px";
-          w.innerHTML = '<span class="cap-bg" id="cap-bg' + i + '"></span><span class="cap-t" id="cap-t' + i + '"></span>';
-          w.querySelector(".cap-t").textContent = WORDS[i][0];
-          grp.appendChild(w);
-        }}
-        box.appendChild(grp);
-        tl.set(grp, {{ visibility: "visible" }}, st);
-        tl.fromTo(grp, {{ opacity: 0, y: 14 }}, {{ opacity: 1, y: 0, duration: 0.14, ease: "power2.out" }}, st);
-        for (let i = a; i <= b; i++) {{
-          const [, ws, we] = WORDS[i];
-          tl.fromTo("#cap-bg" + i, {{ opacity: 0, scaleX: 0 }}, {{ opacity: 1, scaleX: 1, duration: 0.14, ease: "power2.out" }}, ws);
-          tl.fromTo("#cap-t" + i, {{ color: "#ffffff", textShadow: SH }}, {{ color: "#0b1226", textShadow: "0 0 0 rgba(0,0,0,0)", duration: 0.1 }}, ws);
-          if (i < b) {{ tl.to("#cap-bg" + i, {{ opacity: 0, duration: 0.1 }}, we); tl.to("#cap-t" + i, {{ color: "#ffffff", textShadow: SH, duration: 0.1 }}, we); }}
-        }}
-        tl.to(grp, {{ opacity: 0, duration: 0.1, ease: "power2.in" }}, en - 0.1);
-        tl.set(grp, {{ opacity: 0, visibility: "hidden" }}, en);
+      SUBS.forEach(([html, st, en], i) => {{
+        const d = document.createElement("div");
+        d.className = "sub"; d.id = "sub" + i; d.innerHTML = "<span>" + html + "</span>";
+        box.appendChild(d);
+        tl.set(d, {{ visibility: "visible" }}, st);
+        tl.fromTo(d, {{ opacity: 0, y: 12 }}, {{ opacity: 1, y: 0, duration: 0.14, ease: "power2.out" }}, st);
+        tl.to(d, {{ opacity: 0, duration: 0.1, ease: "power2.in" }}, en - 0.1);
+        tl.set(d, {{ opacity: 0, visibility: "hidden" }}, en);
       }});
       window.__timelines["captions"] = tl;
     }})();
   </script>
 </template>
 """)
+words = subs
 print(f"built {END}s, {len(SHOTS)} shots, {len(words)} words")
 for (s, e, _), (n, a, b) in zip(LINES, SHOTS):
     pass

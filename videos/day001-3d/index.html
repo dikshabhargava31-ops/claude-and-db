@@ -286,10 +286,10 @@
         box(1.4, 1.0, 0.06, mat("#26407f", 0.5, "#2a4b9a"), o - 1.6, 2.4, -3.06);
         w.mumH = person({ top: "#1f8a7a", pants: "#6b2350", hair: "#1a1210", longHair: true });
         // the Day 2 follow-up: a professional message from the institute
-        const msgTex = bubble("Namaste ji, Coaching Ka System se.\nAapne Class 9 ke admission ki enquiry ki thi.\nEk baar centre visit kar lijiye: classroom\ndekh lenge aur teachers se bhi mil lenge.\nKya is Saturday, 5 PM aapke liye theek rahega?", { bg: "#d9fdd3", sub: "Coaching Ka System · Day 2", w: 1060, size: 40 });
+        const msgTex = bubble("Hello! This is Coaching Ka System.\nThank you for your enquiry about Class 9\nadmission. We would love for you to visit the\ncentre, see the classroom and meet our teachers.\nWould this Saturday at 5 PM work for you?", { bg: "#d9fdd3", sub: "Coaching Ka System · Day 2", w: 1060, size: 40 });
         w.msg = sprite(msgTex, 1.86, 1.86 * msgTex.image.height / msgTex.image.width); w.msg.position.set(o - 0.1, 2.15, -0.2);
         w.ring = sprite(tex(700, 200, (g) => { rr(g, 10, 10, 680, 180, 90, "#22c55e"); g.fillStyle = "#fff"; g.font = "800 60px Inter"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("Week 1 · Incoming call", 350, 102); }), 1.2, 0.34); w.ring.position.set(o - 0.75, 1.5, -0.4);
-        w.kab = sprite(bubble("\"Is hafte centre kab aa sakte hain?\"", { bg: "#fbb524", w: 1000, size: 52, tail: "right" }), 1.45, 0.3); w.kab.position.set(o + 0.2, 1.45, -0.3);
+        w.kab = sprite(bubble("\"When can you visit this week?\"", { bg: "#fbb524", w: 1000, size: 52, tail: "right" }), 1.45, 0.3); w.kab.position.set(o + 0.2, 1.45, -0.3);
 
         // SHEET: the tracker on a laptop
         o = S.sheet;
