@@ -749,7 +749,7 @@ setInterval(render,60*60*1000);
 // sign-in token can't change the site. Everyone signs in to read it. Editors save through the GitHub API: each change is
 // kept as an operation, replayed on the latest copy of the file and committed with their name,
 // so two people editing at once don't overwrite each other.
-const GH={owner:"dikshabhargava31-ops",repo:"ipa-priority-board-data",branch:"main",path:"data.json"};
+const GH={owner:"dikshabhargava31-ops",repo:"ipa_task",branch:"main",path:"data.json"};
 const API=`https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
 const KEY="ipa-priority-board-v2",AUTH_KEY="ipa-priority-board-user";
 let me=null;try{me=JSON.parse(localStorage.getItem(AUTH_KEY)||"null")}catch(_){}
