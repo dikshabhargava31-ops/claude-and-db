@@ -278,6 +278,12 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
         <p class="small muted">Saved = invested + what stayed in your bank and cash. SIPs and moving money between your own accounts don't count as spending.</p>
       </div>
     </div>
+    <div class="panel" id="subPanel">
+      <div class="panel-head"><h2 id="subTitle">Subscriptions last month</h2><span class="small muted" id="subCompare"></span></div>
+      <div class="saved-box"><span class="num" id="subTotal">–</span><span class="muted small" id="subSub"></span></div>
+      <div class="bars" id="subList"></div>
+      <p class="small muted" id="subTip"></p>
+    </div>
     <div class="panel">
       <div class="panel-head"><h2>My investments</h2><span class="small muted" id="invTotal"></span></div>
       <p class="small muted">Bank statements don't show scheme names. Type each name once and every payment after that is matched to it by amount and date.</p>
@@ -680,8 +686,9 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
     (state.wishlist || []).forEach(function (w) {
       if (iso(TODAY) >= w.revisit) out.push({ lvl: "good", t: "Cooling-off done: " + w.item, d: "You waited " + daysBetween(parseIso(w.added), TODAY) + " days. Ask the coach again to see if it fits now.", coach: w.id });
     });
-    var subs = state.bills.filter(function (b) { return b.cat === "Subscriptions"; }).reduce(function (a, b) { return a + b.amount; }, 0);
-    if (M.income && subs > M.income * 0.1) out.push({ lvl: "warn", t: "Subscriptions cost " + fmt(subs) + " a month", d: "That's " + Math.round(subs / M.income * 100) + "% of your income. Cancel the ones you haven't opened this week.", link: "#plan", linkText: "Review bills" });
+    var LS = subsFor(lastMonthKey()), lastSubs = LS.total + LS.fees;
+    var subs = lastSubs || state.bills.filter(function (b) { return b.cat === "Subscriptions"; }).reduce(function (a, b) { return a + b.amount; }, 0);
+    if (M.income && subs > M.income * 0.1) out.push({ lvl: "warn", t: (lastSubs ? "You spent " + fmt(subs) + " on subscriptions in " + monthLabel(LS.key) : "Subscriptions cost " + fmt(subs) + " a month"), d: "That's " + Math.round(subs / M.income * 100) + "% of your income. Cancel the ones you haven't opened this week.", link: "#savings", linkText: "See the list" });
     var bankTx = M.tx.some(function (t) { return t.via !== "cash"; });
     if (M.streak >= 2 && bankTx) out.push({ lvl: "good", t: M.streak + " no-spend days in a row", d: "Nice. Every no-spend day adds " + fmt(M.safePerDay) + " to the rest of your month." });
     if (!state.sample && !bankTx) out.push({ lvl: "warn", t: "No bank transactions for " + TODAY.toLocaleDateString(undefined, { month: "long" }) + " yet", d: "Until you import this month's statements, safe-to-spend only knows about the cash you've logged.", link: "#bank" });
@@ -771,6 +778,7 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
     renderTx();
     renderPlan();
     renderSavings();
+    renderSubs();
   }
 
   function renderOverview(M) {
@@ -845,6 +853,54 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
     var dot = '<circle cx="' + x(M.day) + '" cy="' + y(c) + '" r="4.5" fill="var(--chart-line)"/>';
     var lbl = '<text x="' + Math.min(x(M.day) + 8, W - R - 80) + '" y="' + (y(c) - 8) + '" style="fill:var(--ink)">' + fmt(c) + "</text>";
     document.getElementById("chart").innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Cumulative spending this month: ' + fmt(c) + " by day " + M.day + " of " + M.dim + '">' + g + area + pace + line + dot + lbl + "</svg>";
+  }
+
+  // ---------- subscriptions ----------
+  var SUB_NAMES = [[/anthropic|claude/i, "Claude"], [/openai|chatgpt/i, "ChatGPT"], [/grok|xai/i, "Grok"], [/descript/i, "Descript"], [/adobe/i, "Adobe"],
+    [/google play/i, "Google Play"], [/google india d|google one/i, "Google One"], [/netflix/i, "Netflix"], [/hotstar/i, "JioHotstar"], [/spotify/i, "Spotify"],
+    [/apple/i, "Apple"], [/amazon/i, "Amazon Prime"], [/youtube/i, "YouTube Premium"], [/dmatic/i, "Dmatic Digital"], [/roy digital/i, "Roy Digital"], [/faithtech/i, "FaithTech Labs"]];
+  var FX_FEE = /international|dcc|markup|intl/i;
+  function subName(desc) {
+    for (var i = 0; i < SUB_NAMES.length; i++) if (SUB_NAMES[i][0].test(desc)) return SUB_NAMES[i][1];
+    return desc.replace(/^(kotak|hdfc):\s*/i, "").replace(/^(upi|pcd\/\d+|pci\/\d+)[\/ ]/i, "").split(/[\/]| - /)[0].trim().slice(0, 30) || "Other";
+  }
+  function subsFor(key) {
+    var g = {}, total = 0, fees = 0, inc = 0;
+    state.tx.forEach(function (t) {
+      if (t.date.slice(0, 7) !== key) return;
+      if (t.cat === "Income") inc += t.amount;
+      if (t.cat === "Subscriptions") { var n = subName(t.desc); g[n] = (g[n] || 0) - t.amount; total -= t.amount; }
+      else if (t.cat === "Fees" && FX_FEE.test(t.desc)) fees -= t.amount;
+    });
+    var groups = Object.keys(g).map(function (k) { return [k, g[k]]; }).filter(function (x) { return Math.abs(x[1]) >= 1; }).sort(function (a, b) { return b[1] - a[1]; });
+    return { key: key, total: total, fees: fees, groups: groups, income: inc };
+  }
+  function lastMonthKey() { return monthKey(new Date(TODAY.getFullYear(), TODAY.getMonth() - 1, 1)); }
+  function monthLabel(key, opt) { var p = key.split("-"); return new Date(+p[0], +p[1] - 1, 1).toLocaleDateString(undefined, opt || { month: "long" }); }
+
+  function renderSubs() {
+    var key = lastMonthKey(), S = subsFor(key);
+    if (!S.total) {
+      var keysWith = state.tx.filter(function (t) { return t.cat === "Subscriptions" && t.date.slice(0, 7) < monthKey(TODAY); }).map(function (t) { return t.date.slice(0, 7); }).sort();
+      if (keysWith.length) { key = keysWith[keysWith.length - 1]; S = subsFor(key); }
+    }
+    var panel = document.getElementById("subPanel");
+    if (!S.total) { panel.hidden = true; return; }
+    panel.hidden = false;
+    var prevKey = monthKey(new Date(+key.slice(0, 4), +key.slice(5, 7) - 2, 1)), P = subsFor(prevKey);
+    var all = S.total + S.fees, base = +state.settings.income || S.income;
+    document.getElementById("subTitle").textContent = "Subscriptions in " + monthLabel(key);
+    document.getElementById("subTotal").textContent = fmt(all);
+    document.getElementById("subSub").textContent = S.groups.length + " services" + (S.fees >= 1 ? " plus " + fmt(S.fees) + " foreign card fees" : "") + (base ? " · " + pct(all / base) + " of your " + fmt(base) + " monthly income" : "");
+    var pAll = P.total + P.fees;
+    document.getElementById("subCompare").innerHTML = pAll ? (all > pAll ? '<span class="chip warn">' + fmt(all - pAll) + " more than " + monthLabel(prevKey) + "</span>" : '<span class="chip good">' + fmt(pAll - all) + " less than " + monthLabel(prevKey) + "</span>") : "";
+    var max = S.groups.length ? S.groups[0][1] : 1;
+    var rows = S.groups.concat(S.fees >= 1 ? [["Foreign card fees", S.fees]] : []);
+    document.getElementById("subList").innerHTML = rows.map(function (x) {
+      return '<div class="bar-row"><div class="bar-top"><span>' + esc(x[0]) + '</span><span class="num">' + fmt(x[1]) + '</span></div><div class="bar"><i style="width:' + Math.max(1, x[1] / max * 100) + '%"></i></div></div>';
+    }).join("");
+    var top3 = S.groups.slice(0, 3).reduce(function (a, x) { return a + x[1]; }, 0);
+    document.getElementById("subTip").textContent = "Your top 3 (" + S.groups.slice(0, 3).map(function (x) { return x[0]; }).join(", ") + ") cost " + fmt(top3) + ". Cutting half of everything would add about " + fmt(all / 2) + " a month, " + fmt(all * 6) + " a year, to your savings.";
   }
 
   // ---------- savings and investments ----------
