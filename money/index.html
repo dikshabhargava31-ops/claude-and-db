@@ -1,0 +1,1109 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spend Coach</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="A personal money dashboard: what's safe to spend today, budgets, bills, reminders and a coach that tells you when to buy and when to wait. Everything stays in this browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: a sticky ledger header with tabs; each view is a single column of panels that splits into two columns on wide screens. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --sunk: #e8eeec;
+  --line: #d3dcd9;
+  --ink: #12211d;
+  --muted: #56665f;
+  --accent: #0e6b56;
+  --accent-ink: #ffffff;
+  --accent-soft: #d6ebe4;
+  --good: #1f7a3f;
+  --good-soft: #dcf0e2;
+  --warn: #9a5b00;
+  --warn-soft: #fbecd2;
+  --bad: #b3261e;
+  --bad-soft: #f8dcd9;
+  --chart-line: #0e6b56;
+  --chart-pace: #8a9a94;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1513; --surface: #142019; --sunk: #1b2a25; --line: #2a3b35; --ink: #e5eeea; --muted: #9db0a8;
+    --accent: #4cc3a0; --accent-ink: #062018; --accent-soft: #173a30;
+    --good: #6bd38f; --good-soft: #163522; --warn: #f0b552; --warn-soft: #3a2a10; --bad: #ff8a80; --bad-soft: #3d1a17;
+    --chart-line: #4cc3a0; --chart-pace: #6f827b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1513; --surface: #142019; --sunk: #1b2a25; --line: #2a3b35; --ink: #e5eeea; --muted: #9db0a8;
+  --accent: #4cc3a0; --accent-ink: #062018; --accent-soft: #173a30;
+  --good: #6bd38f; --good-soft: #163522; --warn: #f0b552; --warn-soft: #3a2a10; --bad: #ff8a80; --bad-soft: #3d1a17;
+  --chart-line: #4cc3a0; --chart-pace: #6f827b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: 1.15rem; font-weight: 700; }
+h3 { font-size: 1rem; font-weight: 700; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.small { font-size: .85rem; }
+.label { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-block: 12px 0; }
+.brand { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+.mark { width: 30px; height: 30px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-family: var(--display); font-weight: 700; }
+.brand h1 { font-size: 1.2rem; }
+.allow-pill { font-size: .85rem; padding: 5px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--ink); white-space: nowrap; }
+.tabs { display: flex; gap: 2px; width: 100%; overflow-x: auto; scrollbar-width: none; }
+.tabs a { padding: 10px 12px; text-decoration: none; color: var(--muted); font-weight: 600; border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs a[aria-current="page"] { color: var(--ink); border-color: var(--accent); }
+.tabs a:hover { color: var(--ink); }
+
+main.wrap { padding-block: 20px 60px; display: grid; gap: 16px; }
+.view { display: grid; gap: 16px; }
+.grid2 { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 880px) { .grid2 { grid-template-columns: 1.15fr 1fr; } }
+.grid2 > * { min-width: 0; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.panel-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+
+.banner { border: 1px dashed var(--warn); background: var(--warn-soft); border-radius: var(--radius); padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+
+/* Hero */
+.hero { display: grid; gap: 18px; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); align-items: center; } }
+.safe { display: grid; gap: 4px; }
+.safe .big { font-family: var(--display); font-size: clamp(2.4rem, 7vw, 3.4rem); font-weight: 700; letter-spacing: -.02em; line-height: 1; }
+.stats { display: flex; flex-wrap: wrap; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.stat { flex: 1 1 130px; background: var(--surface); padding: 10px 12px; display: grid; gap: 2px; align-content: start; }
+.stat .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.05rem; font-weight: 500; }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.chip.good { background: var(--good-soft); color: var(--good); }
+.chip.warn { background: var(--warn-soft); color: var(--warn); }
+.chip.bad { background: var(--bad-soft); color: var(--bad); }
+.chip.info { background: var(--accent-soft); color: var(--ink); }
+
+/* Nudges */
+.nudges { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.nudge { display: grid; grid-template-columns: 4px 1fr; gap: 12px; padding: 10px 12px 10px 0; background: var(--sunk); border-radius: 8px; overflow: hidden; }
+.nudge::before { content: ""; background: var(--accent); }
+.nudge.bad::before { background: var(--bad); }
+.nudge.warn::before { background: var(--warn); }
+.nudge.good::before { background: var(--good); }
+.nudge b { display: block; }
+
+/* Budget bars */
+.bars { display: grid; gap: 12px; }
+.bar-row { display: grid; gap: 5px; }
+.bar-top { display: flex; justify-content: space-between; gap: 10px; font-size: .9rem; }
+.bar { height: 8px; background: var(--sunk); border-radius: 99px; overflow: hidden; position: relative; }
+.bar i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: var(--accent); }
+.bar i.warn { background: var(--warn); }
+.bar i.bad { background: var(--bad); }
+.bar .pace { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); opacity: .45; }
+
+/* Chart */
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { fill: var(--muted); font: 11px var(--mono); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .82rem; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; background: var(--chart-line); }
+.legend span.pace::before { background: var(--chart-pace); }
+
+/* Lists and tables */
+.list { list-style: none; margin: 0; padding: 0; display: grid; }
+.list li { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--line); }
+.list li:first-child { border-top: 0; }
+.list .grow { flex: 1 1 160px; min-width: 0; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: left; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.amt { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.amt.in { color: var(--good); }
+th.amt { text-align: right; }
+td select { padding: 4px 6px; font-size: .85rem; }
+
+/* Forms */
+form, .form { display: grid; gap: 12px; }
+.fields { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.field { display: grid; gap: 5px; min-width: 0; }
+.field > span { font-size: .82rem; font-weight: 600; color: var(--muted); }
+input[type="text"], input[type="number"], input[type="date"], select, textarea {
+  width: 100%; min-width: 0; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface);
+}
+textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg label { cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: inline-block; padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: .88rem; }
+.seg input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 9px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn:hover { background: var(--sunk); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.sm { padding: 5px 10px; font-size: .85rem; }
+.btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+.btn.danger { color: var(--bad); }
+
+/* Coach verdict */
+.verdict { border-radius: var(--radius); padding: 18px; display: grid; gap: 12px; border: 1px solid var(--line); background: var(--sunk); }
+.verdict.go { background: var(--good-soft); border-color: transparent; }
+.verdict.wait { background: var(--warn-soft); border-color: transparent; }
+.verdict.skip { background: var(--bad-soft); border-color: transparent; }
+.verdict .word { font-family: var(--display); font-size: 2rem; font-weight: 700; line-height: 1; }
+.verdict.go .word { color: var(--good); }
+.verdict.wait .word { color: var(--warn); }
+.verdict.skip .word { color: var(--bad); }
+.reasons { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+.reasons li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; font-size: .92rem; }
+.reasons li::before { content: "●"; font-size: .8rem; line-height: 1.6; color: var(--muted); }
+.reasons li.good::before { content: "✓"; color: var(--good); }
+.reasons li.warn::before { content: "!"; color: var(--warn); font-weight: 700; }
+.reasons li.bad::before { content: "✕"; color: var(--bad); }
+.meter { height: 10px; border-radius: 99px; background: linear-gradient(90deg, var(--bad) 0 45%, var(--warn) 45% 70%, var(--good) 70% 100%); position: relative; opacity: .9; }
+.meter i { position: absolute; top: -4px; width: 4px; height: 18px; border-radius: 2px; background: var(--ink); transform: translateX(-2px); }
+
+.saved-box { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; padding: 12px 14px; border-radius: 8px; background: var(--accent-soft); }
+.saved-box .num { font-size: 1.3rem; font-weight: 500; }
+
+.steps { margin: 0; padding-left: 1.2rem; display: grid; gap: 6px; }
+.prose { max-width: 68ch; display: grid; gap: 10px; }
+.empty { padding: 14px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-size: .9rem; }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-weight: 600; z-index: 20; max-width: calc(100% - 32px); }
+@media (prefers-reduced-motion: no-preference) { .bar i, .meter i { transition: width .4s ease, left .4s ease; } }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><div class="mark" aria-hidden="true">S</div><h1>Spend Coach</h1></div>
+    <span class="allow-pill" id="allowPill">Today: …</span>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#overview" data-view="overview">Overview</a>
+      <a href="#coach" data-view="coach">Should I buy it?</a>
+      <a href="#transactions" data-view="transactions">Transactions</a>
+      <a href="#plan" data-view="plan">Budget &amp; bills</a>
+      <a href="#bank" data-view="bank">Connect bank</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="banner" id="sampleBanner" hidden>
+    <p><b>These are example numbers.</b> Import your bank statement or add your own transactions to see your real picture.</p>
+    <div class="row"><a class="btn sm primary" href="#bank">Import my statement</a><button class="btn sm" id="clearSample" type="button">Clear examples</button></div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="view" id="v-overview">
+    <div class="panel">
+      <div class="hero">
+        <div class="safe">
+          <span class="label">Safe to spend today</span>
+          <span class="big num" id="safeToday">–</span>
+          <span class="muted small" id="safeSub"></span>
+        </div>
+        <div class="stats" id="stats"></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="panel-head"><h2>Reminders from your coach</h2><span class="muted small" id="nudgeCount"></span></div>
+        <ul class="nudges" id="nudges"></ul>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Spending this month</h2><span class="muted small" id="monthName"></span></div>
+        <div class="chart" id="chart"></div>
+        <div class="legend"><span>What you've spent</span><span class="pace">Even pace that still hits your savings goal</span></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="panel-head"><h2>Budgets</h2><span class="muted small">The tick marks where you should be by today</span></div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Bills coming up</h2><a href="#plan" class="small">Edit bills</a></div>
+        <ul class="list" id="upcoming"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- COACH -->
+  <section class="view" id="v-coach" hidden>
+    <div class="grid2">
+      <div class="panel">
+        <div class="panel-head"><h2>Thinking of buying something?</h2></div>
+        <p class="muted small">Tell me what it is. I'll check it against what's left this month, your budgets, your bills, payday and your savings goal.</p>
+        <form id="coachForm">
+          <div class="fields">
+            <label class="field"><span>What is it?</span><input type="text" id="cItem" placeholder="New headphones" required></label>
+            <label class="field"><span>Price</span><input type="number" id="cPrice" min="1" step="1" placeholder="4999" required></label>
+            <label class="field"><span>Category</span><select id="cCat"></select></label>
+          </div>
+          <div class="field"><span>Is it a need or a want?</span>
+            <div class="seg" role="radiogroup">
+              <label><input type="radio" name="cType" value="need" id="cNeed"><span>Need</span></label>
+              <label><input type="radio" name="cType" value="want" id="cWant" checked><span>Want</span></label>
+            </div>
+          </div>
+          <div class="field"><span>Could it wait a week?</span>
+            <div class="seg" role="radiogroup">
+              <label><input type="radio" name="cWait" value="yes" id="cWaitYes" checked><span>Yes, it could wait</span></label>
+              <label><input type="radio" name="cWait" value="no" id="cWaitNo"><span>No, I need it now</span></label>
+            </div>
+          </div>
+          <div class="field"><span>How are you feeling right now?</span>
+            <div class="seg" role="radiogroup">
+              <label><input type="radio" name="cMood" value="fine" id="cMoodFine" checked><span>Fine</span></label>
+              <label><input type="radio" name="cMood" value="bored" id="cMoodBored"><span>Bored</span></label>
+              <label><input type="radio" name="cMood" value="stressed" id="cMoodStressed"><span>Stressed or low</span></label>
+              <label><input type="radio" name="cMood" value="celebrating" id="cMoodCeleb"><span>Celebrating</span></label>
+            </div>
+          </div>
+          <div class="row"><button class="btn primary" type="submit">Ask the coach</button></div>
+        </form>
+      </div>
+      <div class="panel" id="verdictPanel">
+        <div class="empty" id="verdictEmpty">Your answer appears here: <b>Go ahead</b>, <b>Wait</b> or <b>Skip it</b>, with the reasons and what to do next.</div>
+        <div id="verdict" hidden></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="panel-head"><h2>Cooling-off list</h2><span class="muted small">Things you decided to wait on</span></div>
+        <ul class="list" id="wishlist"></ul>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Money you didn't spend</h2></div>
+        <div class="saved-box"><span class="num" id="skippedTotal">0</span><span class="muted small" id="skippedSub">kept by skipping impulse buys</span></div>
+        <div class="prose small muted">
+          <p><b>How the coach decides.</b> It starts from what's left after your bills and savings goal, then looks at your daily allowance after the purchase, the category budget, how fast you're spending this month, days until payday, and how many hours of work the price costs you.</p>
+          <p>Wants that can wait get a cooling-off period: 1 day for small things, 7 days for medium ones, 30 days for anything over a tenth of your monthly income. If you still want it when the time is up, it's usually a good buy.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRANSACTIONS -->
+  <section class="view" id="v-transactions" hidden>
+    <div class="panel">
+      <div class="panel-head"><h2>Add a transaction</h2><a href="#bank" class="small">Import a bank statement instead</a></div>
+      <form id="txForm">
+        <div class="fields">
+          <label class="field"><span>Date</span><input type="date" id="tDate" required></label>
+          <label class="field"><span>Description</span><input type="text" id="tDesc" placeholder="Swiggy order" required></label>
+          <label class="field"><span>Amount</span><input type="number" id="tAmt" min="0.01" step="0.01" required></label>
+          <label class="field"><span>Category</span><select id="tCat"></select></label>
+        </div>
+        <div class="row">
+          <div class="seg" role="radiogroup">
+            <label><input type="radio" name="tDir" value="out" id="tOut" checked><span>Money out</span></label>
+            <label><input type="radio" name="tDir" value="in" id="tIn"><span>Money in</span></label>
+          </div>
+          <button class="btn primary" type="submit">Add</button>
+        </div>
+      </form>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>All transactions</h2>
+        <div class="row">
+          <select id="fMonth" aria-label="Month"></select>
+          <select id="fCat" aria-label="Category"></select>
+          <input type="text" id="fSearch" placeholder="Search" aria-label="Search transactions" style="width:160px">
+        </div>
+      </div>
+      <p class="small muted" id="txSummary"></p>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th class="amt">Amount</th><th></th></tr></thead><tbody id="txBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="view" id="v-plan" hidden>
+    <div class="grid2">
+      <div class="panel">
+        <h2>Your month</h2>
+        <form id="setForm">
+          <div class="fields">
+            <label class="field"><span>Monthly take-home pay</span><input type="number" id="sIncome" min="0" step="1"></label>
+            <label class="field"><span>Payday (day of month)</span><input type="number" id="sPayday" min="1" max="31" step="1"></label>
+            <label class="field"><span>Save every month</span><input type="number" id="sSave" min="0" step="1"></label>
+            <label class="field"><span>Currency</span><select id="sCur"></select></label>
+          </div>
+          <p class="small muted">Your savings goal comes off the top. Safe-to-spend is what's left after savings and the bills still due this month.</p>
+          <div class="row"><button class="btn primary" type="submit">Save</button></div>
+        </form>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Category budgets</h2><span class="muted small" id="budgetTotal"></span></div>
+        <div class="form" id="budgetForm"></div>
+        <div class="row"><input type="text" id="newCat" placeholder="New category" style="max-width:220px" aria-label="New category name"><button class="btn sm" id="addCat" type="button">Add category</button></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Monthly bills</h2><span class="muted small">Rent, EMIs, subscriptions, insurance: anything that comes out every month</span></div>
+      <ul class="list" id="billList"></ul>
+      <form id="billForm">
+        <div class="fields">
+          <label class="field"><span>Bill</span><input type="text" id="bName" placeholder="Electricity" required></label>
+          <label class="field"><span>Amount</span><input type="number" id="bAmt" min="1" step="1" required></label>
+          <label class="field"><span>Due on day</span><input type="number" id="bDay" min="1" max="31" step="1" required></label>
+          <label class="field"><span>Category</span><select id="bCat"></select></label>
+        </div>
+        <div class="row"><button class="btn primary" type="submit">Add bill</button></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- BANK -->
+  <section class="view" id="v-bank" hidden>
+    <div class="grid2">
+      <div class="panel">
+        <h2>Import your bank statement</h2>
+        <ol class="steps small">
+          <li>Open your bank's app or net banking and go to account statements.</li>
+          <li>Download the statement as <b>CSV</b> or <b>Excel</b> for the last month or two. If it's Excel, open it and save as CSV.</li>
+          <li>Choose the file below, or paste its contents. Cards work the same way.</li>
+        </ol>
+        <div class="form">
+          <label class="field"><span>Statement file (.csv)</span><input type="file" id="csvFile" accept=".csv,text/csv,text/plain"></label>
+          <label class="field"><span>Or paste it here</span><textarea id="csvText" placeholder="Date,Narration,Withdrawal Amt.,Deposit Amt.,Closing Balance&#10;21/10/2026,UPI-SWIGGY-...,412.00,,48210.55"></textarea></label>
+          <div class="row"><button class="btn primary" id="csvPreview" type="button">Read statement</button><span class="small muted" id="csvMsg"></span></div>
+          <div id="csvResult"></div>
+        </div>
+        <p class="small muted">The page finds the date, description and amount columns on its own, sorts each line into a category by the merchant name, and skips lines you've already imported. You can change any category afterwards.</p>
+      </div>
+      <div class="panel">
+        <h2>Live bank connection</h2>
+        <div class="prose small">
+          <p>A page like this can't log in to your bank by itself, and you should never type your bank password into one. Live connections go through a regulated data service that your bank works with:</p>
+          <ul class="steps">
+            <li><b>India:</b> the RBI Account Aggregator network (apps like Finvu, OneMoney, or the aggregator option inside Fi, Jupiter and INDmoney). You approve read-only access to your accounts with OTP consent.</li>
+            <li><b>US, Canada, UK, EU:</b> Plaid, TrueLayer or GoCardless Bank Account Data.</li>
+          </ul>
+          <p>Wiring one of these into this dashboard needs a small private server to hold the API keys. Until then, a statement import once a week takes about a minute and gives the coach everything it needs.</p>
+          <p class="muted">Your data stays in this browser. Nothing is sent anywhere.</p>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Back up or move your data</h2><span class="small muted">Use this to keep a copy or move to another device</span></div>
+      <div class="row"><button class="btn" id="exportBtn" type="button">Show backup</button><button class="btn" id="copyBtn" type="button" hidden>Copy backup</button><button class="btn" id="importBtn" type="button">Restore from pasted backup</button><button class="btn danger" id="resetBtn" type="button">Delete everything</button></div>
+      <textarea id="backupText" placeholder="Your backup appears here. To restore, paste a backup here and choose Restore." aria-label="Backup data"></textarea>
+      <p class="small" id="resetConfirm" hidden><b>Delete all transactions, budgets and bills?</b> <button class="btn sm danger" id="resetYes" type="button">Yes, delete</button> <button class="btn sm" id="resetNo" type="button">Cancel</button></p>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+(function () {
+  "use strict";
+  var KEY = "spend-coach-v1";
+  var CURRENCIES = { INR: "en-IN", USD: "en-US", EUR: "de-DE", GBP: "en-GB", AED: "en-AE", CAD: "en-CA", AUD: "en-AU", SGD: "en-SG" };
+  var EXCLUDED = { "Income": 1, "Transfers": 1 };
+  var RULES = [
+    ["Income", /salary|payroll|interest credit|int\.? ?cr|dividend|refund|cashback|reversal/i],
+    ["Transfers", /self transfer|own account|to savings|credit card payment|cc payment|bill ?desk.*card|neft.*self|sip|mutual fund|zerodha|groww|ppf|recurring deposit/i],
+    ["Rent", /\brent\b|landlord|nobroker|house rent/i],
+    ["Groceries", /bigbasket|blinkit|zepto|instamart|dmart|d-mart|grocer|supermarket|reliance fresh|more retail|jiomart|walmart|whole foods|tesco|aldi|lidl|kirana|vegetable|milk|dairy/i],
+    ["Food & dining", /swiggy|zomato|restaurant|cafe|café|starbucks|mcdonald|domino|pizza|kfc|burger|chaayos|haldiram|eats|doordash|deliveroo|bakery|dine/i],
+    ["Transport", /uber|\bola\b|rapido|metro|petrol|fuel|diesel|hpcl|bpcl|indian oil|shell|irctc|fastag|lyft|parking|toll|redbus|indigo|air india|vistara/i],
+    ["Bills & utilities", /electric|bescom|tata power|adani|msedcl|airtel|\bjio\b|vodafone|\bvi\b|bsnl|broadband|recharge|water bill|gas bill|piped gas|insurance|lic\b|premium|emi\b|loan/i],
+    ["Entertainment", /netflix|spotify|prime video|hotstar|disney|bookmyshow|cinema|pvr|inox|youtube|apple\.com|sonyliv|zee5|steam|playstation/i],
+    ["Health", /pharm|apollo|medplus|hospital|clinic|1mg|netmeds|practo|diagnostic|lab|gym|cult\.?fit|doctor/i],
+    ["Shopping", /amazon|flipkart|myntra|ajio|meesho|nykaa|tata cliq|croma|reliance digital|decathlon|ikea|zara|h&m|mall|target|ebay/i]
+  ];
+  var DEFAULT_BUDGETS = { "Rent": 22000, "Groceries": 8000, "Food & dining": 6000, "Transport": 4000, "Bills & utilities": 4500, "Shopping": 5000, "Entertainment": 2000, "Health": 2500, "Other": 3000 };
+
+  var TODAY = new Date();
+  var state = load() || sampleState();
+  var view = "overview";
+
+  // ---------- storage ----------
+  function load() {
+    try { var raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* storage unavailable: keep working in memory */ }
+  }
+
+  // ---------- dates ----------
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function iso(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function parseIso(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function monthKey(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1); }
+  function daysIn(y, m) { return new Date(y, m + 1, 0).getDate(); }
+  function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+  function daysBetween(a, b) { return Math.round((parseIso(iso(b)) - parseIso(iso(a))) / 86400000); }
+
+  // ---------- sample data (marked as examples) ----------
+  function sampleState() {
+    var s = {
+      sample: true,
+      settings: { currency: "INR", income: 85000, payday: 1, savings: 15000 },
+      budgets: Object.assign({}, DEFAULT_BUDGETS),
+      bills: [
+        { id: uid(), name: "Rent", amount: 22000, day: 3, cat: "Rent" },
+        { id: uid(), name: "Electricity", amount: 1800, day: 18, cat: "Bills & utilities" },
+        { id: uid(), name: "Phone and broadband", amount: 1199, day: 22, cat: "Bills & utilities" },
+        { id: uid(), name: "Health insurance", amount: 1450, day: 27, cat: "Bills & utilities" },
+        { id: uid(), name: "Netflix", amount: 649, day: 28, cat: "Entertainment" }
+      ],
+      tx: [], wishlist: [], skipped: []
+    };
+    var y = TODAY.getFullYear(), m = TODAY.getMonth();
+    var lines = [
+      [1, "Salary credit - ACME TECH PVT LTD", 85000], [3, "NEFT - House rent - landlord", -22000],
+      [2, "UPI-SWIGGY", -486], [4, "UPI-BLINKIT", -1240], [5, "UPI-UBER INDIA", -312], [6, "UPI-ZOMATO", -612],
+      [7, "AMAZON PAY - Shopping", -2399], [8, "UPI-DMART", -2860], [9, "UPI-STARBUCKS", -420], [10, "UPI-RAPIDO", -148],
+      [11, "UPI-SWIGGY", -538], [12, "BOOKMYSHOW", -760], [13, "UPI-ZEPTO", -894], [14, "APOLLO PHARMACY", -655],
+      [15, "UPI-SWIGGY", -402], [15, "MYNTRA", -1899], [16, "UPI-UBER INDIA", -286], [17, "UPI-ZOMATO", -710],
+      [18, "BESCOM ELECTRICITY", -1800], [19, "UPI-BIGBASKET", -1980], [19, "UPI-CHAAYOS", -310], [20, "HPCL PETROL", -1500],
+      [21, "UPI-SWIGGY", -645], [22, "AIRTEL BROADBAND", -1199], [23, "UPI-BLINKIT", -760], [24, "UPI-ZOMATO", -540],
+      [25, "FLIPKART", -1299], [26, "UPI-OLA", -230], [27, "UPI-SWIGGY", -480]
+    ];
+    var todayDate = TODAY.getDate();
+    lines.forEach(function (l) {
+      if (l[0] > todayDate) return;
+      s.tx.push({ id: uid(), date: iso(new Date(y, m, l[0])), desc: l[1], amount: l[2], cat: categorize(l[1], l[2]) });
+    });
+    // last month, lighter detail, for history
+    var pm = new Date(y, m - 1, 1), pdays = daysIn(pm.getFullYear(), pm.getMonth());
+    [[1, "Salary credit - ACME TECH PVT LTD", 85000], [3, "NEFT - House rent - landlord", -22000], [5, "UPI-BIGBASKET", -3100],
+     [8, "UPI-SWIGGY", -2900], [12, "AMAZON", -4200], [15, "UPI-UBER INDIA", -1800], [18, "BESCOM ELECTRICITY", -1650],
+     [20, "UPI-ZOMATO", -2400], [22, "AIRTEL BROADBAND", -1199], [24, "UPI-DMART", -3400], [26, "BOOKMYSHOW", -1100],
+     [27, "Health insurance premium", -1450], [28, "NETFLIX", -649], [29, "MYNTRA", -2600]].forEach(function (l) {
+      s.tx.push({ id: uid(), date: iso(new Date(pm.getFullYear(), pm.getMonth(), Math.min(l[0], pdays))), desc: l[1], amount: l[2], cat: categorize(l[1], l[2]) });
+    });
+    s.wishlist.push({ id: uid(), item: "Noise-cancelling headphones", price: 7999, cat: "Shopping", added: iso(addDays(TODAY, -8)), revisit: iso(addDays(TODAY, -1)) });
+    s.skipped.push({ item: "Second pair of sneakers", price: 3499, date: iso(addDays(TODAY, -5)) });
+    return s;
+  }
+
+  function uid() { return Math.random().toString(36).slice(2, 10); }
+  function categorize(desc, amount) {
+    for (var i = 0; i < RULES.length; i++) {
+      if (RULES[i][1].test(desc)) {
+        if (RULES[i][0] === "Income" && amount < 0) continue;
+        return RULES[i][0];
+      }
+    }
+    return amount > 0 ? "Income" : "Other";
+  }
+
+  // ---------- money ----------
+  function fmt(n, opts) {
+    var cur = state.settings.currency || "INR";
+    try {
+      return new Intl.NumberFormat(CURRENCIES[cur] || "en-IN", Object.assign({ style: "currency", currency: cur, maximumFractionDigits: 0 }, opts || {})).format(n);
+    } catch (e) { return cur + " " + Math.round(n); }
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function categories() {
+    var set = {};
+    Object.keys(state.budgets).forEach(function (c) { set[c] = 1; });
+    state.tx.forEach(function (t) { set[t.cat] = 1; });
+    set["Income"] = 1; set["Transfers"] = 1; set["Other"] = 1;
+    return Object.keys(set);
+  }
+  function spendCats() { return categories().filter(function (c) { return !EXCLUDED[c]; }); }
+
+  // ---------- the numbers everything else uses ----------
+  function month() {
+    var y = TODAY.getFullYear(), m = TODAY.getMonth(), key = monthKey(TODAY);
+    var dim = daysIn(y, m), day = TODAY.getDate();
+    var tx = state.tx.filter(function (t) { return t.date.slice(0, 7) === key; });
+    var incomeIn = 0, spent = 0, byCat = {}, daily = new Array(dim + 1).fill(0), spendDays = {};
+    tx.forEach(function (t) {
+      if (t.cat === "Income" && t.amount > 0) { incomeIn += t.amount; return; }
+      if (EXCLUDED[t.cat]) return;
+      var v = -t.amount;
+      spent += v;
+      byCat[t.cat] = (byCat[t.cat] || 0) + v;
+      var d = +t.date.slice(8, 10);
+      daily[d] += v;
+      if (v > 0) spendDays[d] = 1;
+    });
+    var income = Math.max(incomeIn, +state.settings.income || 0);
+    var savings = +state.settings.savings || 0;
+    var billsDue = state.bills.filter(function (b) { return b.day > day && b.day <= dim; });
+    var billsDueTotal = billsDue.reduce(function (a, b) { return a + b.amount; }, 0);
+    var spendable = income - savings;
+    var left = spendable - spent - billsDueTotal;
+    var daysLeft = dim - day + 1;
+    var safePerDay = left / daysLeft;
+    var expectedByNow = spendable * day / dim;
+    var pace = expectedByNow > 0 ? spent / expectedByNow : 0;
+    var payday = Math.min(+state.settings.payday || 1, dim);
+    var toPayday = day < payday ? payday - day : dim - day + payday;
+    var hourly = income / 173;
+    var spentToday = daily[day] || 0;
+    var streak = 0;
+    for (var d = day - 1; d >= 1; d--) { if (spendDays[d]) break; streak++; }
+    return { y: y, m: m, key: key, dim: dim, day: day, tx: tx, income: income, incomeIn: incomeIn, savings: savings, spent: spent,
+      byCat: byCat, daily: daily, billsDue: billsDue, billsDueTotal: billsDueTotal, spendable: spendable, left: left,
+      daysLeft: daysLeft, safePerDay: safePerDay, pace: pace, payday: payday, toPayday: toPayday, hourly: hourly,
+      spentToday: spentToday, streak: streak, spendDays: spendDays };
+  }
+
+  // ---------- reminders ----------
+  function nudges(M) {
+    var out = [];
+    var todayLeft = M.safePerDay - M.spentToday;
+    if (M.left <= 0) {
+      out.push({ lvl: "bad", t: "Spending freeze until payday", d: "You've used this month's spending money" + (M.savings ? " unless you dip into your " + fmt(M.savings) + " savings goal" : "") + ". Stick to essentials for the next " + M.toPayday + " days." });
+    } else if (todayLeft <= 0) {
+      out.push({ lvl: "warn", t: "You've hit today's limit", d: "You spent " + fmt(M.spentToday) + " today against an allowance of " + fmt(M.safePerDay) + ". Anything more today comes out of the rest of the month." });
+    } else {
+      out.push({ lvl: "good", t: "You can spend " + fmt(todayLeft) + " more today", d: "That keeps you on track for the " + M.daysLeft + " days left this month and your " + fmt(M.savings) + " savings goal." });
+    }
+    if (M.pace > 1.1 && M.left > 0) {
+      out.push({ lvl: "warn", t: "You're spending " + Math.round((M.pace - 1) * 100) + "% faster than planned", d: "By today you'd normally have spent " + fmt(M.spendable * M.day / M.dim) + "; you've spent " + fmt(M.spent) + ". Try a no-spend day or two this week." });
+    }
+    M.billsDue.filter(function (b) { return b.day - M.day <= 5; }).forEach(function (b) {
+      var n = b.day - M.day;
+      out.push({ lvl: "info", t: b.name + " (" + fmt(b.amount) + ") is due " + (n === 1 ? "tomorrow" : "in " + n + " days"), d: "Keep that money in your account. It's already set aside in your safe-to-spend number." });
+    });
+    Object.keys(state.budgets).forEach(function (c) {
+      var lim = state.budgets[c], s = M.byCat[c] || 0;
+      if (!lim || EXCLUDED[c] || c === "Rent") return;
+      if (s > lim) out.push({ lvl: "bad", t: c + " is over budget by " + fmt(s - lim), d: "Stop spending on " + c.toLowerCase() + " for the rest of the month, or move money from a category with room left." });
+      else if (s >= lim * 0.8 && M.day < M.dim - 3) out.push({ lvl: "warn", t: c + " is at " + Math.round(s / lim * 100) + "% with " + M.daysLeft + " days to go", d: "Only " + fmt(lim - s) + " left for " + c.toLowerCase() + " this month." });
+    });
+    // repeat merchants
+    var counts = {};
+    M.tx.forEach(function (t) {
+      if (t.amount >= 0) return;
+      var k = merchant(t.desc); if (!k) return;
+      counts[k] = counts[k] || { n: 0, s: 0 }; counts[k].n++; counts[k].s += -t.amount;
+    });
+    Object.keys(counts).forEach(function (k) {
+      if (counts[k].n >= 4 && !/rent|salary/i.test(k)) out.push({ lvl: "warn", t: counts[k].n + " " + k + " orders this month (" + fmt(counts[k].s) + ")", d: "Cutting this in half would save about " + fmt(counts[k].s / M.day * M.dim / 2) + " a month." });
+    });
+    (state.wishlist || []).forEach(function (w) {
+      if (iso(TODAY) >= w.revisit) out.push({ lvl: "good", t: "Cooling-off done: " + w.item, d: "You waited " + daysBetween(parseIso(w.added), TODAY) + " days. Ask the coach again to see if it fits now.", coach: w.id });
+    });
+    if (M.streak >= 2) out.push({ lvl: "good", t: M.streak + " no-spend days in a row", d: "Nice. Every no-spend day adds " + fmt(M.safePerDay) + " to the rest of your month." });
+    if (state.sample || !M.tx.length) out.push({ lvl: "info", t: "Bring in your real numbers", d: "Import a statement from your bank once a week so these reminders reflect your spending.", link: "#bank" });
+    var order = { bad: 0, warn: 1, info: 2, good: 3 };
+    return out.sort(function (a, b) { return order[a.lvl] - order[b.lvl]; });
+  }
+  function merchant(desc) {
+    var m = desc.match(/swiggy|zomato|uber|ola|rapido|blinkit|zepto|instamart|amazon|flipkart|myntra|starbucks|bigbasket|dmart|doordash/i);
+    return m ? m[0].charAt(0).toUpperCase() + m[0].slice(1).toLowerCase() : null;
+  }
+
+  // ---------- coach ----------
+  function coach(input) {
+    var M = month();
+    var price = input.price, reasons = [], score = 100;
+    var left = M.left, safe = M.safePerDay;
+    var share = left > 0 ? price / left : Infinity;
+    var hours = M.hourly > 0 ? price / M.hourly : 0;
+    var lim = state.budgets[input.cat], catSpent = M.byCat[input.cat] || 0;
+    var isWant = input.type === "want";
+
+    if (left <= 0) { score -= 60; reasons.push(["bad", "You've already used this month's spending money. " + M.toPayday + " days until payday."]); }
+    else if (price > left) { score -= 60; reasons.push(["bad", "It costs " + fmt(price - left) + " more than everything you have left this month after bills and savings."]); }
+    else if (share > 0.5) { score -= 35; reasons.push(["bad", "It would use " + Math.round(share * 100) + "% of what's left for the next " + M.daysLeft + " days."]); }
+    else if (share > 0.2) { score -= 18; reasons.push(["warn", "It takes " + Math.round(share * 100) + "% of what's left for the next " + M.daysLeft + " days."]); }
+    else { reasons.push(["good", "It fits: " + Math.max(1, Math.round(share * 100)) + "% of what's left this month."]); }
+
+    if (left > 0) {
+      var after = (left - price) / M.daysLeft;
+      var tone = after < 0 ? "bad" : after < safe * 0.6 ? "warn" : "good";
+      if (tone !== "good") score -= 10;
+      reasons.push([tone, "Your daily allowance goes from " + fmt(safe) + " to " + fmt(after) + " for the rest of the month."]);
+    }
+
+    if (lim) {
+      var rem = lim - catSpent;
+      if (price > rem) { score -= 20; reasons.push([rem <= 0 ? "bad" : "warn", input.cat + " budget: " + (rem <= 0 ? "already used up" : "only " + fmt(rem) + " left") + ", so this goes " + fmt(price - Math.max(rem, 0)) + " over."]); }
+      else if ((catSpent + price) / lim > 0.8) { score -= 8; reasons.push(["warn", "This brings " + input.cat.toLowerCase() + " to " + Math.round((catSpent + price) / lim * 100) + "% of its budget."]); }
+      else reasons.push(["good", "Fits your " + input.cat.toLowerCase() + " budget with " + fmt(rem - price) + " to spare."]);
+    }
+
+    if (M.pace > 1.1) { score -= 10; reasons.push(["warn", "You're spending " + Math.round((M.pace - 1) * 100) + "% faster than planned this month."]); }
+
+    if (hours >= 1) {
+      if (isWant && hours > 8) score -= 8;
+      reasons.push([hours > 8 && isWant ? "warn" : "info", "It costs about " + (hours < 10 ? hours.toFixed(1) : Math.round(hours)) + " hours of your work" + (hours >= 16 ? " (" + (hours / 8).toFixed(1) + " working days)" : "") + "."]);
+    }
+
+    var waitPayday = isWant && M.toPayday <= 5 && share > 0.1 && M.toPayday > 0;
+    if (waitPayday) { score -= 12; reasons.push(["warn", "Payday is in " + M.toPayday + (M.toPayday === 1 ? " day" : " days") + ". Buying after it keeps this month on track."]); }
+
+    if (isWant && (input.mood === "bored" || input.mood === "stressed")) { score -= 12; reasons.push(["warn", (input.mood === "bored" ? "Boredom" : "Stress") + " is the most common trigger for buys people regret. Give it a day."]); }
+    if (isWant && input.mood === "celebrating" && share > 0.15) { score -= 5; reasons.push(["info", "Celebrating is a good reason, but set a limit before you start."]); }
+
+    var w = (state.wishlist || []).find(function (x) { return x.item.toLowerCase() === input.item.toLowerCase(); });
+    if (w && iso(TODAY) >= w.revisit) { score += 12; reasons.push(["good", "You waited " + daysBetween(parseIso(w.added), TODAY) + " days and still want it. That's a considered buy."]); }
+
+    if (!isWant) { score += 15; }
+    score = Math.max(0, Math.min(100, score));
+
+    var verdict = score >= 70 ? "go" : score >= 45 ? "wait" : "skip";
+    if (!isWant && price <= left && verdict === "skip") verdict = "wait";
+    if (!isWant && input.wait === "no" && price <= left) verdict = "go";
+
+    var cool = price < M.income * 0.02 ? 1 : price < M.income * 0.1 ? 7 : 30;
+    if (waitPayday) cool = Math.max(1, M.toPayday);
+    var advice;
+    if (verdict === "go") advice = isWant ? "Go ahead and enjoy it. Log it here so your allowance updates." : "Buy it. It's a need and it fits your month.";
+    else if (verdict === "wait") advice = !isWant ? "You need it, but it squeezes the month. Look for a cheaper option, or cut " + fmt(Math.min(price, Math.max(0, left)) * 0.5) + " from a want category to make room."
+      : (input.wait === "yes" ? "Put it on your cooling-off list for " + cool + (cool === 1 ? " day" : " days") + ". If you still want it then, ask again." : "If you really can't wait, find a cheaper version or take the money from another category first.");
+    else advice = !isWant ? "You need it but can't cover it this month. Buy the cheapest version that works, or move money from your savings goal knowingly." : "Skip this one. Put it on the cooling-off list, or bank the money and watch your skipped total grow.";
+
+    return { verdict: verdict, score: score, reasons: reasons, advice: advice, cool: cool, input: input };
+  }
+
+  // ---------- rendering ----------
+  function render() {
+    var M = month();
+    document.getElementById("sampleBanner").hidden = !state.sample;
+    var todayLeft = M.safePerDay - M.spentToday;
+    document.getElementById("allowPill").textContent = "Today: " + (M.left <= 0 ? "spending freeze" : todayLeft > 0 ? fmt(todayLeft) + " left" : "limit reached");
+    renderOverview(M);
+    renderCoachSide(M);
+    renderTx();
+    renderPlan();
+  }
+
+  function renderOverview(M) {
+    var todayLeft = M.safePerDay - M.spentToday;
+    var safeEl = document.getElementById("safeToday");
+    safeEl.textContent = fmt(Math.max(0, todayLeft));
+    safeEl.style.color = M.left <= 0 || todayLeft <= 0 ? "var(--bad)" : M.pace > 1.1 ? "var(--warn)" : "var(--ink)";
+    document.getElementById("safeSub").textContent = M.left <= 0
+      ? "You're " + fmt(-M.left) + " past this month's plan. " + M.toPayday + " days to payday."
+      : "Daily allowance " + fmt(M.safePerDay) + " for the next " + M.daysLeft + " days" + (M.spentToday ? ", " + fmt(M.spentToday) + " spent today." : ".");
+    var paceChip = M.pace > 1.1 ? '<span class="chip warn">' + Math.round(M.pace * 100) + '% of pace</span>' : M.pace < 0.9 ? '<span class="chip good">Under pace</span>' : '<span class="chip info">On pace</span>';
+    var stats = [
+      ["Income this month", fmt(M.income), M.incomeIn ? "" : '<span class="small muted">from your settings</span>'],
+      ["Spent so far", fmt(M.spent), paceChip],
+      ["Bills still due", fmt(M.billsDueTotal), '<span class="small muted">' + M.billsDue.length + ' bills</span>'],
+      ["Savings goal", fmt(M.savings), '<span class="small muted">set aside first</span>'],
+      ["Left to spend", fmt(M.left), M.left < 0 ? '<span class="chip bad">Over</span>' : '<span class="small muted">' + M.daysLeft + ' days left</span>']
+    ];
+    document.getElementById("stats").innerHTML = stats.map(function (s) {
+      return '<div class="stat"><span class="label">' + s[0] + '</span><span class="v">' + s[1] + "</span>" + (s[2] || "") + "</div>";
+    }).join("");
+
+    var N = nudges(M);
+    document.getElementById("nudgeCount").textContent = N.filter(function (n) { return n.lvl === "bad" || n.lvl === "warn"; }).length + " need attention";
+    document.getElementById("nudges").innerHTML = N.map(function (n) {
+      var extra = n.coach ? ' <button class="btn sm" type="button" data-recheck="' + n.coach + '">Ask the coach</button>' : n.link ? ' <a class="small" href="' + n.link + '">Import now</a>' : "";
+      return '<li class="nudge ' + n.lvl + '"><div><b>' + esc(n.t) + "</b><span class=\"small muted\">" + esc(n.d) + "</span>" + extra + "</div></li>";
+    }).join("");
+
+    document.getElementById("monthName").textContent = TODAY.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+    drawChart(M);
+
+    var cats = Object.keys(state.budgets).filter(function (c) { return state.budgets[c] > 0 && !EXCLUDED[c]; });
+    var paceX = M.day / M.dim * 100;
+    document.getElementById("bars").innerHTML = cats.length ? cats.map(function (c) {
+      var lim = state.budgets[c], s = M.byCat[c] || 0, pct = Math.min(100, s / lim * 100);
+      var cls = s > lim ? "bad" : s > lim * 0.8 ? "warn" : "";
+      var chip = s > lim ? '<span class="chip bad">' + fmt(s - lim) + ' over</span>' : '<span class="muted num">' + fmt(lim - s) + " left</span>";
+      return '<div class="bar-row"><div class="bar-top"><span>' + esc(c) + ' <span class="muted num small">' + fmt(s) + " / " + fmt(lim) + "</span></span>" + chip + '</div><div class="bar"><i class="' + cls + '" style="width:' + pct + '%"></i>' + (c === "Rent" ? "" : '<span class="pace" style="left:' + paceX + '%"></span>') + "</div></div>";
+    }).join("") : '<div class="empty">No budgets yet. <a href="#plan">Set them up</a>.</div>';
+
+    var bills = state.bills.slice().map(function (b) {
+      var due = b.day > M.day ? new Date(M.y, M.m, Math.min(b.day, M.dim)) : new Date(M.y, M.m + 1, Math.min(b.day, daysIn(M.y, M.m + 1)));
+      return { b: b, due: due, n: daysBetween(TODAY, due) };
+    }).sort(function (a, b) { return a.n - b.n; }).slice(0, 6);
+    document.getElementById("upcoming").innerHTML = bills.length ? bills.map(function (x) {
+      var chip = x.n <= 3 ? "warn" : "info";
+      return '<li><span class="grow">' + esc(x.b.name) + ' <span class="small muted">' + x.due.toLocaleDateString(undefined, { day: "numeric", month: "short" }) + '</span></span><span class="chip ' + chip + '">' + (x.n === 0 ? "today" : x.n === 1 ? "tomorrow" : "in " + x.n + " days") + '</span><span class="num">' + fmt(x.b.amount) + "</span></li>";
+    }).join("") : '<li class="muted">No bills added. <a href="#plan">Add your rent, EMIs and subscriptions</a>.</li>';
+  }
+
+  function drawChart(M) {
+    var W = 560, H = 220, L = 58, R = 12, T = 12, B = 26;
+    var cum = [0], c = 0;
+    for (var d = 1; d <= M.day; d++) { c += M.daily[d]; cum.push(c); }
+    var max = Math.max(M.spendable, c, 1) * 1.05;
+    var x = function (d) { return L + (W - L - R) * d / M.dim; };
+    var y = function (v) { return T + (H - T - B) * (1 - v / max); };
+    var g = "", ticks = 4;
+    for (var i = 0; i <= ticks; i++) {
+      var v = max / ticks * i;
+      g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y(v) + '" y2="' + y(v) + '" stroke="var(--line)" stroke-width="1"/>';
+      g += '<text x="' + (L - 6) + '" y="' + (y(v) + 4) + '" text-anchor="end">' + fmt(v, { notation: "compact", maximumFractionDigits: 1 }) + "</text>";
+    }
+    [1, 8, 15, 22, M.dim].forEach(function (d) { g += '<text x="' + x(d) + '" y="' + (H - 8) + '" text-anchor="middle">' + d + "</text>"; });
+    var pace = '<line x1="' + x(0) + '" y1="' + y(0) + '" x2="' + x(M.dim) + '" y2="' + y(M.spendable) + '" stroke="var(--chart-pace)" stroke-width="2" stroke-dasharray="5 5"/>';
+    var pts = cum.map(function (v, d) { return x(d) + "," + y(v); }).join(" ");
+    var area = '<polygon points="' + x(0) + "," + y(0) + " " + pts + " " + x(M.day) + "," + y(0) + '" fill="var(--chart-line)" opacity=".12"/>';
+    var line = '<polyline points="' + pts + '" fill="none" stroke="var(--chart-line)" stroke-width="2.5" stroke-linejoin="round"/>';
+    var dot = '<circle cx="' + x(M.day) + '" cy="' + y(c) + '" r="4.5" fill="var(--chart-line)"/>';
+    var lbl = '<text x="' + Math.min(x(M.day) + 8, W - R - 80) + '" y="' + (y(c) - 8) + '" style="fill:var(--ink)">' + fmt(c) + "</text>";
+    document.getElementById("chart").innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Cumulative spending this month: ' + fmt(c) + " by day " + M.day + " of " + M.dim + '">' + g + area + pace + line + dot + lbl + "</svg>";
+  }
+
+  function renderCoachSide(M) {
+    var wl = state.wishlist || [];
+    document.getElementById("wishlist").innerHTML = wl.length ? wl.map(function (w) {
+      var n = daysBetween(TODAY, parseIso(w.revisit));
+      var chip = n <= 0 ? '<span class="chip good">Ready to decide</span>' : '<span class="chip info">' + n + (n === 1 ? " day" : " days") + " to go</span>";
+      return '<li><span class="grow">' + esc(w.item) + ' <span class="num small muted">' + fmt(w.price) + "</span></span>" + chip +
+        '<span class="row"><button class="btn sm" type="button" data-recheck="' + w.id + '">Ask again</button><button class="btn sm" type="button" data-bought="' + w.id + '">Bought it</button><button class="btn sm ghost" type="button" data-letgo="' + w.id + '">Let it go</button></span></li>';
+    }).join("") : '<li class="muted">Nothing here. When the coach says wait, add the item and it reminds you when the time is up.</li>';
+    var sk = state.skipped || [];
+    var total = sk.reduce(function (a, s) { return a + s.price; }, 0);
+    document.getElementById("skippedTotal").textContent = fmt(total);
+    document.getElementById("skippedSub").textContent = sk.length ? "kept by skipping " + sk.length + (sk.length === 1 ? " impulse buy" : " impulse buys") : "kept by skipping impulse buys. Skip one and it shows up here.";
+  }
+
+  function showVerdict(r) {
+    var words = { go: "Go ahead", wait: "Wait", skip: "Skip it" };
+    var html = '<div class="verdict ' + r.verdict + '"><div class="panel-head"><span class="word">' + words[r.verdict] + '</span><span class="small muted">' + esc(r.input.item) + " · " + fmt(r.input.price) + "</span></div>" +
+      '<div class="meter" aria-label="Score ' + r.score + ' out of 100"><i style="left:' + r.score + '%"></i></div>' +
+      "<p><b>" + esc(r.advice) + "</b></p>" +
+      '<ul class="reasons">' + r.reasons.map(function (x) { return '<li class="' + x[0] + '">' + esc(x[1]) + "</li>"; }).join("") + "</ul>" +
+      '<div class="row">' +
+      (r.verdict !== "skip" || r.input.type === "need" ? '<button class="btn ' + (r.verdict === "go" ? "primary" : "") + '" type="button" id="vBuy">I bought it</button>' : "") +
+      (r.input.type === "want" ? '<button class="btn ' + (r.verdict === "wait" ? "primary" : "") + '" type="button" id="vWait">Wait ' + r.cool + (r.cool === 1 ? " day" : " days") + "</button>" : "") +
+      (r.input.type === "want" ? '<button class="btn ' + (r.verdict === "skip" ? "primary" : "") + '" type="button" id="vSkip">Skip it and keep ' + fmt(r.input.price) + "</button>" : "") +
+      "</div></div>";
+    var box = document.getElementById("verdict");
+    box.innerHTML = html; box.hidden = false;
+    document.getElementById("verdictEmpty").hidden = true;
+    var buy = document.getElementById("vBuy"), wait = document.getElementById("vWait"), skip = document.getElementById("vSkip");
+    if (buy) buy.onclick = function () { addTx({ date: iso(TODAY), desc: r.input.item, amount: -r.input.price, cat: r.input.cat }); removeWish(r.input.item); toast("Logged. Your allowance is updated."); resetCoach(); };
+    if (wait) wait.onclick = function () {
+      removeWish(r.input.item);
+      state.wishlist.push({ id: uid(), item: r.input.item, price: r.input.price, cat: r.input.cat, added: iso(TODAY), revisit: iso(addDays(TODAY, r.cool)) });
+      commit(); toast("Added to your cooling-off list. You'll see a reminder in " + r.cool + (r.cool === 1 ? " day." : " days.")); resetCoach();
+    };
+    if (skip) skip.onclick = function () { removeWish(r.input.item); state.skipped.push({ item: r.input.item, price: r.input.price, date: iso(TODAY) }); commit(); toast("Skipped. " + fmt(r.input.price) + " stays in your pocket."); resetCoach(); };
+  }
+  function resetCoach() {
+    document.getElementById("coachForm").reset();
+    document.getElementById("verdict").hidden = true;
+    document.getElementById("verdictEmpty").hidden = false;
+  }
+  function removeWish(item) { state.wishlist = (state.wishlist || []).filter(function (w) { return w.item.toLowerCase() !== item.toLowerCase(); }); }
+
+  function renderTx() {
+    var months = {};
+    state.tx.forEach(function (t) { months[t.date.slice(0, 7)] = 1; });
+    months[monthKey(TODAY)] = 1;
+    var fm = document.getElementById("fMonth"), cur = fm.value || monthKey(TODAY);
+    fm.innerHTML = '<option value="all">All months</option>' + Object.keys(months).sort().reverse().map(function (k) {
+      var p = k.split("-"); return '<option value="' + k + '">' + new Date(+p[0], +p[1] - 1, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" }) + "</option>";
+    }).join("");
+    fm.value = months[cur] || cur === "all" ? cur : monthKey(TODAY);
+    var fc = document.getElementById("fCat"), cc = fc.value || "all";
+    fc.innerHTML = '<option value="all">All categories</option>' + categories().map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("");
+    fc.value = cc;
+    var q = document.getElementById("fSearch").value.trim().toLowerCase();
+    var list = state.tx.filter(function (t) {
+      return (fm.value === "all" || t.date.slice(0, 7) === fm.value) && (fc.value === "all" || t.cat === fc.value) && (!q || t.desc.toLowerCase().indexOf(q) >= 0);
+    }).sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+    var inn = 0, out = 0;
+    list.forEach(function (t) { if (EXCLUDED[t.cat]) { if (t.cat === "Income") inn += t.amount; } else out += -t.amount; });
+    document.getElementById("txSummary").textContent = list.length + " transactions · " + fmt(inn) + " in · " + fmt(out) + " spent";
+    var opts = categories();
+    document.getElementById("txBody").innerHTML = list.length ? list.slice(0, 400).map(function (t) {
+      return "<tr><td class=\"num small\">" + parseIso(t.date).toLocaleDateString(undefined, { day: "numeric", month: "short" }) + "</td><td>" + esc(t.desc) + '</td><td><select data-cat="' + t.id + '" aria-label="Category">' +
+        opts.map(function (c) { return "<option" + (c === t.cat ? " selected" : "") + ">" + esc(c) + "</option>"; }).join("") +
+        '</select></td><td class="amt' + (t.amount > 0 ? " in" : "") + '">' + (t.amount > 0 ? "+" : "") + fmt(t.amount, { maximumFractionDigits: 2 }) + '</td><td><button class="btn sm ghost" type="button" data-del="' + t.id + '" aria-label="Delete">✕</button></td></tr>';
+    }).join("") : '<tr><td colspan="5" class="muted">No transactions match.</td></tr>';
+  }
+
+  function renderPlan() {
+    var s = state.settings;
+    var set = function (id, v) { var el = document.getElementById(id); if (document.activeElement !== el) el.value = v; };
+    set("sIncome", s.income); set("sPayday", s.payday); set("sSave", s.savings);
+    var sc = document.getElementById("sCur");
+    if (!sc.options.length) sc.innerHTML = Object.keys(CURRENCIES).map(function (c) { return "<option>" + c + "</option>"; }).join("");
+    sc.value = s.currency;
+    var cats = Object.keys(state.budgets);
+    var total = cats.reduce(function (a, c) { return a + (+state.budgets[c] || 0); }, 0);
+    var room = (+s.income || 0) - (+s.savings || 0);
+    document.getElementById("budgetTotal").innerHTML = fmt(total) + " budgeted of " + fmt(room) + (total > room ? ' <span class="chip bad">over by ' + fmt(total - room) + "</span>" : "");
+    var bf = document.getElementById("budgetForm");
+    if (!bf.contains(document.activeElement)) {
+      bf.innerHTML = '<div class="fields">' + cats.map(function (c, i) {
+        return '<label class="field"><span>' + esc(c) + '</span><span class="row" style="flex-wrap:nowrap"><input type="number" min="0" step="100" id="bud-' + i + '" data-bud="' + esc(c) + '" value="' + state.budgets[c] + '"><button class="btn sm ghost" type="button" data-rmcat="' + esc(c) + '" aria-label="Remove ' + esc(c) + '">✕</button></span></label>';
+      }).join("") + "</div>";
+    }
+    document.getElementById("billList").innerHTML = state.bills.length ? state.bills.slice().sort(function (a, b) { return a.day - b.day; }).map(function (b) {
+      return '<li><span class="grow">' + esc(b.name) + ' <span class="small muted">day ' + b.day + " · " + esc(b.cat) + '</span></span><span class="num">' + fmt(b.amount) + '</span><button class="btn sm ghost" type="button" data-rmbill="' + b.id + '" aria-label="Remove ' + esc(b.name) + '">✕</button></li>';
+    }).join("") : '<li class="muted">No bills yet.</li>';
+    ["cCat", "tCat", "bCat"].forEach(function (id) {
+      var el = document.getElementById(id), v = el.value;
+      var list = id === "tCat" ? categories() : spendCats();
+      el.innerHTML = list.map(function (c) { return "<option>" + esc(c) + "</option>"; }).join("");
+      el.value = list.indexOf(v) >= 0 ? v : (id === "cCat" ? "Shopping" : list[0]);
+      if (!el.value) el.value = list[0];
+    });
+  }
+
+  // ---------- actions ----------
+  function commit() { save(); render(); }
+  function leaveSample() {
+    if (!state.sample) return;
+    state = { sample: false, settings: state.settings, budgets: state.budgets, bills: state.bills, tx: [], wishlist: [], skipped: [] };
+  }
+  function addTx(t) { state.tx.push(Object.assign({ id: uid() }, t)); commit(); }
+  function toast(msg) {
+    var el = document.getElementById("toast");
+    el.textContent = msg; el.hidden = false;
+    clearTimeout(toast.t); toast.t = setTimeout(function () { el.hidden = true; }, 3200);
+  }
+
+  document.getElementById("clearSample").onclick = function () { leaveSample(); commit(); toast("Examples cleared. Your settings, budgets and bills are kept so you can edit them."); };
+
+  document.getElementById("coachForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = e.target;
+    var r = coach({
+      item: document.getElementById("cItem").value.trim(),
+      price: +document.getElementById("cPrice").value,
+      cat: document.getElementById("cCat").value,
+      type: f.querySelector('input[name="cType"]:checked').value,
+      wait: f.querySelector('input[name="cWait"]:checked').value,
+      mood: f.querySelector('input[name="cMood"]:checked').value
+    });
+    showVerdict(r);
+  });
+
+  document.getElementById("txForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var amt = +document.getElementById("tAmt").value;
+    var dirIn = document.getElementById("tIn").checked;
+    var desc = document.getElementById("tDesc").value.trim();
+    var cat = document.getElementById("tCat").value;
+    leaveSample();
+    addTx({ date: document.getElementById("tDate").value, desc: desc, amount: dirIn ? amt : -amt, cat: cat });
+    e.target.reset(); document.getElementById("tDate").value = iso(TODAY);
+    toast("Added.");
+  });
+  document.getElementById("tDesc").addEventListener("input", function () {
+    var c = categorize(this.value, document.getElementById("tIn").checked ? 1 : -1);
+    if (c !== "Other") document.getElementById("tCat").value = c;
+  });
+  ["fMonth", "fCat"].forEach(function (id) { document.getElementById(id).addEventListener("change", renderTx); });
+  document.getElementById("fSearch").addEventListener("input", renderTx);
+
+  document.getElementById("setForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    state.settings.income = +document.getElementById("sIncome").value || 0;
+    state.settings.payday = Math.min(31, Math.max(1, +document.getElementById("sPayday").value || 1));
+    state.settings.savings = +document.getElementById("sSave").value || 0;
+    state.settings.currency = document.getElementById("sCur").value;
+    commit(); toast("Saved.");
+  });
+  document.getElementById("budgetForm").addEventListener("change", function (e) {
+    var c = e.target.getAttribute("data-bud"); if (!c) return;
+    state.budgets[c] = +e.target.value || 0; save(); render();
+  });
+  document.getElementById("addCat").onclick = function () {
+    var n = document.getElementById("newCat").value.trim(); if (!n || state.budgets[n] != null) return;
+    state.budgets[n] = 0; document.getElementById("newCat").value = ""; commit();
+  };
+  document.getElementById("billForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    state.bills.push({ id: uid(), name: document.getElementById("bName").value.trim(), amount: +document.getElementById("bAmt").value, day: Math.min(31, Math.max(1, +document.getElementById("bDay").value)), cat: document.getElementById("bCat").value });
+    e.target.reset(); commit(); toast("Bill added.");
+  });
+
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-del],[data-rmcat],[data-rmbill],[data-recheck],[data-bought],[data-letgo]"); if (!t) return;
+    var id;
+    if ((id = t.getAttribute("data-del"))) { state.tx = state.tx.filter(function (x) { return x.id !== id; }); commit(); }
+    else if ((id = t.getAttribute("data-rmcat"))) { delete state.budgets[id]; commit(); }
+    else if ((id = t.getAttribute("data-rmbill"))) { state.bills = state.bills.filter(function (x) { return x.id !== id; }); commit(); }
+    else if ((id = t.getAttribute("data-recheck"))) {
+      var w = state.wishlist.find(function (x) { return x.id === id; }); if (!w) return;
+      location.hash = "coach"; show("coach");
+      document.getElementById("cItem").value = w.item; document.getElementById("cPrice").value = w.price; document.getElementById("cCat").value = w.cat;
+      document.getElementById("cWant").checked = true;
+      document.getElementById("coachForm").requestSubmit();
+    }
+    else if ((id = t.getAttribute("data-bought"))) {
+      var b = state.wishlist.find(function (x) { return x.id === id; }); if (!b) return;
+      state.wishlist = state.wishlist.filter(function (x) { return x.id !== id; });
+      addTx({ date: iso(TODAY), desc: b.item, amount: -b.price, cat: b.cat }); toast("Logged.");
+    }
+    else if ((id = t.getAttribute("data-letgo"))) {
+      var g = state.wishlist.find(function (x) { return x.id === id; }); if (!g) return;
+      state.wishlist = state.wishlist.filter(function (x) { return x.id !== id; });
+      state.skipped.push({ item: g.item, price: g.price, date: iso(TODAY) }); commit(); toast(fmt(g.price) + " kept.");
+    }
+  });
+  document.addEventListener("change", function (e) {
+    var id = e.target.getAttribute && e.target.getAttribute("data-cat"); if (!id) return;
+    var t = state.tx.find(function (x) { return x.id === id; }); if (t) { t.cat = e.target.value; commit(); }
+  });
+
+  // ---------- CSV import ----------
+  var pending = [];
+  function parseCSV(text) {
+    var rows = [], row = [], field = "", q = false;
+    var delim = (text.split("\n")[0].match(/;/g) || []).length > (text.split("\n")[0].match(/,/g) || []).length ? ";" : (text.indexOf("\t") >= 0 && text.indexOf(",") < 0 ? "\t" : ",");
+    for (var i = 0; i < text.length; i++) {
+      var ch = text[i];
+      if (q) { if (ch === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else q = false; } else field += ch; }
+      else if (ch === '"') q = true;
+      else if (ch === delim) { row.push(field); field = ""; }
+      else if (ch === "\n" || ch === "\r") { if (ch === "\r" && text[i + 1] === "\n") i++; row.push(field); rows.push(row); row = []; field = ""; }
+      else field += ch;
+    }
+    if (field || row.length) { row.push(field); rows.push(row); }
+    return rows.map(function (r) { return r.map(function (c) { return c.trim(); }); }).filter(function (r) { return r.some(function (c) { return c; }); });
+  }
+  var MON = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+  function parseDate(s, order) {
+    s = s.trim(); var m;
+    if ((m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/))) return mk(+m[1], +m[2], +m[3]);
+    if ((m = s.match(/^(\d{1,2})[-\/. ]([A-Za-z]{3})[A-Za-z]*[-\/. ,]*(\d{2,4})/))) return mk(yr(m[3]), MON[m[2].toLowerCase()], +m[1]);
+    if ((m = s.match(/^([A-Za-z]{3})[A-Za-z]* (\d{1,2}),? (\d{4})/))) return mk(+m[3], MON[m[1].toLowerCase()], +m[2]);
+    if ((m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/))) return order === "MDY" ? mk(yr(m[3]), +m[1], +m[2]) : mk(yr(m[3]), +m[2], +m[1]);
+    return null;
+    function yr(v) { v = +v; return v < 100 ? 2000 + v : v; }
+    function mk(y, mo, d) { if (!mo || mo > 12 || d > 31 || !d) return null; return y + "-" + pad(mo) + "-" + pad(d); }
+  }
+  function num(s) {
+    if (s == null) return NaN; s = String(s).trim(); if (!s) return NaN;
+    var neg = /^\(.*\)$/.test(s) || /-\s*$|^-|dr$/i.test(s);
+    var v = parseFloat(s.replace(/[^0-9.]/g, ""));
+    return isNaN(v) ? NaN : (neg ? -v : v);
+  }
+  function readStatement(text) {
+    var rows = parseCSV(text);
+    var hi = -1, H;
+    for (var i = 0; i < Math.min(rows.length, 40); i++) {
+      var r = rows[i].map(function (c) { return c.toLowerCase(); });
+      if (r.some(function (c) { return /date/.test(c); }) && r.some(function (c) { return /amount|debit|withdraw|credit|deposit|narration|description|details|particulars/.test(c); })) { hi = i; H = r; break; }
+    }
+    if (hi < 0) return { error: "I couldn't find a header row with a date and an amount column. Check that this is the transactions CSV from your bank." };
+    var find = function (re, not) { for (var k = 0; k < H.length; k++) if (re.test(H[k]) && !(not && not.test(H[k]))) return k; return -1; };
+    var cDate = find(/^(txn |tran(saction)? |value |posting |booking )?date|date$/i, /value/); if (cDate < 0) cDate = find(/date/);
+    var cDesc = find(/narration|description|details|particulars|remarks|merchant|payee|name|memo|transaction$/i);
+    var cDebit = find(/debit|withdraw|dr\b|paid out|money out/i);
+    var cCredit = find(/credit|deposit|cr\b|paid in|money in/i, /card/);
+    var cAmt = find(/^amount|amount$|amt\b|^value$/i, /balance/);
+    var cType = find(/^type$|dr\/cr|cr\/dr|debit\/credit/i);
+    if (cDate < 0 || (cAmt < 0 && cDebit < 0 && cCredit < 0)) return { error: "Found a header but no amount columns. Columns seen: " + H.join(", ") };
+    var body = rows.slice(hi + 1);
+    var order = "DMY";
+    body.forEach(function (r) { var m = (r[cDate] || "").match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.]/); if (m && +m[2] > 12) order = "MDY"; });
+    if (state.settings.currency === "USD") { var anyD = body.some(function (r) { var m = (r[cDate] || "").match(/^(\d{1,2})[-\/.]/); return m && +m[1] > 12; }); if (!anyD) order = "MDY"; }
+    var out = [], skipped = 0;
+    body.forEach(function (r) {
+      var d = parseDate(r[cDate] || "", order); if (!d) { skipped++; return; }
+      var amt;
+      if (cDebit >= 0 || cCredit >= 0) {
+        var db = cDebit >= 0 ? num(r[cDebit]) : NaN, cr = cCredit >= 0 ? num(r[cCredit]) : NaN;
+        if (!isNaN(db) && db !== 0) amt = -Math.abs(db); else if (!isNaN(cr) && cr !== 0) amt = Math.abs(cr);
+        else if (cAmt >= 0) amt = num(r[cAmt]);
+      } else amt = num(r[cAmt]);
+      if (cType >= 0 && amt != null && !isNaN(amt)) { var ty = (r[cType] || "").toLowerCase(); if (/^d|debit|dr/.test(ty)) amt = -Math.abs(amt); else if (/^c|credit|cr/.test(ty)) amt = Math.abs(amt); }
+      if (amt == null || isNaN(amt) || amt === 0) { skipped++; return; }
+      var desc = (cDesc >= 0 ? r[cDesc] : "") || "Transaction";
+      out.push({ date: d, desc: desc.replace(/\s+/g, " ").slice(0, 120), amount: Math.round(amt * 100) / 100, cat: categorize(desc, amt) });
+    });
+    return { rows: out, skipped: skipped };
+  }
+  function txKey(t) { return t.date + "|" + t.amount + "|" + t.desc.toLowerCase().slice(0, 40); }
+
+  document.getElementById("csvFile").addEventListener("change", function () {
+    var f = this.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () { document.getElementById("csvText").value = rd.result; document.getElementById("csvPreview").click(); };
+    rd.readAsText(f);
+  });
+  document.getElementById("csvPreview").onclick = function () {
+    var res = readStatement(document.getElementById("csvText").value || "");
+    var msg = document.getElementById("csvMsg"), box = document.getElementById("csvResult");
+    if (res.error) { msg.textContent = ""; box.innerHTML = '<div class="empty">' + esc(res.error) + "</div>"; return; }
+    var existing = {}; (state.sample ? [] : state.tx).forEach(function (t) { existing[txKey(t)] = 1; });
+    pending = res.rows.filter(function (t) { return !existing[txKey(t)]; });
+    var dupes = res.rows.length - pending.length;
+    var spent = pending.reduce(function (a, t) { return a + (t.amount < 0 && !EXCLUDED[t.cat] ? -t.amount : 0); }, 0);
+    msg.textContent = pending.length + " new transactions" + (dupes ? ", " + dupes + " already imported" : "") + (res.skipped ? ", " + res.skipped + " lines skipped" : "");
+    box.innerHTML = pending.length ? '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Category</th><th class="amt">Amount</th></tr></thead><tbody>' +
+      pending.slice(0, 8).map(function (t) { return '<tr><td class="num small">' + t.date + "</td><td>" + esc(t.desc) + "</td><td>" + esc(t.cat) + '</td><td class="amt' + (t.amount > 0 ? " in" : "") + '">' + fmt(t.amount, { maximumFractionDigits: 2 }) + "</td></tr>"; }).join("") +
+      "</tbody></table></div>" + '<p class="small muted">Showing ' + Math.min(8, pending.length) + " of " + pending.length + ". Total spending " + fmt(spent) + ".</p>" +
+      '<div class="row"><button class="btn primary" type="button" id="csvImport">Import ' + pending.length + " transactions</button>" + (state.sample ? '<span class="small muted">This replaces the example transactions.</span>' : "") + "</div>"
+      : '<div class="empty">Nothing new to import.</div>';
+    var b = document.getElementById("csvImport");
+    if (b) b.onclick = function () {
+      leaveSample();
+      pending.forEach(function (t) { state.tx.push(Object.assign({ id: uid() }, t)); });
+      var inc = pending.filter(function (t) { return t.cat === "Income" && t.date.slice(0, 7) === monthKey(TODAY); }).reduce(function (a, t) { return a + t.amount; }, 0);
+      if (inc > 0 && (!state.settings.income || state.settings.income === 85000)) state.settings.income = Math.round(inc);
+      var n = pending.length; pending = [];
+      box.innerHTML = ""; msg.textContent = ""; document.getElementById("csvText").value = ""; document.getElementById("csvFile").value = "";
+      commit(); toast("Imported " + n + " transactions."); location.hash = "overview";
+    };
+  };
+
+  // ---------- backup ----------
+  document.getElementById("exportBtn").onclick = function () {
+    document.getElementById("backupText").value = JSON.stringify(state);
+    document.getElementById("copyBtn").hidden = false;
+  };
+  document.getElementById("copyBtn").onclick = function () {
+    var ta = document.getElementById("backupText");
+    var fallback = function () { ta.focus(); ta.select(); toast("Selected. Press Ctrl+C or Cmd+C to copy."); };
+    try { navigator.clipboard.writeText(ta.value).then(function () { toast("Backup copied. Paste it somewhere safe."); }, fallback); } catch (e) { fallback(); }
+  };
+  document.getElementById("importBtn").onclick = function () {
+    try {
+      var d = JSON.parse(document.getElementById("backupText").value);
+      if (!d || !d.settings || !Array.isArray(d.tx)) throw new Error("bad");
+      d.wishlist = d.wishlist || []; d.skipped = d.skipped || []; d.bills = d.bills || []; d.budgets = d.budgets || {};
+      state = d; commit(); toast("Restored " + d.tx.length + " transactions.");
+    } catch (e) { toast("That isn't a Spend Coach backup. Paste the full text from Show backup."); }
+  };
+  document.getElementById("resetBtn").onclick = function () { document.getElementById("resetConfirm").hidden = false; };
+  document.getElementById("resetNo").onclick = function () { document.getElementById("resetConfirm").hidden = true; };
+  document.getElementById("resetYes").onclick = function () {
+    state = { sample: false, settings: { currency: state.settings.currency, income: 0, payday: 1, savings: 0 }, budgets: Object.assign({}, DEFAULT_BUDGETS), bills: [], tx: [], wishlist: [], skipped: [] };
+    Object.keys(state.budgets).forEach(function (k) { state.budgets[k] = 0; });
+    document.getElementById("resetConfirm").hidden = true; commit(); toast("Everything deleted. Start with Budget & bills."); location.hash = "plan";
+  };
+
+  // ---------- views ----------
+  var VIEWS = ["overview", "coach", "transactions", "plan", "bank"];
+  function show(v) {
+    if (VIEWS.indexOf(v) < 0) v = "overview";
+    view = v;
+    VIEWS.forEach(function (x) { document.getElementById("v-" + x).hidden = x !== v; });
+    document.querySelectorAll(".tabs a").forEach(function (a) { if (a.dataset.view === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  }
+  window.addEventListener("hashchange", function () { show(location.hash.slice(1)); window.scrollTo(0, 0); });
+
+  document.getElementById("tDate").value = iso(TODAY);
+  render();
+  show(location.hash.slice(1));
+  // refresh once the date rolls over if the page stays open
+  setInterval(function () { var n = new Date(); if (iso(n) !== iso(TODAY)) { TODAY = n; render(); } }, 60000);
+})();
+</script>

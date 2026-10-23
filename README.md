@@ -30,6 +30,17 @@ Data is saved in the browser's local storage. Use **Settings & backup** to expor
 - **Back up / Restore:** download a copy of the board, or replace it for everyone from a copy.
 - **Files:** GitHub Pages can't store uploads, so add work as links (for example Google Drive).
 
+## Spend Coach
+
+`money/index.html` is a personal money dashboard (one file, no build step).
+
+- **Overview:** what's safe to spend today, income, spending, bills still due, savings goal, a spending-pace chart, budget bars and upcoming bills.
+- **Reminders:** today's allowance, spending faster than planned, budgets at 80% or over, bills due within 5 days, repeat food-delivery or taxi orders, no-spend streaks, and cooling-off items ready to decide.
+- **Should I buy it?:** enter an item, price, need or want, and your mood. The coach answers Go ahead, Wait or Skip it, with reasons (share of what's left, new daily allowance, category budget, pace, payday, hours of work). Waiting adds it to a cooling-off list; skipping adds to a "money you didn't spend" total.
+- **Connect bank:** import a CSV statement from any bank or card. Columns and categories are detected, and lines you've already imported are skipped. Live bank links need an Account Aggregator (India) or Plaid/TrueLayer service and a small server; this page doesn't have one.
+
+It opens with example numbers. Data is saved only in the browser's local storage; use **Back up or move your data** to copy it.
+
 ## Video studio
 
 Claude Code makes videos here with HyperFrames (skills in `.claude/skills/`). Each video lives in `videos/<name>/`. `CLAUDE.md` maps trending styles (vertical reels, word-by-word captions, kinetic type, beat-synced edits, launch promos) to the right tool. `scripts/setup-video-tools.sh` installs auto-editor, PySceneDetect and yt-dlp (`--full` adds Demucs); cloud sessions run it automatically. To control DaVinci Resolve or transcribe locally, see `docs/local-video-setup.md`.
