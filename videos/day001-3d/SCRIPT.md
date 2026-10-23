@@ -15,4 +15,4 @@ This is the voiceover text exactly as the person wrote it. The reel's screens fo
 11. और जो नहीं आए? 2 days बाद message, 1 week बाद call। हर बार एक ही question: "कब आ सकते हैं?"
 12. साथ ही, सब चीज़ एक Excel sheet पे track करो। हर enquiry की एक row — नाम, class, phone, enquiry की date, visit हुई या नहीं, और admission हुआ या नहीं।
 13. हर week count करो — कितनी enquiries, कितने visits, कितने admissions।
-14. तो, fees पे नहीं, visit पे focus करो। Ready messages चाहिए? Comment करो ENQUIRY। और follow करो।
+14. तो, fees पे नहीं, visit पे focus करो। Excel tracking sheet चाहिए? Comment करो ENQUIRY। और follow करो।

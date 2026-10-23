@@ -7,9 +7,9 @@ pauses, paste them into SPANS, set VOICE to the file, and run  python3 tools/bui
 import json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-VOICE_LEN = 111.2  # seconds in raw/voice.m4a
-VOICE = "raw/voice.m4a"  # the person's recording: part 1 + 0.3 s + part 2
-SPANS = [[0.4, 5.35], [5.5, 11.55], [12.05, 18.55], [18.95, 28.5], [29.15, 36.65], [37.05, 45.9], [47.25, 53.15], [53.9, 66.05], [66.75, 69.6], [70.05, 79.4], [79.85, 87.5], [87.8, 98.25], [99.98, 104.62], [105.12, 110.67]]  # measured from the recording's pauses (lines 1–12 in part 1, 13–14 in part 2)
+VOICE_LEN = 100.4  # seconds in raw/voice.m4a (built by tools/voice.py)
+VOICE = "raw/voice.m4a"  # the person's recording: recording 1 to 91.8 s + recording 2, pauses cut to 0.3 s
+SPANS = [[0.22, 5.09], [5.39, 9.2], [9.44, 12.22], [12.44, 20.5], [20.89, 29.27], [29.47, 35.89], [36.09, 40.87], [41.09, 51.58], [51.86, 53.87], [54.05, 63.57], [63.84, 71.62], [71.96, 85.21], [85.49, 89.47], [89.71, 100.24]]  # fitted by tools/voice.py (lines 1–13 in recording 1, 14 in recording 2)
 
 TEXT = [re.sub(r"^\d+\.\s*", "", l).strip() for l in (ROOT / "SCRIPT.md").read_text().splitlines() if re.match(r"^\d+\.\s", l)]
 assert len(TEXT) == 14, len(TEXT)
@@ -33,7 +33,7 @@ EV = {
     "fee": at(5, 0.72), "soch": at(6, 0.2), "grey": at(6, 0.7), "cal": at(8, 0.3),
     "three": [at(9, 0.35), at(9, 0.6), at(9, 0.82)], "msg": at(10, 0.15), "ring": at(10, 0.38), "kab": at(10, 0.78),
     "rows": [at(11, 0.3 + 0.13 * k) for k in range(5)], "bars": [at(12, 0.3), at(12, 0.55), at(12, 0.8)],
-    "endcard": at(13, 0.42),
+    "endcard": at(13, 0.45),
 }
 TIMING = {"lines": [{"s": s, "e": e} for s, e, _ in LINES], "shots": [{"n": n, "a": a, "b": b} for n, a, b in SHOTS], "ev": EV, "end": END}
 TJ = json.dumps(TIMING)
@@ -141,7 +141,7 @@ blocks = "\n".join(f'    <div id="c{k}" class="card"><span class="pill {cls}">{p
       <div id="end-lock"><div id="end-logo">KS</div><div id="end-name">Coaching Ka System</div></div>
       <div class="c" style="top: 800px"><span id="end-handle">@coachingkasystem</span></div>
       <div class="c" style="top: 930px"><span id="end-cta">Comment <span style="color: #fbb524">ENQUIRY</span></span></div>
-      <div class="c" style="top: 1060px; font-size: 36px; font-weight: 600; color: #c7cfe0">Ready messages ke liye</div>
+      <div class="c" style="top: 1060px; font-size: 36px; font-weight: 600; color: #c7cfe0">Excel tracking sheet ke liye</div>
       <div class="c" style="top: 1140px; font-size: 48px; font-weight: 800; color: #fbb524">Follow for Day 002</div>
     </div>
   </div>
@@ -186,7 +186,7 @@ EN = [
     "And those who don't come? A message after 2 days, a call after 1 week. Always the same question: *\"When can you visit?\"*",
     "Also, track everything in an *Excel sheet.* One row per enquiry: name, class, phone, enquiry date, visited or not, admitted or not.",
     "Every week, count: how many enquiries, how many visits, how many *admissions.*",
-    "So focus on the *visit,* not the fees. Want ready-made messages? Comment *ENQUIRY.* And follow.",
+    "So focus on the *visit,* not the fees. Want the *Excel tracking sheet?* Comment *ENQUIRY.* And follow.",
 ]
 assert len(EN) == len(LINES)
 subs = []  # [html, start, end]
