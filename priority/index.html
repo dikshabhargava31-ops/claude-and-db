@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>IPA Priority Board</title>
+<meta name="description" content="IPA projects and tasks in priority order, with what to do now and a timeline.">
+<style>body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: workspace page — project gallery on top, do-this-now strip, tabbed task views (Kanban / By day / By project), then a day-grid timeline of projects. */
+:root{
+  --bg:#ffffff; --panel:#f7f7f5; --sunk:#efefec; --line:#e6e5e1; --hover:#f3f3f0;
+  --ink:#1f1f1d; --muted:#6b6a65; --faint:#8f8e88;
+  --accent:#c2700a; --accent-soft:#fbefdd;
+  --crit:#c4362b; --crit-soft:#fbe4e1; --warn:#9a6900; --warn-soft:#faf0d4;
+  --ok:#2f7d4f; --ok-soft:#e1f2e7; --info:#2f63b8; --info-soft:#e3ebf8; --grey-soft:#ececea;
+  --h1:#e9dcf6; --h2:#dcebf8; --h3:#fbe7d2; --h4:#f8dcdc; --h5:#dff1e6; --h6:#f3ecd2; --h7:#e2e6ef;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#191919; --panel:#202020; --sunk:#2a2a2a; --line:#323232; --hover:#262626;
+  --ink:#ebebe8; --muted:#a3a29c; --faint:#85847e;
+  --accent:#f0a33a; --accent-soft:#3a2a12;
+  --crit:#f0786d; --crit-soft:#3d1f1d; --warn:#e8b94a; --warn-soft:#382d12;
+  --ok:#6cc893; --ok-soft:#183126; --info:#8ea8f0; --info-soft:#1e2640; --grey-soft:#2f2f2f;
+  --h1:#372c47; --h2:#223447; --h3:#45311c; --h4:#452626; --h5:#1f3a2b; --h6:#3d3519; --h7:#2a2f3c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#191919; --panel:#202020; --sunk:#2a2a2a; --line:#323232; --hover:#262626;
+  --ink:#ebebe8; --muted:#a3a29c; --faint:#85847e;
+  --accent:#f0a33a; --accent-soft:#3a2a12;
+  --crit:#f0786d; --crit-soft:#3d1f1d; --warn:#e8b94a; --warn-soft:#382d12;
+  --ok:#6cc893; --ok-soft:#183126; --info:#8ea8f0; --info-soft:#1e2640; --grey-soft:#2f2f2f;
+  --h1:#372c47; --h2:#223447; --h3:#45311c; --h4:#452626; --h5:#1f3a2b; --h6:#3d3519; --h7:#2a2f3c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body)}
+.wrap{max-width:1200px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.015em}
+h1{font-size:clamp(1.9rem,4.5vw,2.6rem);line-height:1.05}
+h2{font-size:1.35rem}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:.85rem}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0}
+
+header{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:end;justify-content:space-between}
+.btn{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:6px 12px;font-weight:500;font-size:.9rem}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--info);color:#fff;border-color:var(--info)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.danger{color:var(--crit);border-color:var(--crit)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:.88rem;color:var(--muted)}
+.stat b{font-variant-numeric:tabular-nums;color:var(--ink)} .stat .c b{color:var(--crit)}
+
+/* tabs */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{all:unset;cursor:pointer;padding:7px 10px;font-size:.9rem;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--ink);font-weight:500}
+.tabs button:focus-visible{outline:2px solid var(--accent)}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;line-height:1;padding:4px 8px;border-radius:999px;background:var(--grey-soft);color:var(--muted);white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.pill.prog{background:var(--info-soft);color:var(--info)}
+.pill.wait{background:var(--crit-soft);color:var(--crit)}
+.pill.done{background:var(--ok-soft);color:var(--ok)}
+.chip{font:500 .72rem/1 var(--f-mono);padding:4px 7px;border-radius:5px;background:var(--grey-soft);color:var(--muted);white-space:nowrap}
+.chip.crit{background:var(--crit-soft);color:var(--crit)} .chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.est{background:transparent;border:1px dashed var(--faint)}
+.pr{font:600 .7rem/1 var(--f-mono);padding:4px 6px;border-radius:4px;background:var(--ink);color:var(--bg)}
+
+/* gallery */
+.gallery{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(200px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px}
+.pcard{all:unset;cursor:pointer;display:grid;grid-template-rows:110px auto;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg);min-width:0}
+.pcard:hover{background:var(--hover)}
+.pcard:focus-visible{outline:2px solid var(--accent)}
+.cover{display:grid;place-items:center;position:relative}
+.cover svg{width:64px;height:64px;stroke:var(--ink);opacity:.72;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.cover .pr{position:absolute;top:8px;left:8px}
+.pbody{padding:10px 12px 12px;display:grid;gap:7px}
+.pbody .name{font-weight:600;line-height:1.25}
+.pbody .left{font-size:.82rem;color:var(--muted)}
+
+/* focus */
+.focus{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.focus .tag{font:600 .7rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--accent);writing-mode:horizontal-tb}
+.focus .t{font-weight:600;font-size:1.05rem}
+.focus .then{font-size:.85rem;color:var(--muted)}
+@media (max-width:620px){.focus{grid-template-columns:1fr}}
+
+/* kanban */
+.kanban{display:grid;grid-template-columns:repeat(4,minmax(240px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.col{background:var(--panel);border-radius:8px;padding:8px;display:grid;gap:6px;align-content:start;min-height:120px}
+.col.drop{outline:2px dashed var(--info);outline-offset:-2px}
+.col-head{display:flex;gap:8px;align-items:center;padding:2px 4px 6px}
+.tcard{all:unset;cursor:grab;display:grid;gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 10px;box-shadow:0 1px 1px rgb(0 0 0 / .04)}
+.tcard:hover{border-color:var(--faint)}
+.tcard:focus-visible{outline:2px solid var(--accent)}
+.tcard .t{display:flex;gap:8px;align-items:flex-start;font-size:.9rem;font-weight:500;overflow-wrap:anywhere}
+.tcard .t i{flex:none;width:14px;height:14px;border:1.5px solid var(--faint);border-radius:50%;margin-top:3px}
+.tcard.isdone .t i{background:var(--ok);border-color:var(--ok)}
+.tcard .meta,.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.proj{font-size:.78rem;color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.proj::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--sw,var(--sunk))}
+.col .more{justify-self:start}
+
+/* lists */
+.bucket{display:grid;gap:2px}
+.bucket h3{font-size:1rem;padding:10px 0 6px;display:flex;gap:8px;align-items:baseline}
+.bucket[data-b="over"] h3{color:var(--crit)}
+.row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;padding:8px 6px;border-bottom:1px solid var(--line)}
+.row:hover{background:var(--hover)}
+.row input{width:17px;height:17px;margin-top:3px;accent-color:var(--ok)}
+.row .t{min-width:0;overflow-wrap:anywhere;cursor:pointer}
+.row.isdone .t{text-decoration:line-through;color:var(--faint)}
+.row .right{display:flex;gap:6px;flex-wrap:wrap;justify-content:end}
+.group-head{display:flex;gap:10px;align-items:center;padding:14px 0 6px}
+
+/* timeline */
+.tl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+.tl{position:relative;min-width:1100px}
+.tl-days{display:grid;border-bottom:1px solid var(--line);background:var(--bg);position:relative}
+.tl-days div{font:.7rem var(--f-mono);color:var(--faint);text-align:center;padding:4px 0}
+.tl-days div.wk{color:var(--muted)} .tl-days div.now{color:var(--bg);background:var(--crit);border-radius:4px;margin:2px}
+.tl-months{display:grid;font-size:.8rem;font-weight:600;padding:6px 0 0}
+.tl-body{position:relative;display:grid;gap:10px;padding:12px 0 16px}
+.tl-grid{position:absolute;inset:0;display:grid;pointer-events:none}
+.tl-grid div{border-left:1px solid transparent}
+.tl-grid div.we{background:var(--panel)}
+.tl-grid div.now{border-left:2px solid var(--crit)}
+.tl-row{position:relative;height:34px}
+.tl-bar{all:unset;cursor:pointer;position:absolute;top:2px;height:30px;display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);box-shadow:0 1px 2px rgb(0 0 0 / .06);white-space:nowrap;overflow:hidden;font-size:.85rem;font-weight:500;min-width:40px}
+.tl-bar:hover{border-color:var(--faint)}
+.tl-bar .sw{width:10px;height:10px;border-radius:3px;flex:none}
+.tl-tick{position:absolute;bottom:-4px;width:6px;height:6px;border-radius:50%;background:var(--accent);transform:translateX(-50%)}
+.tl-tick.crit{background:var(--crit)}
+
+/* dialog */
+.scrim{position:fixed;inset:0;background:rgb(10 10 10 / .4);display:grid;place-items:center;padding:16px;z-index:20}
+.sheet{background:var(--bg);border:1px solid var(--line);border-radius:12px;width:min(720px,100%);max-height:calc(100% - 32px);overflow:auto;padding:20px;display:grid;gap:14px}
+.sheet.narrow{width:min(460px,100%)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.grid3{grid-template-columns:1fr}}
+.field{display:grid;gap:5px}
+.lbl{font:500 .72rem/1 var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.field input,.field select,.field textarea,.trow input,.trow select{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:7px 9px;width:100%}
+.field textarea{min-height:60px;resize:vertical}
+.tlist{display:grid;gap:6px}
+.trow{display:grid;grid-template-columns:minmax(0,1fr) 140px 130px auto;gap:6px;align-items:center}
+@media (max-width:620px){.trow{grid-template-columns:1fr 1fr auto}.trow [data-f="t"]{grid-column:1/-1}}
+.sheet-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.empty{border:1px dashed var(--line);border-radius:8px;padding:14px;color:var(--faint);font-size:.88rem}
+/* attention */
+.attention{border:1px solid var(--crit);background:var(--crit-soft);border-radius:8px;padding:12px 14px;gap:6px}
+.att-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;color:var(--crit)}
+.att-head .muted{color:var(--ink);opacity:.75}
+.att-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-top:1px solid rgb(196 54 43 / .2)}
+.chip.idle{background:var(--crit-soft);color:var(--crit)}
+
+/* quote */
+.quote{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;padding:18px 20px;border-radius:10px;background:var(--accent-soft)}
+.quote .mark{font:700 3.2rem/0.6 var(--f-display);color:var(--accent);padding-top:14px}
+.quote blockquote{margin:0;font:600 clamp(1.05rem,2.4vw,1.3rem)/1.35 var(--f-display);letter-spacing:-.01em;text-wrap:balance}
+.quote figcaption{margin-top:6px;font-size:.85rem;color:var(--muted)}
+@media (max-width:560px){.quote{grid-template-columns:minmax(0,1fr)}.quote .mark{display:none}}
+
+/* calendar */
+.cal-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.cal-bar h3{font-size:1.1rem;min-width:150px}
+.cal-scroll{overflow-x:auto}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(100px,1fr));min-width:720px;border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.cal .dow{font:500 .72rem var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 8px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--panel)}
+.cal .day{min-height:112px;padding:6px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;gap:4px;align-content:start;cursor:pointer}
+.cal .day:hover{background:var(--hover)}
+.cal .day.out{background:var(--panel)} .cal .day.out .dn{color:var(--faint)}
+.cal .dn{font:500 .8rem var(--f-mono);justify-self:end;width:24px;height:24px;display:grid;place-items:center;border-radius:50%}
+.cal .day.today .dn{background:var(--crit);color:#fff}
+.cal .ev{all:unset;cursor:pointer;display:block;font-size:.75rem;line-height:1.25;padding:3px 6px;border-radius:4px;background:var(--sw);color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal .ev.done{text-decoration:line-through;opacity:.6}
+.cal .ev.est{outline:1px dashed var(--faint);outline-offset:-1px}
+.cal .ev:focus-visible{outline:2px solid var(--accent)}
+.cal .more{font-size:.72rem;color:var(--muted);padding-left:4px}
+
+/* project folder */
+.panel{width:min(1240px,100%);height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);padding:0;gap:0;overflow:hidden}
+.panel-head{padding:18px 22px 0;display:grid;gap:10px;border-bottom:1px solid var(--line)}
+.panel-head .tabs{border-bottom:0}
+.panel-title{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.panel-title > div{display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-width:0}
+.panel-body{overflow:auto;padding:18px 22px 24px;display:grid;gap:18px;align-content:start}
+.ov{display:grid;gap:14px;max-width:760px}
+.drop{display:grid;gap:4px;place-items:center;text-align:center;border:1.5px dashed var(--line);border-radius:8px;padding:22px;color:var(--muted);cursor:pointer}
+.drop:hover,.drop.on{border-color:var(--info);background:var(--info-soft);color:var(--info)}
+.drop b{color:var(--ink)}
+.linkform{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:8px}
+.linkform input{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:7px 9px;width:100%}
+@media (max-width:620px){.linkform{grid-template-columns:1fr}}
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.file{border:1px solid var(--line);border-radius:8px;overflow:hidden;display:grid;grid-template-rows:100px auto;min-width:0}
+.file .thumb{background:var(--panel);display:grid;place-items:center;overflow:hidden;border:0;padding:0}
+.file .thumb img,.file .thumb video{width:100%;height:100%;object-fit:cover}
+.file .ext{font:600 .85rem var(--f-mono);color:var(--muted);border:1px solid var(--line);padding:8px 10px;border-radius:4px;background:var(--bg);text-transform:uppercase}
+.file .fb{padding:8px 10px 10px;display:grid;gap:6px}
+.file .fn{font-weight:500;font-size:.88rem;overflow-wrap:anywhere}
+.links{display:grid}
+.link{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 6px;border-bottom:1px solid var(--line)}
+.link:hover{background:var(--hover)}
+.link .ic{width:28px;height:28px;border-radius:6px;background:var(--panel);display:grid;place-items:center;font:600 .7rem var(--f-mono);color:var(--muted)}
+.link a{color:var(--ink);font-weight:500;text-decoration:none;overflow-wrap:anywhere}
+.link a:hover{text-decoration:underline}
+.sub{font-size:.95rem;display:flex;gap:8px;align-items:baseline}
+.lightbox{display:grid;gap:10px;justify-items:center}
+.lightbox img,.lightbox video{max-width:100%;max-height:75vh;border-radius:6px}
+#dlg2 .scrim{z-index:25}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;font-size:.88rem;z-index:30}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div style="display:grid;gap:8px">
+      <span class="muted small mono" id="today"></span>
+      <h1>IPA Priority Board</h1>
+      <div class="stat" id="stat"></div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="exportBtn" type="button">Export</button>
+      <button class="btn ghost" id="importBtn" type="button">Import</button>
+      <input type="file" id="importIn" accept=".json,application/json" hidden>
+      <button class="btn" id="addTaskBtn" type="button">+ Task</button>
+      <button class="btn primary" id="addBtn" type="button">+ Project</button>
+    </div>
+  </header>
+
+  <section class="focus" id="notice" hidden></section>
+
+  <figure class="quote" id="quote" aria-live="polite"></figure>
+
+  <section>
+    <h2>Projects</h2>
+    <div class="tabs" role="tablist" id="ptabs">
+      <button role="tab" data-pf="all" aria-selected="true" type="button">All projects</button>
+      <button role="tab" data-pf="In progress" aria-selected="false" type="button">In progress</button>
+      <button role="tab" data-pf="Not started" aria-selected="false" type="button">Not started</button>
+      <button role="tab" data-pf="Waiting" aria-selected="false" type="button">Waiting</button>
+      <button role="tab" data-pf="Done" aria-selected="false" type="button">Done</button>
+    </div>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
+  <section class="attention" id="attention" hidden aria-live="polite"></section>
+
+  <section class="focus" id="focus" aria-live="polite"><span class="tag">Do this now</span><span class="muted">Loading…</span><span></span></section>
+
+  <section>
+    <h2>Tasks</h2>
+    <div class="tabs" role="tablist" id="ttabs">
+      <button role="tab" data-tv="kanban" aria-selected="true" type="button">Kanban</button>
+      <button role="tab" data-tv="day" aria-selected="false" type="button">By day</button>
+      <button role="tab" data-tv="project" aria-selected="false" type="button">By project</button>
+      <button role="tab" data-tv="calendar" aria-selected="false" type="button">Calendar</button>
+    </div>
+    <div id="tasks"></div>
+  </section>
+
+  <section>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px 12px">
+      <h2>Timeline</h2><span class="muted small">Each bar runs from today to the project's last open deadline. Dots are task deadlines.</span>
+    </div>
+    <div class="tl-scroll"><div class="tl" id="timeline"></div></div>
+  </section>
+
+  <footer class="muted small" style="display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px">
+    <span>Your changes save in this browser. Use Export to back them up or to update <span class="mono">data.json</span> for everyone.</span>
+    <button class="btn ghost" id="resetBtn" type="button">Reload published board</button>
+  </footer>
+</div>
+
+<div id="dlg" hidden></div>
+<div id="dlg2" hidden></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+const TSTAT=["Not started","In progress","Waiting","Done"];
+const PSTAT=["Not started","In progress","Waiting","Done"];
+const ICONS={
+  check:'<rect x="14" y="8" width="36" height="48" rx="4"/><path d="M22 22h20M22 31h12"/><path d="M24 44l6 6 12-14"/>',
+  steps:'<path d="M8 52h14V40h14V28h14V14h6"/><path d="M48 14l8 0M52 10v8"/>',
+  cap:'<path d="M6 26l26-12 26 12-26 12z"/><path d="M16 31v12c6 6 26 6 32 0V31"/><path d="M58 26v14"/>',
+  play:'<rect x="6" y="14" width="52" height="36" rx="10"/><path d="M27 24v16l14-8z"/>',
+  grid:'<rect x="8" y="8" width="13" height="13" rx="2"/><rect x="25" y="8" width="13" height="13" rx="2"/><rect x="42" y="8" width="13" height="13" rx="2"/><rect x="8" y="25" width="13" height="13" rx="2"/><rect x="25" y="25" width="13" height="13" rx="2"/><rect x="42" y="25" width="13" height="13" rx="2"/><rect x="8" y="42" width="13" height="13" rx="2"/><rect x="25" y="42" width="13" height="13" rx="2"/><rect x="42" y="42" width="13" height="13" rx="2"/>',
+  briefcase:'<rect x="8" y="20" width="48" height="32" rx="4"/><path d="M24 20v-6h16v6M8 34h48"/>',
+  building:'<path d="M10 54V22l22-12 22 12v32"/><path d="M6 54h52M24 54V38h16v16M20 28h4M40 28h4"/>',
+  spark:'<path d="M32 8v48M8 32h48M15 15l34 34M49 15L15 49"/>'
+};
+let db=null, canWrite=true, projects=[], pf="all", tv="kanban", expanded={};
+let assetsNs=null, dlNs=null, filesBy={}, fileSubs={}, openP=null, pTab="overview";
+const TYPES={pdf:"application/pdf",png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",svg:"image/svg+xml",mp4:"video/mp4",webm:"video/webm",csv:"text/csv",md:"text/markdown",json:"application/json",txt:"text/plain"};
+const OFFICE=new Set(["doc","docx","xls","xlsx","ppt","pptx","odt","ods","odp","pages","numbers","key"]);
+try{tv=localStorage.getItem("pb-tv")||"kanban"}catch(e){}
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const today0=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const dl=s=>s?Math.round((new Date(s+"T00:00:00")-today0())/864e5):null;
+const fmt=s=>s?new Date(s+"T00:00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"}):"";
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const rid=()=>Math.random().toString(36).slice(2,9);
+const tstat=t=>t.status||(t.done?"Done":"Not started");
+const hue=p=>`var(--h${((+p.priority||7)-1)%7+1})`;
+const pcls=s=>s==="In progress"?"prog":s==="Waiting"?"wait":s==="Done"?"done":"";
+const pill=s=>`<span class="pill ${pcls(s)}">${esc(s)}</span>`;
+function projStatus(p){if(p.status)return p.status;const ts=p.tasks||[];if(ts.length&&ts.every(t=>tstat(t)==="Done"))return"Done";if(ts.some(t=>tstat(t)!=="Not started"))return"In progress";return"Not started"}
+function dueChip(t){const d=dl(t.due);const e=t.est?" est":"";if(d===null)return"";
+  if(tstat(t)==="Done")return`<span class="chip">${fmt(t.due)}</span>`;
+  if(d<0)return`<span class="chip crit">${-d}d overdue</span>`;if(d===0)return`<span class="chip crit${e}">Today</span>`;
+  if(d===1)return`<span class="chip warn${e}">Tomorrow</span>`;if(d<=6)return`<span class="chip warn${e}">${fmt(t.due)}</span>`;
+  return`<span class="chip${e}">${fmt(t.due)}</span>`}
+const byPri=()=>[...projects].sort((a,b)=>(+a.priority||99)-(+b.priority||99));
+function allTasks(){const o=[];byPri().forEach(p=>(p.tasks||[]).forEach(t=>o.push({...t,st:tstat(t),p})));return o}
+// Order: urgency band first (overdue, due within a day, this week, later), then your project priority, then date.
+const band=t=>{const d=dl(t.due);return d===null?4:d<0?0:d<=1?1:d<=7?2:3};
+const cmp=(a,b)=>band(a)-band(b)||(+a.p.priority||99)-(+b.p.priority||99)||(a.due||"9999").localeCompare(b.due||"9999")||(a.est?1:0)-(b.est?1:0);
+const openTasks=()=>allTasks().filter(t=>t.st!=="Done"&&projStatus(t.p)!=="Done").sort(cmp);
+
+function taskCard(t){return`<button class="tcard ${t.st==="Done"?"isdone":""}" type="button" draggable="${canWrite}" data-task="${esc(t.p.id)}|${esc(t.id)}">
+  <span class="t"><i aria-hidden="true"></i><span>${esc(t.t)}</span></span>
+  <span class="meta"><span class="proj" style="--sw:${hue(t.p)}">${esc(t.p.name)}</span>${dueChip(t)}</span></button>`}
+
+function render(){
+  $("#today").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const open=openTasks();
+  const over=open.filter(t=>band(t)===0).length, tod=open.filter(t=>dl(t.due)===0).length, wk=open.filter(t=>{const d=dl(t.due);return d!==null&&d>=0&&d<=7}).length, est=open.filter(t=>t.est).length;
+  $("#stat").innerHTML=`<span class="${over?"c":""}"><b>${over}</b> overdue</span><span><b>${tod}</b> due today</span><span><b>${wk}</b> due this week</span><span><b>${est}</b> suggested dates to confirm</span>`;
+
+  // gallery
+  document.querySelectorAll("#ptabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.pf===pf));
+  const gp=byPri().filter(p=>pf==="all"||projStatus(p)===pf);
+  $("#gallery").innerHTML=gp.map(p=>{const ts=p.tasks||[];const left=ts.filter(t=>tstat(t)!=="Done").length;
+    const nx=ts.filter(t=>tstat(t)!=="Done").map(t=>({...t,p})).sort(cmp)[0];
+    return`<button class="pcard" type="button" data-edit="${esc(p.id)}"><div class="cover" style="background:${hue(p)}"><span class="pr">P${esc(p.priority||"–")}</span><svg viewBox="0 0 64 64" aria-hidden="true">${ICONS[p.icon]||ICONS.spark}</svg></div>
+    <div class="pbody"><span class="name">${esc(p.name)}</span><span class="meta">${pill(projStatus(p))}${nx?dueChip(nx):""}${isStale(p)?`<span class="chip idle">Idle ${idleDays(p)}d</span>`:""}</span><span class="left mono">${left}/${ts.length} tasks left · ${(filesBy[p.id]||[]).length} files</span></div></button>`}).join("")
+    ||'<div class="empty">No projects here.</div>';
+
+  // focus
+  const top=open[0];
+  $("#focus").innerHTML=!projects.length?'<span class="tag">Do this now</span><span class="muted">Add a project to get started.</span><span></span>'
+    :!top?'<span class="tag">Do this now</span><span>Everything open is done.</span><span></span>'
+    :`<span class="tag">Do this now</span><div style="display:grid;gap:4px;min-width:0"><span class="t">${esc(top.t)}</span>
+      <span class="meta"><span class="proj" style="--sw:${hue(top.p)}">${esc(top.p.name)}</span>${dueChip(top)}</span>
+      ${open[1]?`<span class="then">Then: ${esc(open[1].t)} · ${esc(open[1].p.name)}</span>`:""}</div>
+      ${canWrite?`<button class="btn" type="button" data-done="${esc(top.p.id)}|${esc(top.id)}">Mark done</button>`:"<span></span>"}`;
+
+  // task views
+  document.querySelectorAll("#ttabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tv===tv));
+  const all=allTasks().filter(t=>projStatus(t.p)!=="Done");
+  if(tv==="kanban"){
+    $("#tasks").innerHTML=`<div class="kanban">${TSTAT.map(s=>{let list=all.filter(t=>t.st===s).sort(cmp);
+      if(s==="Done")list=list.reverse();const lim=expanded[s]?Infinity:8;
+      return`<div class="col" data-col="${s}"><div class="col-head">${pill(s)}<span class="muted small mono">${list.length}</span></div>
+      ${list.slice(0,lim).map(taskCard).join("")}${list.length>lim?`<button class="btn ghost more" type="button" data-more="${s}">Show ${list.length-lim} more</button>`:""}</div>`}).join("")}</div>
+      <p class="muted small">Drag a card to another column to change its status, or click it to edit.</p>`;
+  }else if(tv==="day"){
+    const b={over:[],today:[],tomorrow:[],week:[],next:[],later:[],nodate:[]};
+    open.forEach(t=>{const d=dl(t.due);(d===null?b.nodate:d<0?b.over:d===0?b.today:d===1?b.tomorrow:d<=7?b.week:d<=14?b.next:b.later).push(t)});
+    const names={over:"Overdue",today:"Today",tomorrow:"Tomorrow",week:"This week",next:"Next week",later:"Later",nodate:"No date"};
+    $("#tasks").innerHTML=Object.keys(names).filter(k=>b[k].length).map(k=>{const lim=(k==="later"&&!expanded.later)?6:Infinity;
+      return`<div class="bucket" data-b="${k}"><h3>${names[k]} <span class="muted small mono">${b[k].length}</span></h3>${b[k].slice(0,lim).map(row).join("")}
+      ${b[k].length>lim?`<button class="btn ghost" type="button" data-more="later">Show ${b[k].length-lim} more</button>`:""}</div>`}).join("")||'<div class="empty">No open tasks.</div>';
+  }else if(tv==="calendar"){
+    renderCalendar();
+  }else{
+    $("#tasks").innerHTML=byPri().map(p=>{const ts=(p.tasks||[]).map(t=>({...t,st:tstat(t),p})).sort((a,b)=>(a.st==="Done")-(b.st==="Done")||(a.due||"9999").localeCompare(b.due||"9999"));
+      return`<div><div class="group-head"><span class="pr">P${esc(p.priority||"–")}</span><h3>${esc(p.name)}</h3>${pill(projStatus(p))}</div>${ts.map(row).join("")||'<div class="empty">No tasks.</div>'}</div>`}).join("");
+  }
+
+  renderTimeline();
+  renderAttention();
+  $("#addBtn").hidden=!canWrite;$("#addTaskBtn").hidden=!canWrite;
+}
+function row(t){return`<div class="row ${t.st==="Done"?"isdone":""}"><input type="checkbox" aria-label="Mark done" data-check="${esc(t.p.id)}|${esc(t.id)}" ${t.st==="Done"?"checked":""} ${canWrite?"":"disabled"}>
+  <span class="t" data-task="${esc(t.p.id)}|${esc(t.id)}" tabindex="0">${esc(t.t)}<br><span class="proj" style="--sw:${hue(t.p)}">${esc(t.p.name)}</span></span>
+  <span class="right">${t.st!=="Not started"&&t.st!=="Done"?pill(t.st):""}${t.est?'<span class="chip est">Suggested</span>':""}${dueChip(t)}</span></div>`}
+
+let calM=(()=>{const d=today0();d.setDate(1);return d})();
+function calShift(n){if(n===0){calM=today0();calM.setDate(1)}else calM=new Date(calM.getFullYear(),calM.getMonth()+n,1);render()}
+function renderCalendar(){
+  const first=new Date(calM);const off=(first.getDay()+6)%7;const start=new Date(first);start.setDate(1-off);
+  const last=new Date(calM.getFullYear(),calM.getMonth()+1,0);const cells=Math.ceil((off+last.getDate())/7)*7;
+  const byDay={};allTasks().filter(t=>t.due).forEach(t=>(byDay[t.due]=byDay[t.due]||[]).push(t));
+  Object.values(byDay).forEach(l=>l.sort((a,b)=>(a.st==="Done")-(b.st==="Done")||(+a.p.priority||99)-(+b.p.priority||99)));
+  const tIso=iso(today0());let h="";
+  ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(d=>h+=`<div class="dow">${d}</div>`);
+  for(let i=0;i<cells;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=iso(d);const list=byDay[k]||[];const show=list.slice(0,4);
+    h+=`<div class="day ${d.getMonth()!==calM.getMonth()?"out":""} ${k===tIso?"today":""}" data-day="${k}" aria-label="${d.toLocaleDateString("en-IN",{day:"numeric",month:"long"})}, ${list.length} tasks"><span class="dn">${d.getDate()}</span>
+      ${show.map(t=>`<button type="button" class="ev ${t.st==="Done"?"done":""} ${t.est?"est":""}" style="--sw:${hue(t.p)}" data-task="${esc(t.p.id)}|${esc(t.id)}" title="${esc(t.t)} · ${esc(t.p.name)}">${esc(t.t)}</button>`).join("")}
+      ${list.length>4?`<span class="more">+${list.length-4} more</span>`:""}</div>`}
+  $("#tasks").innerHTML=`<div class="cal-bar"><button class="btn" type="button" data-cal="-1" aria-label="Previous month">‹</button><button class="btn" type="button" data-cal="0">Today</button><button class="btn" type="button" data-cal="1" aria-label="Next month">›</button>
+    <h3>${calM.toLocaleDateString("en-IN",{month:"long",year:"numeric"})}</h3><span class="muted small">Colours match each project. ${canWrite?"Click an empty space on a day to add a task.":""}</span></div>
+    <div class="cal-scroll"><div class="cal">${h}</div></div>`;
+}
+
+const QUOTES=[
+  ["Arise, awake, and stop not till the goal is reached.","Swami Vivekananda"],
+  ["Take up one idea. Make that one idea your life.","Swami Vivekananda"],
+  ["A journey of a thousand miles begins with a single step.","Lao Tzu"],
+  ["It is not that we have a short time to live, but that we waste a lot of it.","Seneca"],
+  ["Luck is what happens when preparation meets opportunity.","Seneca"],
+  ["We are what we repeatedly do.","Will Durant, summarising Aristotle"],
+  ["Well done is better than well said.","Benjamin Franklin"],
+  ["Lost time is never found again.","Benjamin Franklin"],
+  ["You have power over your mind, not outside events. Realise this, and you will find strength.","Marcus Aurelius"],
+  ["The impediment to action advances action. What stands in the way becomes the way.","Marcus Aurelius"],
+  ["First say to yourself what you would be; and then do what you have to do.","Epictetus"],
+  ["It does not matter how slowly you go as long as you do not stop.","Attributed to Confucius"],
+  ["Our greatest weakness lies in giving up. The most certain way to succeed is always to try just one more time.","Thomas Edison"],
+  ["Do not wait to strike till the iron is hot; but make it hot by striking.","W. B. Yeats"],
+  ["What we think, we become.","Attributed to the Buddha"],
+  ["Kaal kare so aaj kar, aaj kare so ab.","Kabir"],
+  ["Nothing great was ever achieved without enthusiasm.","Ralph Waldo Emerson"],
+  ["Go confidently in the direction of your dreams.","Henry David Thoreau"],
+  ["The secret of getting ahead is getting started.","Attributed to Mark Twain"],
+  ["Focus on the step in front of you, not the whole staircase.","Proverb"]
+];
+let qIdx=Math.floor(today0()/864e5);
+function renderQuote(){const q=QUOTES[((qIdx%QUOTES.length)+QUOTES.length)%QUOTES.length];
+  $("#quote").innerHTML=`<span class="mark" aria-hidden="true">“</span><div><blockquote>${esc(q[0])}</blockquote><figcaption>${esc(q[1])}</figcaption></div><button class="btn ghost" type="button" id="qNext">Another quote</button>`}
+
+function renderTimeline(){
+  const start=today0();start.setDate(start.getDate()-3);const N=49;const days=[];
+  for(let i=0;i<N;i++){const d=new Date(start);d.setDate(d.getDate()+i);days.push(d)}
+  const col=`grid-template-columns:repeat(${N},1fr)`;const ti=3;
+  let months=[];days.forEach((d,i)=>{const m=d.toLocaleDateString("en-IN",{month:"long"});if(!months.length||months[months.length-1].m!==m)months.push({m,s:i,n:1});else months[months.length-1].n++});
+  let h=`<div class="tl-months" style="${col}">${months.map(m=>`<div style="grid-column:${m.s+1}/span ${m.n};padding-left:6px">${m.m}</div>`).join("")}</div>
+  <div class="tl-days" style="${col}">${days.map((d,i)=>`<div class="${i===ti?"now":d.getDay()===1?"wk":""}">${d.getDate()}</div>`).join("")}</div>
+  <div class="tl-body"><div class="tl-grid" style="${col}">${days.map((d,i)=>`<div class="${i===ti?"now":(d.getDay()===0||d.getDay()===6)?"we":""}"></div>`).join("")}</div>`;
+  const pos=s=>{const d=dl(s);return d===null?null:d+ti};
+  byPri().filter(p=>projStatus(p)!=="Done").forEach(p=>{
+    const open=(p.tasks||[]).filter(t=>tstat(t)!=="Done");const dated=open.filter(t=>t.due);
+    if(!dated.length){h+=`<div class="tl-row"></div>`;return}
+    const ps=dated.map(t=>pos(t.due));const s0=Math.max(0,Math.min(ti,...ps));const e0=Math.max(...ps);const e=Math.min(N-1,e0);
+    const L=s0/N*100,W=Math.max((e-s0+1)/N*100,8);
+    h+=`<div class="tl-row"><button class="tl-bar" type="button" data-edit="${esc(p.id)}" style="left:${L}%;width:${W}%" title="${esc(p.name)}">
+      <span class="sw" style="background:${hue(p)}"></span>${esc(p.name)} ${pill(projStatus(p))}<span class="muted small mono">${open.length} tasks left${e0>N-1?" →":""}</span></button>
+      ${dated.filter(t=>pos(t.due)<=N-1).map(t=>`<span class="tl-tick ${dl(t.due)<0?"crit":""}" style="left:${(Math.max(0,pos(t.due))+.5)/N*100}%" title="${esc(t.t)} · ${esc(fmt(t.due))}"></span>`).join("")}</div>`});
+  h+='</div>';
+  $("#timeline").innerHTML=h;
+}
+
+async function setTask(pid,tid,patch,proofed){
+  const p=projects.find(x=>x.id===pid);if(!p)return;const cur=(p.tasks||[]).find(t=>t.id===tid);if(!cur)return;
+  if(patch.status==="Done"&&tstat(cur)!=="Done"&&!proofed){
+    const rest={...patch};delete rest.status;delete rest.done;
+    if(Object.keys(rest).some(k=>rest[k]!==cur[k]))await setTask(pid,tid,rest,true);
+    proofDialog(pid,tid);return"proof";
+  }
+  const now=new Date().toISOString();
+  const tasks=(p.tasks||[]).map(t=>{if(t.id!==tid)return t;const n={...t,...patch};n.done=tstat(n)==="Done";if(n.done&&!t.done)n.doneAt=now;if(!n.done)delete n.doneAt;return n});
+  const body={tasks,updatedAt:now};if(patch.status==="Done")body.lastWorkAt=now;
+  await safe(()=>db.doc("projects/"+pid).update(body),patch.status==="Done"?"Done. Work logged.":"Updated");
+}
+
+/* ---------- accountability ---------- */
+const BOARD_URL=location.origin+location.pathname;
+let hashOpened=false;
+function openFromHash(){const h=(location.hash||"").slice(1);if(h&&projects.find(x=>x.id===h)){openProject(h);return true}return false}
+window.addEventListener("hashchange",openFromHash);
+const TRACK_START="2026-10-23T00:00:00Z";
+function lastWork(p){let m=p.lastWorkAt||TRACK_START;(filesBy[p.id]||[]).forEach(f=>{if(f.addedAt>m)m=f.addedAt});(p.tasks||[]).forEach(t=>{if(t.doneAt&&t.doneAt>m)m=t.doneAt});return m}
+const remindAfter=p=>+p.remindAfter||((+p.priority||99)<=4?4:7);
+const idleDays=p=>Math.floor((today0()-new Date(new Date(lastWork(p)).setHours(0,0,0,0)))/864e5);
+const isStale=p=>projStatus(p)!=="Done"&&projStatus(p)!=="Waiting"&&idleDays(p)>=remindAfter(p);
+function proofDialog(pid,tid){
+  const p=projects.find(x=>x.id===pid);const t=(p.tasks||[]).find(x=>x.id===tid);if(!t)return;
+  $("#dlg2").innerHTML=`<div class="scrim" id="scrim2"><form class="sheet narrow" id="proof"><h2>Show the work</h2>
+    <p class="muted small" style="margin:0">To mark <strong>${esc(t.t)}</strong> as done, add a link or a document of what was produced. It is saved in the ${esc(p.name)} folder.</p>
+    <div class="tabs" role="tablist"><button type="button" role="tab" data-pk="link" aria-selected="true">Add a link</button>${assetsNs?'<button type="button" role="tab" data-pk="file" aria-selected="false">Upload a file</button>':""}</div>
+    <div id="pk-link" class="field" style="gap:8px"><input id="pf-u" type="url" placeholder="https:// (Drive, Canva, Claude, Instagram post, YouTube video…)" aria-label="Link"><input id="pf-n" placeholder="Title (optional)" aria-label="Title"></div>
+    <div id="pk-file" class="field" hidden><input id="pf-f" type="file" aria-label="File"><span class="muted small">PDF, image, video, CSV or text, up to 20 MB.</span></div>
+    <div class="field"><label class="lbl" for="pf-note">What was done (optional)</label><textarea id="pf-note" rows="2"></textarea></div>
+    <div class="sheet-foot"><span></span><div class="actions"><button type="button" class="btn" id="cancel2">Not yet</button><button class="btn primary" type="submit">Log work and mark done</button></div></div></form></div>`;
+  showDlg2();render();
+  let mode="link";
+  document.querySelectorAll("[data-pk]").forEach(b=>b.onclick=()=>{mode=b.dataset.pk;document.querySelectorAll("[data-pk]").forEach(x=>x.setAttribute("aria-selected",x===b));$("#pk-link").hidden=mode!=="link";$("#pk-file").hidden=mode!=="file"});
+  $("#proof").onsubmit=async e=>{e.preventDefault();const note=$("#pf-note").value.trim();const now=new Date().toISOString();let doc;
+    if(mode==="link"){const u=$("#pf-u").value.trim();if(!/^https?:\/\//i.test(u)){toast("Add a link that starts with https://");return}
+      doc={kind:"link",name:$("#pf-n").value.trim()||t.t,url:u}}
+    else{const f=$("#pf-f").files[0];if(!f){toast("Choose a file first.");return}const ext=(f.name.split(".").pop()||"").toLowerCase();const type=TYPES[ext];
+      if(!type){toast(OFFICE.has(ext)?"Word, Excel and PowerPoint files can't be stored. Save it as a PDF or add its Drive link.":"This file type can't be stored. Use PDF, an image, video, CSV or text.",6000);return}
+      toast("Uploading…",60000);try{const r=await assetsNs.upload(f,{type});doc={kind:"file",name:f.name,assetId:r.id,contentType:r.contentType,size:r.sizeBytes}}
+      catch(err){toast(err&&err.code==="too_large"?"That file is over 20 MB. Add a Drive link instead.":"Couldn't upload the file. Try again.",6000);return}}
+    Object.assign(doc,{taskId:tid,taskName:t.t,addedAt:now},note?{note}:{});
+    try{await db.collection("projects/"+pid+"/files").add(doc)}catch(_){toast("Couldn't save the work log. Try again.");return}
+    closeDlg2();await setTask(pid,tid,{status:"Done"},true)};
+}
+function renderAttention(){
+  const stale=byPri().filter(isStale);const el=$("#attention");
+  if(!stale.length){el.hidden=true;el.innerHTML="";return}
+  el.hidden=false;
+  el.innerHTML=`<div class="att-head"><strong>Needs attention</strong><span class="muted small">No work logged recently. Add what you've done, or set the project to Waiting.</span></div>
+    ${stale.map(p=>{const d=idleDays(p);return`<div class="att-row"><span class="pr">P${esc(p.priority||"–")}</span><span><strong>${esc(p.name)}</strong> · ${d===0?"no work logged yet":`no work logged for ${d} day${d>1?"s":""}`}<span class="muted small"> (reminder after ${remindAfter(p)} days)</span></span>
+      <button class="btn" type="button" data-logp="${esc(p.id)}">Log work</button></div>`}).join("")}`;
+}
+
+function taskEditor(pid,tid,preDue){
+  const p0=pid?projects.find(x=>x.id===pid):null;const t0=p0&&tid?(p0.tasks||[]).find(x=>x.id===tid):null;
+  const isNew=!t0;const dis=canWrite?"":"disabled";const t=t0?{...t0,status:tstat(t0)}:{t:"",due:preDue||"",status:"Not started"};
+  $("#dlg2").innerHTML=`<div class="scrim" id="scrim2"><form class="sheet narrow" id="form2"><h2>${isNew?"New task":"Task"}</h2>
+    <div class="field"><label class="lbl" for="x-t">Task</label><input id="x-t" required value="${esc(t.t)}" ${dis}></div>
+    <div class="field"><label class="lbl" for="x-p">Project</label><select id="x-p" ${dis||!isNew?"disabled":""}>${byPri().map(p=>`<option value="${esc(p.id)}" ${p0&&p0.id===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select></div>
+    <div class="grid3" style="grid-template-columns:1fr 1fr">
+      <div class="field"><label class="lbl" for="x-d">Due</label><input id="x-d" type="date" value="${esc(t.due||"")}" ${dis}></div>
+      <div class="field"><label class="lbl" for="x-s">Status</label><select id="x-s" ${dis}>${TSTAT.map(s=>`<option ${s===t.status?"selected":""}>${s}</option>`).join("")}</select></div></div>
+    ${t.est?'<span class="muted small">This date is a suggestion. Saving confirms it.</span>':""}
+    <div class="sheet-foot"><div>${!isNew&&canWrite?'<button type="button" class="btn danger" id="delT">Delete task</button>':""}</div>
+    <div class="actions"><button type="button" class="btn" id="cancel2">${canWrite?"Cancel":"Close"}</button>${canWrite?'<button class="btn primary" type="submit">Save</button>':""}</div></div></form></div>`;
+  showDlg2();
+  const dt=$("#delT");if(dt)dt.onclick=async()=>{if(!dt.dataset.armed){dt.dataset.armed=1;dt.textContent="Tap again to delete";return}
+    const p=projects.find(x=>x.id===pid);await safe(()=>db.doc("projects/"+pid).update({tasks:(p.tasks||[]).filter(x=>x.id!==tid),updatedAt:new Date().toISOString()}),"Task deleted");closeDlg2()};
+  $("#form2").onsubmit=async e=>{e.preventDefault();const text=$("#x-t").value.trim();if(!text)return;
+    const st=$("#x-s").value;const nt={t:text,due:$("#x-d").value,status:st,done:st==="Done",est:false};
+    if(isNew){const p=projects.find(x=>x.id===$("#x-p").value);if(!p)return;
+      await safe(()=>db.doc("projects/"+p.id).update({tasks:[...(p.tasks||[]),{id:rid(),...nt}],updatedAt:new Date().toISOString()}),"Task added")}
+    else{const r=await setTask(pid,tid,nt);if(r==="proof")return}
+    closeDlg2()};
+}
+function showDlg2(){$("#dlg2").hidden=false;$("#cancel2").onclick=closeDlg2;$("#scrim2").onclick=e=>{if(e.target.id==="scrim2")closeDlg2()};const f=$("#dlg2 input:not([disabled])");if(f)f.focus()}
+function closeDlg2(){$("#dlg2").hidden=true;$("#dlg2").innerHTML=""}
+
+/* ---------- project folder ---------- */
+function syncFileSubs(){
+  if(!db)return;const ids=new Set(projects.map(p=>p.id));
+  projects.forEach(p=>{if(fileSubs[p.id])return;
+    fileSubs[p.id]=db.collection("projects/"+p.id+"/files").onSnapshot(s=>{filesBy[p.id]=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.addedAt||"").localeCompare(a.addedAt||""));render();refreshPanel()},()=>{})});
+  Object.keys(fileSubs).forEach(id=>{if(!ids.has(id)){fileSubs[id]();delete fileSubs[id];delete filesBy[id]}});
+}
+function openProject(pid,tab){
+  if(!projects.find(x=>x.id===pid))return;openP=pid;pTab=tab||"overview";
+  $("#dlg").innerHTML=`<div class="scrim" id="scrim"><div class="sheet panel" role="dialog" aria-modal="true" aria-labelledby="pTitle"><div class="panel-head" id="phead"></div><div class="panel-body" id="pbody"></div></div></div>`;
+  $("#dlg").hidden=false;$("#scrim").onclick=e=>{if(e.target.id==="scrim")closeProject()};
+  refreshPanel(true);
+}
+function closeProject(){openP=null;$("#dlg").hidden=true;$("#dlg").innerHTML=""}
+function refreshPanel(full){
+  if(!openP||$("#dlg").hidden)return;const p=projects.find(x=>x.id===openP);if(!p){closeProject();return}
+  const ts=p.tasks||[],fs=filesBy[p.id]||[];const left=ts.filter(t=>tstat(t)!=="Done").length;
+  $("#phead").innerHTML=`<div class="panel-title"><div><span class="pr">P${esc(p.priority||"–")}</span><h2 id="pTitle">${esc(p.name)}</h2>${pill(projStatus(p))}${isStale(p)?`<span class="chip idle">Idle ${idleDays(p)}d</span>`:""}</div>
+    <div class="actions"><a class="btn ghost" href="${BOARD_URL}#${esc(p.id)}" target="_blank" rel="noopener">Open in new tab ↗</a><button class="btn ghost" type="button" id="copyP">Copy link</button><button class="btn" type="button" id="closeP">Close</button></div></div>
+    <div class="tabs" role="tablist">${[["overview","Overview"],["tasks",`Tasks · ${left} open`],["files",`Files & links · ${fs.length}`],["log","Work log"]].map(([k,l])=>`<button role="tab" type="button" data-ptab="${k}" aria-selected="${pTab===k}">${l}</button>`).join("")}</div>`;
+  $("#closeP").onclick=closeProject;
+  $("#copyP").onclick=()=>{const u=BOARD_URL+"#"+p.id;try{navigator.clipboard.writeText(u).then(()=>toast("Link copied"),()=>toast(u,8000))}catch(_){toast(u,8000)}};
+  if(full||pTab!=="overview")renderPBody(p);
+}
+function renderPBody(p){
+  const dis=canWrite?"":"disabled";const B=$("#pbody");
+  if(pTab==="overview"){
+    B.innerHTML=`<div class="ov">
+      <div class="field"><label class="lbl" for="ov-name">Project name</label><input id="ov-name" data-ov="name" value="${esc(p.name)}" ${dis}></div>
+      <div class="grid3">
+        <div class="field"><label class="lbl" for="ov-pri">Priority (1 = top)</label><input id="ov-pri" type="number" min="1" max="20" data-ov="priority" value="${esc(p.priority)}" ${dis}></div>
+        <div class="field"><label class="lbl" for="ov-st">Status</label><select id="ov-st" data-ov="status" ${dis}>${PSTAT.map(s=>`<option ${s===projStatus(p)?"selected":""}>${s}</option>`).join("")}</select></div>
+        <div class="field"><label class="lbl" for="ov-own">Owner</label><input id="ov-own" data-ov="owner" value="${esc(p.owner)}" placeholder="Who leads it" ${dis}></div></div>
+      <div class="field"><label class="lbl" for="ov-rem">Remind us after this many days without logged work</label><input id="ov-rem" type="number" min="1" max="60" data-ov="remindAfter" value="${esc(remindAfter(p))}" style="max-width:120px" ${dis}>
+        <span class="muted small">Last work logged: ${idleDays(p)===0?"today":idleDays(p)+" days ago"}. Work counts when a task is marked done with proof, or a file or link is added.</span></div>
+      <div class="field"><label class="lbl" for="ov-about">About this project</label><textarea id="ov-about" data-ov="about" rows="3" placeholder="Goal, who it's for, what success looks like" ${dis}>${esc(p.about)}</textarea></div>
+      <div class="field"><label class="lbl" for="ov-con">Key people and contacts</label><textarea id="ov-con" data-ov="contacts" rows="3" placeholder="Names, roles, phone or email" ${dis}>${esc(p.contacts)}</textarea></div>
+      <div class="field"><label class="lbl" for="ov-notes">Notes</label><textarea id="ov-notes" data-ov="notes" rows="8" placeholder="Decisions, meeting notes, anything to remember" ${dis}>${esc(p.notes)}</textarea></div>
+      <div class="sheet-foot"><span class="muted small">${canWrite?"Changes save automatically.":"You have view-only access."}</span>${canWrite?'<button type="button" class="btn danger" id="delP">Delete project</button>':""}</div></div>`;
+    const dp=$("#delP");if(dp)dp.onclick=async()=>{if(!dp.dataset.armed){dp.dataset.armed=1;dp.textContent="Tap again to delete";return}await safe(()=>db.doc("projects/"+p.id).delete(),"Project deleted");closeProject()};
+  }else if(pTab==="tasks"){
+    const ts=(p.tasks||[]).map(t=>({...t,st:tstat(t),p})).sort((a,b)=>(a.st==="Done")-(b.st==="Done")||(a.due||"9999").localeCompare(b.due||"9999"));
+    B.innerHTML=`${canWrite?`<form class="linkform" id="newTask"><input id="nt-t" placeholder="Add a task" aria-label="New task"><input id="nt-d" type="date" aria-label="Due date"><button class="btn primary" type="submit">Add task</button></form>`:""}
+      <div>${ts.map(row).join("")||'<div class="empty">No tasks yet.</div>'}</div>`;
+    const f=$("#newTask");if(f)f.onsubmit=async e=>{e.preventDefault();const t=$("#nt-t").value.trim();if(!t)return;const due=$("#nt-d").value;
+      await safe(()=>db.doc("projects/"+p.id).update({tasks:[...(p.tasks||[]),{id:rid(),t,due,status:"Not started",done:false,est:false}],updatedAt:new Date().toISOString()}),"Task added")};
+  }else if(pTab==="log"){
+    const fs=filesBy[p.id]||[];const ev=[];
+    (p.tasks||[]).filter(t=>t.doneAt).forEach(t=>ev.push({at:t.doneAt,html:`<strong>Done:</strong> ${esc(t.t)}`}));
+    fs.forEach(f=>ev.push({at:f.addedAt,html:f.taskName?`<strong>Work added</strong> for “${esc(f.taskName)}”: ${f.kind==="file"?esc(f.name):`<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`}${f.note?` · ${esc(f.note)}`:""}`
+      :`<strong>${f.kind==="file"?"File added":"Link added"}:</strong> ${f.kind==="file"?esc(f.name):`<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`}`}));
+    ev.sort((a,b)=>(b.at||"").localeCompare(a.at||""));
+    const d=idleDays(p);
+    B.innerHTML=`<div class="${isStale(p)?"attention":"focus"}" style="display:block">${d===0?"Work logged today.":`Last work logged ${d} day${d>1?"s":""} ago.`} The reminder appears after ${remindAfter(p)} days with nothing logged.</div>
+      <div class="links">${ev.map(e=>`<div class="link" style="grid-template-columns:110px minmax(0,1fr)"><span class="muted small mono">${new Date(e.at).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</span><span style="min-width:0;overflow-wrap:anywhere">${e.html}</span></div>`).join("")||'<div class="empty">Nothing logged yet. Mark a task done with proof, or add a file or link.</div>'}</div>`;
+  }else{
+    const fs=filesBy[p.id]||[];const files=fs.filter(f=>f.kind==="file"),links=fs.filter(f=>f.kind!=="file");
+    B.innerHTML=`${assetsNs?`<label class="drop" id="drop"><input type="file" id="fileIn" multiple hidden><b>Drop files here or click to choose</b><span class="small">PDF, images, video, CSV, Markdown or text · up to 20 MB each. For Word, Excel or PowerPoint, save as PDF or add the Drive link below.</span></label>`
+        :'<div class="empty">File uploads aren\'t available on this site. Upload the file to Google Drive and add its link below.</div>'}
+      ${canWrite?`<form class="linkform" id="newLink"><input id="nl-n" placeholder="Title, e.g. Alpine agreement (Google Drive)" aria-label="Link title"><input id="nl-u" type="url" placeholder="Paste a link: Drive, Canva, Claude, website…" aria-label="Link URL" required><button class="btn primary" type="submit">Add link</button></form>`:""}
+      <div style="display:grid;gap:10px"><h3 class="sub">Files <span class="muted small mono">${files.length}</span></h3>
+        ${files.length?`<div class="files">${files.map(fileCard).join("")}</div>`:'<div class="empty">No files yet.</div>'}</div>
+      <div style="display:grid;gap:6px"><h3 class="sub">Links <span class="muted small mono">${links.length}</span></h3>
+        ${links.length?`<div class="links">${links.map(linkRow).join("")}</div>`:'<div class="empty">No links yet.</div>'}</div>`;
+    const inp=$("#fileIn"),drop=$("#drop");
+    if(inp){inp.onchange=()=>{uploadFiles(p.id,[...inp.files]);inp.value=""};
+      drop.ondragover=e=>{e.preventDefault();drop.classList.add("on")};drop.ondragleave=()=>drop.classList.remove("on");
+      drop.ondrop=e=>{e.preventDefault();drop.classList.remove("on");uploadFiles(p.id,[...e.dataTransfer.files])}}
+    const lf=$("#newLink");if(lf)lf.onsubmit=async e=>{e.preventDefault();let u=$("#nl-u").value.trim();if(!/^https?:\/\//i.test(u)){toast("Links need to start with https://");return}
+      const n=$("#nl-n").value.trim()||hostOf(u);await safe(()=>db.collection("projects/"+p.id+"/files").add({kind:"link",name:n,url:u,addedAt:new Date().toISOString()}),"Link added")};
+  }
+}
+const hostOf=u=>{try{return new URL(u).hostname.replace(/^www\./,"")}catch(_){return u}};
+const sizeOf=b=>b>1048576?(b/1048576).toFixed(1)+" MB":Math.max(1,Math.round(b/1024))+" KB";
+const dShort=s=>s?new Date(s).toLocaleDateString("en-IN",{day:"numeric",month:"short"}):"";
+function fileCard(f){const img=/^image\//.test(f.contentType),vid=/^video\//.test(f.contentType);const ext=(f.name.split(".").pop()||"file").slice(0,5);
+  return`<div class="file"><button class="thumb" type="button" ${img||vid?`data-view="${esc(f.id)}"`:`data-dlf="${esc(f.id)}"`} aria-label="${img||vid?"View":"Download"} ${esc(f.name)}">${img?`<img src="/_blob/${esc(f.assetId)}" alt="" loading="lazy">`:vid?`<video src="/_blob/${esc(f.assetId)}" muted preload="metadata"></video>`:`<span class="ext">${esc(ext)}</span>`}</button>
+  <div class="fb"><span class="fn">${esc(f.name)}</span><span class="muted small mono">${sizeOf(f.size||0)} · ${dShort(f.addedAt)}</span>${f.taskName?`<span class="muted small">Work for: ${esc(f.taskName)}</span>`:""}${f.note?`<span class="small">${esc(f.note)}</span>`:""}
+  <div class="actions">${img||vid?`<button class="btn ghost" type="button" data-view="${esc(f.id)}">View</button>`:""}${dlNs?`<button class="btn ghost" type="button" data-dlf="${esc(f.id)}">Download</button>`:""}${assetsNs?`<button class="btn ghost" type="button" data-rmf="${esc(f.id)}">Remove</button>`:""}</div></div></div>`}
+function linkRow(l){const h=hostOf(l.url);
+  return`<div class="link"><span class="ic" aria-hidden="true">${esc(h.slice(0,2).toUpperCase())}</span><div style="min-width:0"><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.name)}</a><div class="muted small">${esc(h)} · ${dShort(l.addedAt)}${l.taskName?" · Work for: "+esc(l.taskName):""}${l.note?" · "+esc(l.note):""}</div></div>
+  ${canWrite?`<button class="btn ghost" type="button" data-rmf="${esc(l.id)}">Remove</button>`:"<span></span>"}</div>`}
+async function uploadFiles(pid,list){
+  if(!assetsNs){toast("File uploads aren't available on this site. Add a Drive link instead.");return}
+  for(const f of list){const ext=(f.name.split(".").pop()||"").toLowerCase();const type=TYPES[ext];
+    if(!type){toast(OFFICE.has(ext)?`${f.name}: Word, Excel and PowerPoint files can't be stored here. Save it as a PDF, or add its Google Drive link.`:`${f.name}: this type can't be stored. Use PDF, an image, video, CSV or text.`,6000);continue}
+    toast("Uploading "+f.name+"…",60000);
+    try{const r=await assetsNs.upload(f,{type});
+      await db.collection("projects/"+pid+"/files").add({kind:"file",name:f.name,assetId:r.id,contentType:r.contentType,size:r.sizeBytes,addedAt:new Date().toISOString()});toast("Added "+f.name)}
+    catch(e){const c=e&&e.code;toast(c==="too_large"?f.name+" is over 20 MB. Compress it or add a Drive link.":c==="quota_or_state"?"File storage is full. Remove old files first.":c==="unsupported_type"?f.name+": this file type can't be stored.":"Couldn't upload "+f.name+". Try again.",6000)}}
+}
+function findFile(id){for(const pid in filesBy){const f=filesBy[pid].find(x=>x.id===id);if(f)return{f,pid}}return{}}
+async function downloadFile(id){const{f}=findFile(id);if(!f)return;if(!dlNs){toast("Downloads aren't available in this view.");return}
+  try{const blob=await (await fetch("/_blob/"+f.assetId)).blob();await dlNs.save({filename:f.name,data:blob})}
+  catch(e){const c=e&&e.code;if(c==="declined")return;toast(c==="rejected_extension"?"This file type can't be downloaded here.":"Couldn't download the file. Try again.")}}
+function viewFile(id){const{f}=findFile(id);if(!f)return;const vid=/^video\//.test(f.contentType);
+  $("#dlg2").innerHTML=`<div class="scrim" id="scrim2"><div class="sheet lightbox" style="width:min(1000px,100%)"><div class="sheet-foot" style="width:100%"><strong style="overflow-wrap:anywhere">${esc(f.name)}</strong><div class="actions">${dlNs?`<button class="btn" type="button" data-dlf="${esc(f.id)}">Download</button>`:""}<button class="btn" type="button" id="cancel2">Close</button></div></div>
+  ${vid?`<video src="/_blob/${esc(f.assetId)}" controls></video>`:`<img src="/_blob/${esc(f.assetId)}" alt="${esc(f.name)}">`}</div></div>`;showDlg2()}
+async function removeFile(btn){const id=btn.dataset.rmf;const{f,pid}=findFile(id);if(!f)return;
+  if(!btn.dataset.armed){btn.dataset.armed=1;btn.textContent="Tap again";return}
+  if(f.kind==="file"&&assetsNs){try{await assetsNs.delete(f.assetId)}catch(e){toast(e&&e.code==="not_uploader"?"Only the person who uploaded this file can remove it.":"Couldn't remove the file. Try again.");return}}
+  await safe(()=>db.doc("projects/"+pid+"/files/"+id).delete(),"Removed")}
+
+function projEditor(p){
+  const isNew=!p;p=p?structuredClone(p):{name:"",priority:projects.length+1,status:"Not started",owner:"",notes:"",icon:"spark",tasks:[]};
+  let tasks=(p.tasks||[]).map(t=>({...t,status:tstat(t)}));const dis=canWrite?"":"disabled";
+  const rows=()=>tasks.map((t,i)=>`<div class="trow" data-i="${i}"><input data-f="t" value="${esc(t.t)}" placeholder="Task" aria-label="Task" ${dis}>
+    <input type="date" data-f="due" value="${esc(t.due||"")}" aria-label="Due date" ${dis}>
+    <select data-f="status" aria-label="Status" ${dis}>${TSTAT.map(s=>`<option ${s===t.status?"selected":""}>${s}</option>`).join("")}</select>
+    ${canWrite?`<button type="button" class="btn ghost" data-rm="${i}" aria-label="Remove task">✕</button>`:"<span></span>"}</div>`).join("");
+  $("#dlg").innerHTML=`<div class="scrim" id="scrim"><form class="sheet" id="form"><h2>${isNew?"New project":esc(p.name)}</h2>
+    <div class="field"><label class="lbl" for="f-name">Project</label><input id="f-name" required value="${esc(p.name)}" ${dis}></div>
+    <div class="grid3">
+      <div class="field"><label class="lbl" for="f-pri">Priority (1 = top)</label><input id="f-pri" type="number" min="1" max="20" value="${esc(p.priority)}" ${dis}></div>
+      <div class="field"><label class="lbl" for="f-status">Status</label><select id="f-status" ${dis}>${PSTAT.map(s=>`<option ${s===projStatus(p)?"selected":""}>${s}</option>`).join("")}</select></div>
+      <div class="field"><label class="lbl" for="f-owner">Owner</label><input id="f-owner" value="${esc(p.owner)}" ${dis}></div></div>
+    <div class="field"><span class="lbl">Tasks</span><div class="tlist" id="tlist">${rows()}</div>
+      ${canWrite?'<button type="button" class="btn" id="addRow" style="justify-self:start">+ Add task</button>':""}</div>
+    <div class="field"><label class="lbl" for="f-notes">Notes</label><textarea id="f-notes" ${dis}>${esc(p.notes)}</textarea></div>
+    <div class="sheet-foot"><div>${!isNew&&canWrite?'<button type="button" class="btn danger" id="delP">Delete project</button>':""}</div>
+    <div class="actions"><button type="button" class="btn" id="cancel">${canWrite?"Cancel":"Close"}</button>${canWrite?'<button class="btn primary" type="submit">Save</button>':""}</div></div></form></div>`;
+  showDlg();
+  const sync=()=>document.querySelectorAll("#tlist .trow").forEach(r=>{const t=tasks[+r.dataset.i];const nd=r.querySelector('[data-f="due"]').value;if(nd!==(t.due||""))t.est=false;t.due=nd;t.t=r.querySelector('[data-f="t"]').value;t.status=r.querySelector('[data-f="status"]').value});
+  const ar=$("#addRow");if(ar)ar.onclick=()=>{sync();tasks.push({id:rid(),t:"",due:"",status:"Not started"});$("#tlist").innerHTML=rows();const a=document.querySelectorAll('#tlist [data-f="t"]');a[a.length-1].focus()};
+  $("#tlist").onclick=e=>{const b=e.target.closest("[data-rm]");if(b){sync();tasks.splice(+b.dataset.rm,1);$("#tlist").innerHTML=rows()}};
+  const dp=$("#delP");if(dp)dp.onclick=async()=>{if(!dp.dataset.armed){dp.dataset.armed=1;dp.textContent="Tap again to delete";return}await safe(()=>db.doc("projects/"+p.id).delete(),"Project deleted");closeDlg()};
+  $("#form").onsubmit=async e=>{e.preventDefault();sync();
+    const body={name:$("#f-name").value.trim(),priority:+$("#f-pri").value||99,status:$("#f-status").value,owner:$("#f-owner").value.trim(),notes:$("#f-notes").value.trim(),icon:p.icon||"spark",
+      tasks:tasks.filter(t=>t.t.trim()).map(t=>({id:t.id||rid(),t:t.t.trim(),due:t.due||"",status:t.status,done:t.status==="Done",est:!!t.est,...(t.note?{note:t.note}:{})})),updatedAt:new Date().toISOString()};
+    if(!body.name)return;const ref=isNew?db.collection("projects").doc():db.doc("projects/"+p.id);
+    await safe(()=>ref.set(body),"Saved");closeDlg()};
+}
+function showDlg(){$("#dlg").hidden=false;$("#cancel").onclick=closeDlg;$("#scrim").onclick=e=>{if(e.target.id==="scrim")closeDlg()};const f=$("#dlg input:not([disabled])");if(f)f.focus()}
+function closeDlg(){$("#dlg").hidden=true;$("#dlg").innerHTML=""}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#dlg2").hidden)closeDlg2();else if(openP)closeProject();else if(!$("#dlg").hidden)closeDlg()}
+  if(e.key==="Enter"&&e.target.matches(".row .t")){const[p,t]=e.target.dataset.task.split("|");taskEditor(p,t)}});
+
+async function safe(fn,msg){
+  if(!db){toast("The board is still loading. Try again in a moment.");return}
+  try{await fn();toast(msg)}catch(e){
+    if(e&&e.code==="invalid_argument"){canWrite=false;render();toast("You have view-only access to this board.")}
+    else if(e&&e.code==="quota_exceeded")toast("The board is full. Delete finished projects to add more.");
+    else toast("Couldn't save. Check your connection and try again.")}
+}
+function toast(m,ms){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,ms||2400)}
+
+document.addEventListener("click",e=>{
+  const ptab=e.target.closest("[data-pf]");if(ptab){pf=ptab.dataset.pf;render();return}
+  const ttab=e.target.closest("[data-tv]");if(ttab){tv=ttab.dataset.tv;try{localStorage.setItem("pb-tv",tv)}catch(_){}render();return}
+  const mo=e.target.closest("[data-more]");if(mo){expanded[mo.dataset.more]=true;render();return}
+  const dn=e.target.closest("[data-done]");if(dn){const[p,t]=dn.dataset.done.split("|");setTask(p,t,{status:"Done"});return}
+  const lp=e.target.closest("[data-logp]");if(lp){openProject(lp.dataset.logp,"files");return}
+  const pt=e.target.closest("[data-ptab]");if(pt){pTab=pt.dataset.ptab;refreshPanel(true);return}
+  const vw=e.target.closest("[data-view]");if(vw){viewFile(vw.dataset.view);return}
+  const df=e.target.closest("[data-dlf]");if(df){downloadFile(df.dataset.dlf);return}
+  const rf=e.target.closest("[data-rmf]");if(rf){removeFile(rf);return}
+  const cm=e.target.closest("[data-cal]");if(cm){calShift(+cm.dataset.cal);return}
+  const qn=e.target.closest("#qNext");if(qn){qIdx++;renderQuote();return}
+  if(e.target.closest("input,a,label"))return;
+  const tk=e.target.closest("[data-task]");if(tk){const[p,t]=tk.dataset.task.split("|");taskEditor(p,t);return}
+  const ed=e.target.closest("[data-edit]");if(ed){openProject(ed.dataset.edit);return}
+  const cd=e.target.closest("[data-day]");if(cd&&canWrite&&projects.length){taskEditor(byPri()[0].id,null,cd.dataset.day)}
+});
+document.addEventListener("change",e=>{const c=e.target.closest("[data-check]");if(c){const[p,t]=c.dataset.check.split("|");setTask(p,t,{status:c.checked?"Done":"Not started"});return}
+  const ov=e.target.closest("[data-ov]");if(ov&&openP){const k=ov.dataset.ov;let v=ov.value;if(k==="priority")v=+v||99;if(k==="remindAfter")v=Math.max(1,+v||7);if(k==="name"&&!v.trim()){toast("A project needs a name.");return}
+    safe(()=>db.doc("projects/"+openP).update({[k]:typeof v==="string"?v.trim():v,updatedAt:new Date().toISOString()}),"Saved")}});
+let dragKey=null;
+document.addEventListener("dragstart",e=>{const c=e.target.closest(".tcard");if(c){dragKey=c.dataset.task;e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain",dragKey)}catch(_){}}});
+document.addEventListener("dragover",e=>{const col=e.target.closest(".col");if(col&&dragKey){e.preventDefault();document.querySelectorAll(".col.drop").forEach(x=>x!==col&&x.classList.remove("drop"));col.classList.add("drop")}});
+document.addEventListener("dragleave",e=>{const col=e.target.closest(".col");if(col&&!col.contains(e.relatedTarget))col.classList.remove("drop")});
+document.addEventListener("drop",e=>{const col=e.target.closest(".col");if(col&&dragKey){e.preventDefault();col.classList.remove("drop");const[p,t]=dragKey.split("|");dragKey=null;setTask(p,t,{status:col.dataset.col})}});
+document.addEventListener("dragend",()=>{dragKey=null;document.querySelectorAll(".col.drop").forEach(x=>x.classList.remove("drop"))});
+$("#addBtn").addEventListener("click",()=>projEditor(null));
+$("#addTaskBtn").addEventListener("click",()=>{if(!projects.length){toast("Add a project first.");return}taskEditor(byPri()[0].id,null)});
+
+renderQuote();
+render();
+setInterval(render,60*60*1000);
+/* ---------- local store (browser storage, seeded from data.json) ---------- */
+const KEY="ipa-priority-board-v1";
+let store=null;const subs=new Set();
+function persist(){store.savedAt=new Date().toISOString();try{localStorage.setItem(KEY,JSON.stringify(store))}catch(_){toast("Couldn't save in this browser. Export a backup.",6000)}subs.forEach(f=>f())}
+function getDoc(s){return s.length===2?store.projects.find(x=>x.id===s[1]):(store.files[s[1]]||[]).find(x=>x.id===s[3])}
+function putDoc(s,o){const l=s.length===2?store.projects:(store.files[s[1]]=store.files[s[1]]||[]);const i=l.findIndex(x=>x.id===o.id);if(i<0)l.push(o);else l[i]=o}
+function delDoc(s){if(s.length===2){store.projects=store.projects.filter(x=>x.id!==s[1]);delete store.files[s[1]]}else store.files[s[1]]=(store.files[s[1]]||[]).filter(x=>x.id!==s[3])}
+const snapOf=l=>({docs:l.map(x=>({id:x.id,data:()=>{const{id,...r}=structuredClone(x);return r}}))});
+const localDb={
+  doc(path){const s=path.split("/");return{
+    async update(b){const o=getDoc(s);if(!o)throw new Error("missing");Object.assign(o,structuredClone(b));persist()},
+    async set(b){putDoc(s,{...structuredClone(b),id:s[s.length-1]});persist()},
+    async delete(){delDoc(s);persist()}}},
+  collection(path){const s=path.split("/");return{
+    doc(){return localDb.doc(path+"/"+rid())},
+    async add(b){const id=rid();putDoc([...s,id],{...structuredClone(b),id});persist();return{id}},
+    onSnapshot(cb){const f=()=>cb(snapOf(s.length===1?store.projects:(store.files[s[1]]||[])));subs.add(f);f();return()=>subs.delete(f)}}}
+};
+const validBoard=d=>d&&Array.isArray(d.projects)&&d.projects.every(p=>p&&p.id&&p.name);
+const asStore=d=>({base:d.exportedAt||"",projects:d.projects,files:d.files||{}});
+async function fetchPublished(){const r=await fetch("data.json",{cache:"no-store"});if(!r.ok)throw new Error(r.status);const d=await r.json();if(!validBoard(d))throw new Error("bad data");return d}
+function replaceStore(d,msg){store=asStore(structuredClone(d));persist();toast(msg)}
+function showNotice(pub){const n=$("#notice");
+  n.innerHTML=`<span class="tag">Update</span><span>A newer version of the board was published on ${esc(new Date(pub.exportedAt).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}))}. Loading it replaces the changes saved in this browser.</span><span class="actions"><button class="btn ghost" type="button" id="nLater">Later</button><button class="btn primary" type="button" id="nLoad">Load it</button></span>`;
+  n.hidden=false;$("#nLater").onclick=()=>n.hidden=true;$("#nLoad").onclick=()=>{replaceStore(pub,"Loaded the published board");n.hidden=true}}
+function exportBoard(){const d={version:1,exportedAt:new Date().toISOString(),projects:store.projects,files:store.files};
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));a.download="data.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast("Exported. Replace priority/data.json in the repo with it to update the board for everyone.",6000)}
+$("#exportBtn").onclick=()=>store&&exportBoard();
+$("#importBtn").onclick=()=>$("#importIn").click();
+$("#importIn").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+  try{const d=JSON.parse(await f.text());if(!validBoard(d))throw 0;replaceStore(d,"Imported "+d.projects.length+" projects")}catch(_){toast("That file isn't a board export.")}};
+$("#resetBtn").onclick=async e=>{const b=e.currentTarget;if(!b.dataset.armed){b.dataset.armed=1;b.textContent="Tap again: this replaces your changes";return}
+  delete b.dataset.armed;b.textContent="Reload published board";try{replaceStore(await fetchPublished(),"Loaded the published board")}catch(_){toast("Couldn't load data.json. Check your connection.")}};
+
+(async()=>{
+  let saved=null;try{saved=JSON.parse(localStorage.getItem(KEY)||"null")}catch(_){}
+  let pub=null;try{pub=await fetchPublished()}catch(_){}
+  if(saved&&validBoard(saved)){store=saved;store.files=store.files||{};if(pub&&pub.exportedAt&&pub.exportedAt>(store.base||""))showNotice(pub)}
+  else if(pub)store=asStore(pub);
+  else{$("#focus").innerHTML='<span class="tag">Do this now</span><span class="muted">Couldn\'t load the board. Check your connection and reload.</span><span></span>';return}
+  db=localDb;
+  db.collection("projects").onSnapshot(snap=>{projects=snap.docs.map(d=>({id:d.id,...d.data()}));syncFileSubs();render();refreshPanel();if(!hashOpened&&projects.length){hashOpened=true;openFromHash()}});
+  refreshPanel(true);
+})();
+</script>
+
+</body></html>

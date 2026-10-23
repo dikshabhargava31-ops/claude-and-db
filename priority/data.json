@@ -1,0 +1,696 @@
+{
+  "version": 1,
+  "exportedAt": "2026-10-23T06:15:00Z",
+  "projects": [
+    {
+      "id": "p1-parthu",
+      "icon": "check",
+      "name": "PARTHU AI (AI copy checking)",
+      "notes": "Vendor: Alpine Technologies. Dates are suggested; confirm with Alpine's schedule.",
+      "owner": "",
+      "priority": 1,
+      "status": "In progress",
+      "tasks": [
+        {
+          "done": false,
+          "due": "2026-10-26",
+          "est": true,
+          "id": "a1",
+          "status": "In progress",
+          "t": "Confirm the signed development agreement is back from Alpine"
+        },
+        {
+          "done": false,
+          "due": "2026-10-27",
+          "est": true,
+          "id": "a2",
+          "status": "In progress",
+          "t": "Lock teacher portal wireframe (upload-a-paper flow, no principal approval) and hand to Alpine"
+        },
+        {
+          "done": false,
+          "due": "2026-10-31",
+          "est": true,
+          "id": "a3",
+          "note": "waiting on Alpine",
+          "status": "Waiting",
+          "t": "Re-test staging fixes from the teacher app test findings"
+        },
+        {
+          "done": false,
+          "due": "2026-11-07",
+          "est": true,
+          "id": "a4",
+          "status": "Not started",
+          "t": "Collect 30–50 teacher-marked answer sheets for AI calibration"
+        },
+        {
+          "done": false,
+          "due": "2026-11-14",
+          "est": true,
+          "id": "a5",
+          "status": "Not started",
+          "t": "Calibrate AI grading against teacher marks; sign off accuracy"
+        },
+        {
+          "done": false,
+          "due": "2026-11-21",
+          "est": true,
+          "id": "a6",
+          "status": "Not started",
+          "t": "Pilot school onboarding plan (teachers, training, first test)"
+        }
+      ],
+      "updatedAt": "2026-10-23T06:05:00Z"
+    },
+    {
+      "id": "p2-cuet",
+      "icon": "cap",
+      "name": "CUET Counselling (Everything CUET)",
+      "notes": "Tasks from the CUET launch plan, re-planned on 23 Oct around the 1 Nov lead-capture start. GST pulled forward to before payments open; hiring and research moved after launch week. 2027 work grouped into two items.",
+      "owner": "",
+      "priority": 3,
+      "status": "In progress",
+      "tasks": [
+        {
+          "done": false,
+          "due": "2026-10-23",
+          "id": "c01",
+          "t": "Register Instagram handle (Everything CUET)"
+        },
+        {
+          "done": false,
+          "due": "2026-10-24",
+          "id": "c02",
+          "t": "Management sign-off on plan, pricing and budget"
+        },
+        {
+          "done": false,
+          "due": "2026-10-24",
+          "id": "c03",
+          "t": "Set up WhatsApp Business (INR billing)"
+        },
+        {
+          "done": false,
+          "due": "2026-10-24",
+          "id": "c04",
+          "t": "Script first 5 Reels (start posting)"
+        },
+        {
+          "done": false,
+          "due": "2026-10-27",
+          "id": "c05",
+          "t": "Script remaining 10 Reels + 10 YouTube videos"
+        },
+        {
+          "done": false,
+          "due": "2026-10-27",
+          "id": "c06",
+          "t": "Set up Bigin CRM (free tier)"
+        },
+        {
+          "done": false,
+          "due": "2026-10-28",
+          "id": "c07",
+          "t": "Service agreement, refund policy, parent consent form"
+        },
+        {
+          "done": false,
+          "due": "2026-10-28",
+          "id": "c08",
+          "t": "Add counselling packages to Razorpay"
+        },
+        {
+          "done": false,
+          "due": "2026-10-29",
+          "id": "c09",
+          "t": "DU / BHU / CURAJ cut-off sheet"
+        },
+        {
+          "done": false,
+          "due": "2026-10-30",
+          "id": "c10",
+          "note": "before payments open 1 Nov",
+          "t": "Confirm GST invoicing under IPA's GSTIN"
+        },
+        {
+          "done": false,
+          "due": "2026-10-30",
+          "id": "c11",
+          "t": "WhatsApp Community (updates, parents, stream groups)"
+        },
+        {
+          "done": false,
+          "due": "2026-10-31",
+          "id": "c12",
+          "t": "First 3 lead magnets (DU list, subject checker, options guide)"
+        },
+        {
+          "done": false,
+          "due": "2026-10-31",
+          "id": "c13",
+          "t": "Website: resource pages, predictor, WhatsApp button, thank-you page"
+        },
+        {
+          "done": false,
+          "due": "2026-11-01",
+          "id": "c14",
+          "t": "Ask-a-Counsellor booking + payment live"
+        },
+        {
+          "done": false,
+          "due": "2026-11-07",
+          "id": "c15",
+          "t": "Hire counsellor-cum-telecaller (IPA HR)"
+        },
+        {
+          "done": false,
+          "due": "2026-11-12",
+          "id": "c16",
+          "t": "Research sprint: mystery-shop 5–8 counsellors, IG audit, YouTube + Trends"
+        },
+        {
+          "done": false,
+          "due": "2026-11-15",
+          "id": "c17",
+          "t": "Parent's guide to CUET (Hindi PDF)"
+        },
+        {
+          "done": false,
+          "due": "2026-11-20",
+          "id": "c18",
+          "t": "File 'Everything CUET' trademark"
+        },
+        {
+          "done": false,
+          "due": "2026-11-30",
+          "id": "c19",
+          "t": "Sign 3–5 coaching-centre referral tie-ups"
+        },
+        {
+          "done": false,
+          "due": "2026-11-30",
+          "id": "c20",
+          "t": "Pick psychometric vendor + Premium session kit"
+        },
+        {
+          "done": false,
+          "due": "2026-12-12",
+          "id": "c21",
+          "t": "Meta pixel + source tags on website links"
+        },
+        {
+          "done": false,
+          "due": "2026-12-15",
+          "id": "c22",
+          "t": "Form + Subject session kit (sheet, checklist, script)"
+        },
+        {
+          "done": false,
+          "due": "2026-12-20",
+          "id": "c23",
+          "t": "CUET 2027 form-filling checklist + video"
+        },
+        {
+          "done": false,
+          "due": "2027-01-05",
+          "id": "c24",
+          "t": "Jan–Feb 2027: NTA dates, Rajasthan colleges PDF, mock series plan"
+        },
+        {
+          "done": false,
+          "due": "2027-04-15",
+          "id": "c25",
+          "t": "Apr–Sep 2027 season: predictor, peak staff, consent flow, CSAS, cut-off tracker"
+        }
+      ],
+      "updatedAt": "2026-10-23T06:05:00Z"
+    },
+    {
+      "id": "p3-mentorship",
+      "icon": "steps",
+      "name": "Mentorship Program (Class 8 to CA Inter)",
+      "notes": "Covers Class 8–10, Class 11–12 Commerce, CA Foundation (₹5,999) and CA Inter (₹6,999). Dates are suggested.",
+      "owner": "",
+      "priority": 2,
+      "status": "In progress",
+      "tasks": [
+        {
+          "done": false,
+          "due": "2026-10-24",
+          "est": true,
+          "id": "m1",
+          "t": "Start promoting the Class 9 & 10 ad posters"
+        },
+        {
+          "done": false,
+          "due": "2026-10-24",
+          "est": true,
+          "id": "m2",
+          "t": "Share Class 12 batch application form with students and parents"
+        },
+        {
+          "done": false,
+          "due": "2026-10-26",
+          "est": true,
+          "id": "m3",
+          "t": "Launch CA Inter mentorship ads"
+        },
+        {
+          "done": false,
+          "due": "2026-10-29",
+          "est": true,
+          "id": "m4",
+          "t": "Open CA Foundation mentorship enrolment"
+        },
+        {
+          "done": false,
+          "due": "2026-11-04",
+          "est": true,
+          "id": "m5",
+          "t": "Commerce Class 11–12 landing page + study audit offer live"
+        },
+        {
+          "done": false,
+          "due": "2026-11-14",
+          "est": true,
+          "id": "m6",
+          "t": "Define Class 8 mentorship offer and price"
+        },
+        {
+          "done": false,
+          "due": "2026-11-30",
+          "est": true,
+          "id": "m7",
+          "t": "Review first-month enrolments; adjust ads and offers"
+        }
+      ],
+      "updatedAt": "2026-10-23T06:05:00Z"
+    },
+    {
+      "id": "p4-virtual-ceo",
+      "icon": "briefcase",
+      "name": "B2B Consultation (Virtual CEO)",
+      "notes": "Starter tasks with suggested dates; replace with the real plan.",
+      "owner": "",
+      "priority": 7,
+      "status": "Not started",
+      "tasks": [
+        {
+          "done": false,
+          "due": "2026-10-31",
+          "est": true,
+          "id": "v1",
+          "t": "Write the offer: what Virtual CEO includes, deliverables, pricing"
+        },
+        {
+          "done": false,
+          "due": "2026-11-07",
+          "est": true,
+          "id": "v2",
+          "t": "One-page pitch + case study from IPA's own systems"
+        },
+        {
+          "done": false,
+          "due": "2026-11-10",
+          "est": true,
+          "id": "v3",
+          "t": "List 15 institutes / coaching centres to approach"
+        },
+        {
+          "done": false,
+          "due": "2026-11-14",
+          "est": true,
+          "id": "v4",
+          "t": "Draft the consulting agreement template"
+        },
+        {
+          "done": false,
+          "due": "2026-11-21",
+          "est": true,
+          "id": "v5",
+          "t": "Book first 3 discovery calls"
+        }
+      ],
+      "updatedAt": "2026-10-23T06:05:00Z"
+    },
+    {
+      "id": "p5-mahendra-yt",
+      "icon": "play",
+      "name": "CA Mahendra Sir YouTube Channel",
+      "notes": "Ongoing channel. Dates are suggested.",
+      "owner": "",
+      "priority": 4,
+      "status": "In progress",
+      "tasks": [
+        {
+          "done": false,
+          "due": "2026-10-28",
+          "est": true,
+          "id": "y1",
+          "t": "Plan November content calendar (pillars + 8 topics)"
+        },
+        {
+          "done": false,
+          "due": "2026-10-31",
+          "est": true,
+          "id": "y2",
+          "t": "Script the next 4 videos"
+        },
+        {
+          "done": false,
+          "due": "2026-11-03",
+          "est": true,
+          "id": "y3",
+          "t": "Thumbnails + motion graphics for the next 2 uploads"
+        },
+        {
+          "done": false,
+          "due": "2026-11-30",
+          "est": true,
+          "id": "y4",
+          "t": "Monthly review: views, CTR, best video"
+        }
+      ],
+      "updatedAt": "2026-10-23T06:05:00Z"
+    },
+    {
+      "id": "p6-ipa-instagram",
+      "icon": "grid",
+      "name": "IPA Offline Instagram",
+      "notes": "Ongoing channel. Dates are suggested.",
+      "owner": "",
+      "priority": 6,
+      "status": "In progress",
+      "tasks": [
+        {
+          "done": false,
+          "due": "2026-10-28",
+          "est": true,
+          "id": "i1",
+          "t": "November post calendar"
+        },
+        {
+          "done": false,
+          "due": "2026-11-02",
+          "est": true,
+          "id": "i2",
+          "t": "Batch-shoot 2 weeks of Reels with faculty and students"
+        },
+        {
+          "done": false,
+          "due": "2026-11-15",
+          "est": true,
+          "id": "i3",
+          "t": "Admissions-season content series plan (results, toppers, campus)"
+        }
+      ],
+      "updatedAt": "2026-10-23T06:05:00Z"
+    },
+    {
+      "id": "p7-admissions",
+      "icon": "building",
+      "name": "Offline Admissions Activities (2027–28)",
+      "notes": "Activities to drive next year's admissions. Dates are suggested, working back from a Dec–Apr activity season.",
+      "owner": "",
+      "priority": 5,
+      "status": "Not started",
+      "tasks": [
+        {
+          "done": false,
+          "due": "2026-11-07",
+          "est": true,
+          "id": "o1",
+          "t": "Set 2027–28 admission targets per batch with management"
+        },
+        {
+          "done": false,
+          "due": "2026-11-14",
+          "est": true,
+          "id": "o2",
+          "t": "Draft activity calendar Nov–Apr: school seminars, scholarship test, parent meets, demo classes"
+        },
+        {
+          "done": false,
+          "due": "2026-11-21",
+          "est": true,
+          "id": "o3",
+          "t": "Approve budget and an owner for each activity"
+        },
+        {
+          "done": false,
+          "due": "2026-11-28",
+          "est": true,
+          "id": "o4",
+          "t": "Book the first school seminars for December"
+        },
+        {
+          "done": false,
+          "due": "2026-12-05",
+          "est": true,
+          "id": "o5",
+          "t": "Fix scholarship test date + registration form"
+        },
+        {
+          "done": false,
+          "due": "2026-12-15",
+          "est": true,
+          "id": "o6",
+          "t": "Brochure and fee structure for 2027–28"
+        }
+      ],
+      "updatedAt": "2026-10-23T06:05:00Z"
+    }
+  ],
+  "files": {
+    "p1-parthu": [
+      {
+        "id": "l01",
+        "addedAt": "2026-10-23T06:10:01Z",
+        "kind": "link",
+        "name": "PARTHU.AI Software Development Agreement",
+        "url": "https://claude.ai/artifact/XhnSvJ4pK4erjU7RjLcKH4"
+      },
+      {
+        "id": "l02",
+        "addedAt": "2026-10-23T06:10:02Z",
+        "kind": "link",
+        "name": "PARTHU Teacher Portal Wireframe",
+        "url": "https://claude.ai/artifact/MNTiBz4eW9uZKwTZb9XzyA"
+      },
+      {
+        "id": "l03",
+        "addedAt": "2026-10-23T06:10:03Z",
+        "kind": "link",
+        "name": "Teacher App – Test Findings & Required Changes",
+        "url": "https://claude.ai/artifact/YMvWbgyMrFSqnouUfKkVjh"
+      },
+      {
+        "id": "l04",
+        "addedAt": "2026-10-23T06:10:04Z",
+        "kind": "link",
+        "name": "Staging Change List (Surface Area & Volume test)",
+        "url": "https://claude.ai/artifact/H8mftXT6rA6Z5qcKhDtSak"
+      },
+      {
+        "id": "l05",
+        "addedAt": "2026-10-23T06:10:05Z",
+        "kind": "link",
+        "name": "Teacher App – Review Notes Changes",
+        "url": "https://claude.ai/artifact/LWZNRG8F76BVHcV5jigd3V"
+      },
+      {
+        "id": "l06",
+        "addedAt": "2026-10-23T06:10:06Z",
+        "kind": "link",
+        "name": "Teacher Portal v8 – Fixes to Make Now",
+        "url": "https://claude.ai/artifact/GPKFeLXYgyueHuFWEeA7Zy"
+      },
+      {
+        "id": "l07",
+        "addedAt": "2026-10-23T06:10:07Z",
+        "kind": "link",
+        "name": "Super Admin – Change Checklist",
+        "url": "https://claude.ai/artifact/KUd3wRPjXLGdDZ2BiWLb8M"
+      },
+      {
+        "id": "l08",
+        "addedAt": "2026-10-23T06:10:08Z",
+        "kind": "link",
+        "name": "PARTHU AI animated website",
+        "url": "https://claude.ai/artifact/8nzQjEwpRbtBntXyg6Kx7o"
+      },
+      {
+        "id": "l09",
+        "addedAt": "2026-10-23T06:10:09Z",
+        "kind": "link",
+        "name": "Vendor Proposals – Neutral Comparison",
+        "url": "https://claude.ai/artifact/EYzPvD1Q6WKsoeEfcxQ1Ax"
+      }
+    ],
+    "p2-cuet": [
+      {
+        "id": "l01",
+        "addedAt": "2026-10-23T06:10:01Z",
+        "kind": "link",
+        "name": "IPA CUET counselling launch plan (dashboard)",
+        "url": "https://claude.ai/artifact/Jz5Bes34BHPHtANAbZmJHJ"
+      },
+      {
+        "id": "l02",
+        "addedAt": "2026-10-23T06:10:02Z",
+        "kind": "link",
+        "name": "Everything CUET – Instagram Plan & Verified Content",
+        "url": "https://claude.ai/artifact/9aUhVph44DEFp7NGpsjTh8"
+      },
+      {
+        "id": "l03",
+        "addedAt": "2026-10-23T06:10:03Z",
+        "kind": "link",
+        "name": "CUET UG E-book – Research Pack",
+        "url": "https://claude.ai/artifact/MRDnjvPApqdUQoqi54yT6K"
+      },
+      {
+        "id": "l04",
+        "addedAt": "2026-10-23T06:10:04Z",
+        "kind": "link",
+        "name": "CUET UG at a Glance – Carousel",
+        "url": "https://claude.ai/artifact/YKwNH766Xwky53RGmDSBtk"
+      },
+      {
+        "id": "l05",
+        "addedAt": "2026-10-23T06:10:05Z",
+        "kind": "link",
+        "name": "Script – How to Make Your CUET College List in 3 Tiers",
+        "url": "https://claude.ai/artifact/Ktj6q99PpJSitpSGgzMWk5"
+      },
+      {
+        "id": "l06",
+        "addedAt": "2026-10-23T06:10:06Z",
+        "kind": "link",
+        "name": "Script – CUET College List (Reference-Video Structure)",
+        "url": "https://claude.ai/artifact/GDfsCj68k55J6CQwRsoVcr"
+      }
+    ],
+    "p3-mentorship": [
+      {
+        "id": "l01",
+        "addedAt": "2026-10-23T06:10:01Z",
+        "kind": "link",
+        "name": "CA Inter Mentorship Ads",
+        "url": "https://claude.ai/artifact/QmnSrpaLvHuLBREgrmyuuU"
+      },
+      {
+        "id": "l02",
+        "addedAt": "2026-10-23T06:10:02Z",
+        "kind": "link",
+        "name": "Class 9 & 10 Ad Posters",
+        "url": "https://claude.ai/artifact/LZNvo1ku84ps3xZ1r4yLUW"
+      },
+      {
+        "id": "l03",
+        "addedAt": "2026-10-23T06:10:03Z",
+        "kind": "link",
+        "name": "Class 12 Batch Application Form",
+        "url": "https://claude.ai/artifact/NQwqvPQR9egaNj99Ndkjx4"
+      },
+      {
+        "id": "l04",
+        "addedAt": "2026-10-23T06:10:04Z",
+        "kind": "link",
+        "name": "Commerce Mentorship Landing",
+        "url": "https://claude.ai/artifact/SJTvNhUzqbmRQT9ov5HcLg"
+      },
+      {
+        "id": "l05",
+        "addedAt": "2026-10-23T06:10:05Z",
+        "kind": "link",
+        "name": "CA Foundation Timetable",
+        "url": "https://claude.ai/artifact/H6sxCw67QmGD6rKLUkGh5U"
+      },
+      {
+        "id": "l06",
+        "addedAt": "2026-10-23T06:10:06Z",
+        "kind": "link",
+        "name": "CA Foundation 80-Day Target Sheet",
+        "url": "https://claude.ai/artifact/8JZw4Z8GBBzeMMNJsAvCTh"
+      },
+      {
+        "id": "l07",
+        "addedAt": "2026-10-23T06:10:07Z",
+        "kind": "link",
+        "name": "Foundation Timetable (Class 8–10)",
+        "url": "https://claude.ai/artifact/JAaHr7mU3RTiR67FGqscag"
+      },
+      {
+        "id": "l08",
+        "addedAt": "2026-10-23T06:10:08Z",
+        "kind": "link",
+        "name": "Topper's Daily Schedule",
+        "url": "https://claude.ai/artifact/4uVi1U94YGaeZy13P9d3So"
+      }
+    ],
+    "p5-mahendra-yt": [
+      {
+        "id": "l01",
+        "addedAt": "2026-10-23T06:10:01Z",
+        "kind": "link",
+        "name": "CA Mahendra Sir: Content Calendar",
+        "url": "https://claude.ai/artifact/5dim381UzDJCCZtg6KQPLu"
+      },
+      {
+        "id": "l02",
+        "addedAt": "2026-10-23T06:10:02Z",
+        "kind": "link",
+        "name": "Script – Why ICAI Is Changing the CA Course Again",
+        "url": "https://claude.ai/artifact/4ujS1FUwHsKYVuFLiUYyuV"
+      },
+      {
+        "id": "l03",
+        "addedAt": "2026-10-23T06:10:03Z",
+        "kind": "link",
+        "name": "Script – CA Foundation Fail Hone Ki Asli Keemat",
+        "url": "https://claude.ai/artifact/JVMzN6soYv4EXoewqzEsUq"
+      },
+      {
+        "id": "l04",
+        "addedAt": "2026-10-23T06:10:04Z",
+        "kind": "link",
+        "name": "Study 12 Hours Thumbnail",
+        "url": "https://claude.ai/artifact/MtNPvHf5nJRRLdq7XKVMT7"
+      }
+    ],
+    "p6-ipa-instagram": [
+      {
+        "id": "l01",
+        "addedAt": "2026-10-23T06:10:01Z",
+        "kind": "link",
+        "name": "IPA Institute – Instagram Content Pillar Plan",
+        "url": "https://claude.ai/artifact/CqozbBG24BmZFdZZyp6yMx"
+      },
+      {
+        "id": "l02",
+        "addedAt": "2026-10-23T06:10:02Z",
+        "kind": "link",
+        "name": "IPA October Post Calendar",
+        "url": "https://claude.ai/artifact/4jEdQnLP9tYPck1njp1nG1"
+      },
+      {
+        "id": "l03",
+        "addedAt": "2026-10-23T06:10:03Z",
+        "kind": "link",
+        "name": "Coaching Business Reels: 10 Scripts",
+        "url": "https://claude.ai/artifact/2Td1A5W4Fb8nt68kLaADHr"
+      }
+    ],
+    "p7-admissions": [
+      {
+        "id": "l01",
+        "addedAt": "2026-10-23T06:10:01Z",
+        "kind": "link",
+        "name": "IPA staff dashboard",
+        "url": "https://claude.ai/artifact/4Jv9AeLSuDHpAqXJX6npP8"
+      }
+    ]
+  }
+}

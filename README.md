@@ -17,3 +17,11 @@ A single static page: `index.html`, plus `assets/`. There is no build step. It's
 - **Systems:** a PARA overview and an archive. Search with `/` (or Ctrl+K), and quick capture with `N`.
 
 Data is saved in the browser's local storage. Use **Settings & backup** to export or import it. Data from the earlier planner versions carries over.
+
+## IPA Priority Board
+
+`priority/` is the IPA Priority Board (`index.html` plus `data.json`, no build step). It has the projects gallery, "Do this now", tasks (Kanban, by day, by project, calendar), a timeline, a folder for each project with notes, links and a work log, and idle-project reminders.
+
+- **Data:** the board loads `priority/data.json`. Changes are saved in each visitor's browser.
+- **To update the board for everyone:** click **Export**, then replace `priority/data.json` in the repo with the downloaded file. Visitors who have local changes will see a prompt to load the newer version.
+- **Files:** GitHub Pages can't store uploads, so add work as links (for example Google Drive).
