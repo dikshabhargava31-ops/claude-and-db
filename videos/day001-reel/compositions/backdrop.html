@@ -1,23 +1,18 @@
 <template>
   <style>
     #root { position: absolute; inset: 0; }
-    #bd-panel {
-      position: absolute; left: 0; top: 0; width: 1080px; height: 640px;
-      background: linear-gradient(180deg, #0b1226 0%, #0b1226 73%, rgba(11, 18, 38, 0.82) 82%, rgba(11, 18, 38, 0) 100%);
-    }
-    #bd-foot {
-      position: absolute; left: 0; bottom: 0; width: 1080px; height: 900px;
-      background: linear-gradient(0deg, rgba(5, 9, 20, 0.72) 0%, rgba(5, 9, 20, 0.45) 45%, rgba(5, 9, 20, 0) 100%);
-    }
+    #bd-panel { position: absolute; left: 0; top: 0; width: 1080px; height: 585px; background: #0b1226; border-bottom: 5px solid #fbb524; }
   </style>
   <div id="root" data-composition-id="backdrop" data-width="1080" data-height="1920">
     <div id="bd-panel"></div>
-    <div id="bd-foot"></div>
   </div>
   <script>
     window.__timelines = window.__timelines || {};
     const tl = gsap.timeline({ paused: true });
-    tl.set("#bd-panel", { opacity: 1 }, 0);
+    // the panel ends where each shot's old burned-in card ends (measured per shot), so nothing below it is covered
+    [[0, 585], [11.5, 640], [21.2, 580], [25.6, 700], [32.75, 585], [37.1, 805], [44.35, 585]].forEach(([t, h]) => {
+      tl.set("#bd-panel", { height: h }, t);
+    });
     window.__timelines["backdrop"] = tl;
   </script>
 </template>

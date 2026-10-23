@@ -21,7 +21,6 @@
       #cam {
         position: absolute;
         inset: 0;
-        transform-origin: 50% 100%;
       }
       #cam video {
         position: absolute;
@@ -99,30 +98,32 @@
     <script>
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
-      // Camera: base scale per shot hides the old card (origin bottom centre); punch-ins are hard cuts
+      // Camera: each shot plays unscaled under a panel that ends exactly at its old card's edge.
+      // Punch-ins pivot on that edge, so the card above stays hidden and the characters below stay whole.
       const shots = [
-        [0, 1.15, 0],
-        [2.55, 1.35, -180],
-        [4.5, 1.15, 0],
-        [7.9, 1.15, 0],
-        [11.5, 1.22, 0],
-        [12.4, 1.32, 0],
-        [15.45, 1.4, 0],
-        [18.35, 1.26, 0],
-        [21.2, 1.28, 0],
-        [23.7, 1.38, 0],
-        [25.6, 1.22, 0],
-        [28.65, 1.4, 0],
-        [32.75, 1.16, 0],
-        [35.95, 1.26, 0],
-        [37.1, 1.3, 0],
-        [41.3, 1.45, 0],
-        [44.35, 1.16, 0],
-        [47.0, 1.3, 0],
+        // [time, scale, x, panel edge px]
+        [0, 1.0, 0, 585],
+        [2.55, 1.2, -100, 585],
+        [4.5, 1.0, 0, 585],
+        [7.9, 1.0, 0, 585],
+        [11.5, 1.0, 0, 640],
+        [12.4, 1.1, 0, 640],
+        [15.45, 1.2, 0, 640],
+        [18.35, 1.06, 0, 640],
+        [21.2, 1.0, 0, 580],
+        [23.7, 1.12, 0, 580],
+        [25.6, 1.0, 0, 700],
+        [28.65, 1.18, 0, 700],
+        [32.75, 1.0, 0, 585],
+        [35.95, 1.1, 0, 585],
+        [37.1, 1.0, 0, 805],
+        [41.3, 1.18, 0, 805],
+        [44.35, 1.0, 0, 585],
+        [47.0, 1.12, 0, 585],
       ];
-      shots.forEach(([t, s, x]) => tl.set("#cam", { scale: s, x: x }, t));
+      shots.forEach(([t, sc, x, edge]) => tl.set("#cam", { scale: sc, x: x, transformOrigin: "50% " + edge + "px" }, t));
       // slow push on the opening shot only, so frame 0 already reads
-      tl.fromTo("#cam", { scale: 1.15 }, { scale: 1.22, duration: 2.5, ease: "none" }, 0.02);
+      tl.fromTo("#cam", { scale: 1.0 }, { scale: 1.06, duration: 2.5, ease: "none" }, 0.02);
       window.__timelines["main"] = tl;
     </script>
   </body>
