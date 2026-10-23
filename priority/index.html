@@ -152,8 +152,8 @@ header{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:end;justify-content
 .field input,.field select,.field textarea,.trow input,.trow select{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:7px 9px;width:100%}
 .field textarea{min-height:60px;resize:vertical}
 .tlist{display:grid;gap:6px}
-.trow{display:grid;grid-template-columns:minmax(0,1fr) 140px 130px auto;gap:6px;align-items:center}
-@media (max-width:620px){.trow{grid-template-columns:1fr 1fr auto}.trow [data-f="t"]{grid-column:1/-1}}
+.trow{display:grid;grid-template-columns:minmax(0,1fr) 135px 120px 130px auto;gap:6px;align-items:center}
+@media (max-width:620px){.trow{grid-template-columns:1fr 1fr}.trow [data-f="t"]{grid-column:1/-1}}
 .sheet-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .empty{border:1px dashed var(--line);border-radius:8px;padding:14px;color:var(--faint);font-size:.88rem}
 /* attention */
@@ -218,6 +218,15 @@ header{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:end;justify-content
 .lightbox{display:grid;gap:10px;justify-items:center}
 .lightbox img,.lightbox video{max-width:100%;max-height:75vh;border-radius:6px}
 #dlg2 .scrim{z-index:25}
+.who{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;line-height:1;color:var(--ink);white-space:nowrap}
+.who b{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--info-soft);color:var(--info);font:600 .65rem/1 var(--f-body)}
+.by{color:var(--muted);font-size:.82rem}
+.sel{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:5px 8px;font-size:.88rem;max-width:100%}
+.me{font-size:.88rem;color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+.me b{color:var(--ink);font-weight:600}
+.sync{display:inline-flex;gap:6px;align-items:center}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.sync.ok::before{background:var(--ok)} .sync.saving::before{background:var(--warn)} .sync.bad::before{background:var(--crit)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:8px;font-size:.88rem;z-index:30}
 </style>
 </head>
@@ -230,15 +239,14 @@ header{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:end;justify-content
       <div class="stat" id="stat"></div>
     </div>
     <div class="actions">
-      <button class="btn ghost" id="exportBtn" type="button">Export</button>
-      <button class="btn ghost" id="importBtn" type="button">Import</button>
+      <span class="me" id="me"></span>
+      <button class="btn ghost" id="exportBtn" type="button">Back up</button>
+      <button class="btn ghost" id="importBtn" type="button">Restore</button>
       <input type="file" id="importIn" accept=".json,application/json" hidden>
       <button class="btn" id="addTaskBtn" type="button">+ Task</button>
       <button class="btn primary" id="addBtn" type="button">+ Project</button>
     </div>
   </header>
-
-  <section class="focus" id="notice" hidden></section>
 
   <figure class="quote" id="quote" aria-live="polite"></figure>
 
@@ -259,7 +267,9 @@ header{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:end;justify-content
   <section class="focus" id="focus" aria-live="polite"><span class="tag">Do this now</span><span class="muted">Loading…</span><span></span></section>
 
   <section>
-    <h2>Tasks</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px 12px">
+      <h2>Tasks</h2><label class="small muted">Show tasks for <select class="sel" id="personSel"></select></label>
+    </div>
     <div class="tabs" role="tablist" id="ttabs">
       <button role="tab" data-tv="kanban" aria-selected="true" type="button">Kanban</button>
       <button role="tab" data-tv="day" aria-selected="false" type="button">By day</button>
@@ -277,14 +287,15 @@ header{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:end;justify-content
   </section>
 
   <footer class="muted small" style="display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px">
-    <span>Your changes save in this browser. Use Export to back them up or to update <span class="mono">data.json</span> for everyone.</span>
-    <button class="btn ghost" id="resetBtn" type="button">Reload published board</button>
+    <span class="sync" id="sync">Loading…</span>
+    <span>Everyone sees the same board. Each change is saved to the repository with the editor's name. <a id="histLink" target="_blank" rel="noopener noreferrer">See change history ↗</a></span>
   </footer>
 </div>
 
 <div id="dlg" hidden></div>
 <div id="dlg2" hidden></div>
 <div id="toast" class="toast" hidden></div>
+<datalist id="people"></datalist>
 
 <script>
 const TSTAT=["Not started","In progress","Waiting","Done"];
@@ -299,11 +310,11 @@ const ICONS={
   building:'<path d="M10 54V22l22-12 22 12v32"/><path d="M6 54h52M24 54V38h16v16M20 28h4M40 28h4"/>',
   spark:'<path d="M32 8v48M8 32h48M15 15l34 34M49 15L15 49"/>'
 };
-let db=null, canWrite=true, projects=[], pf="all", tv="kanban", expanded={};
+let db=null, canWrite=false, person="all", projects=[], pf="all", tv="kanban", expanded={};
 let assetsNs=null, dlNs=null, filesBy={}, fileSubs={}, openP=null, pTab="overview";
 const TYPES={pdf:"application/pdf",png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",gif:"image/gif",webp:"image/webp",svg:"image/svg+xml",mp4:"video/mp4",webm:"video/webm",csv:"text/csv",md:"text/markdown",json:"application/json",txt:"text/plain"};
 const OFFICE=new Set(["doc","docx","xls","xlsx","ppt","pptx","odt","ods","odp","pages","numbers","key"]);
-try{tv=localStorage.getItem("pb-tv")||"kanban"}catch(e){}
+try{tv=localStorage.getItem("pb-tv")||"kanban";person=localStorage.getItem("pb-person")||"all"}catch(e){}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const today0=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
@@ -322,7 +333,12 @@ function dueChip(t){const d=dl(t.due);const e=t.est?" est":"";if(d===null)return
   if(d===1)return`<span class="chip warn${e}">Tomorrow</span>`;if(d<=6)return`<span class="chip warn${e}">${fmt(t.due)}</span>`;
   return`<span class="chip${e}">${fmt(t.due)}</span>`}
 const byPri=()=>[...projects].sort((a,b)=>(+a.priority||99)-(+b.priority||99));
-function allTasks(){const o=[];byPri().forEach(p=>(p.tasks||[]).forEach(t=>o.push({...t,st:tstat(t),p})));return o}
+function allTasks(){const o=[];byPri().forEach(p=>(p.tasks||[]).forEach(t=>o.push({...t,st:tstat(t),p})));return o.filter(forPerson)}
+const norm=s=>String(s||"").trim().toLowerCase();
+function forPerson(t){if(person==="all")return true;if(person==="__none")return !norm(t.who);return norm(t.who)===norm(person==="__me"?myName():person)}
+function people(){const m=new Map();const add=n=>{n=String(n||"").trim();if(n&&!m.has(norm(n)))m.set(norm(n),n)};
+  if(myName())add(myName());projects.forEach(p=>{add(p.owner);(p.tasks||[]).forEach(t=>add(t.who))});return[...m.values()].sort((a,b)=>a.localeCompare(b))}
+const whoChip=n=>n?`<span class="who" title="Assigned to ${esc(n)}"><b aria-hidden="true">${esc(n.trim()[0].toUpperCase())}</b>${esc(n)}</span>`:"";
 // Order: urgency band first (overdue, due within a day, this week, later), then your project priority, then date.
 const band=t=>{const d=dl(t.due);return d===null?4:d<0?0:d<=1?1:d<=7?2:3};
 const cmp=(a,b)=>band(a)-band(b)||(+a.p.priority||99)-(+b.p.priority||99)||(a.due||"9999").localeCompare(b.due||"9999")||(a.est?1:0)-(b.est?1:0);
@@ -330,13 +346,22 @@ const openTasks=()=>allTasks().filter(t=>t.st!=="Done"&&projStatus(t.p)!=="Done"
 
 function taskCard(t){return`<button class="tcard ${t.st==="Done"?"isdone":""}" type="button" draggable="${canWrite}" data-task="${esc(t.p.id)}|${esc(t.id)}">
   <span class="t"><i aria-hidden="true"></i><span>${esc(t.t)}</span></span>
-  <span class="meta"><span class="proj" style="--sw:${hue(t.p)}">${esc(t.p.name)}</span>${dueChip(t)}</span></button>`}
+  <span class="meta"><span class="proj" style="--sw:${hue(t.p)}">${esc(t.p.name)}</span>${dueChip(t)}${whoChip(t.who)}</span></button>`}
 
 function render(){
   $("#today").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   const open=openTasks();
   const over=open.filter(t=>band(t)===0).length, tod=open.filter(t=>dl(t.due)===0).length, wk=open.filter(t=>{const d=dl(t.due);return d!==null&&d>=0&&d<=7}).length, est=open.filter(t=>t.est).length;
   $("#stat").innerHTML=`<span class="${over?"c":""}"><b>${over}</b> overdue</span><span><b>${tod}</b> due today</span><span><b>${wk}</b> due this week</span><span><b>${est}</b> suggested dates to confirm</span>`;
+
+  // people
+  const ps=people();if(person!=="all"&&person!=="__none"&&person!=="__me"&&!ps.some(n=>norm(n)===norm(person)))person="all";
+  if(person==="__me"&&!myName())person="all";
+  $("#personSel").innerHTML=`<option value="all">Everyone</option>${myName()?`<option value="__me">Me (${esc(myName())})</option>`:""}${ps.filter(n=>norm(n)!==norm(myName())).map(n=>`<option>${esc(n)}</option>`).join("")}<option value="__none">Unassigned</option>`;
+  $("#personSel").value=person;
+  $("#people").innerHTML=ps.map(n=>`<option value="${esc(n)}">`).join("");
+  $("#me").innerHTML=me&&me.token?`Signed in as <b>${esc(me.name)}</b><button class="btn ghost" type="button" id="signOut">Sign out</button>`:`<button class="btn" type="button" id="signIn">Sign in to edit</button>`;
+  $("#importBtn").hidden=!canWrite;
 
   // gallery
   document.querySelectorAll("#ptabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.pf===pf));
@@ -350,9 +375,9 @@ function render(){
   // focus
   const top=open[0];
   $("#focus").innerHTML=!projects.length?'<span class="tag">Do this now</span><span class="muted">Add a project to get started.</span><span></span>'
-    :!top?'<span class="tag">Do this now</span><span>Everything open is done.</span><span></span>'
+    :!top?`<span class="tag">Do this now</span><span>${person==="all"?"Everything open is done.":"Nothing open for this person."}</span><span></span>`
     :`<span class="tag">Do this now</span><div style="display:grid;gap:4px;min-width:0"><span class="t">${esc(top.t)}</span>
-      <span class="meta"><span class="proj" style="--sw:${hue(top.p)}">${esc(top.p.name)}</span>${dueChip(top)}</span>
+      <span class="meta"><span class="proj" style="--sw:${hue(top.p)}">${esc(top.p.name)}</span>${dueChip(top)}${whoChip(top.who)}</span>
       ${open[1]?`<span class="then">Then: ${esc(open[1].t)} · ${esc(open[1].p.name)}</span>`:""}</div>
       ${canWrite?`<button class="btn" type="button" data-done="${esc(top.p.id)}|${esc(top.id)}">Mark done</button>`:"<span></span>"}`;
 
@@ -385,7 +410,7 @@ function render(){
 }
 function row(t){return`<div class="row ${t.st==="Done"?"isdone":""}"><input type="checkbox" aria-label="Mark done" data-check="${esc(t.p.id)}|${esc(t.id)}" ${t.st==="Done"?"checked":""} ${canWrite?"":"disabled"}>
   <span class="t" data-task="${esc(t.p.id)}|${esc(t.id)}" tabindex="0">${esc(t.t)}<br><span class="proj" style="--sw:${hue(t.p)}">${esc(t.p.name)}</span></span>
-  <span class="right">${t.st!=="Not started"&&t.st!=="Done"?pill(t.st):""}${t.est?'<span class="chip est">Suggested</span>':""}${dueChip(t)}</span></div>`}
+  <span class="right">${whoChip(t.who)}${t.st!=="Not started"&&t.st!=="Done"?pill(t.st):""}${t.est?'<span class="chip est">Suggested</span>':""}${dueChip(t)}</span></div>`}
 
 let calM=(()=>{const d=today0();d.setDate(1);return d})();
 function calShift(n){if(n===0){calM=today0();calM.setDate(1)}else calM=new Date(calM.getFullYear(),calM.getMonth()+n,1);render()}
@@ -460,7 +485,7 @@ async function setTask(pid,tid,patch,proofed){
     proofDialog(pid,tid);return"proof";
   }
   const now=new Date().toISOString();
-  const tasks=(p.tasks||[]).map(t=>{if(t.id!==tid)return t;const n={...t,...patch};n.done=tstat(n)==="Done";if(n.done&&!t.done)n.doneAt=now;if(!n.done)delete n.doneAt;return n});
+  const tasks=(p.tasks||[]).map(t=>{if(t.id!==tid)return t;const n={...t,...patch};n.done=tstat(n)==="Done";if(n.done&&!t.done){n.doneAt=now;delete n.logHidden}if(!n.done)delete n.doneAt;return n});
   const body={tasks,updatedAt:now};if(patch.status==="Done")body.lastWorkAt=now;
   await safe(()=>db.doc("projects/"+pid).update(body),patch.status==="Done"?"Done. Work logged.":"Updated");
 }
@@ -471,7 +496,7 @@ let hashOpened=false;
 function openFromHash(){const h=(location.hash||"").slice(1);if(h&&projects.find(x=>x.id===h)){openProject(h);return true}return false}
 window.addEventListener("hashchange",openFromHash);
 const TRACK_START="2026-10-23T00:00:00Z";
-function lastWork(p){let m=p.lastWorkAt||TRACK_START;(filesBy[p.id]||[]).forEach(f=>{if(f.addedAt>m)m=f.addedAt});(p.tasks||[]).forEach(t=>{if(t.doneAt&&t.doneAt>m)m=t.doneAt});return m}
+function lastWork(p){let m=p.lastWorkAt||TRACK_START;(filesBy[p.id]||[]).forEach(f=>{if(f.addedAt>m)m=f.addedAt});(p.tasks||[]).forEach(t=>{if(t.doneAt&&!t.logHidden&&t.doneAt>m)m=t.doneAt});return m}
 const remindAfter=p=>+p.remindAfter||((+p.priority||99)<=4?4:7);
 const idleDays=p=>Math.floor((today0()-new Date(new Date(lastWork(p)).setHours(0,0,0,0)))/864e5);
 const isStale=p=>projStatus(p)!=="Done"&&projStatus(p)!=="Waiting"&&idleDays(p)>=remindAfter(p);
@@ -513,17 +538,19 @@ function taskEditor(pid,tid,preDue){
   $("#dlg2").innerHTML=`<div class="scrim" id="scrim2"><form class="sheet narrow" id="form2"><h2>${isNew?"New task":"Task"}</h2>
     <div class="field"><label class="lbl" for="x-t">Task</label><input id="x-t" required value="${esc(t.t)}" ${dis}></div>
     <div class="field"><label class="lbl" for="x-p">Project</label><select id="x-p" ${dis||!isNew?"disabled":""}>${byPri().map(p=>`<option value="${esc(p.id)}" ${p0&&p0.id===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select></div>
-    <div class="grid3" style="grid-template-columns:1fr 1fr">
+    <div class="grid3">
       <div class="field"><label class="lbl" for="x-d">Due</label><input id="x-d" type="date" value="${esc(t.due||"")}" ${dis}></div>
-      <div class="field"><label class="lbl" for="x-s">Status</label><select id="x-s" ${dis}>${TSTAT.map(s=>`<option ${s===t.status?"selected":""}>${s}</option>`).join("")}</select></div></div>
+      <div class="field"><label class="lbl" for="x-s">Status</label><select id="x-s" ${dis}>${TSTAT.map(s=>`<option ${s===t.status?"selected":""}>${s}</option>`).join("")}</select></div>
+      <div class="field"><label class="lbl" for="x-w">Assigned to</label><input id="x-w" list="people" value="${esc(t.who||"")}" placeholder="Name" ${dis}></div></div>
     ${t.est?'<span class="muted small">This date is a suggestion. Saving confirms it.</span>':""}
+    ${!isNew?`<span class="by">${[t.createdBy?`Added by ${esc(t.createdBy)}${t.createdAt?" on "+esc(dShort(t.createdAt)):""}`:"",t.doneAt&&tstat(t)==="Done"?`Done${t.doneBy?" by "+esc(t.doneBy):""} on ${esc(dShort(t.doneAt))}`:"",t.updatedBy?`Last changed by ${esc(t.updatedBy)}`:""].filter(Boolean).join(" · ")}</span>`:""}
     <div class="sheet-foot"><div>${!isNew&&canWrite?'<button type="button" class="btn danger" id="delT">Delete task</button>':""}</div>
     <div class="actions"><button type="button" class="btn" id="cancel2">${canWrite?"Cancel":"Close"}</button>${canWrite?'<button class="btn primary" type="submit">Save</button>':""}</div></div></form></div>`;
   showDlg2();
   const dt=$("#delT");if(dt)dt.onclick=async()=>{if(!dt.dataset.armed){dt.dataset.armed=1;dt.textContent="Tap again to delete";return}
     const p=projects.find(x=>x.id===pid);await safe(()=>db.doc("projects/"+pid).update({tasks:(p.tasks||[]).filter(x=>x.id!==tid),updatedAt:new Date().toISOString()}),"Task deleted");closeDlg2()};
   $("#form2").onsubmit=async e=>{e.preventDefault();const text=$("#x-t").value.trim();if(!text)return;
-    const st=$("#x-s").value;const nt={t:text,due:$("#x-d").value,status:st,done:st==="Done",est:false};
+    const st=$("#x-s").value;const nt={t:text,due:$("#x-d").value,status:st,done:st==="Done",est:false,who:$("#x-w").value.trim()};
     if(isNew){const p=projects.find(x=>x.id===$("#x-p").value);if(!p)return;
       await safe(()=>db.doc("projects/"+p.id).update({tasks:[...(p.tasks||[]),{id:rid(),...nt}],updatedAt:new Date().toISOString()}),"Task added")}
     else{const r=await setTask(pid,tid,nt);if(r==="proof")return}
@@ -574,22 +601,22 @@ function renderPBody(p){
     const dp=$("#delP");if(dp)dp.onclick=async()=>{if(!dp.dataset.armed){dp.dataset.armed=1;dp.textContent="Tap again to delete";return}await safe(()=>db.doc("projects/"+p.id).delete(),"Project deleted");closeProject()};
   }else if(pTab==="tasks"){
     const ts=(p.tasks||[]).map(t=>({...t,st:tstat(t),p})).sort((a,b)=>(a.st==="Done")-(b.st==="Done")||(a.due||"9999").localeCompare(b.due||"9999"));
-    B.innerHTML=`${canWrite?`<form class="linkform" id="newTask"><input id="nt-t" placeholder="Add a task" aria-label="New task"><input id="nt-d" type="date" aria-label="Due date"><button class="btn primary" type="submit">Add task</button></form>`:""}
+    B.innerHTML=`${canWrite?`<form class="linkform" id="newTask" style="grid-template-columns:minmax(0,1fr) 150px 150px auto"><input id="nt-t" placeholder="Add a task" aria-label="New task"><input id="nt-d" type="date" aria-label="Due date"><input id="nt-w" list="people" placeholder="Assigned to" aria-label="Assigned to"><button class="btn primary" type="submit">Add task</button></form>`:""}
       <div>${ts.map(row).join("")||'<div class="empty">No tasks yet.</div>'}</div>`;
-    const f=$("#newTask");if(f)f.onsubmit=async e=>{e.preventDefault();const t=$("#nt-t").value.trim();if(!t)return;const due=$("#nt-d").value;
-      await safe(()=>db.doc("projects/"+p.id).update({tasks:[...(p.tasks||[]),{id:rid(),t,due,status:"Not started",done:false,est:false}],updatedAt:new Date().toISOString()}),"Task added")};
+    const f=$("#newTask");if(f)f.onsubmit=async e=>{e.preventDefault();const t=$("#nt-t").value.trim();if(!t)return;const due=$("#nt-d").value,who=$("#nt-w").value.trim();
+      await safe(()=>db.doc("projects/"+p.id).update({tasks:[...(p.tasks||[]),{id:rid(),t,due,status:"Not started",done:false,est:false,who}],updatedAt:new Date().toISOString()}),"Task added")};
   }else if(pTab==="log"){
     const fs=filesBy[p.id]||[];const ev=[];
-    (p.tasks||[]).filter(t=>t.doneAt).forEach(t=>ev.push({at:t.doneAt,html:`<strong>Done:</strong> ${esc(t.t)}`}));
-    fs.forEach(f=>ev.push({at:f.addedAt,html:f.taskName?`<strong>Work added</strong> for “${esc(f.taskName)}”: ${f.kind==="file"?esc(f.name):`<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`}${f.note?` · ${esc(f.note)}`:""}`
+    (p.tasks||[]).filter(t=>t.doneAt&&!t.logHidden).forEach(t=>ev.push({at:t.doneAt,by:t.doneBy,rm:`data-hidelog="${esc(p.id)}|${esc(t.id)}" title="Removes this entry from the log. The task stays done."`,html:`<strong>Done:</strong> ${esc(t.t)}`}));
+    fs.forEach(f=>ev.push({at:f.addedAt,by:f.addedBy,rm:`data-rmf="${esc(f.id)}" title="Removes this ${f.kind==="file"?"file":"link"} from the project."`,html:f.taskName?`<strong>Work added</strong> for “${esc(f.taskName)}”: ${f.kind==="file"?esc(f.name):`<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`}${f.note?` · ${esc(f.note)}`:""}`
       :`<strong>${f.kind==="file"?"File added":"Link added"}:</strong> ${f.kind==="file"?esc(f.name):`<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.name)}</a>`}`}));
     ev.sort((a,b)=>(b.at||"").localeCompare(a.at||""));
     const d=idleDays(p);
     B.innerHTML=`<div class="${isStale(p)?"attention":"focus"}" style="display:block">${d===0?"Work logged today.":`Last work logged ${d} day${d>1?"s":""} ago.`} The reminder appears after ${remindAfter(p)} days with nothing logged.</div>
-      <div class="links">${ev.map(e=>`<div class="link" style="grid-template-columns:110px minmax(0,1fr)"><span class="muted small mono">${new Date(e.at).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</span><span style="min-width:0;overflow-wrap:anywhere">${e.html}</span></div>`).join("")||'<div class="empty">Nothing logged yet. Mark a task done with proof, or add a file or link.</div>'}</div>`;
+      <div class="links">${ev.map(e=>`<div class="link" style="grid-template-columns:110px minmax(0,1fr) auto"><span class="muted small mono">${new Date(e.at).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})}</span><span style="min-width:0;overflow-wrap:anywhere">${e.html}${e.by?` <span class="by">· by ${esc(e.by)}</span>`:""}</span>${canWrite?`<button class="btn ghost" type="button" ${e.rm}>Delete</button>`:"<span></span>"}</div>`).join("")||'<div class="empty">Nothing logged yet. Mark a task done with proof, or add a file or link.</div>'}</div>`;
   }else{
     const fs=filesBy[p.id]||[];const files=fs.filter(f=>f.kind==="file"),links=fs.filter(f=>f.kind!=="file");
-    B.innerHTML=`${assetsNs?`<label class="drop" id="drop"><input type="file" id="fileIn" multiple hidden><b>Drop files here or click to choose</b><span class="small">PDF, images, video, CSV, Markdown or text · up to 20 MB each. For Word, Excel or PowerPoint, save as PDF or add the Drive link below.</span></label>`
+    B.innerHTML=`${!canWrite?"":assetsNs?`<label class="drop" id="drop"><input type="file" id="fileIn" multiple hidden><b>Drop files here or click to choose</b><span class="small">PDF, images, video, CSV, Markdown or text · up to 20 MB each. For Word, Excel or PowerPoint, save as PDF or add the Drive link below.</span></label>`
         :'<div class="empty">File uploads aren\'t available on this site. Upload the file to Google Drive and add its link below.</div>'}
       ${canWrite?`<form class="linkform" id="newLink"><input id="nl-n" placeholder="Title, e.g. Alpine agreement (Google Drive)" aria-label="Link title"><input id="nl-u" type="url" placeholder="Paste a link: Drive, Canva, Claude, website…" aria-label="Link URL" required><button class="btn primary" type="submit">Add link</button></form>`:""}
       <div style="display:grid;gap:10px"><h3 class="sub">Files <span class="muted small mono">${files.length}</span></h3>
@@ -612,7 +639,7 @@ function fileCard(f){const img=/^image\//.test(f.contentType),vid=/^video\//.tes
   <div class="fb"><span class="fn">${esc(f.name)}</span><span class="muted small mono">${sizeOf(f.size||0)} · ${dShort(f.addedAt)}</span>${f.taskName?`<span class="muted small">Work for: ${esc(f.taskName)}</span>`:""}${f.note?`<span class="small">${esc(f.note)}</span>`:""}
   <div class="actions">${img||vid?`<button class="btn ghost" type="button" data-view="${esc(f.id)}">View</button>`:""}${dlNs?`<button class="btn ghost" type="button" data-dlf="${esc(f.id)}">Download</button>`:""}${assetsNs?`<button class="btn ghost" type="button" data-rmf="${esc(f.id)}">Remove</button>`:""}</div></div></div>`}
 function linkRow(l){const h=hostOf(l.url);
-  return`<div class="link"><span class="ic" aria-hidden="true">${esc(h.slice(0,2).toUpperCase())}</span><div style="min-width:0"><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.name)}</a><div class="muted small">${esc(h)} · ${dShort(l.addedAt)}${l.taskName?" · Work for: "+esc(l.taskName):""}${l.note?" · "+esc(l.note):""}</div></div>
+  return`<div class="link"><span class="ic" aria-hidden="true">${esc(h.slice(0,2).toUpperCase())}</span><div style="min-width:0"><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.name)}</a><div class="muted small">${esc(h)} · ${dShort(l.addedAt)}${l.addedBy?" · by "+esc(l.addedBy):""}${l.taskName?" · Work for: "+esc(l.taskName):""}${l.note?" · "+esc(l.note):""}</div></div>
   ${canWrite?`<button class="btn ghost" type="button" data-rmf="${esc(l.id)}">Remove</button>`:"<span></span>"}</div>`}
 async function uploadFiles(pid,list){
   if(!assetsNs){toast("File uploads aren't available on this site. Add a Drive link instead.");return}
@@ -630,8 +657,11 @@ async function downloadFile(id){const{f}=findFile(id);if(!f)return;if(!dlNs){toa
 function viewFile(id){const{f}=findFile(id);if(!f)return;const vid=/^video\//.test(f.contentType);
   $("#dlg2").innerHTML=`<div class="scrim" id="scrim2"><div class="sheet lightbox" style="width:min(1000px,100%)"><div class="sheet-foot" style="width:100%"><strong style="overflow-wrap:anywhere">${esc(f.name)}</strong><div class="actions">${dlNs?`<button class="btn" type="button" data-dlf="${esc(f.id)}">Download</button>`:""}<button class="btn" type="button" id="cancel2">Close</button></div></div>
   ${vid?`<video src="/_blob/${esc(f.assetId)}" controls></video>`:`<img src="/_blob/${esc(f.assetId)}" alt="${esc(f.name)}">`}</div></div>`;showDlg2()}
+async function hideLog(btn){const[pid,tid]=btn.dataset.hidelog.split("|");const p=projects.find(x=>x.id===pid);if(!p)return;
+  if(!btn.dataset.armed){btn.dataset.armed=1;btn.textContent="Tap again to delete";return}
+  await safe(()=>db.doc("projects/"+pid).update({tasks:(p.tasks||[]).map(t=>t.id===tid?{...t,logHidden:true}:t),updatedAt:new Date().toISOString()}),"Removed from the work log")}
 async function removeFile(btn){const id=btn.dataset.rmf;const{f,pid}=findFile(id);if(!f)return;
-  if(!btn.dataset.armed){btn.dataset.armed=1;btn.textContent="Tap again";return}
+  if(!btn.dataset.armed){btn.dataset.armed=1;btn.textContent="Tap again to delete";return}
   if(f.kind==="file"&&assetsNs){try{await assetsNs.delete(f.assetId)}catch(e){toast(e&&e.code==="not_uploader"?"Only the person who uploaded this file can remove it.":"Couldn't remove the file. Try again.");return}}
   await safe(()=>db.doc("projects/"+pid+"/files/"+id).delete(),"Removed")}
 
@@ -641,6 +671,7 @@ function projEditor(p){
   const rows=()=>tasks.map((t,i)=>`<div class="trow" data-i="${i}"><input data-f="t" value="${esc(t.t)}" placeholder="Task" aria-label="Task" ${dis}>
     <input type="date" data-f="due" value="${esc(t.due||"")}" aria-label="Due date" ${dis}>
     <select data-f="status" aria-label="Status" ${dis}>${TSTAT.map(s=>`<option ${s===t.status?"selected":""}>${s}</option>`).join("")}</select>
+    <input data-f="who" list="people" value="${esc(t.who||"")}" placeholder="Assigned to" aria-label="Assigned to" ${dis}>
     ${canWrite?`<button type="button" class="btn ghost" data-rm="${i}" aria-label="Remove task">✕</button>`:"<span></span>"}</div>`).join("");
   $("#dlg").innerHTML=`<div class="scrim" id="scrim"><form class="sheet" id="form"><h2>${isNew?"New project":esc(p.name)}</h2>
     <div class="field"><label class="lbl" for="f-name">Project</label><input id="f-name" required value="${esc(p.name)}" ${dis}></div>
@@ -654,13 +685,13 @@ function projEditor(p){
     <div class="sheet-foot"><div>${!isNew&&canWrite?'<button type="button" class="btn danger" id="delP">Delete project</button>':""}</div>
     <div class="actions"><button type="button" class="btn" id="cancel">${canWrite?"Cancel":"Close"}</button>${canWrite?'<button class="btn primary" type="submit">Save</button>':""}</div></div></form></div>`;
   showDlg();
-  const sync=()=>document.querySelectorAll("#tlist .trow").forEach(r=>{const t=tasks[+r.dataset.i];const nd=r.querySelector('[data-f="due"]').value;if(nd!==(t.due||""))t.est=false;t.due=nd;t.t=r.querySelector('[data-f="t"]').value;t.status=r.querySelector('[data-f="status"]').value});
+  const sync=()=>document.querySelectorAll("#tlist .trow").forEach(r=>{const t=tasks[+r.dataset.i];const nd=r.querySelector('[data-f="due"]').value;if(nd!==(t.due||""))t.est=false;t.due=nd;t.t=r.querySelector('[data-f="t"]').value;t.status=r.querySelector('[data-f="status"]').value;t.who=r.querySelector('[data-f="who"]').value.trim()});
   const ar=$("#addRow");if(ar)ar.onclick=()=>{sync();tasks.push({id:rid(),t:"",due:"",status:"Not started"});$("#tlist").innerHTML=rows();const a=document.querySelectorAll('#tlist [data-f="t"]');a[a.length-1].focus()};
   $("#tlist").onclick=e=>{const b=e.target.closest("[data-rm]");if(b){sync();tasks.splice(+b.dataset.rm,1);$("#tlist").innerHTML=rows()}};
   const dp=$("#delP");if(dp)dp.onclick=async()=>{if(!dp.dataset.armed){dp.dataset.armed=1;dp.textContent="Tap again to delete";return}await safe(()=>db.doc("projects/"+p.id).delete(),"Project deleted");closeDlg()};
   $("#form").onsubmit=async e=>{e.preventDefault();sync();
     const body={name:$("#f-name").value.trim(),priority:+$("#f-pri").value||99,status:$("#f-status").value,owner:$("#f-owner").value.trim(),notes:$("#f-notes").value.trim(),icon:p.icon||"spark",
-      tasks:tasks.filter(t=>t.t.trim()).map(t=>({id:t.id||rid(),t:t.t.trim(),due:t.due||"",status:t.status,done:t.status==="Done",est:!!t.est,...(t.note?{note:t.note}:{})})),updatedAt:new Date().toISOString()};
+      tasks:tasks.filter(t=>t.t.trim()).map(t=>({id:t.id||rid(),t:t.t.trim(),due:t.due||"",status:t.status,done:t.status==="Done",est:!!t.est,who:t.who||"",...(t.note?{note:t.note}:{})})),updatedAt:new Date().toISOString()};
     if(!body.name)return;const ref=isNew?db.collection("projects").doc():db.doc("projects/"+p.id);
     await safe(()=>ref.set(body),"Saved");closeDlg()};
 }
@@ -672,7 +703,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#dlg2").hidd
 async function safe(fn,msg){
   if(!db){toast("The board is still loading. Try again in a moment.");return}
   try{await fn();toast(msg)}catch(e){
-    if(e&&e.code==="invalid_argument"){canWrite=false;render();toast("You have view-only access to this board.")}
+    if(e&&e.code==="invalid_argument"){toast("Sign in to make changes.");signInDialog()}
     else if(e&&e.code==="quota_exceeded")toast("The board is full. Delete finished projects to add more.");
     else toast("Couldn't save. Check your connection and try again.")}
 }
@@ -688,6 +719,9 @@ document.addEventListener("click",e=>{
   const vw=e.target.closest("[data-view]");if(vw){viewFile(vw.dataset.view);return}
   const df=e.target.closest("[data-dlf]");if(df){downloadFile(df.dataset.dlf);return}
   const rf=e.target.closest("[data-rmf]");if(rf){removeFile(rf);return}
+  const hl=e.target.closest("[data-hidelog]");if(hl){hideLog(hl);return}
+  if(e.target.closest("#signIn")){signInDialog();return}
+  if(e.target.closest("#signOut")){signOut();return}
   const cm=e.target.closest("[data-cal]");if(cm){calShift(+cm.dataset.cal);return}
   const qn=e.target.closest("#qNext");if(qn){qIdx++;renderQuote();return}
   if(e.target.closest("input,a,label"))return;
@@ -695,7 +729,8 @@ document.addEventListener("click",e=>{
   const ed=e.target.closest("[data-edit]");if(ed){openProject(ed.dataset.edit);return}
   const cd=e.target.closest("[data-day]");if(cd&&canWrite&&projects.length){taskEditor(byPri()[0].id,null,cd.dataset.day)}
 });
-document.addEventListener("change",e=>{const c=e.target.closest("[data-check]");if(c){const[p,t]=c.dataset.check.split("|");setTask(p,t,{status:c.checked?"Done":"Not started"});return}
+document.addEventListener("change",e=>{if(e.target.id==="personSel"){person=e.target.value;try{localStorage.setItem("pb-person",person)}catch(_){}render();return}
+  const c=e.target.closest("[data-check]");if(c){const[p,t]=c.dataset.check.split("|");setTask(p,t,{status:c.checked?"Done":"Not started"});return}
   const ov=e.target.closest("[data-ov]");if(ov&&openP){const k=ov.dataset.ov;let v=ov.value;if(k==="priority")v=+v||99;if(k==="remindAfter")v=Math.max(1,+v||7);if(k==="name"&&!v.trim()){toast("A project needs a name.");return}
     safe(()=>db.doc("projects/"+openP).update({[k]:typeof v==="string"?v.trim():v,updatedAt:new Date().toISOString()}),"Saved")}});
 let dragKey=null;
@@ -708,52 +743,175 @@ $("#addBtn").addEventListener("click",()=>projEditor(null));
 $("#addTaskBtn").addEventListener("click",()=>{if(!projects.length){toast("Add a project first.");return}taskEditor(byPri()[0].id,null)});
 
 renderQuote();
-render();
 setInterval(render,60*60*1000);
-/* ---------- local store (browser storage, seeded from data.json) ---------- */
-const KEY="ipa-priority-board-v1";
-let store=null;const subs=new Set();
-function persist(){store.savedAt=new Date().toISOString();try{localStorage.setItem(KEY,JSON.stringify(store))}catch(_){toast("Couldn't save in this browser. Export a backup.",6000)}subs.forEach(f=>f())}
-function getDoc(s){return s.length===2?store.projects.find(x=>x.id===s[1]):(store.files[s[1]]||[]).find(x=>x.id===s[3])}
-function putDoc(s,o){const l=s.length===2?store.projects:(store.files[s[1]]=store.files[s[1]]||[]);const i=l.findIndex(x=>x.id===o.id);if(i<0)l.push(o);else l[i]=o}
-function delDoc(s){if(s.length===2){store.projects=store.projects.filter(x=>x.id!==s[1]);delete store.files[s[1]]}else store.files[s[1]]=(store.files[s[1]]||[]).filter(x=>x.id!==s[3])}
-const snapOf=l=>({docs:l.map(x=>({id:x.id,data:()=>{const{id,...r}=structuredClone(x);return r}}))});
-const localDb={
-  doc(path){const s=path.split("/");return{
-    async update(b){const o=getDoc(s);if(!o)throw new Error("missing");Object.assign(o,structuredClone(b));persist()},
-    async set(b){putDoc(s,{...structuredClone(b),id:s[s.length-1]});persist()},
-    async delete(){delDoc(s);persist()}}},
-  collection(path){const s=path.split("/");return{
-    doc(){return localDb.doc(path+"/"+rid())},
-    async add(b){const id=rid();putDoc([...s,id],{...structuredClone(b),id});persist();return{id}},
-    onSnapshot(cb){const f=()=>cb(snapOf(s.length===1?store.projects:(store.files[s[1]]||[])));subs.add(f);f();return()=>subs.delete(f)}}}
-};
+/* ---------- shared board: priority/data.json in the GitHub repo ---------- */
+// Everyone reads the same file. Signed-in editors save through the GitHub API: each change is
+// kept as an operation, replayed on the latest copy of the file and committed with their name,
+// so two people editing at once don't overwrite each other.
+const GH={owner:"dikshabhargava31-ops",repo:"claude-and-db",branch:"main",path:"priority/data.json"};
+const API=`https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
+const KEY="ipa-priority-board-v2",AUTH_KEY="ipa-priority-board-user";
+let me=null;try{me=JSON.parse(localStorage.getItem(AUTH_KEY)||"null")}catch(_){}
+canWrite=!!(me&&me.token);
+function myName(){return me&&me.name||""}
+let shared=null,sha=null,pending=[],store=null,lastSync=null,flushing=false,flushTimer=null,savedCount=0,syncState="";
+const subs=new Set();
+const DEL={__del:1};
 const validBoard=d=>d&&Array.isArray(d.projects)&&d.projects.every(p=>p&&p.id&&p.name);
-const asStore=d=>({base:d.exportedAt||"",projects:d.projects,files:d.files||{}});
-async function fetchPublished(){const r=await fetch("data.json",{cache:"no-store"});if(!r.ok)throw new Error(r.status);const d=await r.json();if(!validBoard(d))throw new Error("bad data");return d}
-function replaceStore(d,msg){store=asStore(structuredClone(d));persist();toast(msg)}
-function showNotice(pub){const n=$("#notice");
-  n.innerHTML=`<span class="tag">Update</span><span>A newer version of the board was published on ${esc(new Date(pub.exportedAt).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}))}. Loading it replaces the changes saved in this browser.</span><span class="actions"><button class="btn ghost" type="button" id="nLater">Later</button><button class="btn primary" type="button" id="nLoad">Load it</button></span>`;
-  n.hidden=false;$("#nLater").onclick=()=>n.hidden=true;$("#nLoad").onclick=()=>{replaceStore(pub,"Loaded the published board");n.hidden=true}}
+const normalize=d=>{d.projects=d.projects||[];d.files=d.files||{};return d};
+const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+
+function patchObj(o,p){for(const k in p){if(p[k]&&p[k].__del)delete o[k];else o[k]=structuredClone(p[k])}}
+function diff(a,b){const p={};for(const k in b)if(!same(a[k],b[k]))p[k]=b[k];for(const k in a)if(!(k in b))p[k]=DEL;return p}
+function applyOp(d,o){
+  const p=o.pid&&d.projects.find(x=>x.id===o.pid);
+  if(o.k==="all"){d.projects=structuredClone(o.data.projects);d.files=structuredClone(o.data.files||{})}
+  else if(o.k==="pset"){const n={...structuredClone(o.doc),id:o.pid};const i=d.projects.findIndex(x=>x.id===o.pid);if(i<0)d.projects.push(n);else d.projects[i]=n}
+  else if(o.k==="pdel"){d.projects=d.projects.filter(x=>x.id!==o.pid);delete d.files[o.pid]}
+  else if(!p)return;
+  else if(o.k==="pupd")patchObj(p,o.patch);
+  else if(o.k==="tadd"){p.tasks=p.tasks||[];if(!p.tasks.some(t=>t.id===o.task.id))p.tasks.push(structuredClone(o.task))}
+  else if(o.k==="tdel")p.tasks=(p.tasks||[]).filter(t=>t.id!==o.tid);
+  else if(o.k==="tupd"){const t=(p.tasks||[]).find(t=>t.id===o.tid);if(t)patchObj(t,o.patch)}
+  else if(o.k==="fadd"){const l=d.files[o.pid]=d.files[o.pid]||[];if(!l.some(f=>f.id===o.doc.id))l.push(structuredClone(o.doc))}
+  else if(o.k==="fdel"&&d.files[o.pid])d.files[o.pid]=d.files[o.pid].filter(f=>f.id!==o.fid);
+}
+function rebuild(){store=normalize(structuredClone(shared));pending.forEach(o=>applyOp(store,o));
+  try{localStorage.setItem(KEY,JSON.stringify({shared,sha,pending}))}catch(_){}
+  subs.forEach(f=>f());showSync()}
+
+function taskOps(pid,oldTs,newTs){
+  const ops=[],by=myName(),now=new Date().toISOString(),om=new Map(oldTs.map(t=>[t.id,t])),keep=new Set(newTs.map(t=>t.id));
+  oldTs.forEach(t=>{if(!keep.has(t.id))ops.push({k:"tdel",pid,tid:t.id,desc:`deleted task “${t.t}”`})});
+  newTs.forEach(t=>{const o=om.get(t.id);
+    if(!o){ops.push({k:"tadd",pid,task:{...t,createdBy:by,createdAt:now,...(t.doneAt?{doneBy:by}:{})},desc:`added task “${t.t}”`});return}
+    const p=diff(o,t);if(!Object.keys(p).length)return;
+    if(p.doneAt)p.doneBy=p.doneAt.__del?DEL:by;
+    const desc=p.logHidden?`removed “${o.t}” from the work log`:p.status&&p.status!==tstat(o)?`moved “${o.t}” to ${p.status}`:p.who!==undefined&&!p.who.__del&&p.who!==(o.who||"")?`assigned “${o.t}” to ${p.who||"nobody"}`:`edited task “${o.t}”`;
+    Object.assign(p,{updatedBy:by,updatedAt:now});
+    ops.push({k:"tupd",pid,tid:t.id,patch:p,desc})});
+  return ops}
+function queue(ops){if(!ops.length)return;const at=new Date().toISOString();ops.forEach(o=>{o.by=myName();o.at=at;pending.push(o)});rebuild();scheduleFlush()}
+function need(){if(!canWrite||!me)throw Object.assign(new Error("Sign in to edit"),{code:"invalid_argument"})}
+const sharedDb={
+  doc(path){const s=path.split("/");return{
+    async update(b){need();const p=store.projects.find(x=>x.id===s[1]);if(!p||s.length!==2)throw new Error("missing");
+      const{tasks,...rest}=b;const ops=tasks?taskOps(s[1],p.tasks||[],tasks):[];
+      const pp={};for(const k in rest)if(!same(p[k],rest[k]))pp[k]=rest[k];
+      const real=Object.keys(pp).filter(k=>k!=="updatedAt"&&k!=="lastWorkAt");
+      if(real.length||ops.length){pp.updatedBy=myName();ops.push({k:"pupd",pid:s[1],patch:pp,desc:real.length?`edited ${real.join(", ")} of “${p.name}”`:""})}
+      queue(ops)},
+    async set(b){need();if(store.projects.some(x=>x.id===s[1]))return this.update(b);
+      queue([{k:"pset",pid:s[1],doc:{...b,createdBy:myName(),createdAt:new Date().toISOString()},desc:`added project “${b.name}”`}])},
+    async delete(){need();if(s.length===2){const p=store.projects.find(x=>x.id===s[1]);queue([{k:"pdel",pid:s[1],desc:`deleted project “${p?p.name:s[1]}”`}])}
+      else{const f=(store.files[s[1]]||[]).find(x=>x.id===s[3]);queue([{k:"fdel",pid:s[1],fid:s[3],desc:`deleted “${f?f.name:s[3]}” from the work log`}])}}}},
+  collection(path){const s=path.split("/");return{
+    doc(){return sharedDb.doc(path+"/"+rid())},
+    async add(b){need();const id=rid();queue([{k:"fadd",pid:s[1],doc:{...b,id,addedBy:myName()},desc:`added ${b.taskName?"work for “"+b.taskName+"”":"link “"+b.name+"”"}`}]);return{id}},
+    onSnapshot(cb){const f=()=>cb({docs:(s.length===1?store.projects:(store.files[s[1]]||[])).map(x=>({id:x.id,data:()=>{const{id,...r}=structuredClone(x);return r}}))});subs.add(f);f();return()=>subs.delete(f)}}}
+};
+
+/* ---------- GitHub reads and writes ---------- */
+function b64enc(str){const b=new TextEncoder().encode(str);let o="";for(let i=0;i<b.length;i+=32768)o+=String.fromCharCode.apply(null,b.subarray(i,i+32768));return btoa(o)}
+function b64dec(str){const bin=atob(str.replace(/\s/g,""));return new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))}
+const ghHeaders=()=>({Accept:"application/vnd.github+json",...(me&&me.token?{Authorization:"Bearer "+me.token}:{})});
+async function readRemote(){
+  if(me&&me.token){const r=await fetch(`${API}?ref=${GH.branch}&t=${Date.now()}`,{cache:"no-store",headers:ghHeaders()});
+    if(r.ok){const j=await r.json();const d=JSON.parse(b64dec(j.content));if(validBoard(d))return{data:normalize(d),sha:j.sha}}
+    else if(r.status!==404)throw Object.assign(new Error("read"),{status:r.status})}
+  // Viewers (and the first save, before the file is on main): the raw file, then the copy published with the site.
+  for(const u of[`https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${GH.path}?t=${Date.now()}`,`data.json?t=${Date.now()}`]){
+    try{const r=await fetch(u,{cache:"no-store"});if(r.ok){const d=await r.json();if(validBoard(d))return{data:normalize(d),sha:null}}}catch(_){}}
+  throw new Error("read")}
+function commitMsg(batch){const ds=batch.map(o=>o.desc).filter(Boolean);const who=batch[0].by||"Someone";
+  return`Board: ${who} ${ds[0]||"updated the board"}${ds.length>1?` (+${ds.length-1} more)`:""}`}
+function scheduleFlush(ms){clearTimeout(flushTimer);flushTimer=setTimeout(flush,ms??1000)}
+async function flush(){
+  if(flushing||!pending.length||!me||!me.token)return;flushing=true;setSync("saving");
+  const batch=pending.slice();
+  try{
+    for(let tries=0;tries<4;tries++){
+      const rem=await readRemote();
+      const next=normalize(structuredClone(rem.data||shared));batch.forEach(o=>applyOp(next,o));
+      next.version=1;next.exportedAt=new Date().toISOString();
+      const r=await fetch(API,{method:"PUT",headers:{...ghHeaders(),"Content-Type":"application/json"},
+        body:JSON.stringify({message:commitMsg(batch),content:b64enc(JSON.stringify(next,null,2)+"\n"),branch:GH.branch,...(rem.sha?{sha:rem.sha}:{})})});
+      if(r.status===409||r.status===422)continue; // someone saved first: re-read and replay
+      if(r.status===401||r.status===403||r.status===404){setSync("auth");toast("GitHub didn't accept the save. Sign in again with a token that can write to this repository.",8000);return}
+      if(!r.ok)throw new Error(r.status);
+      const j=await r.json();shared=next;sha=j.content.sha;savedCount++;
+      pending=pending.filter(o=>!batch.includes(o));lastSync=new Date();setSync("ok");rebuild();
+      if(pending.length)scheduleFlush(300);return}
+    throw new Error("conflict")}
+  catch(_){setSync("error");scheduleFlush(30000)}
+  finally{flushing=false}
+}
+async function pull(){
+  if(flushing||document.hidden||!shared)return;const seen=savedCount;
+  try{const rem=await readRemote();if(flushing||seen!==savedCount||!rem.data)return;
+    if((rem.data.exportedAt||"")<(shared.exportedAt||""))return; // a cached copy older than what we have
+    lastSync=new Date();if(rem.sha)sha=rem.sha;
+    if(!same(rem.data,shared)){shared=rem.data;rebuild()}else showSync();
+    if(syncState==="offline")setSync(pending.length?"error":"ok")}
+  catch(_){setSync("offline")}
+}
+function setSync(s){syncState=s;showSync()}
+function showSync(){const el=$("#sync");if(!el)return;const n=pending.length;
+  const t=lastSync?lastSync.toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"}):"";
+  const[cls,msg]=syncState==="saving"?["saving","Saving…"]
+    :syncState==="error"?["bad",`Couldn't save ${n} change${n===1?"":"s"}. Retrying shortly.`]
+    :syncState==="auth"?["bad",`${n} change${n===1?"":"s"} not saved. Sign in again.`]
+    :syncState==="offline"?["bad","Offline. Showing the last copy loaded."]
+    :n&&!canWrite?["bad",`${n} change${n===1?"":"s"} not saved. Sign in to save them.`]
+    :["ok",`${canWrite?"All changes saved":"View only"}${t?" · updated "+t:""}`];
+  el.className="sync "+cls;el.textContent=msg}
+
+/* ---------- sign in ---------- */
+function signInDialog(){
+  $("#dlg2").innerHTML=`<div class="scrim" id="scrim2"><form class="sheet narrow" id="signin"><h2>Sign in to edit</h2>
+    <p class="muted small" style="margin:0">Your name is shown on tasks you're assigned, tasks you finish and work you log. Saving needs a GitHub access token for this repository. It stays in this browser only.</p>
+    <div class="field"><label class="lbl" for="si-n">Your name</label><input id="si-n" required value="${esc(me&&me.name)}" autocomplete="name" placeholder="e.g. Diksha"></div>
+    <div class="field"><label class="lbl" for="si-t">GitHub access token</label><input id="si-t" type="password" required value="${esc(me&&me.token)}" autocomplete="off" placeholder="github_pat_…">
+      <span class="muted small">Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">fine-grained token</a> for only <span class="mono">${GH.owner}/${GH.repo}</span>, with <b>Contents: Read and write</b>. You need to be a collaborator on the repository.</span></div>
+    <div class="sheet-foot"><span></span><div class="actions"><button type="button" class="btn" id="cancel2">Cancel</button><button class="btn primary" type="submit">Sign in</button></div></div></form></div>`;
+  showDlg2();
+  $("#signin").onsubmit=async e=>{e.preventDefault();const name=$("#si-n").value.trim(),token=$("#si-t").value.trim();if(!name||!token)return;
+    toast("Checking access…",15000);
+    try{const r=await fetch(`https://api.github.com/repos/${GH.owner}/${GH.repo}`,{cache:"no-store",headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+token}});
+      if(r.status===401){toast("GitHub didn't accept that token.",6000);return}
+      if(!r.ok)throw 0;const j=await r.json();
+      if(!(j.permissions&&j.permissions.push)){toast("That account can't save to this repository. Ask the owner to add you as a collaborator.",8000);return}}
+    catch(_){toast("Couldn't reach GitHub. Check your connection.",6000);return}
+    me={name,token};try{localStorage.setItem(AUTH_KEY,JSON.stringify(me))}catch(_){}
+    canWrite=true;closeDlg2();setSync("ok");render();refreshPanel(true);toast("Signed in as "+name);flush();pull()};
+}
+function signOut(){me=null;canWrite=false;try{localStorage.removeItem(AUTH_KEY)}catch(_){}if(person==="__me")person="all";setSync("ok");render();refreshPanel(true);toast("Signed out")}
+
+/* ---------- backup ---------- */
 function exportBoard(){const d={version:1,exportedAt:new Date().toISOString(),projects:store.projects,files:store.files};
-  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));a.download="data.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  toast("Exported. Replace priority/data.json in the repo with it to update the board for everyone.",6000)}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));a.download="ipa-priority-board-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast("Backup downloaded.")}
 $("#exportBtn").onclick=()=>store&&exportBoard();
 $("#importBtn").onclick=()=>$("#importIn").click();
-$("#importIn").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
-  try{const d=JSON.parse(await f.text());if(!validBoard(d))throw 0;replaceStore(d,"Imported "+d.projects.length+" projects")}catch(_){toast("That file isn't a board export.")}};
-$("#resetBtn").onclick=async e=>{const b=e.currentTarget;if(!b.dataset.armed){b.dataset.armed=1;b.textContent="Tap again: this replaces your changes";return}
-  delete b.dataset.armed;b.textContent="Reload published board";try{replaceStore(await fetchPublished(),"Loaded the published board")}catch(_){toast("Couldn't load data.json. Check your connection.")}};
+$("#importIn").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;let d;
+  try{d=JSON.parse(await f.text());if(!validBoard(d))throw 0}catch(_){toast("That file isn't a board backup.");return}
+  if(!confirm(`Replace the board for everyone with this backup (${d.projects.length} projects)?`))return;
+  try{need();queue([{k:"all",data:{projects:d.projects,files:d.files||{}},desc:"restored the board from a backup"}]);toast("Restoring the backup…")}catch(_){signInDialog()}};
+$("#histLink").href=`https://github.com/${GH.owner}/${GH.repo}/commits/${GH.branch}/${GH.path}`;
 
 (async()=>{
   let saved=null;try{saved=JSON.parse(localStorage.getItem(KEY)||"null")}catch(_){}
-  let pub=null;try{pub=await fetchPublished()}catch(_){}
-  if(saved&&validBoard(saved)){store=saved;store.files=store.files||{};if(pub&&pub.exportedAt&&pub.exportedAt>(store.base||""))showNotice(pub)}
-  else if(pub)store=asStore(pub);
-  else{$("#focus").innerHTML='<span class="tag">Do this now</span><span class="muted">Couldn\'t load the board. Check your connection and reload.</span><span></span>';return}
-  db=localDb;
-  db.collection("projects").onSnapshot(snap=>{projects=snap.docs.map(d=>({id:d.id,...d.data()}));syncFileSubs();render();refreshPanel();if(!hashOpened&&projects.length){hashOpened=true;openFromHash()}});
-  refreshPanel(true);
+  if(saved&&validBoard(saved.shared)){shared=normalize(saved.shared);sha=saved.sha||null;pending=Array.isArray(saved.pending)?saved.pending:[]}
+  db=sharedDb;
+  const start=()=>{rebuild();db.collection("projects").onSnapshot(snap=>{projects=snap.docs.map(d=>({id:d.id,...d.data()}));syncFileSubs();render();refreshPanel();if(!hashOpened&&projects.length){hashOpened=true;openFromHash()}})};
+  if(shared)start();
+  try{const rem=await readRemote();if(!shared||(rem.data.exportedAt||"")>=(shared.exportedAt||"")){shared=rem.data;sha=rem.sha}lastSync=new Date();setSync("ok")}
+  catch(_){setSync("offline")}
+  if(!shared){$("#focus").innerHTML='<span class="tag">Do this now</span><span class="muted">Couldn\'t load the board. Check your connection and reload.</span><span></span>';return}
+  if(!projects.length&&!subs.size)start();else rebuild();
+  if(pending.length)flush();
+  setInterval(pull,canWrite?30000:90000);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)pull()});
 })();
 </script>
 

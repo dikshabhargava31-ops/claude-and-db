@@ -22,6 +22,9 @@ Data is saved in the browser's local storage. Use **Settings & backup** to expor
 
 `priority/` is the IPA Priority Board (`index.html` plus `data.json`, no build step). It has the projects gallery, "Do this now", tasks (Kanban, by day, by project, calendar), a timeline, a folder for each project with notes, links and a work log, and idle-project reminders.
 
-- **Data:** the board loads `priority/data.json`. Changes are saved in each visitor's browser.
-- **To update the board for everyone:** click **Export**, then replace `priority/data.json` in the repo with the downloaded file. Visitors who have local changes will see a prompt to load the newer version.
+- **Shared data:** everyone sees the board stored in `priority/data.json` on `main`. Anyone with the link can view it.
+- **Editing:** click **Sign in to edit** and enter your name and a GitHub [fine-grained token](https://github.com/settings/personal-access-tokens/new) for only this repository, with **Contents: Read and write**. Each editor must be a collaborator on the repository (Settings → Collaborators). The token is kept only in that browser.
+- **Names:** every change is saved as a commit with the editor's name. Tasks show who they're assigned to, who added them and who finished them. The work log and links show who added each entry. Use **Show tasks for** to see one person's tasks. The repository's commit history for `priority/data.json` is the full change history.
+- **Work log:** editors can delete entries. Deleting a "Done" entry keeps the task done.
+- **Back up / Restore:** download a copy of the board, or replace it for everyone from a copy.
 - **Files:** GitHub Pages can't store uploads, so add work as links (for example Google Drive).
