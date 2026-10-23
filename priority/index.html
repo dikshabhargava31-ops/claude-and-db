@@ -288,7 +288,7 @@ header{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:end;justify-content
 
   <footer class="muted small" style="display:flex;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px">
     <span class="sync" id="sync">Loading…</span>
-    <span>Everyone sees the same board. Each change is saved to the repository with the editor's name. <a id="histLink" target="_blank" rel="noopener noreferrer">See change history ↗</a></span>
+    <span>The board is private to people added to its repository. Each change is saved with the editor's name. <a id="histLink" target="_blank" rel="noopener noreferrer">See change history ↗</a></span>
   </footer>
 </div>
 
@@ -360,8 +360,8 @@ function render(){
   $("#personSel").innerHTML=`<option value="all">Everyone</option>${myName()?`<option value="__me">Me (${esc(myName())})</option>`:""}${ps.filter(n=>norm(n)!==norm(myName())).map(n=>`<option>${esc(n)}</option>`).join("")}<option value="__none">Unassigned</option>`;
   $("#personSel").value=person;
   $("#people").innerHTML=ps.map(n=>`<option value="${esc(n)}">`).join("");
-  $("#me").innerHTML=me&&me.token?`Signed in as <b>${esc(me.name)}</b><button class="btn ghost" type="button" id="signOut">Sign out</button>`:`<button class="btn" type="button" id="signIn">Sign in to edit</button>`;
-  $("#importBtn").hidden=!canWrite;
+  $("#me").innerHTML=me&&me.token?`Signed in as <b>${esc(me.name)}</b><button class="btn ghost" type="button" id="signOut">Sign out</button>`:`<button class="btn" type="button" id="signIn">Sign in</button>`;
+  $("#importBtn").hidden=!canWrite;$("#exportBtn").hidden=!(me&&me.token);
 
   // gallery
   document.querySelectorAll("#ptabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.pf===pf));
@@ -703,7 +703,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("#dlg2").hidd
 async function safe(fn,msg){
   if(!db){toast("The board is still loading. Try again in a moment.");return}
   try{await fn();toast(msg)}catch(e){
-    if(e&&e.code==="invalid_argument"){toast("Sign in to make changes.");signInDialog()}
+    if(e&&e.code==="invalid_argument"){if(signedIn)toast("Your GitHub account can view this board but not edit it.",6000);else{toast("Sign in to make changes.");signInDialog()}}
     else if(e&&e.code==="quota_exceeded")toast("The board is full. Delete finished projects to add more.");
     else toast("Couldn't save. Check your connection and try again.")}
 }
@@ -720,7 +720,7 @@ document.addEventListener("click",e=>{
   const df=e.target.closest("[data-dlf]");if(df){downloadFile(df.dataset.dlf);return}
   const rf=e.target.closest("[data-rmf]");if(rf){removeFile(rf);return}
   const hl=e.target.closest("[data-hidelog]");if(hl){hideLog(hl);return}
-  if(e.target.closest("#signIn")){signInDialog();return}
+  if(e.target.closest("#signIn,#signIn2")){signInDialog();return}
   if(e.target.closest("#signOut")){signOut();return}
   const cm=e.target.closest("[data-cal]");if(cm){calShift(+cm.dataset.cal);return}
   const qn=e.target.closest("#qNext");if(qn){qIdx++;renderQuote();return}
@@ -744,15 +744,17 @@ $("#addTaskBtn").addEventListener("click",()=>{if(!projects.length){toast("Add a
 
 renderQuote();
 setInterval(render,60*60*1000);
-/* ---------- shared board: priority/data.json in the GitHub repo ---------- */
-// Everyone reads the same file. Signed-in editors save through the GitHub API: each change is
+/* ---------- shared board: data.json in a private GitHub repo ---------- */
+// The data lives in its own private repository, apart from this site, so it isn't public and a
+// sign-in token can't change the site. Everyone signs in to read it. Editors save through the GitHub API: each change is
 // kept as an operation, replayed on the latest copy of the file and committed with their name,
 // so two people editing at once don't overwrite each other.
-const GH={owner:"dikshabhargava31-ops",repo:"claude-and-db",branch:"main",path:"priority/data.json"};
+const GH={owner:"dikshabhargava31-ops",repo:"ipa-priority-board-data",branch:"main",path:"data.json"};
 const API=`https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
 const KEY="ipa-priority-board-v2",AUTH_KEY="ipa-priority-board-user";
 let me=null;try{me=JSON.parse(localStorage.getItem(AUTH_KEY)||"null")}catch(_){}
-canWrite=!!(me&&me.token);
+const signedIn=!!(me&&me.token);
+canWrite=signedIn&&me.canWrite!==false;
 function myName(){return me&&me.name||""}
 let shared=null,sha=null,pending=[],store=null,lastSync=null,flushing=false,flushTimer=null,savedCount=0,syncState="";
 const subs=new Set();
@@ -816,13 +818,11 @@ function b64enc(str){const b=new TextEncoder().encode(str);let o="";for(let i=0;
 function b64dec(str){const bin=atob(str.replace(/\s/g,""));return new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))}
 const ghHeaders=()=>({Accept:"application/vnd.github+json",...(me&&me.token?{Authorization:"Bearer "+me.token}:{})});
 async function readRemote(){
-  if(me&&me.token){const r=await fetch(`${API}?ref=${GH.branch}&t=${Date.now()}`,{cache:"no-store",headers:ghHeaders()});
-    if(r.ok){const j=await r.json();const d=JSON.parse(b64dec(j.content));if(validBoard(d))return{data:normalize(d),sha:j.sha}}
-    else if(r.status!==404)throw Object.assign(new Error("read"),{status:r.status})}
-  // Viewers (and the first save, before the file is on main): the raw file, then the copy published with the site.
-  for(const u of[`https://raw.githubusercontent.com/${GH.owner}/${GH.repo}/${GH.branch}/${GH.path}?t=${Date.now()}`,`data.json?t=${Date.now()}`]){
-    try{const r=await fetch(u,{cache:"no-store"});if(r.ok){const d=await r.json();if(validBoard(d))return{data:normalize(d),sha:null}}}catch(_){}}
-  throw new Error("read")}
+  const r=await fetch(`${API}?ref=${GH.branch}&t=${Date.now()}`,{cache:"no-store",headers:ghHeaders()});
+  if(r.status===404)return{data:null,sha:null};
+  if(!r.ok)throw Object.assign(new Error("read"),{status:r.status});
+  const j=await r.json();const d=JSON.parse(b64dec(j.content));if(!validBoard(d))throw new Error("bad data");
+  return{data:normalize(d),sha:j.sha}}
 function commitMsg(batch){const ds=batch.map(o=>o.desc).filter(Boolean);const who=batch[0].by||"Someone";
   return`Board: ${who} ${ds[0]||"updated the board"}${ds.length>1?` (+${ds.length-1} more)`:""}`}
 function scheduleFlush(ms){clearTimeout(flushTimer);flushTimer=setTimeout(flush,ms??1000)}
@@ -831,7 +831,7 @@ async function flush(){
   const batch=pending.slice();
   try{
     for(let tries=0;tries<4;tries++){
-      const rem=await readRemote();
+      const rem=await readRemote();if(!rem.data&&!shared)throw new Error("no board");
       const next=normalize(structuredClone(rem.data||shared));batch.forEach(o=>applyOp(next,o));
       next.version=1;next.exportedAt=new Date().toISOString();
       const r=await fetch(API,{method:"PUT",headers:{...ghHeaders(),"Content-Type":"application/json"},
@@ -861,31 +861,34 @@ function showSync(){const el=$("#sync");if(!el)return;const n=pending.length;
   const[cls,msg]=syncState==="saving"?["saving","Saving…"]
     :syncState==="error"?["bad",`Couldn't save ${n} change${n===1?"":"s"}. Retrying shortly.`]
     :syncState==="auth"?["bad",`${n} change${n===1?"":"s"} not saved. Sign in again.`]
-    :syncState==="offline"?["bad","Offline. Showing the last copy loaded."]
+    :syncState==="offline"?["bad","Couldn't reach the board. Showing the last copy loaded."]
+    :syncState==="locked"?["bad","Signed out"]
     :n&&!canWrite?["bad",`${n} change${n===1?"":"s"} not saved. Sign in to save them.`]
     :["ok",`${canWrite?"All changes saved":"View only"}${t?" · updated "+t:""}`];
   el.className="sync "+cls;el.textContent=msg}
 
 /* ---------- sign in ---------- */
 function signInDialog(){
-  $("#dlg2").innerHTML=`<div class="scrim" id="scrim2"><form class="sheet narrow" id="signin"><h2>Sign in to edit</h2>
-    <p class="muted small" style="margin:0">Your name is shown on tasks you're assigned, tasks you finish and work you log. Saving needs a GitHub access token for this repository. It stays in this browser only.</p>
+  $("#dlg2").innerHTML=`<div class="scrim" id="scrim2"><form class="sheet narrow" id="signin"><h2>Sign in</h2>
+    <p class="muted small" style="margin:0">The board is private. Your name is shown on tasks you're assigned, tasks you finish and work you log. Your token stays in this browser only.</p>
     <div class="field"><label class="lbl" for="si-n">Your name</label><input id="si-n" required value="${esc(me&&me.name)}" autocomplete="name" placeholder="e.g. Diksha"></div>
-    <div class="field"><label class="lbl" for="si-t">GitHub access token</label><input id="si-t" type="password" required value="${esc(me&&me.token)}" autocomplete="off" placeholder="github_pat_…">
-      <span class="muted small">Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">fine-grained token</a> for only <span class="mono">${GH.owner}/${GH.repo}</span>, with <b>Contents: Read and write</b>. You need to be a collaborator on the repository.</span></div>
+    <div class="field"><label class="lbl" for="si-t">GitHub access token</label><input id="si-t" type="password" required value="${esc(me&&me.token)}" autocomplete="off" placeholder="ghp_…">
+      <span class="muted small">Ask Diksha to add your GitHub account to the board's private repository. Then <a href="https://github.com/settings/tokens/new?scopes=repo&amp;description=IPA%20Priority%20Board" target="_blank" rel="noopener noreferrer">create a classic token</a> with the <b>repo</b> box ticked, and paste it here.</span></div>
     <div class="sheet-foot"><span></span><div class="actions"><button type="button" class="btn" id="cancel2">Cancel</button><button class="btn primary" type="submit">Sign in</button></div></div></form></div>`;
   showDlg2();
   $("#signin").onsubmit=async e=>{e.preventDefault();const name=$("#si-n").value.trim(),token=$("#si-t").value.trim();if(!name||!token)return;
-    toast("Checking access…",15000);
+    toast("Checking access…",15000);let push=false;
     try{const r=await fetch(`https://api.github.com/repos/${GH.owner}/${GH.repo}`,{cache:"no-store",headers:{Accept:"application/vnd.github+json",Authorization:"Bearer "+token}});
       if(r.status===401){toast("GitHub didn't accept that token.",6000);return}
-      if(!r.ok)throw 0;const j=await r.json();
-      if(!(j.permissions&&j.permissions.push)){toast("That account can't save to this repository. Ask the owner to add you as a collaborator.",8000);return}}
+      if(r.status===404||r.status===403){toast("That account can't open the board yet. Ask Diksha to add you to the board's repository, and tick repo when you create the token.",9000);return}
+      if(!r.ok)throw 0;const j=await r.json();push=!!(j.permissions&&j.permissions.push)}
     catch(_){toast("Couldn't reach GitHub. Check your connection.",6000);return}
-    me={name,token};try{localStorage.setItem(AUTH_KEY,JSON.stringify(me))}catch(_){}
-    canWrite=true;closeDlg2();setSync("ok");render();refreshPanel(true);toast("Signed in as "+name);flush();pull()};
+    me={name,token,canWrite:push};try{localStorage.setItem(AUTH_KEY,JSON.stringify(me))}catch(_){}
+    location.reload()};
 }
-function signOut(){me=null;canWrite=false;try{localStorage.removeItem(AUTH_KEY)}catch(_){}if(person==="__me")person="all";setSync("ok");render();refreshPanel(true);toast("Signed out")}
+// Signing out also clears the copy of the board kept in this browser.
+function signOut(){if(pending.length&&!confirm(`${pending.length} change${pending.length===1?" isn't":"s aren't"} saved yet. Sign out anyway?`))return;
+  try{localStorage.removeItem(AUTH_KEY);localStorage.removeItem(KEY)}catch(_){}location.reload()}
 
 /* ---------- backup ---------- */
 function exportBoard(){const d={version:1,exportedAt:new Date().toISOString(),projects:store.projects,files:store.files};
@@ -900,6 +903,8 @@ $("#importIn").onchange=async e=>{const f=e.target.files[0];e.target.value="";if
 $("#histLink").href=`https://github.com/${GH.owner}/${GH.repo}/commits/${GH.branch}/${GH.path}`;
 
 (async()=>{
+  if(!signedIn){render();$("#focus").innerHTML='<span class="tag">Private board</span><span>Sign in with your name and GitHub token to see the board.</span><button class="btn primary" type="button" id="signIn2">Sign in</button>';
+    $("#gallery").innerHTML='<div class="empty">Sign in to see projects.</div>';$("#tasks").innerHTML="";$("#timeline").innerHTML="";setSync("locked");signInDialog();return}
   let saved=null;try{saved=JSON.parse(localStorage.getItem(KEY)||"null")}catch(_){}
   if(saved&&validBoard(saved.shared)){shared=normalize(saved.shared);sha=saved.sha||null;pending=Array.isArray(saved.pending)?saved.pending:[]}
   db=sharedDb;
@@ -907,7 +912,7 @@ $("#histLink").href=`https://github.com/${GH.owner}/${GH.repo}/commits/${GH.bran
   if(shared)start();
   try{const rem=await readRemote();if(!shared||(rem.data.exportedAt||"")>=(shared.exportedAt||"")){shared=rem.data;sha=rem.sha}lastSync=new Date();setSync("ok")}
   catch(_){setSync("offline")}
-  if(!shared){$("#focus").innerHTML='<span class="tag">Do this now</span><span class="muted">Couldn\'t load the board. Check your connection and reload.</span><span></span>';return}
+  if(!shared){$("#focus").innerHTML=`<span class="tag">Do this now</span><span class="muted">${syncState==="offline"?"Couldn't load the board. Check your connection and reload.":"The board's data file isn't set up yet."}</span><span></span>`;return}
   if(!projects.length&&!subs.size)start();else rebuild();
   if(pending.length)flush();
   setInterval(pull,canWrite?30000:90000);
