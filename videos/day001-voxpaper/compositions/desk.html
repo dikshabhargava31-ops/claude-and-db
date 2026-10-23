@@ -1,0 +1,160 @@
+<template>
+  <style>
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+    @font-face { font-family: "Kalam"; font-weight: 700; src: url("assets/fonts/kalam-devanagari-700-normal.woff2") format("woff2"); unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF; }
+    #root { position: absolute; inset: 0; overflow: hidden; background: #e9e2d3; font-family: "Archivo Black", sans-serif; color: #151515; }
+    #cam { position: absolute; inset: 0; transform-origin: 540px 960px; }
+    #world { position: absolute; left: 0; top: 0; width: 2160px; height: 3840px; background: #e9e2d3 url("assets/paper.jpg") 0 0 / 1080px 1920px repeat; }
+    /* headline words printed on paper strips, the Vox way */
+    .strip { position: absolute; padding: 14px 26px 6px; background: #fbfaf6; box-shadow: 4px 6px 0 rgba(0, 0, 0, 0.12), 8px 14px 22px rgba(0, 0, 0, 0.16); font-size: 92px; line-height: 1.05; letter-spacing: -0.01em; white-space: nowrap; }
+    .strip.dark { background: #151515; color: #fbfaf6; }
+    .hl { position: relative; display: inline-block; }
+    .hl i { position: absolute; left: -10px; right: -10px; top: 18%; bottom: 6%; background: #ffd23f; transform-origin: 0 50%; }
+    .hl span { position: relative; }
+    .hand { font-family: "Kalam", cursive; font-weight: 700; }
+    .pen { position: absolute; overflow: visible; }
+    .pen path { fill: none; stroke: #d62828; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+    .stamp { position: absolute; padding: 10px 26px 2px; border: 9px solid #d62828; border-radius: 14px; color: #d62828; font-size: 80px; letter-spacing: 0.04em; mix-blend-mode: multiply; white-space: nowrap; }
+
+    /* A: the register */
+    #reg { position: absolute; left: 110px; top: 560px; width: 860px; height: 760px; background: #fdfcf8 repeating-linear-gradient(180deg, transparent 0 44px, #c5d4e6 44px 45px) 0 92px / 100% 680px no-repeat; box-shadow: 6px 12px 26px rgba(0, 0, 0, 0.22); }
+    #reg::before { content: ""; position: absolute; left: 84px; top: 0; bottom: 0; width: 3px; background: #e4a0a0; }
+    #reg-title { position: absolute; left: 108px; top: 26px; font-size: 40px; }
+    .row { position: absolute; left: 104px; font-size: 34px; line-height: 45px; color: #24305e; white-space: nowrap; }
+    .row u { display: inline-block; width: 54px; text-decoration: none; color: #6b7491; }
+    .strike { position: absolute; left: 150px; width: 330px; height: 6px; border-radius: 3px; background: #d62828; transform-origin: 0 50%; }
+    .keep { position: absolute; left: 146px; width: 340px; height: 38px; border-radius: 4px; background: rgba(255, 210, 63, 0.8); mix-blend-mode: multiply; transform-origin: 0 50%; }
+
+    /* B: photocopies of the same reply */
+    .copy { position: absolute; width: 760px; height: 250px; padding: 26px 30px; background: #f3f1ec; box-shadow: 4px 8px 18px rgba(0, 0, 0, 0.22); font-family: "Roboto", sans-serif; }
+    .copy::after { content: ""; position: absolute; inset: 0; background: radial-gradient(rgba(0, 0, 0, 0.12) 1px, transparent 1.4px) 0 0 / 7px 7px; mix-blend-mode: multiply; }
+    .copy em { display: block; font-size: 30px; font-style: normal; color: #6b6b6b; }
+    .copy b { display: inline-block; margin-top: 14px; padding: 18px 26px; border-radius: 18px; background: #d9fdd3; font-size: 46px; font-weight: 500; color: #111; }
+    .copy b small { display: block; font-size: 30px; font-style: italic; color: #6b6b6b; font-weight: 400; margin-bottom: 4px; }
+
+    /* C: the call screenshot, printed and taped */
+    #call { position: absolute; left: 1360px; top: 2560px; width: 560px; height: 760px; padding: 26px 26px 90px; background: #fbfaf6; box-shadow: 6px 14px 26px rgba(0, 0, 0, 0.25); }
+    #call-in { position: relative; width: 100%; height: 100%; background: #1c1c1e; font-family: "Roboto", sans-serif; color: #fff; text-align: center; }
+    #call-ava { position: absolute; left: 174px; top: 90px; width: 160px; height: 160px; border-radius: 50%; background: #3a3a3c; font-size: 62px; font-weight: 700; line-height: 160px; }
+    #call-name { position: absolute; left: 0; top: 290px; width: 100%; font-size: 44px; }
+    #call-sub { position: absolute; left: 0; top: 350px; width: 100%; font-size: 28px; color: #a1a1a6; }
+    .cb { position: absolute; top: 470px; width: 110px; height: 110px; border-radius: 50%; }
+    .tape { position: absolute; width: 190px; height: 58px; background: rgba(236, 222, 182, 0.85); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12); }
+
+    /* D: index cards on string */
+    .card { position: absolute; width: 860px; height: 190px; padding: 70px 40px 0; background: #fdfcf8 linear-gradient(180deg, transparent 0 52px, #e07a7a 52px 55px, transparent 55px); box-shadow: 4px 10px 20px rgba(0, 0, 0, 0.2); font-size: 58px; color: #1d2b5c; white-space: nowrap; }
+    .pin { position: absolute; width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff6b6b, #b81d1d); box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3); }
+  </style>
+  <div id="root" data-composition-id="desk" data-width="1080" data-height="1920">
+    <div id="cam" data-layout-allow-overflow>
+      <div id="world">
+        <!-- A -->
+        <div id="a1" class="strip" style="left: 90px; top: 230px">15 ENQUIRY.</div>
+        <div id="a2" class="strip dark" style="left: 90px; top: 380px; font-size: 80px">ADMISSION SIRF</div>
+        <div id="a3" class="strip" style="z-index: 3; left: 800px; top: 500px; font-size: 150px; padding: 6px 22px 0"><span class="hl"><i id="a2-hl"></i><span>3?</span></span></div>
+        <div id="reg">
+          <div id="reg-title" class="hand">Enquiry Register · is mahine</div>
+          <div id="reg-rows"></div>
+        </div>
+        <svg id="a-circle" class="pen" style="z-index: 4; left: 770px; top: 470px; width: 250px; height: 230px" viewBox="0 0 230 190" preserveAspectRatio="none"><path id="a-circle-p" pathLength="1" stroke-dasharray="1" d="M130 12 C60 6 14 50 18 100 C22 160 100 184 160 170 C214 158 226 110 212 70 C200 34 160 14 104 18"/></svg>
+
+        <!-- desk props, one per stop: texture for the lower part of the frame -->
+        <svg style="position: absolute; left: 600px; top: 1420px; width: 520px; height: 120px; transform: rotate(-14deg)" viewBox="0 0 520 120"><rect x="60" y="35" width="400" height="50" fill="#f2c230"/><rect x="60" y="35" width="400" height="10" fill="#e0ad16"/><rect x="460" y="35" width="40" height="50" fill="#e89a9a"/><polygon points="60,35 0,60 60,85" fill="#e9cfa3"/><polygon points="20,52 0,60 20,68" fill="#333"/></svg>
+        <svg style="position: absolute; left: 1500px; top: 1380px; width: 360px; height: 360px" viewBox="0 0 360 360"><circle cx="180" cy="180" r="140" fill="none" stroke="rgba(120, 72, 30, 0.22)" stroke-width="22"/><circle cx="180" cy="180" r="128" fill="none" stroke="rgba(120, 72, 30, 0.12)" stroke-width="6"/></svg>
+        <svg style="position: absolute; left: 1180px; top: 3330px; width: 140px; height: 300px; transform: rotate(18deg)" viewBox="0 0 140 300"><path d="M40 260 L40 60 A30 30 0 0 1 100 60 L100 230 A20 20 0 0 1 60 230 L60 90" fill="none" stroke="#8d96a3" stroke-width="10" stroke-linecap="round"/></svg>
+        <div class="hand" style="position: absolute; left: 640px; top: 3330px; width: 300px; height: 280px; padding: 40px 30px; background: #fff27a; box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.18); transform: rotate(5deg); font-size: 52px; line-height: 1.1; color: #333">Day 001<br/>enquiry → admission</div>
+
+        <!-- B -->
+        <div id="b1" class="strip" style="left: 1170px; top: 230px">HAR ENQUIRY KO</div>
+        <div id="b2" class="strip" style="left: 1170px; top: 390px"><span class="hl"><i id="b2-hl"></i><span>EK HI</span></span> JAWAB?</div>
+        <div id="cp1" data-layout-allow-overlap data-layout-allow-occlusion class="copy" style="left: 1230px; top: 600px"><em>WhatsApp · Rohan ke Papa · 9:41</em><b data-layout-allow-occlusion>Fees ₹2,500 / month.</b></div>
+        <div id="cp2" data-layout-allow-overlap data-layout-allow-occlusion class="copy" style="left: 1290px; top: 700px"><em>WhatsApp · Priya ki Mummy · 9:44</em><b><small>Forwarded</small>Fees ₹2,500 / month.</b></div>
+        <div id="cp3" data-layout-allow-overlap data-layout-allow-occlusion class="copy" style="left: 1210px; top: 800px"><em>WhatsApp · Aman ke Papa · 9:52</em><b><small>Forwarded</small>Fees ₹2,500 / month.</b></div>
+        <div id="cp4" data-layout-allow-overlap data-layout-allow-occlusion class="copy" style="left: 1300px; top: 900px"><em>WhatsApp · Sneha · 10:03</em><b><small>Forwarded</small>Fees ₹2,500 / month.</b></div>
+        <div id="b-stamp" class="stamp" style="left: 1200px; top: 1190px; font-size: 70px">COPY-PASTE ×15</div>
+
+        <!-- C -->
+        <div id="c1" class="strip" style="left: 1170px; top: 2150px">PEHLI CALL PE</div>
+        <div id="c2" class="strip dark" style="left: 1170px; top: 2310px">FEES</div>
+        <svg id="c-x" class="pen" style="left: 1150px; top: 2330px; width: 340px; height: 110px" viewBox="0 0 340 110"><path id="c-x-p" pathLength="1" stroke-dasharray="1" d="M10 70 C90 50 220 48 330 40"/></svg>
+        <div id="c3" class="hand" style="position: absolute; left: 1520px; top: 2290px; font-size: 104px; color: #d62828; white-space: nowrap">mat batao!</div>
+        <div id="call">
+          <div id="call-in"><div id="call-ava">RP</div><div id="call-name">Rohan ke Papa</div><div id="call-sub">Incoming call…</div><i class="cb" style="left: 90px; background: #ff3b30"></i><i class="cb" style="left: 308px; background: #34c759"></i></div>
+          <div class="hand" style="position: absolute; left: 0; bottom: 18px; width: 100%; text-align: center; font-size: 40px; color: #333">9:46 pm · pehli call</div>
+        </div>
+        <i class="tape" style="left: 1310px; top: 2530px; transform: rotate(-24deg)"></i>
+        <i class="tape" style="left: 1800px; top: 2530px; transform: rotate(22deg)"></i>
+
+        <!-- D -->
+        <div id="d1" class="strip" style="left: 90px; top: 2150px">PEHLE</div>
+        <div id="d2" class="strip" style="left: 90px; top: 2300px; font-size: 150px"><span class="hl"><i id="d2-hl"></i><span>3 SAWAAL.</span></span></div>
+        <div id="q1" class="card hand" style="left: 110px; top: 2580px">1. Kab se join karna hai?</div>
+        <div id="q2" class="card hand" style="left: 150px; top: 2800px">2. Bacche ko kya dikkat hai?</div>
+        <div id="q3" class="card hand" style="left: 110px; top: 3020px">3. Is hafte centre aa sakte?</div>
+        <svg id="d-string" class="pen" style="left: 0; top: 2500px; width: 1080px; height: 800px" viewBox="0 0 1080 800"><path id="d-string-p" pathLength="1" stroke-dasharray="1" style="stroke-width: 4" d="M150 100 C40 180 60 260 190 320 C60 380 40 470 150 540"/></svg>
+        <i id="p1" class="pin" style="left: 130px; top: 2580px"></i>
+        <i id="p2" class="pin" style="left: 170px; top: 2800px"></i>
+        <i id="p3" class="pin" style="left: 130px; top: 3020px"></i>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    // register rows: 15 names, 12 get struck out, 3 survive (illustrative names)
+    const names = ["Sneha · 11th", "Kabir · 9th", "Ananya · 10th", "Arjun · 12th", "Isha · 8th", "Dev · 9th", "Meera · 11th", "Kunal · 10th", "Riya · 9th", "Yash · 12th", "Tanvi · 8th", "Vivaan · 10th", "Neha · 9th", "Om · 11th", "Zoya · 10th"];
+    const keep = [0, 5, 9];
+    const rows = document.getElementById("reg-rows");
+    names.forEach((n, k) => {
+      const y = 92 + k * 45;
+      rows.insertAdjacentHTML("beforeend", '<div class="row hand" style="top:' + y + 'px"><u>' + (k + 1) + '.</u>' + n + '</div>' + (keep.includes(k) ? '<i class="keep" style="top:' + (y + 5) + 'px"></i>' : '<i class="strike" style="top:' + (y + 24) + 'px"></i>'));
+    });
+
+    const slap = (sel, t, rot) => tl.fromTo(sel, { opacity: 0, scale: 1.25, rotation: rot - 6 }, { opacity: 1, scale: 1, rotation: rot, duration: 0.22, ease: "back.out(1.7)" }, t);
+    const swipe = (sel, t) => tl.fromTo(sel, { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "power2.inOut" }, t);
+    const draw = (sel, t, d) => tl.fromTo(sel, { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: d || 0.4, ease: "power2.inOut" }, t);
+    const drop = (sel, t, rot) => tl.fromTo(sel, { opacity: 0, y: -180, rotation: rot * 3, scale: 1.08 }, { opacity: 1, y: 0, rotation: rot, scale: 1, duration: 0.32, ease: "power3.out" }, t);
+
+    // the camera travels across one desk: A (top left) → B (right) → C (down) → D (left)
+    const stops = [[0, 0, 0], [3.4, -1080, 0], [5.6, -1080, -1920], [7.9, 0, -1920]];
+    stops.forEach(([t, x, y], k) => {
+      if (k) {
+        tl.to("#world", { x, y, duration: 0.6, ease: "power3.inOut" }, t - 0.3);
+        tl.to("#cam", { scale: 0.88, duration: 0.3, ease: "power2.in" }, t - 0.3);
+        tl.to("#cam", { scale: 1, duration: 0.3, ease: "power2.out" }, t);
+      }
+      const next = k + 1 < stops.length ? stops[k + 1][0] - 0.3 : 10.5;
+      tl.fromTo("#cam", { scale: 1 }, { scale: 1.035, duration: next - (k ? t + 0.3 : 0), ease: "none", immediateRender: false }, k ? t + 0.3 : 0);
+    });
+
+    // A: the register
+    tl.set("#reg", { rotation: -1.5 }, 0);
+    tl.set("#a1", { rotation: -2 }, 0);
+    slap("#a2", 1.7, 1.5); slap("#a3", 2.2, 4);
+    tl.set(".strike, .keep", { scaleX: 0 }, 0);
+    tl.to(".strike", { scaleX: 1, duration: 0.12, ease: "power2.out", stagger: 0.07 }, 1.95);
+    tl.to(".keep", { scaleX: 1, duration: 0.22, ease: "power2.out", stagger: 0.1 }, 2.75);
+    tl.set("#a2-hl", { scaleX: 0 }, 0); swipe("#a2-hl", 2.45);
+    draw("#a-circle-p", 2.75, 0.4);
+
+    // B: the same reply, photocopied
+    slap("#b1", 3.45, -1.5); slap("#b2", 3.8, 1);
+    tl.set("#b2-hl", { scaleX: 0 }, 0); swipe("#b2-hl", 4.1);
+    drop("#cp1", 3.65, -5); drop("#cp2", 3.95, 4); drop("#cp3", 4.25, -3); drop("#cp4", 4.55, 6);
+    tl.fromTo("#b-stamp", { opacity: 0, scale: 2.4, rotation: -20 }, { opacity: 0.9, scale: 1, rotation: -9, duration: 0.24, ease: "power4.in" }, 4.95);
+
+    // C: the call, and the red pen
+    slap("#c1", 5.65, -1); slap("#c2", 6.1, 2);
+    draw("#c-x-p", 6.75, 0.25);
+    tl.fromTo("#c3", { opacity: 0, clipPath: "inset(0 100% 0 0)" }, { opacity: 1, clipPath: "inset(0 0% 0 0)", duration: 0.5, ease: "steps(10)" }, 7.05);
+    tl.set("#call", { rotation: 3 }, 0);
+
+    // D: three questions pinned on string
+    slap("#d1", 7.95, -2); slap("#d2", 8.25, 1);
+    tl.set("#d2-hl", { scaleX: 0 }, 0); swipe("#d2-hl", 8.5);
+    drop("#q1", 8.7, -2); drop("#q2", 8.95, 1.5); drop("#q3", 9.2, -1);
+    ["#p1", "#p2", "#p3"].forEach((p, k) => tl.fromTo(p, { opacity: 0, scale: 2 }, { opacity: 1, scale: 1, duration: 0.18, ease: "back.out(2)" }, 8.85 + k * 0.25));
+    draw("#d-string-p", 9.6, 0.6);
+    window.__timelines["desk"] = tl;
+  </script>
+</template>
