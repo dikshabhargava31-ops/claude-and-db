@@ -905,10 +905,23 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
 
   // ---------- savings and investments ----------
   function keys(s) { return (s.match || "").toLowerCase().split(",").map(function (k) { return k.trim(); }).filter(Boolean); }
-  function schemeOf(t) {
-    if (t.cat !== "Investments") return null;
+  // Link each investment payment to a scheme. A SIP or payout is used at most once a month,
+  // so two ₹5,000 SIPs a few days apart land on different schemes.
+  function matchSchemes() {
+    var map = {}, used = {};
+    state.tx.filter(function (t) { return t.cat === "Investments"; }).sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }).forEach(function (t) {
+      var m = t.date.slice(0, 7), u = used[m] || (used[m] = {});
+      var s = pickScheme(t, u);
+      if (!s) return;
+      map[t.id] = s;
+      if (s.kind === "sip" || s.kind === "payout") u[s.id] = 1;
+    });
+    return map;
+  }
+  function pickScheme(t, used) {
     var list = state.investments || [];
     if (t.scheme) return list.find(function (s) { return s.id === t.scheme; }) || null;
+    list = list.filter(function (s) { return !used[s.id]; });
     var d = t.desc.toLowerCase(), day = +t.date.slice(8, 10), best = null, bestScore = 1e9;
     list.forEach(function (s) {
       var k = keys(s);
@@ -929,7 +942,7 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
       else if (t.cat === "Investments") m.invested -= t.amount;
       else if (!EXCLUDED[t.cat]) m.spent -= t.amount;
     });
-    return Object.keys(by).sort().slice(-6).map(function (k) {
+    return Object.keys(by).sort().slice(-12).map(function (k) {
       var m = by[k]; m.saved = m.in - m.spent; m.kept = m.saved - m.invested; m.rate = m.in > 0 ? m.saved / m.in : 0;
       var p = k.split("-"); m.d = new Date(+p[0], +p[1] - 1, 1);
       m.short = m.d.toLocaleDateString(undefined, { month: "short" }); m.current = k === monthKey(TODAY);
@@ -980,11 +993,11 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
       ms.slice().reverse().map(function (m) { return "<tr><td>" + m.short + (m.current ? ' <span class="small muted">so far</span>' : "") + '</td><td class="amt">' + fmt(m.in) + '</td><td class="amt">' + fmt(m.spent) + '</td><td class="amt">' + fmt(m.invested) + '</td><td class="amt">' + fmt(m.saved) + '</td><td class="amt">' + pct(m.rate) + "</td></tr>"; }).join("") + "</tbody>";
 
     // investments
-    var inv = state.investments || [], stats = {}, unmatched = [];
+    var inv = state.investments || [], stats = {}, unmatched = [], MATCH = matchSchemes();
     inv.forEach(function (s) { stats[s.id] = { n: 0, total: 0, last: null, thisMonth: null }; });
     state.tx.forEach(function (t) {
       if (t.cat !== "Investments") return;
-      var s = schemeOf(t);
+      var s = MATCH[t.id];
       if (!s) { unmatched.push(t); return; }
       var st = stats[s.id]; st.n++; st.total += Math.abs(t.amount);
       if (!st.last || t.date > st.last) st.last = t.date;
@@ -999,7 +1012,7 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
       inv.map(function (s) {
         var st = stats[s.id], chip;
         if (st.thisMonth) chip = '<span class="chip good">' + (s.kind === "payout" ? "Received " : "Paid ") + dd(st.thisMonth) + "</span>";
-        else if (s.kind === "shares" || s.kind === "other") chip = st.last ? '<span class="small muted">Last ' + dd(st.last) + "</span>" : '<span class="small muted">–</span>';
+        else if (s.kind === "shares" || s.kind === "other" || !s.day) chip = st.last ? '<span class="small muted">Last ' + dd(st.last) + "</span>" : '<span class="small muted">–</span>';
         else if (s.day && s.day > TODAY.getDate()) chip = '<span class="chip info">Due on ' + s.day + "</span>";
         else chip = '<span class="chip warn">Not in statements yet</span>';
         return '<tr><td><input type="text" class="inv-name" data-inv="' + s.id + '" data-field="name" value="' + esc(s.name) + '" aria-label="Scheme name"></td><td>' + KIND[s.kind] + '</td><td class="amt">' + (s.amount ? fmt(s.amount) : "–") + "</td><td>" + (s.day || "–") +
