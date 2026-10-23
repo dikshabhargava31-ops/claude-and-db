@@ -1,0 +1,58 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #0a0a0a; color: #fff; font-family: "League Gothic", sans-serif; }
+    .scr { position: absolute; inset: 0; }
+    .scr.inv { background: #d4ff3a; color: #0a0a0a; }
+    .ln { position: absolute; left: 84px; white-space: nowrap; line-height: 0.9; }
+    .w { display: inline-block; }
+    .tag { position: absolute; left: 90px; font-family: "Archivo Black", sans-serif; font-size: 44px; letter-spacing: 0.12em; color: #8a8a8a; white-space: nowrap; }
+    .lime { color: #d4ff3a; }
+    .bar { position: absolute; height: 18px; background: #d4ff3a; transform-origin: 0 50%; }
+  </style>
+  <div id="root" data-composition-id="lines" data-width="1080" data-height="1920">
+    <!-- 1: hook -->
+    <div id="s1" class="scr clip" data-start="0" data-duration="1.7">
+      <div class="tag" style="top: 690px">HAR MAHINE</div>
+      <div id="s1-a" class="ln" style="top: 750px; font-size: 300px">15 ENQUIRY.</div>
+    </div>
+    <div id="s2" class="scr clip" data-start="1.7" data-duration="1.7">
+      <div id="s2-a" class="ln" style="top: 520px; font-size: 200px">ADMISSION</div>
+      <div id="s2-b" class="ln" style="top: 700px; font-size: 200px">SIRF</div>
+      <div id="s2-c" class="ln lime" style="top: 900px; left: 84px; font-size: 560px">3?</div>
+    </div>
+    <!-- 2: the mistake -->
+    <div id="s3" class="scr clip" data-start="3.4" data-duration="2.2">
+      <div class="tag lime" style="top: 640px">GALTI</div>
+      <div class="ln" style="top: 700px; font-size: 230px"><span id="s3-w1" class="w">HAR</span> <span id="s3-w2" class="w">ENQUIRY</span></div>
+      <div class="ln" style="top: 910px; font-size: 230px"><span id="s3-w3" class="w">EK</span> <span id="s3-w4" class="w">JAISI?</span></div>
+    </div>
+    <!-- 3: the fix -->
+    <div id="s4" class="scr clip" data-start="5.6" data-duration="2.3">
+      <div id="s4-a" class="ln" style="top: 600px; font-size: 170px">PEHLI CALL PE</div>
+      <div id="s4-b" class="ln" style="top: 760px; font-size: 300px">FEES</div>
+      <div id="s4-x" class="bar" style="left: 70px; top: 880px; width: 420px"></div>
+      <div id="s4-c" class="ln" style="top: 1030px; font-size: 170px">MAT BATAO.</div>
+    </div>
+    <div id="s5" class="scr inv clip" data-start="7.9" data-duration="2.6">
+      <div id="s5-a" class="ln" style="top: 560px; font-size: 200px">PEHLE</div>
+      <div id="s5-b" class="ln" style="top: 730px; font-size: 560px">3</div>
+      <div id="s5-c" class="ln" style="top: 1230px; font-size: 230px">SAWAAL.</div>
+    </div>
+  </div>
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    // every word slams in: large, then lands dead still; screens change on hard cuts
+    const slam = (sel, t, from) => tl.fromTo(sel, Object.assign({ opacity: 0, scale: 1.35, transformOrigin: "0% 60%" }, from || {}), { opacity: 1, scale: 1, rotation: 0, duration: 0.14, ease: "power4.out" }, t);
+    tl.fromTo("#s1-a", { scale: 1.12, transformOrigin: "0% 60%" }, { scale: 1, duration: 0.3, ease: "power4.out" }, 0);
+    slam("#s2-a", 1.7); slam("#s2-b", 2.05);
+    slam("#s2-c", 2.45, { scale: 2.2, rotation: -8 });
+    tl.fromTo("#s2-c", { x: 0 }, { keyframes: [{ x: -10, duration: 0.04 }, { x: 8, duration: 0.04 }, { x: -4, duration: 0.04 }, { x: 0, duration: 0.04 }] }, 2.6);
+    slam("#s3-w1", 3.45); slam("#s3-w2", 3.8); slam("#s3-w3", 4.35); slam("#s3-w4", 4.65, { scale: 1.6 });
+    slam("#s4-a", 5.65); slam("#s4-b", 6.1, { scale: 1.6 });
+    tl.fromTo("#s4-x", { scaleX: 0 }, { scaleX: 1, duration: 0.22, ease: "power3.inOut" }, 6.75);
+    slam("#s4-c", 7.1);
+    slam("#s5-a", 7.95); slam("#s5-b", 8.3, { scale: 1.8, rotation: -6 }); slam("#s5-c", 8.6);
+    window.__timelines["lines"] = tl;
+  </script>
+</template>
