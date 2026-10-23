@@ -309,6 +309,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
   <section class="view" id="v-transactions" hidden>
     <div class="panel">
       <div class="panel-head"><h2>Add a transaction</h2><a href="#bank" class="small">Import a bank statement instead</a></div>
+      <p class="small muted">Bank and UPI payments come in with your statement. Add cash here as it happens: salary you're paid in cash, and anything you buy with cash. Salary paid in parts? Add each part as Money in, category Income, when it arrives.</p>
       <form id="txForm">
         <div class="fields">
           <label class="field"><span>Date</span><input type="date" id="tDate" required></label>
@@ -320,6 +321,10 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
           <div class="seg" role="radiogroup">
             <label><input type="radio" name="tDir" value="out" id="tOut" checked><span>Money out</span></label>
             <label><input type="radio" name="tDir" value="in" id="tIn"><span>Money in</span></label>
+          </div>
+          <div class="seg" role="radiogroup" aria-label="Paid by">
+            <label><input type="radio" name="tVia" value="bank" id="tBank" checked><span>Bank or UPI</span></label>
+            <label><input type="radio" name="tVia" value="cash" id="tCash"><span>Cash</span></label>
           </div>
           <button class="btn primary" type="submit">Add</button>
         </div>
@@ -426,7 +431,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
   var EXCLUDED = { "Income": 1, "Transfers": 1, "Investments": 1 };
   var RULES = [
     ["Income", /salary|payroll|interest credit|int\.? ?cr|dividend|refund|cashback|reversal/i],
-    ["Transfers", /self transfer|own account|to savings|credit card payment|cc payment|bill ?desk.*card|neft.*self/i],
+    ["Transfers", /self transfer|own account|to savings|credit card payment|cc payment|bill ?desk.*card|neft.*self|atm|cash dep|cash wdl|by cash|cdm|nfs\/|nwd/i],
     ["Investments", /nach-mut|\bsip\b|mutual fund|\bcams\b|zerodha|groww|hdfc securities|hsl sec|ppf|recurring deposit/i],
     ["Rent", /\brent\b|landlord|nobroker|house rent/i],
     ["Groceries", /bigbasket|blinkit|zepto|instamart|dmart|d-mart|grocer|supermarket|reliance fresh|more retail|jiomart|walmart|whole foods|tesco|aldi|lidl|kirana|vegetable|milk|dairy/i],
@@ -563,12 +568,18 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     var toPayday = day < payday ? payday - day : dim - day + payday;
     var hourly = income / 173;
     var spentToday = daily[day] || 0;
+    var ATM = /atm|cash dep|cash wdl|by cash|cdm|nfs\/|nwd/i;
+    var cash = 0, hasCash = false;
+    state.tx.forEach(function (t) {
+      if (t.via === "cash") { cash += t.amount; hasCash = true; }
+      else if (t.cat === "Transfers" && ATM.test(t.desc)) { cash -= t.amount; hasCash = true; }
+    });
     var streak = 0;
     for (var d = day - 1; d >= 1; d--) { if (spendDays[d]) break; streak++; }
     return { y: y, m: m, key: key, dim: dim, day: day, tx: tx, income: income, incomeIn: incomeIn, savings: savings, spent: spent,
       byCat: byCat, daily: daily, billsDue: billsDue, billsDueTotal: billsDueTotal, spendable: spendable, left: left,
       daysLeft: daysLeft, safePerDay: safePerDay, pace: pace, payday: payday, toPayday: toPayday, hourly: hourly,
-      spentToday: spentToday, streak: streak, spendDays: spendDays };
+      spentToday: spentToday, streak: streak, spendDays: spendDays, cash: cash, hasCash: hasCash };
   }
 
   // ---------- reminders ----------
@@ -610,8 +621,11 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     });
     var subs = state.bills.filter(function (b) { return b.cat === "Subscriptions"; }).reduce(function (a, b) { return a + b.amount; }, 0);
     if (M.income && subs > M.income * 0.1) out.push({ lvl: "warn", t: "Subscriptions cost " + fmt(subs) + " a month", d: "That's " + Math.round(subs / M.income * 100) + "% of your income. Cancel the ones you haven't opened this week.", link: "#plan", linkText: "Review bills" });
-    if (M.streak >= 2 && M.tx.length) out.push({ lvl: "good", t: M.streak + " no-spend days in a row", d: "Nice. Every no-spend day adds " + fmt(M.safePerDay) + " to the rest of your month." });
-    if (!state.sample && !M.tx.length) out.push({ lvl: "warn", t: "No transactions for " + TODAY.toLocaleDateString(undefined, { month: "long" }) + " yet", d: "Until you import this month's statement, safe-to-spend assumes you've spent nothing so far.", link: "#bank" });
+    var bankTx = M.tx.some(function (t) { return t.via !== "cash"; });
+    if (M.streak >= 2 && bankTx) out.push({ lvl: "good", t: M.streak + " no-spend days in a row", d: "Nice. Every no-spend day adds " + fmt(M.safePerDay) + " to the rest of your month." });
+    if (!state.sample && !bankTx) out.push({ lvl: "warn", t: "No bank transactions for " + TODAY.toLocaleDateString(undefined, { month: "long" }) + " yet", d: "Until you import this month's statements, safe-to-spend only knows about the cash you've logged.", link: "#bank" });
+    if (!state.sample && M.incomeIn < M.income && M.day >= 5) out.push({ lvl: "info", t: fmt(M.income - M.incomeIn) + " of this month's income not logged yet", d: "Safe-to-spend counts on your full " + fmt(M.income) + ". When a part of your salary arrives in cash, add it under Transactions as Money in, Cash.", link: "#transactions", linkText: "Log income" });
+    if (!state.sample && !M.tx.some(function (t) { return t.via === "cash"; })) out.push({ lvl: "info", t: "Log cash as you spend it", d: "Cash never shows in a bank statement. Adding it takes ten seconds and keeps your allowance honest.", link: "#transactions", linkText: "Add cash" });
     else if (state.sample) out.push({ lvl: "info", t: "Bring in your real numbers", d: "Import a statement from your bank once a week so these reminders reflect your spending.", link: "#bank" });
     var order = { bad: 0, warn: 1, info: 2, good: 3 };
     return out.sort(function (a, b) { return order[a.lvl] - order[b.lvl]; });
@@ -707,13 +721,15 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
       : "Daily allowance " + fmt(M.safePerDay) + " for the next " + M.daysLeft + " days" + (M.spentToday ? ", " + fmt(M.spentToday) + " spent today." : ".");
     var paceChip = M.pace > 1.1 ? '<span class="chip warn">' + Math.round(M.pace * 100) + '% of pace</span>' : M.pace < 0.9 ? '<span class="chip good">Under pace</span>' : '<span class="chip info">On pace</span>';
     var stats = [
-      ["Income this month", fmt(M.income), M.incomeIn ? "" : '<span class="small muted">from your settings</span>'],
+      M.incomeIn >= M.income ? ["Income this month", fmt(M.incomeIn), ""]
+        : ["Income received", fmt(M.incomeIn), '<span class="small muted">of ' + fmt(M.income) + ' expected</span>'],
       ["Spent so far", fmt(M.spent), paceChip],
       ["Bills still due", fmt(M.billsDueTotal), '<span class="small muted">' + M.billsDue.length + ' bills</span>'],
       ["Savings goal", fmt(M.savings), '<span class="small muted">set aside first</span>'],
+      M.hasCash ? ["Cash in hand", fmt(M.cash), M.cash < 0 ? '<span class="chip warn">Check your cash log</span>' : '<span class="small muted">from your cash log</span>'] : null,
       ["Left to spend", fmt(M.left), M.left < 0 ? '<span class="chip bad">Over</span>' : '<span class="small muted">' + M.daysLeft + ' days left</span>']
     ];
-    document.getElementById("stats").innerHTML = stats.map(function (s) {
+    document.getElementById("stats").innerHTML = stats.filter(Boolean).map(function (s) {
       return '<div class="stat"><span class="label">' + s[0] + '</span><span class="v">' + s[1] + "</span>" + (s[2] || "") + "</div>";
     }).join("");
 
@@ -834,7 +850,7 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     document.getElementById("txSummary").textContent = list.length + " transactions · " + fmt(inn) + " in · " + fmt(out) + " spent";
     var opts = categories();
     document.getElementById("txBody").innerHTML = list.length ? list.slice(0, 400).map(function (t) {
-      return "<tr><td class=\"num small\">" + parseIso(t.date).toLocaleDateString(undefined, { day: "numeric", month: "short" }) + "</td><td>" + esc(t.desc) + '</td><td><select data-cat="' + t.id + '" aria-label="Category">' +
+      return "<tr><td class=\"num small\">" + parseIso(t.date).toLocaleDateString(undefined, { day: "numeric", month: "short" }) + "</td><td>" + esc(t.desc) + (t.via === "cash" ? ' <span class="chip info">Cash</span>' : "") + '</td><td><select data-cat="' + t.id + '" aria-label="Category">' +
         opts.map(function (c) { return "<option" + (c === t.cat ? " selected" : "") + ">" + esc(c) + "</option>"; }).join("") +
         '</select></td><td class="amt' + (t.amount > 0 ? " in" : "") + '">' + (t.amount > 0 ? "+" : "") + fmt(t.amount, { maximumFractionDigits: 2 }) + '</td><td><button class="btn sm ghost" type="button" data-del="' + t.id + '" aria-label="Delete">✕</button></td></tr>';
     }).join("") : '<tr><td colspan="5" class="muted">No transactions match.</td></tr>';
@@ -904,8 +920,11 @@ textarea { min-height: 110px; font-family: var(--mono); font-size: .8rem; }
     var dirIn = document.getElementById("tIn").checked;
     var desc = document.getElementById("tDesc").value.trim();
     var cat = document.getElementById("tCat").value;
+    var cash = document.getElementById("tCash").checked;
     leaveSample();
-    addTx({ date: document.getElementById("tDate").value, desc: desc, amount: dirIn ? amt : -amt, cat: cat });
+    var t = { date: document.getElementById("tDate").value, desc: desc, amount: dirIn ? amt : -amt, cat: cat };
+    if (cash) t.via = "cash";
+    addTx(t);
     e.target.reset(); document.getElementById("tDate").value = iso(TODAY);
     toast("Added.");
   });
