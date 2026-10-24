@@ -275,7 +275,7 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
       <div class="panel">
         <h2>Month by month</h2>
         <div class="table-wrap"><table id="svTable"></table></div>
-        <p class="small muted">Saved = invested + what stayed in your bank and cash. SIPs and moving money between your own accounts don't count as spending.</p>
+        <p class="small muted">Saved = invested + what stayed in your bank and cash. SIPs, moving money between your own accounts and bills you paid for your office don't count as spending. Office money you're still owed counts as saved only once it's paid back.</p>
       </div>
     </div>
     <div class="panel" id="subPanel">
@@ -493,7 +493,7 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
   "use strict";
   var KEY = "spend-coach-v1";
   var CURRENCIES = { INR: "en-IN", USD: "en-US", EUR: "de-DE", GBP: "en-GB", AED: "en-AE", CAD: "en-CA", AUD: "en-AU", SGD: "en-SG" };
-  var EXCLUDED = { "Income": 1, "Transfers": 1, "Investments": 1 };
+  var EXCLUDED = { "Income": 1, "Transfers": 1, "Investments": 1, "Office expenses": 1 };
   var RULES = [
     ["Income", /salary|payroll|interest credit|int\.? ?cr|dividend|refund|cashback|reversal/i],
     ["Transfers", /self transfer|own account|to savings|credit card payment|cc payment|bill ?desk.*card|neft.*self|atm|cash dep|cash wdl|by cash|cdm|nfs\/|nwd/i],
@@ -602,7 +602,7 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
     var set = {};
     Object.keys(state.budgets).forEach(function (c) { set[c] = 1; });
     state.tx.forEach(function (t) { set[t.cat] = 1; });
-    set["Income"] = 1; set["Transfers"] = 1; set["Other"] = 1;
+    set["Income"] = 1; set["Transfers"] = 1; set["Office expenses"] = 1; set["Other"] = 1;
     return Object.keys(set);
   }
   function spendCats() { return categories().filter(function (c) { return !EXCLUDED[c]; }); }
@@ -612,9 +612,10 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
     var y = TODAY.getFullYear(), m = TODAY.getMonth(), key = monthKey(TODAY);
     var dim = daysIn(y, m), day = TODAY.getDate();
     var tx = state.tx.filter(function (t) { return t.date.slice(0, 7) === key; });
-    var incomeIn = 0, spent = 0, byCat = {}, daily = new Array(dim + 1).fill(0), spendDays = {};
+    var officeNet = 0, incomeIn = 0, spent = 0, byCat = {}, daily = new Array(dim + 1).fill(0), spendDays = {};
     tx.forEach(function (t) {
       if (t.cat === "Income" && t.amount > 0) { incomeIn += t.amount; return; }
+      if (t.cat === "Office expenses") { officeNet += t.amount; return; }
       if (EXCLUDED[t.cat]) return;
       var v = -t.amount;
       spent += v;
@@ -628,7 +629,8 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
     var billsDue = state.bills.filter(function (b) { return b.day > day && b.day <= dim; });
     var billsDueTotal = billsDue.reduce(function (a, b) { return a + b.amount; }, 0);
     var spendable = income - savings;
-    var left = spendable - spent - billsDueTotal;
+    // Paying for the office uses your money until it's paid back.
+    var left = spendable - spent - billsDueTotal + Math.min(0, officeNet);
     var daysLeft = dim - day + 1;
     var safePerDay = left / daysLeft;
     var expectedByNow = spendable * day / dim;
@@ -939,13 +941,14 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
   function monthTotals() {
     var by = {};
     state.tx.forEach(function (t) {
-      var k = t.date.slice(0, 7), m = by[k] || (by[k] = { key: k, in: 0, spent: 0, invested: 0 });
+      var k = t.date.slice(0, 7), m = by[k] || (by[k] = { key: k, in: 0, spent: 0, invested: 0, office: 0 });
       if (t.cat === "Income") m.in += t.amount;
       else if (t.cat === "Investments") m.invested -= t.amount;
+      else if (t.cat === "Office expenses") m.office += t.amount;
       else if (!EXCLUDED[t.cat]) m.spent -= t.amount;
     });
     return Object.keys(by).sort().slice(-12).map(function (k) {
-      var m = by[k]; m.saved = m.in - m.spent; m.kept = m.saved - m.invested; m.rate = m.in > 0 ? m.saved / m.in : 0;
+      var m = by[k]; m.saved = m.in - m.spent + m.office; m.kept = m.saved - m.invested; m.rate = m.in > 0 ? m.saved / m.in : 0;
       var p = k.split("-"); m.d = new Date(+p[0], +p[1] - 1, 1);
       m.short = m.d.toLocaleDateString(undefined, { month: "short" }); m.current = k === monthKey(TODAY);
       return m;
@@ -953,6 +956,15 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
   }
   function pct(v) { return Math.round(v * 100) + "%"; }
   function signed(v) { return (v < 0 ? "−" : "+") + fmt(Math.abs(v)); }
+
+  // Money paid on the office's behalf, and what came back. Neither counts as personal spending or income.
+  function officeStat() {
+    var paid = 0, back = 0;
+    state.tx.forEach(function (t) { if (t.cat === "Office expenses") { if (t.amount < 0) paid -= t.amount; else back += t.amount; } });
+    if (!paid) return [];
+    var owed = paid - back;
+    return [["Office still owes you", fmt(Math.max(0, owed)), "paid " + fmt(paid) + " · got back " + fmt(back)]];
+  }
 
   function renderSavings() {
     var ms = monthTotals();
@@ -971,7 +983,7 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
       ["Spent", fmt(T.spent), T.in ? pct(T.spent / T.in) + " of money in" : ""],
       ["Invested", fmt(T.invested), "new money, after payouts"],
       ["Kept in bank and cash", signed(T.kept), ""]
-    ].map(function (s) { return '<div class="stat"><span class="label">' + s[0] + '</span><span class="v">' + s[1] + '</span><span class="small muted">' + s[2] + "</span></div>"; }).join("");
+    ].concat(officeStat()).map(function (s) { return '<div class="stat"><span class="label">' + s[0] + '</span><span class="v">' + s[1] + '</span><span class="small muted">' + s[2] + "</span></div>"; }).join("");
 
     // chart
     var W = 460, H = 230, L = 56, R = 10, Tp = 24, B = 26;
