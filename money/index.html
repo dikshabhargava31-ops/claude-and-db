@@ -579,6 +579,8 @@ td input[type="text"], td input[type="number"] { padding: 6px 8px; font-size: .8
 
   function uid() { return Math.random().toString(36).slice(2, 10); }
   function categorize(desc, amount) {
+    // Google Pay bill payments show up as "Google India Digital": large ones are bills, small monthly ones are Google One.
+    if (/google india d/i.test(desc)) return amount <= -1000 ? "Bills & utilities" : amount < 0 ? "Subscriptions" : "Income";
     for (var i = 0; i < RULES.length; i++) {
       if (RULES[i][1].test(desc)) {
         if (RULES[i][0] === "Income" && amount < 0) continue;
