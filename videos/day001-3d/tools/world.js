@@ -18,6 +18,8 @@
       const cam = new THREE.PerspectiveCamera(42, W / H, 0.1, 200);
       const camL = new THREE.PerspectiveCamera(42, W / 2 / H, 0.1, 200);
       const camR = new THREE.PerspectiveCamera(42, W / 2 / H, 0.1, 200);
+      // framing: pull back a touch and sit the scene 70 px lower, so heads stay clear of the kinetic type up top
+      [[cam, W], [camL, W / 2], [camR, W / 2]].forEach(([c, w]) => { c.zoom = 0.9; c.setViewOffset(w, H, 0, -70, w, H); c.updateProjectionMatrix(); });
 
       // light: a cool night fill everywhere, a warm key and one practical light that follow the shot
       scene.add(new THREE.HemisphereLight("#9fb4ff", "#3a2a22", 1.2));
@@ -263,7 +265,7 @@
 
         // CHART: this week's count
         o = S.chart;
-        room(o, "#1b2238", "#141c36", 14, 12);
+        room(o, "#1b2238", "#141c36", 14, 32);  // deep floor: the camera sits at z 13-15
         w.bars = [["#3b82f6", 3.0, "Enquiries", "15"], ["#fbb524", 1.7, "Visits", "8"], ["#22c55e", 1.0, "Admissions", "5"]].map(([c, h, l, n], k) => {
           const b = box(1.1, 1, 1.1, mat(c, 0.5), o - 1.7 + k * 1.7, 0.5, 0); b.userData.h = h;
           const lab = sprite(label(l, { w: 600, size: 62 }), 1.15, 0.25); lab.position.set(o - 1.7 + k * 1.7, -0.05, 0.8); lab.visible = true;

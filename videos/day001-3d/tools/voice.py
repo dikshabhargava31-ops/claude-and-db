@@ -59,11 +59,19 @@ for f, a, b in [("raw/vo-part1.wav", 0, 91.8), ("raw/vo-part2.wav", 0, 11.6)]:
         # finer speech runs (pauses >= 0.15 s) are the candidate line boundaries
         for u0, u1 in segments(piece, 0.15) if len(piece) > SR else [[0, len(piece) / SR]]:
             speech.append([t0 + u0, t0 + u1, f.endswith("part2.wav")])
+# fumbles the person marked, in the time of the track assembled above (cut at quiet points, crossfaded):
+# a hesitation and pause around 0:46, and a false start at the top of "teacher se milwao..." around 1:00
+FUMBLES = [(43.37, 46.52), (59.72, 61.03)]
+for a, b in sorted(FUMBLES, reverse=True):
+    i, j, n = int(a * SR), int(b * SR), int(XF * SR)
+    ramp = np.linspace(0, 1, n, dtype=np.float32)
+    y = np.concatenate([y[:i], y[i:i + n] * np.sqrt(1 - ramp) + y[j:j + n] * np.sqrt(ramp), y[j + n:]])
+    speech = [[s0, min(s1, a), p2] for s0, s1, p2 in speech if s0 < a] + [[s0 - (b - a), s1 - (b - a), p2] for s0, s1, p2 in speech if s0 >= b]
 fade = int(0.05 * SR); y[:fade] *= np.linspace(0, 1, fade); y[-fade:] *= np.linspace(1, 0, fade)
-# voice polish: rumble cut, a little warmth and presence, gentle de-essing and compression,
+# voice polish: rumble cut, background-noise reduction (afftdn) and a soft gate between phrases, a little warmth and presence, gentle de-essing and compression,
 # then one fixed gain to -14 LUFS (two-pass loudnorm, linear) so it sits loud and steady over the music
 enc = ["-f", "f32le", "-ar", str(SR), "-ac", "1", "-i", "-"]
-POLISH = ("highpass=f=85,equalizer=f=180:t=q:w=1:g=2,equalizer=f=3200:t=q:w=1.2:g=3.5,equalizer=f=10000:t=q:w=1:g=1.5,"
+POLISH = ("highpass=f=85,afftdn=nr=20:nf=-44:tn=1,agate=threshold=0.012:ratio=2:range=0.2:attack=8:release=200,equalizer=f=180:t=q:w=1:g=2,equalizer=f=3200:t=q:w=1.2:g=3.5,equalizer=f=10000:t=q:w=1:g=1.5,"
           "deesser=i=0.35,acompressor=threshold=-22dB:ratio=3:attack=6:release=90:makeup=2")
 m = subprocess.run(["ffmpeg", "-hide_banner", *enc, "-af", POLISH + ",loudnorm=I=-14:TP=-3:LRA=9:print_format=json", "-f", "null", "-"], input=y.tobytes(), capture_output=True).stderr.decode()
 import json as _j

@@ -7,9 +7,9 @@ pauses, paste them into SPANS, set VOICE to the file, and run  python3 tools/bui
 import json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-VOICE_LEN = 100.45  # seconds in raw/voice.m4a (built by tools/voice.py)
+VOICE_LEN = 95.99  # seconds in raw/voice.m4a (built by tools/voice.py)
 VOICE = "raw/voice.m4a"  # the person's recording: recording 1 to 91.8 s + recording 2, pauses cut to 0.3 s of room tone
-SPANS = [[0.26, 5.13], [5.43, 9.15], [9.47, 12.26], [12.47, 20.54], [20.85, 28.17], [28.47, 35.7], [35.91, 40.83], [41.12, 51.54], [51.89, 53.9], [54.08, 63.45], [63.87, 71.65], [71.99, 85.17], [85.53, 89.5], [89.73, 100.2]]  # fitted by tools/voice.py (lines 1–13 in recording 1, 14 in recording 2)
+SPANS = [[0.26, 5.13], [5.43, 9.15], [9.47, 12.26], [12.47, 20.54], [20.85, 28.17], [28.47, 35.7], [35.91, 40.83], [41.12, 48.39], [48.74, 50.75], [50.93, 58.99], [59.41, 67.19], [67.53, 80.71], [81.07, 85.04], [85.27, 95.74]]  # fitted by tools/voice.py before the fumble cuts, then shifted by them
 
 TEXT = [re.sub(r"^\d+\.\s*", "", l).strip() for l in (ROOT / "SCRIPT.md").read_text().splitlines() if re.match(r"^\d+\.\s", l)]
 assert len(TEXT) == 14, len(TEXT)
@@ -80,7 +80,7 @@ voice += f'      <audio id="bgm" class="clip" src="assets/bgm/track.m4a" data-st
 </html>
 """)
 
-# ---------------------------------------------------------------- cards.html: one KGP-style card per line
+# ---------------------------------------------------------------- cards.html: kinetic type per line (words pop in, keywords get a highlighter swipe)
 TICK = '<svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#22c55e"/><path d="M9 18l5 5 11-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 CROSS = '<svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#ef4444"/><path d="M11 11l12 12M23 11l-12 12" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>'
 item = lambda t, html: f'<div class="it" data-at="{t}">{html}</div>'
@@ -104,12 +104,15 @@ blocks = "\n".join(f'    <div id="c{k}" class="card"><span class="pill {cls}">{p
 (ROOT / "compositions" / "cards.html").write_text(f"""<template>
   <style>
     #root {{ position: absolute; inset: 0; font-family: "Inter", sans-serif; color: #fff; }}
-    #cd-top {{ position: absolute; left: 0; top: 0; width: 1080px; height: 230px; background: linear-gradient(180deg, rgba(11, 18, 38, 0.92) 0%, rgba(11, 18, 38, 0.6) 60%, rgba(11, 18, 38, 0) 100%); }}
+    #cd-top {{ position: absolute; left: 0; top: 0; width: 1080px; height: 640px; background: linear-gradient(180deg, rgba(11, 18, 38, 0.92) 0%, rgba(11, 18, 38, 0.72) 45%, rgba(11, 18, 38, 0) 100%); }}
     #cd-dot {{ position: absolute; left: 62px; top: 124px; width: 12px; height: 12px; border-radius: 50%; background: #fbb524; }}
     #cd-series {{ position: absolute; left: 86px; top: 110px; font-size: 28px; font-weight: 700; white-space: nowrap; }}
     #cd-day {{ position: absolute; left: 86px; top: 146px; font-size: 28px; font-weight: 500; color: #b9c3dc; white-space: nowrap; }}
     #cd-logo {{ position: absolute; left: 960px; top: 108px; width: 60px; height: 60px; border-radius: 14px; background: #fbb524; color: #0b1226; font-size: 28px; font-weight: 800; line-height: 62px; text-align: center; }}
-    .card {{ position: absolute; left: 50px; top: 230px; width: 980px; padding: 26px 40px 32px; border-radius: 30px; background: rgba(13, 21, 44, 0.9); border: 2px solid rgba(255, 255, 255, 0.1); box-shadow: 0 22px 50px rgba(0, 0, 0, 0.4); opacity: 0; }}
+    .card {{ position: absolute; left: 50px; top: 215px; width: 980px; padding: 0 30px; opacity: 0; text-shadow: 0 4px 18px rgba(0, 0, 0, 0.55); }}
+    .w {{ display: inline-block; will-change: transform; }}
+    .kw {{ background: linear-gradient(rgba(251, 181, 36, 0.32), rgba(251, 181, 36, 0.32)) no-repeat 0 88% / 0% 34%; padding: 0 4px; }}
+    div.kw {{ width: fit-content; }}
     .pill {{ display: inline-block; height: 46px; padding: 0 18px; border-radius: 23px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; white-space: nowrap; }}
     .pill.hot {{ background: rgba(239, 68, 68, 0.2); color: #ff8a8a; }}
     .pill.ok {{ background: rgba(34, 197, 94, 0.18); color: #4ade80; }}
@@ -152,14 +155,52 @@ blocks = "\n".join(f'    <div id="c{k}" class="card"><span class="pill {cls}">{p
     const tl = gsap.timeline({{ paused: true }});
     const T = {TJ};
     const L = T.lines;
-    // one card per line, in with the voice, out just before the next line
+    // kinetic type: split every card's text into words (svg icons count as one word)
+    const split = (el) => {{
+      [...el.childNodes].forEach((n) => {{
+        if (n.nodeType === 3) {{
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\\s+)/).forEach((p) => {{
+            if (!p) return;
+            if (/^\\s+$/.test(p)) frag.appendChild(document.createTextNode(p));
+            else {{ const w = document.createElement("span"); w.className = "w"; w.textContent = p; frag.appendChild(w); }}
+          }});
+          n.replaceWith(frag);
+        }} else if (n.nodeName.toLowerCase() === "svg") n.classList.add("w");
+        else if (n.nodeType === 1 && !n.classList.contains("pill")) split(n);
+      }});
+    }};
+    document.querySelectorAll(".card").forEach(split);
+    const pop = (words, at, span) => {{
+      const gap = Math.min(0.09, span / Math.max(1, words.length));
+      words.forEach((w, i) => {{
+        const icon = w.nodeName.toLowerCase() === "svg";
+        tl.fromTo(w, {{ opacity: 0, y: 46, scale: icon ? 0 : 0.6, rotation: icon ? -90 : (i % 2 ? 5 : -5) }},
+          {{ opacity: 1, y: 0, scale: 1, rotation: 0, duration: icon ? 0.45 : 0.38, ease: icon ? "back.out(3)" : "back.out(2.2)" }}, at + i * gap);
+      }});
+      return at + words.length * gap;
+    }};
+    // one card per line: pill slides in, words pop in with the voice, keywords get swiped, all fly out before the next line
     L.forEach((l, k) => {{
+      const card = document.getElementById("c" + k);
       const until = k + 1 < L.length ? L[k + 1].s - 0.2 : T.ev.endcard;
-      tl.fromTo("#c" + k, {{ opacity: 0, y: -24 }}, {{ opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }}, Math.max(0.05, l.s - 0.15));
-      tl.to("#c" + k, {{ opacity: 0, y: -16, duration: 0.18, ease: "power3.in" }}, until - 0.18);
+      const t0 = Math.max(0.05, l.s - 0.15);
+      tl.set(card, {{ opacity: 1 }}, t0);
+      tl.fromTo(card.querySelector(".pill"), {{ opacity: 0, x: -60 }}, {{ opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }}, t0);
+      const own = [...card.querySelectorAll(".w")].filter((w) => !w.closest(".it"));
+      const done = pop(own, t0 + 0.12, Math.min(1.2, (l.e - l.s) * 0.35));
+      card.querySelectorAll(".kw").forEach((kw, j) => {{
+        if (!kw.closest(".it")) tl.fromTo(kw, {{ backgroundSize: "0% 34%" }}, {{ backgroundSize: "100% 34%", duration: 0.4, ease: "power2.out" }}, done + 0.05 + j * 0.15);
+      }});
+      tl.to(card.querySelectorAll(".w, .pill"), {{ opacity: 0, y: -30, duration: 0.2, ease: "power2.in", stagger: 0.012 }}, until - 0.32);
+      tl.set(card, {{ opacity: 0 }}, until);
     }});
-    // items land on the words that say them
-    document.querySelectorAll("[data-at]").forEach((el) => tl.fromTo(el, {{ opacity: 0, x: 24 }}, {{ opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }}, +el.dataset.at));
+    // list items land on the words that say them
+    document.querySelectorAll("[data-at]").forEach((el) => {{
+      tl.set(el, {{ opacity: 1 }}, +el.dataset.at);
+      const end = pop([...el.querySelectorAll(".w"), ...el.querySelectorAll(".qn, .day")], +el.dataset.at, 0.4);
+      el.querySelectorAll(".kw").forEach((kw) => tl.fromTo(kw, {{ backgroundSize: "0% 34%" }}, {{ backgroundSize: "100% 34%", duration: 0.35 }}, end));
+    }});
     // the ratio: 15 enquiries, 3 admissions
     tl.fromTo("#r-b", {{ opacity: 0, scale: 2 }}, {{ opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }}, T.ev.green);
     const call = T.shots.find((s) => s.n === "call");

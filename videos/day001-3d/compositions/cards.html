@@ -1,12 +1,15 @@
 <template>
   <style>
     #root { position: absolute; inset: 0; font-family: "Inter", sans-serif; color: #fff; }
-    #cd-top { position: absolute; left: 0; top: 0; width: 1080px; height: 230px; background: linear-gradient(180deg, rgba(11, 18, 38, 0.92) 0%, rgba(11, 18, 38, 0.6) 60%, rgba(11, 18, 38, 0) 100%); }
+    #cd-top { position: absolute; left: 0; top: 0; width: 1080px; height: 640px; background: linear-gradient(180deg, rgba(11, 18, 38, 0.92) 0%, rgba(11, 18, 38, 0.72) 45%, rgba(11, 18, 38, 0) 100%); }
     #cd-dot { position: absolute; left: 62px; top: 124px; width: 12px; height: 12px; border-radius: 50%; background: #fbb524; }
     #cd-series { position: absolute; left: 86px; top: 110px; font-size: 28px; font-weight: 700; white-space: nowrap; }
     #cd-day { position: absolute; left: 86px; top: 146px; font-size: 28px; font-weight: 500; color: #b9c3dc; white-space: nowrap; }
     #cd-logo { position: absolute; left: 960px; top: 108px; width: 60px; height: 60px; border-radius: 14px; background: #fbb524; color: #0b1226; font-size: 28px; font-weight: 800; line-height: 62px; text-align: center; }
-    .card { position: absolute; left: 50px; top: 230px; width: 980px; padding: 26px 40px 32px; border-radius: 30px; background: rgba(13, 21, 44, 0.9); border: 2px solid rgba(255, 255, 255, 0.1); box-shadow: 0 22px 50px rgba(0, 0, 0, 0.4); opacity: 0; }
+    .card { position: absolute; left: 50px; top: 215px; width: 980px; padding: 0 30px; opacity: 0; text-shadow: 0 4px 18px rgba(0, 0, 0, 0.55); }
+    .w { display: inline-block; will-change: transform; }
+    .kw { background: linear-gradient(rgba(251, 181, 36, 0.32), rgba(251, 181, 36, 0.32)) no-repeat 0 88% / 0% 34%; padding: 0 4px; }
+    div.kw { width: fit-content; }
     .pill { display: inline-block; height: 46px; padding: 0 18px; border-radius: 23px; font-size: 28px; font-weight: 800; letter-spacing: 0.06em; line-height: 48px; background: rgba(251, 181, 36, 0.16); color: #fbb524; white-space: nowrap; }
     .pill.hot { background: rgba(239, 68, 68, 0.2); color: #ff8a8a; }
     .pill.ok { background: rgba(34, 197, 94, 0.18); color: #4ade80; }
@@ -44,8 +47,8 @@
     <div id="c6" class="card"><span class="pill hot">04 · MISTAKE</span><div class="ln">"Soch ke batate hain…"</div><div class="ln sm"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#ef4444"/><path d="M11 11l12 12M23 11l-12 12" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg> aur koi follow-up nahi</div></div>
     <div id="c7" class="card"><span class="pill ok">05 · SAHI TAREEKA</span><div class="ln">Phone pe sab mat batao.</div><div class="quote">"Ek baar centre aa jaiye,<br/>bacche se bhi mil lenge."</div></div>
     <div id="c8" class="card"><span class="pill ok">05 · SAHI TAREEKA</span><div class="ln"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="#22c55e"/><path d="M9 18l5 5 11-12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg> Date-time <span class="kw">wahin fix</span></div></div>
-    <div id="c9" class="card"><span class="pill ">06 · VISIT PE 3 THINGS</span><div class="it" data-at="57.359"><span class="qn">1</span>Classroom dikhao</div><div class="it" data-at="59.702"><span class="qn">2</span>Teacher se milwao</div><div class="it" data-at="61.763"><span class="qn">3</span>Trial class ki date fix</div></div>
-    <div id="c10" class="card"><span class="pill warm">07 · JO NAHI AAYE</span><div class="it" data-at="65.037"><span class="day">Day 2</span> Message</div><div class="it" data-at="66.826"><span class="day">Week 1</span> Call</div><div class="it" data-at="69.938"><span class="quote sm">"Kab aa sakte hain?"</span></div></div>
+    <div id="c9" class="card"><span class="pill ">06 · VISIT PE 3 THINGS</span><div class="it" data-at="53.751"><span class="qn">1</span>Classroom dikhao</div><div class="it" data-at="55.766"><span class="qn">2</span>Teacher se milwao</div><div class="it" data-at="57.539"><span class="qn">3</span>Trial class ki date fix</div></div>
+    <div id="c10" class="card"><span class="pill warm">07 · JO NAHI AAYE</span><div class="it" data-at="60.577"><span class="day">Day 2</span> Message</div><div class="it" data-at="62.366"><span class="day">Week 1</span> Call</div><div class="it" data-at="65.478"><span class="quote sm">"Kab aa sakte hain?"</span></div></div>
     <div id="c11" class="card"><span class="pill ">08 · EXCEL SHEET</span><div class="ln">Har enquiry = <span class="kw">1 row</span></div><div class="ln sm">Naam · Class · Phone · Date · Visit · Admission</div></div>
     <div id="c12" class="card"><span class="pill ">09 · HAR WEEK COUNT</span><div class="ln">Enquiries → Visits → <span class="kw">Admissions</span></div></div>
     <div id="c13" class="card"><span class="pill ">10 · FOCUS</span><div class="ln">Fees pe nahi,</div><div class="big kw">visit pe focus</div></div>
@@ -60,16 +63,54 @@
   <script>
     window.__timelines = window.__timelines || {};
     const tl = gsap.timeline({ paused: true });
-    const T = {"lines": [{"s": 0.26, "e": 5.13}, {"s": 5.43, "e": 9.15}, {"s": 9.47, "e": 12.26}, {"s": 12.47, "e": 20.54}, {"s": 20.85, "e": 28.17}, {"s": 28.47, "e": 35.7}, {"s": 35.91, "e": 40.83}, {"s": 41.12, "e": 51.54}, {"s": 51.89, "e": 53.9}, {"s": 54.08, "e": 63.45}, {"s": 63.87, "e": 71.65}, {"s": 71.99, "e": 85.17}, {"s": 85.53, "e": 89.5}, {"s": 89.73, "e": 100.2}], "shots": [{"n": "desk", "a": 0, "b": 5.13}, {"n": "street", "a": 5.13, "b": 9.17}, {"n": "home", "a": 9.17, "b": 12.17}, {"n": "class", "a": 12.17, "b": 20.55}, {"n": "shake", "a": 20.55, "b": 28.17}, {"n": "deskcall", "a": 28.17, "b": 35.61}, {"n": "home2", "a": 35.61, "b": 40.82}, {"n": "call", "a": 40.82, "b": 53.78}, {"n": "tour", "a": 53.78, "b": 63.57}, {"n": "mum", "a": 63.57, "b": 71.69}, {"n": "sheet", "a": 71.69, "b": 85.23}, {"n": "chart", "a": 85.23, "b": 89.43}, {"n": "bye", "a": 89.43, "b": 102.4}], "ev": {"bubbles": [0.26, 0.521, 0.782, 1.043, 1.304, 1.564, 1.825, 2.086, 2.347, 2.608, 2.869, 3.13, 3.391, 3.652, 3.913], "green": 4.546, "tags": [10.726, 11.144, 11.562], "see": [14.891, 16.909, 18.926], "shake": 22.314, "fee": 33.676, "soch": 36.894, "grey": 39.354, "cal": 52.493, "three": [57.359, 59.702, 61.763], "msg": 65.037, "ring": 66.826, "kab": 69.938, "rows": [75.944, 77.657, 79.371, 81.084, 82.798], "bars": [86.721, 87.713, 88.706], "endcard": 94.442}, "end": 102.4};
+    const T = {"lines": [{"s": 0.26, "e": 5.13}, {"s": 5.43, "e": 9.15}, {"s": 9.47, "e": 12.26}, {"s": 12.47, "e": 20.54}, {"s": 20.85, "e": 28.17}, {"s": 28.47, "e": 35.7}, {"s": 35.91, "e": 40.83}, {"s": 41.12, "e": 48.39}, {"s": 48.74, "e": 50.75}, {"s": 50.93, "e": 58.99}, {"s": 59.41, "e": 67.19}, {"s": 67.53, "e": 80.71}, {"s": 81.07, "e": 85.04}, {"s": 85.27, "e": 95.74}], "shots": [{"n": "desk", "a": 0, "b": 5.13}, {"n": "street", "a": 5.13, "b": 9.17}, {"n": "home", "a": 9.17, "b": 12.17}, {"n": "class", "a": 12.17, "b": 20.55}, {"n": "shake", "a": 20.55, "b": 28.17}, {"n": "deskcall", "a": 28.17, "b": 35.61}, {"n": "home2", "a": 35.61, "b": 40.82}, {"n": "call", "a": 40.82, "b": 50.63}, {"n": "tour", "a": 50.63, "b": 59.11}, {"n": "mum", "a": 59.11, "b": 67.23}, {"n": "sheet", "a": 67.23, "b": 80.77}, {"n": "chart", "a": 80.77, "b": 84.97}, {"n": "bye", "a": 84.97, "b": 97.94}], "ev": {"bubbles": [0.26, 0.521, 0.782, 1.043, 1.304, 1.564, 1.825, 2.086, 2.347, 2.608, 2.869, 3.13, 3.391, 3.652, 3.913], "green": 4.546, "tags": [10.726, 11.144, 11.562], "see": [14.891, 16.909, 18.926], "shake": 22.314, "fee": 33.676, "soch": 36.894, "grey": 39.354, "cal": 49.343, "three": [53.751, 55.766, 57.539], "msg": 60.577, "ring": 62.366, "kab": 65.478, "rows": [71.484, 73.197, 74.911, 76.624, 78.338], "bars": [82.261, 83.254, 84.246], "endcard": 89.981}, "end": 97.94};
     const L = T.lines;
-    // one card per line, in with the voice, out just before the next line
+    // kinetic type: split every card's text into words (svg icons count as one word)
+    const split = (el) => {
+      [...el.childNodes].forEach((n) => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          n.textContent.split(/(\s+)/).forEach((p) => {
+            if (!p) return;
+            if (/^\s+$/.test(p)) frag.appendChild(document.createTextNode(p));
+            else { const w = document.createElement("span"); w.className = "w"; w.textContent = p; frag.appendChild(w); }
+          });
+          n.replaceWith(frag);
+        } else if (n.nodeName.toLowerCase() === "svg") n.classList.add("w");
+        else if (n.nodeType === 1 && !n.classList.contains("pill")) split(n);
+      });
+    };
+    document.querySelectorAll(".card").forEach(split);
+    const pop = (words, at, span) => {
+      const gap = Math.min(0.09, span / Math.max(1, words.length));
+      words.forEach((w, i) => {
+        const icon = w.nodeName.toLowerCase() === "svg";
+        tl.fromTo(w, { opacity: 0, y: 46, scale: icon ? 0 : 0.6, rotation: icon ? -90 : (i % 2 ? 5 : -5) },
+          { opacity: 1, y: 0, scale: 1, rotation: 0, duration: icon ? 0.45 : 0.38, ease: icon ? "back.out(3)" : "back.out(2.2)" }, at + i * gap);
+      });
+      return at + words.length * gap;
+    };
+    // one card per line: pill slides in, words pop in with the voice, keywords get swiped, all fly out before the next line
     L.forEach((l, k) => {
+      const card = document.getElementById("c" + k);
       const until = k + 1 < L.length ? L[k + 1].s - 0.2 : T.ev.endcard;
-      tl.fromTo("#c" + k, { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, Math.max(0.05, l.s - 0.15));
-      tl.to("#c" + k, { opacity: 0, y: -16, duration: 0.18, ease: "power3.in" }, until - 0.18);
+      const t0 = Math.max(0.05, l.s - 0.15);
+      tl.set(card, { opacity: 1 }, t0);
+      tl.fromTo(card.querySelector(".pill"), { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, t0);
+      const own = [...card.querySelectorAll(".w")].filter((w) => !w.closest(".it"));
+      const done = pop(own, t0 + 0.12, Math.min(1.2, (l.e - l.s) * 0.35));
+      card.querySelectorAll(".kw").forEach((kw, j) => {
+        if (!kw.closest(".it")) tl.fromTo(kw, { backgroundSize: "0% 34%" }, { backgroundSize: "100% 34%", duration: 0.4, ease: "power2.out" }, done + 0.05 + j * 0.15);
+      });
+      tl.to(card.querySelectorAll(".w, .pill"), { opacity: 0, y: -30, duration: 0.2, ease: "power2.in", stagger: 0.012 }, until - 0.32);
+      tl.set(card, { opacity: 0 }, until);
     });
-    // items land on the words that say them
-    document.querySelectorAll("[data-at]").forEach((el) => tl.fromTo(el, { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.3, ease: "expo.out" }, +el.dataset.at));
+    // list items land on the words that say them
+    document.querySelectorAll("[data-at]").forEach((el) => {
+      tl.set(el, { opacity: 1 }, +el.dataset.at);
+      const end = pop([...el.querySelectorAll(".w"), ...el.querySelectorAll(".qn, .day")], +el.dataset.at, 0.4);
+      el.querySelectorAll(".kw").forEach((kw) => tl.fromTo(kw, { backgroundSize: "0% 34%" }, { backgroundSize: "100% 34%", duration: 0.35 }, end));
+    });
     // the ratio: 15 enquiries, 3 admissions
     tl.fromTo("#r-b", { opacity: 0, scale: 2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, T.ev.green);
     const call = T.shots.find((s) => s.n === "call");
