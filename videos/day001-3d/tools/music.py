@@ -101,6 +101,7 @@ v = np.frombuffer(raw, np.float32)[:N]; v = np.pad(v, (0, N - len(v)))
 hop = 441; nfr = N // hop
 lvl = 20 * np.log10(np.sqrt((v[: nfr * hop].reshape(nfr, hop) ** 2).mean(1)) + 1e-9)
 talk = (lvl > np.percentile(lvl, 25) + 12).astype(float)
+talk = np.maximum(talk, np.roll(talk, -15))  # look ahead 150 ms, so the bed is already down when a word starts
 g = np.empty(nfr); acc = 0.0
 for i in range(nfr):  # attack 60 ms, release 500 ms
     k = 1 - np.exp(-0.01 / (0.06 if talk[i] > acc else 0.5)); acc += (talk[i] - acc) * k; g[i] = acc
@@ -108,7 +109,7 @@ duck = 10 ** (-9 * np.repeat(g, hop) / 20); duck = np.pad(duck, (0, N - len(duck
 VOICE_END = T["lines"][-1]["e"]  # swell only after the last word
 level = np.where(t_all < VOICE_END, 1.0, np.minimum(1.8, 1 + (t_all - VOICE_END) / 0.6 * 0.8))
 fade = np.clip((END + 0.3 - t_all) / 2.0, 0, 1) * np.clip(t_all / 0.4, 0, 1)
-mix = (music * duck * level * 0.9 + fx * 0.28) * fade
+mix = (music * duck * level * 0.9 + fx * 0.22) * fade
 
 (ROOT / "assets/bgm").mkdir(parents=True, exist_ok=True)
 stereo = np.stack([mix, mix], 1).astype(np.float32)

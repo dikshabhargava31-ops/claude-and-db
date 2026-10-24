@@ -68,11 +68,46 @@ for a, b in sorted(FUMBLES, reverse=True):
     y = np.concatenate([y[:i], y[i:i + n] * np.sqrt(1 - ramp) + y[j:j + n] * np.sqrt(ramp), y[j + n:]])
     speech = [[s0, min(s1, a), p2] for s0, s1, p2 in speech if s0 < a] + [[s0 - (b - a), s1 - (b - a), p2] for s0, s1, p2 in speech if s0 >= b]
 fade = int(0.05 * SR); y[:fade] *= np.linspace(0, 1, fade); y[-fade:] *= np.linspace(1, 0, fade)
-# voice polish: rumble cut, background-noise reduction (afftdn) and a soft gate between phrases, a little warmth and presence, gentle de-essing and compression,
+def denoise(x, floor_db=-26, over=2.0):
+    """Spectral noise reduction: learn the room noise from the quietest 6% of frames, then
+    attenuate each frequency by how much of it is noise (smoothed over time, so no 'musical' artefacts)."""
+    nfft, hop = 2048, 512
+    win = np.hanning(nfft).astype(np.float32)
+    pad = np.concatenate([np.zeros(nfft, np.float32), x, np.zeros(nfft, np.float32)])
+    nfr = (len(pad) - nfft) // hop
+    frames = np.lib.stride_tricks.as_strided(pad, (nfr, nfft), (pad.strides[0] * hop, pad.strides[0])) * win
+    X = np.fft.rfft(frames, axis=1); P = np.abs(X) ** 2
+    energy = P.sum(1); quiet = energy <= np.percentile(energy[energy > 0], 6)
+    N = P[quiet & (energy > 0)].mean(0)
+    G = np.maximum(10 ** (floor_db / 20), 1 - over * N / (P + 1e-12)) ** 0.5
+    for i in range(1, nfr):  # release smoothing over time
+        G[i] = np.maximum(G[i], 0.6 * G[i - 1])
+    G = (G + np.roll(G, 1, 1) + np.roll(G, -1, 1)) / 3  # and a little across frequency
+    Y = np.fft.irfft(X * G, nfft, axis=1) * win
+    out = np.zeros(len(pad), np.float32); norm = np.zeros(len(pad), np.float32)
+    for i in range(nfr):
+        out[i * hop:i * hop + nfft] += Y[i]; norm[i * hop:i * hop + nfft] += win ** 2
+    return (out / np.maximum(norm, 1e-3))[nfft:nfft + len(x)].astype(np.float32)
+
+y = denoise(y)
+
+def expand(x, thresh_db=-34, range_db=-12):
+    """Downward expander: between phrases (level under thresh_db) the leftover noise drops by up to range_db."""
+    hop = 441; n = len(x) // hop + 1
+    lvl = 20 * np.log10(np.sqrt(np.pad(x, (0, n * hop - len(x))).reshape(n, hop).astype(np.float64) ** 2).mean(1) + 1e-9)
+    want = np.clip((lvl - thresh_db) / 6, -1, 0) * -range_db  # 0 dB above thresh, down to range_db 6 dB below it
+    g = np.empty(n); acc = 0.0
+    for i in range(n):  # open fast (5 ms), close slowly (150 ms)
+        k = 1 - np.exp(-0.01 / (0.005 if want[i] > acc else 0.15)); acc += (want[i] - acc) * k; g[i] = acc
+    return (x * 10 ** (np.repeat(g, hop)[: len(x)] / 20)).astype(np.float32)
+
+y = expand(y)
+
+# voice polish (after denoise above): rumble cut, a little warmth and presence, gentle de-essing and compression,
 # then one fixed gain to -14 LUFS (two-pass loudnorm, linear) so it sits loud and steady over the music
 enc = ["-f", "f32le", "-ar", str(SR), "-ac", "1", "-i", "-"]
-POLISH = ("highpass=f=85,afftdn=nr=20:nf=-44:tn=1,agate=threshold=0.012:ratio=2:range=0.2:attack=8:release=200,equalizer=f=180:t=q:w=1:g=2,equalizer=f=3200:t=q:w=1.2:g=3.5,equalizer=f=10000:t=q:w=1:g=1.5,"
-          "deesser=i=0.35,acompressor=threshold=-22dB:ratio=3:attack=6:release=90:makeup=2")
+POLISH = ("highpass=f=85,equalizer=f=180:t=q:w=1:g=2,equalizer=f=3200:t=q:w=1.2:g=3.5,equalizer=f=10000:t=q:w=1:g=1.5,"
+          "deesser=i=0.35,acompressor=threshold=-20dB:ratio=2.5:attack=6:release=90:makeup=1.5")
 m = subprocess.run(["ffmpeg", "-hide_banner", *enc, "-af", POLISH + ",loudnorm=I=-14:TP=-3:LRA=9:print_format=json", "-f", "null", "-"], input=y.tobytes(), capture_output=True).stderr.decode()
 import json as _j
 mj = _j.loads(m[m.rindex("{"): m.rindex("}") + 1])
