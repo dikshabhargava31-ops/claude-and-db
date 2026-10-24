@@ -1,0 +1,36 @@
+name: Instagram token refresh
+
+# Instagram tokens last 60 days. This renews them every Monday and saves them back
+# into the IG_ACCOUNTS secret, which needs a GH_PAT secret allowed to edit secrets.
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Renew tokens
+        env:
+          IG_ACCOUNTS: ${{ secrets.IG_ACCOUNTS }}
+        run: python3 instagram/ig_scheduler.py refresh-tokens --out "$RUNNER_TEMP/accounts.json"
+
+      - name: Save renewed tokens
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          [ -s "$RUNNER_TEMP/accounts.json" ] || exit 0
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Add a GH_PAT secret (see instagram/README.md) so renewed tokens can be saved."
+            exit 1
+          fi
+          gh secret set IG_ACCOUNTS --repo "$GITHUB_REPOSITORY" < "$RUNNER_TEMP/accounts.json"
+          rm "$RUNNER_TEMP/accounts.json"
