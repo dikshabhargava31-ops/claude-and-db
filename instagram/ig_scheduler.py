@@ -252,9 +252,12 @@ def cmd_check(args):
 
 def cmd_run(args):
     accounts = load_accounts(args.accounts)
-    if not accounts and not args.dry_run:
-        raise SystemExit("No accounts configured. Set the IG_ACCOUNTS secret (see instagram/README.md).")
     posts, problems = load_posts(args.timezone)
+    if not accounts and not args.dry_run:
+        if not posts:
+            print("No accounts or posts yet. Add the IG_ACCOUNTS secret (see instagram/README.md).")
+            return 0
+        raise SystemExit("No accounts configured. Set the IG_ACCOUNTS secret (see instagram/README.md).")
     for problem in problems:
         print(f"PROBLEM  {problem}")
     state = load_state()
@@ -310,7 +313,8 @@ def cmd_run(args):
 def cmd_refresh_tokens(args):
     accounts = load_accounts(args.accounts)
     if not accounts:
-        raise SystemExit("No accounts configured.")
+        print("No accounts configured yet, nothing to renew.")
+        return 0
     failed = []
     for name, acc in accounts.items():
         try:

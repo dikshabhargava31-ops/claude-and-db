@@ -27,7 +27,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          [ -s "$RUNNER_TEMP/accounts.json" ] || exit 1
+          [ -s "$RUNNER_TEMP/accounts.json" ] || exit 0
           if [ -z "$GH_TOKEN" ]; then
             echo "::error::Add a GH_PAT secret (see instagram/README.md) so renewed tokens can be saved."
             exit 1
