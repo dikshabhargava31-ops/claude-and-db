@@ -1,0 +1,6 @@
+id,account,publish_at,type,media,caption,first_comment
+#example-post,ipa,2026-11-01 18:30,post,https://example.com/photo.jpg,"Caption for a single photo.
+Line breaks work inside quotes.",#hashtags #go #here
+#example-carousel,ipa,2026-11-02 19:00,carousel,https://example.com/1.jpg|https://example.com/2.jpg|https://example.com/3.mp4,Swipe through 👉,
+#example-reel,second_account,2026-11-03 20:00,reel,https://example.com/reel.mp4,New reel!,
+#example-story,ipa,2026-11-04 09:00,story,https://example.com/story.jpg,,
