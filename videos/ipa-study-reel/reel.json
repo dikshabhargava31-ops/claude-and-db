@@ -1,0 +1,29 @@
+{
+  "hook": {"small": "pov: it's 3:51 pm at", "big": "IPA", "len": 2},
+  "hook_size": 230,
+  "shots": [
+    {"src": "S_video_20261008_155604", "at": 0.3, "len": 2.0},
+    {"src": "S_video_20261008_155109", "at": 15.0, "len": 1.0},
+    {"src": "S_video_20261008_160705", "at": 3.0, "len": 0.5},
+    {"src": "S_video_20261008_161133", "at": 1.0, "len": 1.5},
+    {"src": "S_video_20261008_161604", "at": 1.0, "len": 0.75},
+    {"src": "S_video_20261008_161544", "at": 3.0, "len": 0.75},
+    {"src": "S_video_20261008_160148", "at": 6.0, "len": 1.5},
+    {"src": "S_video_20261008_161209", "at": 8.0, "len": 0.75},
+    {"src": "S_video_20261008_161642", "at": 11.0, "len": 0.75},
+    {"src": "S_video_20261008_161327", "at": 6.0, "len": 1.5},
+    {"src": "S_video_20261008_160552", "at": 16.0, "len": 0.75},
+    {"src": "S_video_20261008_160429", "at": 4.0, "len": 0.75},
+    {"src": "S_video_20261008_155109", "at": 42.6, "len": 3.0}
+  ],
+  "captions": [
+    {"at": 2.0, "len": 1.5, "small": "3:52 pm", "big": "highlight."},
+    {"at": 3.5, "len": 1.5, "small": "3:58 pm", "big": "note it|down."},
+    {"at": 5.0, "len": 1.5, "small": "4:01 pm", "big": "solve."},
+    {"at": 6.5, "len": 1.5, "small": "4:05 pm", "big": "re-read."},
+    {"at": 8.0, "len": 1.5, "small": "4:11 pm", "big": "breathe."},
+    {"at": 9.5, "len": 1.5, "small": "4:12 pm", "big": "back at it."},
+    {"at": 11.0, "len": 1.5, "small": "4:16 pm", "big": "repeat."}
+  ],
+  "end": {"at": 12.5, "small": "built one hour at a time.", "big": "IPA INSTITUTE", "place": "AJMER"}
+}

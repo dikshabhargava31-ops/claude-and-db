@@ -29,15 +29,14 @@ def needs_turn(name):
     return not name.startswith(UPRIGHT)
 
 
-def cut_shot(src, out, at, length, speed, zoom_in):
+def cut_shot(src, out, at, length, speed):
+    # The punch-in is animated in the page (sub-pixel smooth); baking it here
+    # with ffmpeg's whole-pixel resizes made the frame shake.
     name = os.path.splitext(os.path.basename(src))[0]
     span = length * speed
     turn = "transpose=1," if needs_turn(name) else ""
-    z0, z1 = (1.0, 1.07) if zoom_in else (1.07, 1.0)
-    w = f"trunc(1080*({z0}+({z1}-{z0})*t/{length})/2)*2"
     vf = (f"{turn}scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,"
-          f"setpts={1 / speed}*(PTS-STARTPTS),fps=30,"
-          f"scale=w='{w}':h=-2:eval=frame,crop=1080:1920")
+          f"setpts={1 / speed}*(PTS-STARTPTS),fps=30")
     subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-ss", str(at), "-t", str(span),
                     "-i", src, "-vf", vf, "-t", str(length), "-an", "-c:v", "libx264",
                     "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p", out], check=True)
@@ -58,17 +57,24 @@ def build(spec_path):
     shots_dir = os.path.join(proj, "raw", "shots")
     os.makedirs(shots_dir, exist_ok=True)
     os.makedirs(os.path.join(proj, "assets"), exist_ok=True)
-    shutil.copy(GSAP, os.path.join(proj, "assets", "gsap.min.js"))
+    dst = os.path.join(proj, "assets", "gsap.min.js")
+    if not os.path.exists(dst):
+        shutil.copy(GSAP, dst)
 
     t = 0.0
     videos = []
+    zooms = []
     for i, s in enumerate(spec["shots"], 1):
         out = os.path.join(shots_dir, f"s{i:02d}.mp4")
         cut_shot(os.path.join(src_dir, s["src"] + ".mp4"), out, s["at"], s["len"],
-                 s.get("speed", 1.0), i % 2 == 1)
+                 s.get("speed", 1.0))
         videos.append(
-            f'      <video id="v{i:02d}" class="clip shot" src="raw/shots/s{i:02d}.mp4" '
-            f'data-start="{t:g}" data-duration="{s["len"]:g}" data-track-index="1" muted playsinline></video>')
+            f'      <div id="w{i:02d}" class="frame"><video id="v{i:02d}" class="clip shot" '
+            f'src="raw/shots/s{i:02d}.mp4" data-start="{t:g}" data-duration="{s["len"]:g}" '
+            f'data-track-index="1" muted playsinline></video></div>')
+        z0, z1 = (1.0, 1.07) if i % 2 else (1.07, 1.0)
+        zooms.append(f'      tl.fromTo("#w{i:02d}", {{ scale: {z0} }}, '
+                     f'{{ scale: {z1}, duration: {s["len"]:g}, ease: "none" }}, {t:g});')
         t += s["len"]
     total = round(t, 3)
     end_at = spec["end"]["at"]
@@ -104,7 +110,7 @@ def build(spec_path):
     page = TEMPLATE.format(
         variables=variables, total=f"{total:g}", videos="\n".join(videos),
         scrim_len=f"{end_at:g}", end_at=f"{end_at:g}", end_len=f"{total - end_at:g}",
-        caps="\n".join(caps), steps=", ".join(tweens), hook_size=spec.get("hook_size", 200),
+        caps="\n".join(caps), zooms="\n".join(zooms), steps=", ".join(tweens), hook_size=spec.get("hook_size", 200),
         accent=spec.get("accent", "#FFD21F"),
         e1=f"{end_at + 0.25:g}", e2=f"{end_at + 0.55:g}", e3=f"{end_at + 0.85:g}", e4=f"{end_at + 1.05:g}")
     open(os.path.join(proj, "index.html"), "w").write(page)
@@ -128,6 +134,7 @@ TEMPLATE = """<!doctype html>
       * {{ margin: 0; padding: 0; box-sizing: border-box; }}
       html, body {{ margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }}
       #root {{ position: relative; width: 100%; height: 100%; background: var(--ground); }}
+      .frame {{ position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; }}
       .shot {{ position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }}
       #scrim {{
         position: absolute; left: 0; top: 0; width: 1080px; height: 900px; z-index: 20;
@@ -169,6 +176,9 @@ TEMPLATE = """<!doctype html>
       const tl = gsap.timeline({{ paused: true }});
       const rise = (sel, at, d = 0.32) =>
         tl.fromTo(sel, {{ y: 60, opacity: 0 }}, {{ y: 0, opacity: 1, duration: d, ease: "power3.out" }}, at);
+
+      // Slow punch-in on every shot, alternating in and out
+{zooms}
 
       // Hook: on screen at frame 0, the big word pulses on the second beat
       tl.fromTo("#hook-b", {{ scale: 1 }}, {{ scale: 1.1, duration: 0.25, ease: "power2.out", yoyo: true, repeat: 1 }}, 0.5);

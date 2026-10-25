@@ -15,6 +15,7 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
       #root { position: relative; width: 100%; height: 100%; background: var(--ground); }
+      .frame { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; }
       .shot { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
       #scrim {
         position: absolute; left: 0; top: 0; width: 1080px; height: 900px; z-index: 20;
@@ -41,19 +42,19 @@
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1080" data-height="1920">
       <!-- Footage: cuts on a 120 bpm grid (0.5 s beats) -->
-      <video id="v01" class="clip shot" src="raw/shots/s01.mp4" data-start="0" data-duration="2" data-track-index="1" muted playsinline></video>
-      <video id="v02" class="clip shot" src="raw/shots/s02.mp4" data-start="2" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v03" class="clip shot" src="raw/shots/s03.mp4" data-start="3" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v04" class="clip shot" src="raw/shots/s04.mp4" data-start="4" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v05" class="clip shot" src="raw/shots/s05.mp4" data-start="5" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v06" class="clip shot" src="raw/shots/s06.mp4" data-start="6" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v07" class="clip shot" src="raw/shots/s07.mp4" data-start="7" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v08" class="clip shot" src="raw/shots/s08.mp4" data-start="8" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v09" class="clip shot" src="raw/shots/s09.mp4" data-start="9" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v10" class="clip shot" src="raw/shots/s10.mp4" data-start="10" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v11" class="clip shot" src="raw/shots/s11.mp4" data-start="11" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v12" class="clip shot" src="raw/shots/s12.mp4" data-start="12" data-duration="1" data-track-index="1" muted playsinline></video>
-      <video id="v13" class="clip shot" src="raw/shots/s13.mp4" data-start="13" data-duration="3" data-track-index="1" muted playsinline></video>
+      <div id="w01" class="frame"><video id="v01" class="clip shot" src="raw/shots/s01.mp4" data-start="0" data-duration="2" data-track-index="1" muted playsinline></video></div>
+      <div id="w02" class="frame"><video id="v02" class="clip shot" src="raw/shots/s02.mp4" data-start="2" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w03" class="frame"><video id="v03" class="clip shot" src="raw/shots/s03.mp4" data-start="3" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w04" class="frame"><video id="v04" class="clip shot" src="raw/shots/s04.mp4" data-start="4" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w05" class="frame"><video id="v05" class="clip shot" src="raw/shots/s05.mp4" data-start="5" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w06" class="frame"><video id="v06" class="clip shot" src="raw/shots/s06.mp4" data-start="6" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w07" class="frame"><video id="v07" class="clip shot" src="raw/shots/s07.mp4" data-start="7" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w08" class="frame"><video id="v08" class="clip shot" src="raw/shots/s08.mp4" data-start="8" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w09" class="frame"><video id="v09" class="clip shot" src="raw/shots/s09.mp4" data-start="9" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w10" class="frame"><video id="v10" class="clip shot" src="raw/shots/s10.mp4" data-start="10" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w11" class="frame"><video id="v11" class="clip shot" src="raw/shots/s11.mp4" data-start="11" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w12" class="frame"><video id="v12" class="clip shot" src="raw/shots/s12.mp4" data-start="12" data-duration="1" data-track-index="1" muted playsinline></video></div>
+      <div id="w13" class="frame"><video id="v13" class="clip shot" src="raw/shots/s13.mp4" data-start="13" data-duration="3" data-track-index="1" muted playsinline></video></div>
 
       <div id="scrim" class="clip" data-start="0" data-duration="13" data-track-index="2"></div>
       <div id="endcard" class="clip" data-start="13" data-duration="3" data-track-index="2"></div>
@@ -95,6 +96,21 @@
       const tl = gsap.timeline({ paused: true });
       const rise = (sel, at, d = 0.32) =>
         tl.fromTo(sel, { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: d, ease: "power3.out" }, at);
+
+      // Slow punch-in on every shot, alternating in and out
+      tl.fromTo("#w01", { scale: 1.0 }, { scale: 1.07, duration: 2, ease: "none" }, 0);
+      tl.fromTo("#w02", { scale: 1.07 }, { scale: 1.0, duration: 1, ease: "none" }, 2);
+      tl.fromTo("#w03", { scale: 1.0 }, { scale: 1.07, duration: 1, ease: "none" }, 3);
+      tl.fromTo("#w04", { scale: 1.07 }, { scale: 1.0, duration: 1, ease: "none" }, 4);
+      tl.fromTo("#w05", { scale: 1.0 }, { scale: 1.07, duration: 1, ease: "none" }, 5);
+      tl.fromTo("#w06", { scale: 1.07 }, { scale: 1.0, duration: 1, ease: "none" }, 6);
+      tl.fromTo("#w07", { scale: 1.0 }, { scale: 1.07, duration: 1, ease: "none" }, 7);
+      tl.fromTo("#w08", { scale: 1.07 }, { scale: 1.0, duration: 1, ease: "none" }, 8);
+      tl.fromTo("#w09", { scale: 1.0 }, { scale: 1.07, duration: 1, ease: "none" }, 9);
+      tl.fromTo("#w10", { scale: 1.07 }, { scale: 1.0, duration: 1, ease: "none" }, 10);
+      tl.fromTo("#w11", { scale: 1.0 }, { scale: 1.07, duration: 1, ease: "none" }, 11);
+      tl.fromTo("#w12", { scale: 1.07 }, { scale: 1.0, duration: 1, ease: "none" }, 12);
+      tl.fromTo("#w13", { scale: 1.0 }, { scale: 1.07, duration: 3, ease: "none" }, 13);
 
       // Hook: on screen at frame 0, the big word pulses on the second beat
       tl.fromTo("#hook-b", { scale: 1 }, { scale: 1.1, duration: 0.25, ease: "power2.out", yoyo: true, repeat: 1 }, 0.5);
