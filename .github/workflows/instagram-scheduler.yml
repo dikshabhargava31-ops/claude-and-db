@@ -5,10 +5,11 @@ on:
     - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: "Only show what would be posted"
-        type: boolean
-        default: false
+      mode:
+        description: "publish: post what is due. dry-run: only show it. verify: test the accounts, post nothing."
+        type: choice
+        options: [publish, dry-run, verify]
+        default: publish
 
 permissions:
   contents: write
@@ -27,7 +28,13 @@ jobs:
       - name: Publish due posts
         env:
           IG_ACCOUNTS: ${{ secrets.IG_ACCOUNTS }}
-        run: python3 instagram/ig_scheduler.py run ${{ inputs.dry_run && '--dry-run' || '' }}
+          MODE: ${{ inputs.mode || 'publish' }}
+        run: |
+          case "$MODE" in
+            verify) python3 instagram/ig_scheduler.py verify ;;
+            dry-run) python3 instagram/ig_scheduler.py run --dry-run ;;
+            *) python3 instagram/ig_scheduler.py run ;;
+          esac
 
       - name: Save what was published
         if: always()

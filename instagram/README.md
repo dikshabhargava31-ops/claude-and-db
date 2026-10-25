@@ -60,7 +60,7 @@ Instagram downloads each file from its link, so the link has to open the file it
 ## Check and run
 
 - **Check the list:** the *Actions* tab shows every run and what it posted or why it failed. On your own computer, `python3 instagram/ig_scheduler.py check` validates `posts.csv` and lists what is queued.
-- **Run it now:** go to *Actions → Instagram scheduler → Run workflow*. Tick *dry run* to only see what would be posted.
+- **Run it now:** go to *Actions → Instagram scheduler → Run workflow*. Choose *dry-run* to only see what would be posted, or *verify* to check that every account's token works without posting anything.
 - **Retry a failed post:** fix it in `posts.csv`, delete its entry under `"failed"` in `published.json`, and give it a new `publish_at` if it is more than 12 hours late.
 
 ## Good to know
