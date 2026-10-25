@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Instagram Scheduler</title>
+<meta name="description" content="Schedule Instagram posts, carousels, Reels and Stories for several accounts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Same palette and type as the IPA Priority Board. */
+:root{
+  --bg:#ffffff; --panel:#f7f7f5; --sunk:#efefec; --line:#e6e5e1; --hover:#f3f3f0;
+  --ink:#1f1f1d; --muted:#6b6a65; --faint:#8f8e88;
+  --accent:#c2700a; --accent-soft:#fbefdd; --on-accent:#ffffff;
+  --crit:#c4362b; --crit-soft:#fbe4e1; --warn:#9a6900; --warn-soft:#faf0d4;
+  --ok:#2f7d4f; --ok-soft:#e1f2e7; --info:#2f63b8; --info-soft:#e3ebf8;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#191919; --panel:#202020; --sunk:#2a2a2a; --line:#323232; --hover:#262626;
+  --ink:#ebebe8; --muted:#a3a29c; --faint:#85847e;
+  --accent:#f0a33a; --accent-soft:#3a2a12; --on-accent:#191919;
+  --crit:#f0786d; --crit-soft:#3d1f1d; --warn:#e8b94a; --warn-soft:#382d12;
+  --ok:#6cc893; --ok-soft:#183126; --info:#8ea8f0; --info-soft:#1e2640; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#191919; --panel:#202020; --sunk:#2a2a2a; --line:#323232; --hover:#262626;
+  --ink:#ebebe8; --muted:#a3a29c; --faint:#85847e;
+  --accent:#f0a33a; --accent-soft:#3a2a12; --on-accent:#191919;
+  --crit:#f0786d; --crit-soft:#3d1f1d; --warn:#e8b94a; --warn-soft:#382d12;
+  --ok:#6cc893; --ok-soft:#183126; --info:#8ea8f0; --info-soft:#1e2640; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body)}
+.wrap{max-width:1100px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px));display:grid;gap:28px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+h1{font:700 30px/1.1 var(--f-display);margin:0;flex:1 1 auto}
+h2{font:600 20px/1.2 var(--f-display);margin:0 0 14px}
+.sub{color:var(--muted);margin:4px 0 0;font-size:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+label{display:block;font-weight:600;font-size:13px;margin:0 0 6px}
+.field{margin-bottom:16px}
+.hint{color:var(--muted);font-size:13px;margin-top:6px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+textarea{min-height:120px;resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{flex:1 1 0;min-width:70px}
+button{font:600 14px var(--f-body);border-radius:9px;padding:9px 14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+button:hover{background:var(--hover)}
+button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.primary:hover{filter:brightness(1.05)}
+button:disabled{opacity:.55;cursor:default}
+button.link{border:0;background:none;padding:4px 6px;color:var(--muted);font-weight:500}
+button.link:hover{color:var(--crit);background:none}
+.check{display:flex;gap:8px;align-items:center;font-weight:500;font-size:14px}
+.check input{width:auto}
+.media-list{display:grid;gap:8px}
+.media-item{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:10px;align-items:center}
+.thumb{width:56px;height:56px;border-radius:8px;background:var(--sunk);border:1px solid var(--line);overflow:hidden;display:grid;place-items:center;font-size:11px;color:var(--faint);text-align:center}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:cover}
+.thumb.bad{background:var(--crit-soft);color:var(--crit)}
+.msg{border-radius:9px;padding:10px 12px;font-size:14px;margin-top:12px}
+.msg.err{background:var(--crit-soft);color:var(--crit)}
+.msg.ok{background:var(--ok-soft);color:var(--ok)}
+.msg.info{background:var(--info-soft);color:var(--info)}
+.counter{float:right;font:400 12px var(--f-mono);color:var(--faint)}
+.counter.over{color:var(--crit)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button{padding:6px 12px;font-size:13px}
+.count{font:500 12px var(--f-mono);color:var(--muted);margin-left:4px}
+.posts{display:grid;gap:10px}
+.post{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;grid-template-columns:56px minmax(0,1fr);gap:12px}
+.post .meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13px;color:var(--muted)}
+.post .when{font-weight:600;color:var(--ink)}
+.post .cap{margin:6px 0 0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.post .actions{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:13px}
+.post .actions a{color:var(--info)}
+.pill{font:500 11px/1 var(--f-mono);padding:4px 7px;border-radius:99px;background:var(--sunk);color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.pill.up{background:var(--info-soft);color:var(--info)}
+.pill.due{background:var(--accent-soft);color:var(--accent)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.err{background:var(--crit-soft);color:var(--crit)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.err-text{color:var(--crit);font-size:13px;margin-top:4px;overflow-wrap:anywhere}
+.empty{color:var(--muted);font-size:14px;padding:16px;text-align:center;border:1px dashed var(--line);border-radius:12px}
+.signin{max-width:560px}
+.signin ol{padding-left:20px;margin:0 0 16px;color:var(--muted);font-size:14px}
+.signin a,.hint a{color:var(--info)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div style="flex:1 1 auto">
+      <h1>Instagram Scheduler</h1>
+      <p class="sub">Times are India time. The scheduler checks for due posts every 15 minutes, but GitHub can start a check up to 2 hours late; use <b>Publish due posts now</b> to post right away.</p>
+    </div>
+    <button id="runNow" hidden>Publish due posts now</button>
+    <button id="signOut" class="link" hidden>Sign out</button>
+  </header>
+
+  <section class="card signin" id="signinCard" hidden>
+    <h2>Sign in</h2>
+    <ol>
+      <li>Create a <a href="https://github.com/settings/tokens/new?scopes=repo&description=Instagram%20Scheduler" target="_blank" rel="noopener">GitHub token</a> with the <b>repo</b> box ticked, then click <b>Generate token</b>.</li>
+      <li>Paste it below. It is kept only in this browser.</li>
+    </ol>
+    <div class="field"><label for="tokenIn">GitHub token</label><input id="tokenIn" type="password" autocomplete="off" placeholder="ghp_…"></div>
+    <button class="primary" id="signInBtn">Sign in</button>
+    <div id="signinMsg"></div>
+  </section>
+
+  <div class="grid" id="app" hidden>
+    <section class="card">
+      <h2>New post</h2>
+      <div class="field">
+        <label for="account">Account</label>
+        <select id="account"></select>
+      </div>
+      <div class="field">
+        <label>Type</label>
+        <div class="seg" id="typeSeg">
+          <button type="button" data-type="post" aria-pressed="true">Photo</button>
+          <button type="button" data-type="carousel" aria-pressed="false">Carousel</button>
+          <button type="button" data-type="reel" aria-pressed="false">Reel</button>
+          <button type="button" data-type="story" aria-pressed="false">Story</button>
+        </div>
+        <div class="hint" id="typeHint"></div>
+      </div>
+      <div class="field">
+        <label>Media link<span id="mediaPlural" hidden>s, in order</span></label>
+        <div class="media-list" id="mediaList"></div>
+        <button type="button" id="addMedia" style="margin-top:8px" hidden>+ Add another</button>
+        <div class="hint">Paste a link that opens the file itself, like a Cloudinary or ImgBB link. Google Drive and Dropbox share links don't work. If the preview stays blank, Instagram can't use the link either.</div>
+      </div>
+      <div class="field" id="captionField">
+        <label for="caption">Caption <span class="counter" id="capCount">0 / 2200</span></label>
+        <textarea id="caption" placeholder="Write the caption…"></textarea>
+      </div>
+      <div class="field" id="commentField">
+        <label for="comment">First comment <span style="font-weight:400;color:var(--muted)">(optional, good for hashtags)</span></label>
+        <input id="comment" placeholder="#ajmer #education">
+      </div>
+      <div class="field">
+        <label>When</label>
+        <div class="row">
+          <input id="date" type="date" aria-label="Date">
+          <input id="time" type="time" aria-label="Time" step="300">
+        </div>
+        <label class="check" style="margin-top:10px"><input type="checkbox" id="asap"> Post as soon as possible</label>
+      </div>
+      <button class="primary" id="scheduleBtn" style="width:100%">Schedule</button>
+      <div id="formMsg"></div>
+    </section>
+
+    <section>
+      <h2>Your posts</h2>
+      <div class="tabs" id="tabs">
+        <button data-tab="upcoming" aria-pressed="true">Upcoming<span class="count" id="c-upcoming"></span></button>
+        <button data-tab="posted" aria-pressed="false">Posted<span class="count" id="c-posted"></span></button>
+        <button data-tab="problems" aria-pressed="false">Problems<span class="count" id="c-problems"></span></button>
+      </div>
+      <div class="posts" id="posts"><div class="empty">Loading…</div></div>
+      <div id="listMsg"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+const GH = {owner: "dikshabhargava31-ops", repo: "claude-and-db", branch: "main"};
+const API = `https://api.github.com/repos/${GH.owner}/${GH.repo}`;
+const AUTH_KEY = "ig-scheduler-token", BOARD_AUTH_KEY = "ipa-priority-board-user", TAB_KEY = "ig-scheduler-tab";
+const COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment"];
+const IST_OFFSET_MIN = 330, LATE_LIMIT_MS = 12 * 3600e3, MAX_ATTEMPTS = 3;
+const VIDEO_RE = /\.(mp4|mov|m4v)$/i, NOT_JPEG_RE = /\.(png|webp|gif|heic|avif|bmp)$/i;
+const TYPE_HINTS = {
+  post: "One JPEG photo. Best at 1080×1350 (4:5).",
+  carousel: "2 to 10 photos or videos, shown in the order below.",
+  reel: "One .mp4 or .mov video, 9:16, 3 seconds to 15 minutes.",
+  story: "One photo or video, 1080×1920. Stories have no caption.",
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+
+/* ---------- sign-in: own token, or the IPA Priority Board's on this same site ---------- */
+function loadToken() {
+  try {
+    const own = localStorage.getItem(AUTH_KEY);
+    if (own) return own;
+    const board = JSON.parse(localStorage.getItem(BOARD_AUTH_KEY) || "null");
+    if (board && board.token) return board.token;
+  } catch (_) {}
+  return "";
+}
+let token = loadToken();
+const headers = () => ({Accept: "application/vnd.github+json", Authorization: "Bearer " + token});
+
+async function gh(path, opts = {}) {
+  const r = await fetch(API + path, {cache: "no-store", ...opts, headers: {...headers(), ...(opts.headers || {})}});
+  if (!r.ok) {
+    let detail = "";
+    try { detail = (await r.json()).message || ""; } catch (_) {}
+    const e = new Error(detail || `GitHub said ${r.status}`);
+    e.status = r.status;
+    throw e;
+  }
+  return r.status === 204 ? null : r.json();
+}
+
+/* ---------- base64 <-> UTF-8 text (captions have emoji) ---------- */
+const decode = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\n/g, "")), c => c.charCodeAt(0)));
+function encode(text) {
+  const bytes = new TextEncoder().encode(text);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+
+/* ---------- CSV, same format Python's csv module reads ---------- */
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", quoted = false;
+  text = text.replace(/^﻿/, "");
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else field += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.length > 1 || row[0] !== "") rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field !== "" || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+const csvField = v => /[",\r\n]/.test(v) || /^\s|\s$/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+const csvLine = values => values.map(v => csvField(String(v ?? ""))).join(",");
+
+/* ---------- times: "YYYY-MM-DD HH:MM" without an offset is India time ---------- */
+function parseWhen(s) {
+  s = (s || "").trim();
+  if (/[zZ]|[+-]\d\d:?\d\d$/.test(s)) return new Date(s.replace(" ", "T"));
+  const m = s.match(/^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)/);
+  if (!m) return null;
+  return new Date(Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5]) - IST_OFFSET_MIN * 60e3);
+}
+function istParts(d) {
+  const t = new Date(d.getTime() + IST_OFFSET_MIN * 60e3);
+  const p = n => String(n).padStart(2, "0");
+  return {date: `${t.getUTCFullYear()}-${p(t.getUTCMonth() + 1)}-${p(t.getUTCDate())}`, time: `${p(t.getUTCHours())}:${p(t.getUTCMinutes())}`};
+}
+const fmtWhen = d => d.toLocaleString("en-IN", {timeZone: "Asia/Kolkata", weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit"});
+
+/* ---------- state ---------- */
+let accounts = {}, postsFile = {sha: null, header: COLUMNS, rows: []}, state = {published: {}, failed: {}};
+let type = "post", tab = "upcoming";
+try { tab = localStorage.getItem(TAB_KEY) || "upcoming"; } catch (_) {}
+
+async function loadAll() {
+  const [acc, posts, pub] = await Promise.all([
+    gh(`/contents/instagram/accounts.json?ref=${GH.branch}`),
+    gh(`/contents/instagram/posts.csv?ref=${GH.branch}`),
+    gh(`/contents/instagram/published.json?ref=${GH.branch}`).catch(() => null),
+  ]);
+  accounts = JSON.parse(decode(acc.content));
+  const rows = parseCSV(decode(posts.content));
+  postsFile = {sha: posts.sha, header: rows[0] || COLUMNS, rows: rows.slice(1)};
+  state = pub ? JSON.parse(decode(pub.content)) : {published: {}, failed: {}};
+  state.published ||= {}; state.failed ||= {};
+}
+
+function rowObjects() {
+  const h = postsFile.header;
+  return postsFile.rows.map(r => Object.fromEntries(h.map((k, i) => [k, (r[i] || "").trim()])))
+    .filter(p => p.id && !p.id.startsWith("#"));
+}
+
+function statusOf(p, now) {
+  if (state.published[p.id]) return {group: "posted", pill: "ok", label: "Posted"};
+  const fail = state.failed[p.id];
+  const when = parseWhen(p.publish_at);
+  if (!when || isNaN(when)) return {group: "problems", pill: "err", label: "Bad date"};
+  if (fail && fail.attempts >= MAX_ATTEMPTS) return {group: "problems", pill: "err", label: "Failed", error: fail.error};
+  if (fail) return {group: "upcoming", pill: "warn", label: `Retrying (${fail.attempts}/${MAX_ATTEMPTS})`, error: fail.error};
+  if (when > now) return {group: "upcoming", pill: "up", label: "Scheduled"};
+  if (now - when > LATE_LIMIT_MS) return {group: "problems", pill: "err", label: "Missed", error: "It was more than 12 hours late, so it was skipped. Delete it and schedule it again."};
+  return {group: "upcoming", pill: "due", label: "Due, posting soon"};
+}
+
+/* ---------- list ---------- */
+function thumbHTML(url) {
+  if (!url) return `<div class="thumb">—</div>`;
+  return VIDEO_RE.test(new URL(url, location.href).pathname)
+    ? `<div class="thumb"><video src="${esc(url)}" muted preload="metadata"></video></div>`
+    : `<div class="thumb"><img src="${esc(url)}" alt="" loading="lazy" onerror="this.parentNode.classList.add('bad');this.remove()"></div>`;
+}
+
+function renderList() {
+  const now = new Date();
+  const items = rowObjects().map(p => ({...p, when: parseWhen(p.publish_at), st: statusOf(p, now)}));
+  const groups = {upcoming: [], posted: [], problems: []};
+  items.forEach(p => groups[p.st.group].push(p));
+  groups.upcoming.sort((a, b) => a.when - b.when);
+  groups.posted.sort((a, b) => (state.published[b.id].published_at || "").localeCompare(state.published[a.id].published_at || ""));
+  for (const k in groups) $("c-" + k).textContent = groups[k].length || "";
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.tab === tab));
+  const list = groups[tab];
+  if (!list.length) {
+    $("posts").innerHTML = `<div class="empty">${{upcoming: "Nothing scheduled yet.", posted: "Nothing posted yet.", problems: "No problems."}[tab]}</div>`;
+    return;
+  }
+  $("posts").innerHTML = list.map(p => {
+    const pub = state.published[p.id];
+    const media = p.media.split("|").map(s => s.trim()).filter(Boolean);
+    const user = accounts[p.account] ? "@" + accounts[p.account] : p.account;
+    const whenText = pub ? "Posted " + fmtWhen(new Date(pub.published_at)) : (p.when && !isNaN(p.when) ? fmtWhen(p.when) : p.publish_at);
+    const canDelete = !pub;
+    return `<article class="post">
+      ${thumbHTML(media[0])}
+      <div>
+        <div class="meta"><span class="when">${esc(whenText)}</span><span>${esc(user)}</span>
+          <span class="pill">${esc(p.type)}${media.length > 1 ? " · " + media.length : ""}</span>
+          <span class="pill ${p.st.pill}">${esc(p.st.label)}</span></div>
+        ${p.caption ? `<p class="cap">${esc(p.caption)}</p>` : ""}
+        ${p.st.error ? `<div class="err-text">${esc(p.st.error)}</div>` : ""}
+        <div class="actions">
+          ${pub && pub.permalink ? `<a href="${esc(pub.permalink)}" target="_blank" rel="noopener">Open on Instagram</a>` : ""}
+          ${canDelete ? `<button class="link" data-del="${esc(p.id)}">Delete</button>` : ""}
+        </div>
+      </div></article>`;
+  }).join("");
+}
+
+/* ---------- form ---------- */
+function setType(t) {
+  type = t;
+  document.querySelectorAll("#typeSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.type === t));
+  $("typeHint").textContent = TYPE_HINTS[t];
+  $("captionField").hidden = $("commentField").hidden = t === "story";
+  $("addMedia").hidden = t !== "carousel";
+  $("mediaPlural").hidden = t !== "carousel";
+  const inputs = mediaInputs();
+  const want = t === "carousel" ? Math.max(2, inputs.length) : 1;
+  while (mediaInputs().length < want) addMediaRow();
+  while (mediaInputs().length > want) $("mediaList").lastElementChild.remove();
+  updateRemoveButtons();
+}
+const mediaInputs = () => [...$("mediaList").querySelectorAll("input")];
+function addMediaRow(value = "") {
+  const row = document.createElement("div");
+  row.className = "media-item";
+  row.innerHTML = `<div class="thumb">preview</div><input type="url" inputmode="url" placeholder="https://…" aria-label="Media link"><button type="button" class="link" aria-label="Remove">✕</button>`;
+  const input = row.querySelector("input");
+  input.value = value;
+  input.addEventListener("input", () => preview(row));
+  row.querySelector("button").addEventListener("click", () => { row.remove(); updateRemoveButtons(); });
+  $("mediaList").appendChild(row);
+  updateRemoveButtons();
+}
+function updateRemoveButtons() {
+  const rows = [...$("mediaList").children];
+  rows.forEach(r => r.querySelector("button").style.visibility = type === "carousel" && rows.length > 2 ? "visible" : "hidden");
+  $("addMedia").disabled = rows.length >= 10;
+}
+function preview(row) {
+  const url = row.querySelector("input").value.trim(), box = row.querySelector(".thumb");
+  box.className = "thumb";
+  if (!/^https:\/\/\S+$/.test(url)) { box.textContent = url ? "needs https://" : "preview"; return; }
+  if (VIDEO_RE.test(new URL(url).pathname)) {
+    box.innerHTML = `<video muted preload="metadata"></video>`;
+    const v = box.firstChild;
+    v.onerror = () => { box.classList.add("bad"); box.textContent = "can't open"; };
+    v.src = url;
+  } else {
+    box.innerHTML = `<img alt="">`;
+    const img = box.firstChild;
+    img.onerror = () => { box.classList.add("bad"); box.textContent = "can't open"; };
+    img.src = url;
+  }
+}
+
+function validate() {
+  const media = mediaInputs().map(i => i.value.trim()).filter(Boolean);
+  const caption = $("caption").value, comment = $("comment").value.trim();
+  const isVideo = u => VIDEO_RE.test(new URL(u).pathname);
+  if (!$("account").value) return "Pick an account.";
+  if (media.some(u => !/^https:\/\/\S+$/.test(u))) return "Every media link must start with https://";
+  if (type === "post" && media.length !== 1) return "Add one photo link.";
+  if (type === "post" && isVideo(media[0])) return "That's a video. Choose Reel for videos.";
+  if (type === "carousel" && (media.length < 2 || media.length > 10)) return "A carousel needs 2 to 10 links.";
+  if (type === "reel" && (media.length !== 1 || !isVideo(media[0]))) return "A reel needs one link ending in .mp4 or .mov.";
+  if (type === "story" && media.length !== 1) return "Add one photo or video link.";
+  if (media.some(u => !isVideo(u) && NOT_JPEG_RE.test(new URL(u).pathname))) return "Instagram only accepts JPEG photos. Save the image as .jpg and use that link.";
+  if (type !== "story" && caption.length > 2200) return "The caption is over Instagram's 2,200 characters.";
+  let when;
+  if ($("asap").checked) when = new Date();
+  else {
+    if (!$("date").value || !$("time").value) return "Pick a date and time.";
+    when = parseWhen(`${$("date").value} ${$("time").value}`);
+    if (when < new Date(Date.now() - 60e3)) return "That time has already passed. Tick “Post as soon as possible” to post now.";
+  }
+  return {media, caption: type === "story" ? "" : caption, comment: type === "story" ? "" : comment, when};
+}
+
+function showMsg(el, kind, text) { $(el).innerHTML = text ? `<div class="msg ${kind}">${text}</div>` : ""; }
+
+// Re-reads posts.csv, applies the change and commits it; retries if someone else saved in between.
+async function savePosts(change, message) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const f = await gh(`/contents/instagram/posts.csv?ref=${GH.branch}`);
+    const rows = parseCSV(decode(f.content));
+    const header = rows[0] || COLUMNS, body = change(rows.slice(1), header);
+    const text = [header, ...body].map(csvLine).join("\n") + "\n";
+    try {
+      const res = await gh(`/contents/instagram/posts.csv`, {method: "PUT", body: JSON.stringify({message, content: encode(text), sha: f.sha, branch: GH.branch})});
+      postsFile = {sha: res.content.sha, header, rows: body};
+      return;
+    } catch (e) {
+      if (e.status !== 409 && e.status !== 422) throw e;
+    }
+  }
+  throw new Error("Someone else was saving at the same time. Try again.");
+}
+
+async function triggerRun() {
+  await gh(`/actions/workflows/instagram-scheduler.yml/dispatches`, {method: "POST", body: JSON.stringify({ref: GH.branch, inputs: {mode: "publish"}})});
+}
+
+async function schedule() {
+  const v = validate();
+  if (typeof v === "string") return showMsg("formMsg", "err", esc(v));
+  const btn = $("scheduleBtn");
+  btn.disabled = true; btn.textContent = "Scheduling…"; showMsg("formMsg", "", "");
+  const account = $("account").value, ist = istParts(v.when);
+  const id = `${account}-${ist.date.replace(/-/g, "")}-${ist.time.replace(":", "")}-${Math.random().toString(36).slice(2, 6)}`;
+  const values = {id, account, publish_at: `${ist.date} ${ist.time}`, type, media: v.media.join("|"), caption: v.caption, first_comment: v.comment};
+  try {
+    await savePosts((rows, header) => [...rows, header.map(k => values[k] ?? "")], `Instagram: schedule ${id}`);
+    let note = `Scheduled for ${esc(fmtWhen(v.when))} on @${esc(accounts[account] || account)}.`;
+    if ($("asap").checked) {
+      try { await triggerRun(); note += " Publishing now; it shows under Posted in a minute or two."; }
+      catch (_) { note += " It goes out on the next check. Use “Publish due posts now” to send it sooner."; }
+    }
+    showMsg("formMsg", "ok", note);
+    $("caption").value = ""; $("comment").value = ""; $("capCount").textContent = "0 / 2200";
+    $("mediaList").innerHTML = ""; setType(type); $("asap").checked = false; toggleAsap();
+    tab = "upcoming"; renderList();
+  } catch (e) {
+    showMsg("formMsg", "err", "Couldn't save: " + esc(e.message));
+  } finally {
+    btn.disabled = false; btn.textContent = "Schedule";
+  }
+}
+
+async function deletePost(id) {
+  if (!window.confirm || !confirm("Delete this post from the schedule?")) return;
+  try {
+    await savePosts(rows => rows.filter(r => (r[0] || "").trim() !== id), `Instagram: remove ${id}`);
+    renderList();
+  } catch (e) { showMsg("listMsg", "err", "Couldn't delete: " + esc(e.message)); }
+}
+
+function toggleAsap() { $("date").disabled = $("time").disabled = $("asap").checked; }
+
+/* ---------- start ---------- */
+async function start() {
+  if (!token) { $("signinCard").hidden = false; return; }
+  try {
+    await loadAll();
+  } catch (e) {
+    if (e.status === 401 || e.status === 403 || e.status === 404) {
+      try { localStorage.removeItem(AUTH_KEY); } catch (_) {}
+      token = "";
+      $("signinCard").hidden = false;
+      showMsg("signinMsg", "err", "That token can't open this repository. Create a new one with the repo box ticked.");
+      return;
+    }
+    $("app").hidden = false;
+    showMsg("listMsg", "err", "Couldn't load your posts: " + esc(e.message));
+    return;
+  }
+  $("app").hidden = false; $("runNow").hidden = false; $("signOut").hidden = false;
+  $("account").innerHTML = Object.entries(accounts).map(([k, u]) => `<option value="${esc(k)}">@${esc(u)}</option>`).join("");
+  const tomorrow = istParts(new Date(Date.now() + 864e5));
+  $("date").value = tomorrow.date; $("time").value = "18:30";
+  $("date").min = istParts(new Date()).date;
+  setType("post");
+  renderList();
+}
+
+$("signInBtn").addEventListener("click", async () => {
+  const t = $("tokenIn").value.trim();
+  if (!t) return showMsg("signinMsg", "err", "Paste your token first.");
+  token = t;
+  try {
+    const repo = await gh("");
+    if (!repo.permissions || !repo.permissions.push) throw Object.assign(new Error("This token can read but not save. Tick the repo box when you create it."), {status: 0});
+    try { localStorage.setItem(AUTH_KEY, t); } catch (_) {}
+    $("signinCard").hidden = true; showMsg("signinMsg", "", "");
+    start();
+  } catch (e) {
+    token = "";
+    showMsg("signinMsg", "err", esc(e.status === 401 ? "GitHub didn't accept that token." : e.message));
+  }
+});
+$("signOut").addEventListener("click", () => { try { localStorage.removeItem(AUTH_KEY); } catch (_) {} location.reload(); });
+$("runNow").addEventListener("click", async () => {
+  const b = $("runNow");
+  b.disabled = true;
+  try { await triggerRun(); showMsg("listMsg", "info", "Started. Due posts go out within a minute or two; refresh to see them under Posted."); }
+  catch (e) { showMsg("listMsg", "err", "Couldn't start it: " + esc(e.message) + ". The token needs the repo box ticked."); }
+  setTimeout(() => b.disabled = false, 30e3);
+});
+$("typeSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setType(b.dataset.type); });
+$("addMedia").addEventListener("click", () => { if (mediaInputs().length < 10) addMediaRow(); });
+$("caption").addEventListener("input", () => {
+  const n = $("caption").value.length;
+  $("capCount").textContent = `${n} / 2200`;
+  $("capCount").classList.toggle("over", n > 2200);
+});
+$("asap").addEventListener("change", toggleAsap);
+$("scheduleBtn").addEventListener("click", schedule);
+$("tabs").addEventListener("click", e => {
+  const b = e.target.closest("button[data-tab]");
+  if (!b) return;
+  tab = b.dataset.tab;
+  try { localStorage.setItem(TAB_KEY, tab); } catch (_) {}
+  renderList();
+});
+$("posts").addEventListener("click", e => { const b = e.target.closest("[data-del]"); if (b) deletePost(b.dataset.del); });
+
+start();
+</script>
+</body>
+</html>

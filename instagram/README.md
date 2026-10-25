@@ -3,7 +3,7 @@
 This tool posts to any number of Instagram accounts on a schedule, for free. You list your posts in `posts.csv`. Every 15 minutes, GitHub Actions publishes the ones that are due through Instagram's official API, then records them in `published.json` so nothing is posted twice.
 
 - **Post types:** single photos, carousels (2–10 photos or videos), Reels and Stories, each with an optional first comment.
-- **Timing:** GitHub starts scheduled runs late when it is busy, so a post usually goes out 0–30 minutes after its time.
+- **Timing:** GitHub starts scheduled runs late when it is busy, sometimes by up to 2 hours. The scheduling page's *Publish due posts now* button posts straight away.
 - **Safety:** a post that fails is retried in each of the next 2 runs, then left alone. A post more than 12 hours late is skipped, so an old date typed by mistake never posts.
 
 ## 1. Set up each Instagram account (once)
@@ -37,7 +37,12 @@ If a token expires anyway, generate a new one (step 1.4) and update `IG_ACCOUNTS
 
 ## 4. Schedule posts
 
-Add rows to `posts.csv`. You can edit it on github.com, or in Excel or Google Sheets (save as CSV):
+The easiest way is the scheduling page, `schedule/` on this site. Pick the account, type, date and time, paste the media links and caption, and click *Schedule*. The page adds the row to `posts.csv` for you and lists what is upcoming, posted or failed. *Publish due posts now* runs the scheduler straight away instead of waiting for GitHub's next check.
+
+- **Signing in:** the page uses a [classic token](https://github.com/settings/tokens/new?scopes=repo&description=Instagram%20Scheduler) with the `repo` box ticked. It's kept only in that browser. If you're already signed in to the IPA Priority Board in the same browser, the page reuses that sign-in.
+- **Accounts:** the account list comes from `accounts.json` (short name → Instagram username, no tokens). When you add an account to `IG_ACCOUNTS`, add it there too.
+
+You can also add rows to `posts.csv` by hand, on github.com or in Excel or Google Sheets (save as CSV):
 
 | Column | What to put |
 | --- | --- |
@@ -55,13 +60,13 @@ Instagram downloads each file from its link, so the link has to open the file it
 
 - **Images:** JPEG only. Use a 4:5 ratio (1080×1350) for the feed and 9:16 (1080×1920) for Stories.
 - **Reels:** MP4 or MOV, 9:16, 3 seconds to 15 minutes. Videos rendered in `videos/<name>/renders/` are already the right size.
-- **Daily limit:** each account can publish at most 50 posts per day through the API.
+- **Daily limit:** each account can publish a limited number of posts per day through the API (100 at the time of writing). The *verify* run shows the current limit.
 
 ## Check and run
 
 - **Check the list:** the *Actions* tab shows every run and what it posted or why it failed. On your own computer, `python3 instagram/ig_scheduler.py check` validates `posts.csv` and lists what is queued.
 - **Run it now:** go to *Actions → Instagram scheduler → Run workflow*. Choose *dry-run* to only see what would be posted, or *verify* to check that every account's token works without posting anything.
-- **Retry a failed post:** fix it in `posts.csv`, delete its entry under `"failed"` in `published.json`, and give it a new `publish_at` if it is more than 12 hours late.
+- **Retry a failed post:** on the scheduling page, delete it under *Problems* and schedule it again. By hand: fix it in `posts.csv`, delete its entry under `"failed"` in `published.json`, and give it a new `publish_at` if it is more than 12 hours late.
 
 ## Good to know
 
