@@ -4,6 +4,7 @@
 Commands:
   check            validate posts.csv and list what is queued
   verify           log in to each account and show its posting quota (posts nothing)
+  probe            have Instagram fetch and process a media link without publishing it
   run [--dry-run]  publish every post that is due and not yet published
   refresh-tokens   renew each account's 60-day token (writes the new accounts JSON to --out)
 
@@ -333,6 +334,27 @@ def cmd_verify(args):
     return 1 if failed else 0
 
 
+def cmd_probe(args):
+    """Create a container for a media link and wait for Instagram to process it. Never publishes."""
+    accounts = load_accounts(args.accounts)
+    name = args.account or next(iter(accounts), None)
+    if name not in accounts:
+        raise SystemExit(f"No account named '{name}'.")
+    graph = Graph(accounts[name])
+    url = args.url
+    try:
+        if is_video(url):
+            container = graph.container(media_type="REELS", video_url=url)
+        else:
+            container = graph.container(image_url=url)
+        graph.wait_until_ready(container)
+    except PostError as e:
+        print(f"REJECTED {url}: {e}")
+        return 1
+    print(f"OK       Instagram accepted {url} (nothing was published)")
+    return 0
+
+
 def cmd_refresh_tokens(args):
     accounts = load_accounts(args.accounts)
     if not accounts:
@@ -370,13 +392,16 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check")
     sub.add_parser("verify")
+    probe = sub.add_parser("probe")
+    probe.add_argument("url")
+    probe.add_argument("--account", help="account to test with (default: the first one)")
     run = sub.add_parser("run")
     run.add_argument("--dry-run", action="store_true", help="show what would be posted without posting")
     run.add_argument("--max-late-hours", type=float, default=12, help="skip posts more than this many hours late (default 12)")
     refresh = sub.add_parser("refresh-tokens")
     refresh.add_argument("--out", required=True, help="file to write the renewed accounts JSON to")
     args = parser.parse_args()
-    handler = {"check": cmd_check, "verify": cmd_verify, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
+    handler = {"check": cmd_check, "verify": cmd_verify, "probe": cmd_probe, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
     sys.exit(handler(args))
 
 

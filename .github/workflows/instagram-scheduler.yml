@@ -6,10 +6,14 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "publish: post what is due. dry-run: only show it. verify: test the accounts, post nothing."
+        description: "publish: post what is due. dry-run: only show it. verify: test the accounts. probe: test a media link. verify and probe post nothing."
         type: choice
-        options: [publish, dry-run, verify]
+        options: [publish, dry-run, verify, probe]
         default: publish
+      probe_url:
+        description: "For probe: the media link to test"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -29,9 +33,11 @@ jobs:
         env:
           IG_ACCOUNTS: ${{ secrets.IG_ACCOUNTS }}
           MODE: ${{ inputs.mode || 'publish' }}
+          PROBE_URL: ${{ inputs.probe_url }}
         run: |
           case "$MODE" in
             verify) python3 instagram/ig_scheduler.py verify ;;
+            probe) python3 instagram/ig_scheduler.py probe "$PROBE_URL" ;;
             dry-run) python3 instagram/ig_scheduler.py run --dry-run ;;
             *) python3 instagram/ig_scheduler.py run ;;
           esac

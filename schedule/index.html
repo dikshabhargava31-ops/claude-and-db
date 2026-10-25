@@ -1,0 +1,1114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Instagram Planner</title>
+<meta name="description" content="Plan, preview and schedule Instagram posts, carousels, Reels and Stories for several accounts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Same palette and type as the IPA Priority Board. */
+:root{
+  --bg:#ffffff; --panel:#f7f7f5; --sunk:#efefec; --line:#e6e5e1; --hover:#f3f3f0;
+  --ink:#1f1f1d; --muted:#6b6a65; --faint:#8f8e88;
+  --accent:#c2700a; --accent-soft:#fbefdd; --on-accent:#ffffff;
+  --crit:#c4362b; --crit-soft:#fbe4e1; --warn:#9a6900; --warn-soft:#faf0d4;
+  --ok:#2f7d4f; --ok-soft:#e1f2e7; --info:#2f63b8; --info-soft:#e3ebf8;
+  --a1:#2f63b8; --a2:#b5428f; --a3:#2f7d4f; --a4:#c2700a; --a5:#6b4fc2; --a6:#1d8a8a;
+  --shadow:0 12px 40px rgba(0,0,0,.18);
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#191919; --panel:#202020; --sunk:#2a2a2a; --line:#323232; --hover:#262626;
+  --ink:#ebebe8; --muted:#a3a29c; --faint:#85847e;
+  --accent:#f0a33a; --accent-soft:#3a2a12; --on-accent:#191919;
+  --crit:#f0786d; --crit-soft:#3d1f1d; --warn:#e8b94a; --warn-soft:#382d12;
+  --ok:#6cc893; --ok-soft:#183126; --info:#8ea8f0; --info-soft:#1e2640;
+  --a1:#8ea8f0; --a2:#e58cc6; --a3:#6cc893; --a4:#f0a33a; --a5:#b5a2f5; --a6:#5fd0d0;
+  --shadow:0 12px 40px rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#191919; --panel:#202020; --sunk:#2a2a2a; --line:#323232; --hover:#262626;
+  --ink:#ebebe8; --muted:#a3a29c; --faint:#85847e;
+  --accent:#f0a33a; --accent-soft:#3a2a12; --on-accent:#191919;
+  --crit:#f0786d; --crit-soft:#3d1f1d; --warn:#e8b94a; --warn-soft:#382d12;
+  --ok:#6cc893; --ok-soft:#183126; --info:#8ea8f0; --info-soft:#1e2640;
+  --a1:#8ea8f0; --a2:#e58cc6; --a3:#6cc893; --a4:#f0a33a; --a5:#b5a2f5; --a6:#5fd0d0;
+  --shadow:0 12px 40px rgba(0,0,0,.5); color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:8px 13px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+button:hover{background:var(--hover)}
+button:disabled{opacity:.5;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.primary:hover{filter:brightness(1.06);background:var(--accent)}
+button.ghost{border-color:transparent;background:none}
+button.ghost:hover{background:var(--hover)}
+button.danger{color:var(--crit)}
+button:focus-visible,input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 11px}
+textarea{resize:vertical}
+svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wrap{max-width:1320px;margin:0 auto;padding:22px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+
+/* top bar */
+.top{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:center;margin-bottom:18px}
+.top h1{font:700 26px/1.1 var(--f-display);margin:0;margin-right:auto}
+.who{font-size:13px;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border-radius:99px;padding:5px 12px 5px 6px;font-weight:500;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.chip.all{padding-left:12px}
+.av{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font:600 11px var(--f-body);flex:none;background:var(--ac,var(--a1))}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;padding:2px;background:var(--panel)}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:8px;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--bg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.nav{display:flex;align-items:center;gap:6px}
+.nav h2{font:600 19px/1.2 var(--f-display);margin:0 6px;min-width:150px}
+.alert{display:flex;gap:10px;align-items:center;background:var(--crit-soft);color:var(--crit);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+.alert button{margin-left:auto;color:var(--crit);border-color:currentColor;background:none;padding:5px 10px;font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--sc);flex:none}
+
+/* status colours */
+.s-scheduled{--sc:var(--info);--ss:var(--info-soft)}
+.s-due{--sc:var(--accent);--ss:var(--accent-soft)}
+.s-retry{--sc:var(--warn);--ss:var(--warn-soft)}
+.s-posted{--sc:var(--ok);--ss:var(--ok-soft)}
+.s-problem{--sc:var(--crit);--ss:var(--crit-soft)}
+
+/* month */
+.month{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--line);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px}
+.dow{background:var(--panel);font:600 12px var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:8px 10px}
+.day{background:var(--bg);min-height:128px;padding:6px;display:flex;flex-direction:column;gap:4px;position:relative}
+.day.out{background:var(--panel)}
+.day.out .dn{color:var(--faint)}
+.day .dn{font:500 13px var(--f-mono);color:var(--muted);display:flex;justify-content:space-between;align-items:center;padding:0 2px}
+.day.today .dn b{background:var(--accent);color:var(--on-accent);border-radius:99px;padding:0 7px}
+.day .dn b{font-weight:600}
+.day .add{opacity:0;border:0;padding:0 6px;font-size:16px;line-height:1.3;color:var(--muted);background:none}
+.day:hover .add,.day .add:focus-visible{opacity:1}
+.day.past .add{display:none}
+.more{font-size:12px;color:var(--muted);border:0;background:none;padding:0 4px;justify-content:flex-start}
+.pc{display:flex;align-items:center;gap:6px;width:100%;border:0;border-left:3px solid var(--sc);background:var(--ss);border-radius:6px;padding:3px 6px 3px 4px;font:500 12px/1.2 var(--f-body);text-align:left;justify-content:flex-start;min-width:0}
+.pc:hover{filter:brightness(.97);background:var(--ss)}
+.pc .th{width:24px;height:24px;border-radius:4px;flex:none}
+.pc .t{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.pc .av{width:16px;height:16px;font-size:9px}
+.pc .ty{margin-left:auto;color:var(--muted);display:flex}
+.pc .ty svg{width:14px;height:14px}
+
+/* week */
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.wcol{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;min-height:360px;display:flex;flex-direction:column;gap:8px}
+.wcol.today{border-color:var(--accent)}
+.wcol h3{font:600 13px var(--f-body);margin:0;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.wcol h3 b{font:700 20px var(--f-display);color:var(--ink)}
+.wcard{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:0;overflow:hidden;border-radius:10px;text-align:left;border-top:3px solid var(--sc);background:var(--bg)}
+.wcard .th{width:100%;height:120px;border-radius:0}
+.wcard .wm{display:flex;align-items:center;gap:6px;padding:0 8px;font-size:12px}
+.wcard .cap{padding:0 8px 8px;font-size:12px;font-weight:400;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wcol .wadd{margin-top:auto;border-style:dashed;color:var(--muted);font-weight:500;font-size:13px}
+
+/* list */
+.list{display:grid;gap:18px}
+.lday h3{font:600 15px var(--f-display);margin:0 0 8px}
+.lday h3 small{font:400 13px var(--f-body);color:var(--muted);margin-left:6px}
+.lrow{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;width:100%;text-align:left;padding:10px;border-radius:12px;border-left:4px solid var(--sc);font-weight:400;justify-content:stretch;align-items:start;margin-bottom:8px}
+.lrow .th{width:64px;height:80px;border-radius:8px}
+.lrow .meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13px;color:var(--muted)}
+.lrow .meta b{color:var(--ink);font-family:var(--f-mono);font-weight:500}
+.lrow p{margin:4px 0 0;font-size:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.pill{font:500 11px/1 var(--f-mono);padding:4px 7px;border-radius:99px;background:var(--ss,var(--sunk));color:var(--sc,var(--muted));text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+.empty{color:var(--muted);text-align:center;padding:40px 16px;border:1px dashed var(--line);border-radius:14px}
+
+/* thumbnails */
+.th{background:var(--sunk) center/cover no-repeat;position:relative;overflow:hidden;display:block}
+.th video{width:100%;height:100%;object-fit:cover;display:block}
+.th .play{position:absolute;right:3px;bottom:3px;color:#fff;filter:drop-shadow(0 0 2px rgba(0,0,0,.6));display:flex}
+.th .play svg{width:12px;height:12px;fill:#fff;stroke:none}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;z-index:20;padding:16px}
+.modal{background:var(--bg);border-radius:18px;box-shadow:var(--shadow);width:min(1080px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}
+.modal.small{width:min(760px,100%)}
+.mhead{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.mhead h2{font:600 19px var(--f-display);margin:0;margin-right:auto}
+.mbody{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.9fr);overflow:auto;flex:1}
+.mform{padding:18px;display:grid;gap:18px;align-content:start}
+.mside{background:var(--panel);border-left:1px solid var(--line);padding:18px;display:grid;place-items:start center;align-content:start;gap:10px;position:sticky;top:0;align-self:start;min-height:100%}
+.mside .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;justify-self:stretch;display:flex;justify-content:space-between}
+.mfoot{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 18px;border-top:1px solid var(--line);background:var(--bg)}
+.mfoot .status{margin-right:auto;font-size:13px;color:var(--muted)}
+.mfoot .status.err{color:var(--crit)}
+@media (max-width:820px){
+  .scrim{padding:0;place-items:stretch}
+  .modal{border-radius:0;max-height:none;height:100%;width:100%}
+  .mbody{grid-template-columns:minmax(0,1fr)}
+  .mside{border-left:0;border-top:1px solid var(--line)}
+}
+.lab{font-weight:600;font-size:13px;margin:0 0 7px;display:flex;justify-content:space-between;gap:10px}
+.lab small{font-weight:400;color:var(--muted);font-family:var(--f-mono);font-size:12px}
+.lab small.over{color:var(--crit)}
+.types{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.types button{flex-direction:column;gap:3px;padding:10px 4px;font-size:13px}
+.types button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.hint{font-size:13px;color:var(--muted);margin-top:6px}
+.drop{border:2px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);font-size:14px;cursor:pointer;display:grid;gap:4px;place-items:center}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft);color:var(--ink)}
+.drop b{color:var(--ink)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:10px}
+.mi{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--sunk);aspect-ratio:4/5}
+.mi.bad{border:2px solid var(--crit)}
+.mi .th{width:100%;height:100%}
+.mi .n{position:absolute;left:5px;top:5px;background:rgba(0,0,0,.6);color:#fff;font:600 11px var(--f-mono);border-radius:99px;padding:1px 7px}
+.mi .x{position:absolute;right:4px;top:4px;padding:2px;border-radius:99px;background:rgba(0,0,0,.6);color:#fff;border:0}
+.mi .mv{position:absolute;bottom:4px;left:4px;right:4px;display:flex;justify-content:space-between}
+.mi .mv button{padding:1px 6px;border-radius:6px;background:rgba(0,0,0,.6);color:#fff;border:0;font-size:12px}
+.mi .info{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.7));color:#fff;font:500 10px var(--f-mono);padding:12px 6px 4px}
+.mi.carousel .info{bottom:24px;background:none;padding-bottom:0}
+.issues{display:grid;gap:4px;margin-top:8px}
+.issue{font-size:13px;border-radius:8px;padding:7px 10px;background:var(--crit-soft);color:var(--crit)}
+.issue.warn{background:var(--warn-soft);color:var(--warn)}
+.linkadd{display:flex;gap:6px;margin-top:8px}
+.linkadd input{font-size:13px;padding:6px 9px}
+.linkadd button{font-size:13px;padding:6px 10px}
+.whenrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.quick button{font-size:12px;padding:5px 10px;border-radius:99px;font-weight:500}
+.quick button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.progress{height:4px;background:var(--sunk);border-radius:99px;overflow:hidden;width:160px}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+
+/* Instagram preview */
+.phone{width:300px;max-width:100%;background:#fff;color:#111;border-radius:22px;border:1px solid #ddd;overflow:hidden;font:13px/1.4 -apple-system,"Segoe UI",system-ui,sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.phone .ph{display:flex;align-items:center;gap:8px;padding:10px 12px;font-weight:600}
+.phone .ph .av{width:28px;height:28px;font-size:12px;box-shadow:0 0 0 2px #fff,0 0 0 3.5px #d6249f}
+.phone .ph .dots{margin-left:auto;font-weight:700;letter-spacing:1px}
+.phone .pm{position:relative;background:#efefef;aspect-ratio:4/5;display:grid;place-items:center;color:#999;font-size:13px;overflow:hidden}
+.phone .pm img,.phone .pm video{width:100%;height:100%;object-fit:cover;display:block}
+.phone .pm .cnt{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.65);color:#fff;border-radius:99px;font-size:11px;padding:2px 8px}
+.phone .pm .arrows{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;padding:0 6px;pointer-events:none}
+.phone .pm .arrows button{pointer-events:auto;width:26px;height:26px;border-radius:50%;padding:0;background:rgba(255,255,255,.85);border:0;color:#111}
+.phone .pdots{display:flex;gap:4px;justify-content:center;padding:6px 0 0}
+.phone .pdots i{width:6px;height:6px;border-radius:50%;background:#c7c7c7}
+.phone .pdots i.on{background:#0095f6}
+.phone .pa{display:flex;gap:14px;padding:8px 12px 4px}
+.phone .pa svg{width:22px;height:22px;stroke:#111;fill:none;stroke-width:1.8}
+.phone .pa .bm{margin-left:auto}
+.phone .pc2{padding:2px 12px 12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.phone .pc2 .more2{color:#8e8e8e}
+.phone .pcm{padding:0 12px 12px;color:#8e8e8e;font-size:12px;overflow-wrap:anywhere}
+.phone .hash{color:#00376b}
+.phone.tall .pm{aspect-ratio:9/16}
+.phone.tall .ov{position:absolute;left:0;right:0;bottom:0;padding:40px 12px 14px;background:linear-gradient(transparent,rgba(0,0,0,.65));color:#fff;text-align:left;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:50%;overflow:hidden}
+.phone.tall .ov b{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.phone.tall .top2{position:absolute;left:10px;right:10px;top:8px;display:flex;align-items:center;gap:6px;color:#fff;font-weight:600;font-size:12px}
+.phone.tall .top2 .bars{position:absolute;top:-4px;left:0;right:0;height:2px;background:rgba(255,255,255,.5);border-radius:2px}
+
+/* details */
+.dgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;padding:18px;overflow:auto}
+@media (max-width:820px){.dgrid{grid-template-columns:minmax(0,1fr)}}
+.dl{display:grid;gap:12px;align-content:start;font-size:14px}
+.dl .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.err-box{background:var(--crit-soft);color:var(--crit);border-radius:10px;padding:10px 12px;font-size:14px;overflow-wrap:anywhere}
+
+/* sign in */
+.signin{max-width:560px;margin:40px auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+.signin h2{font:600 22px var(--f-display);margin:0 0 10px}
+.signin ol{padding-left:20px;color:var(--muted);font-size:14px}
+.signin a{color:var(--info)}
+.msg{border-radius:9px;padding:10px 12px;font-size:14px;margin-top:12px}
+.msg.err{background:var(--crit-soft);color:var(--crit)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:40;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
+
+@media (max-width:720px){
+  .day{min-height:74px;padding:4px}
+  .day .pc .t,.day .pc .ty,.day .pc .av{display:none}
+  .day .pc{padding:2px;border-left-width:0;border-bottom:3px solid var(--sc);justify-content:center}
+  .day .pc .th{width:100%;height:28px}
+  .day .add{display:none}
+  .dow{padding:6px 4px;font-size:10px;text-align:center}
+  .nav h2{min-width:0;font-size:17px}
+  .week{grid-template-columns:minmax(0,1fr)}
+  .wcol{min-height:0}
+  .wcard{flex-direction:row;align-items:center}
+  .wcard .th{width:56px;aspect-ratio:4/5;flex:none}
+  .wcard .cap{display:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-photo" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
+  <symbol id="i-carousel" viewBox="0 0 24 24"><rect x="7" y="3" width="14" height="14" rx="2"/><path d="M3 7v12a2 2 0 0 0 2 2h12"/></symbol>
+  <symbol id="i-reel" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 8h18M8 3l3 5M14 3l3 5"/><path d="m10 12 5 3-5 3z"/></symbol>
+  <symbol id="i-story" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-dasharray="3 2.2"/><path d="M12 8v8M8 12h8"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-comment" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5z"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M19 21 12 16l-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+</svg>
+
+<div class="wrap">
+  <section class="signin" id="signin" hidden>
+    <h2>Instagram Planner</h2>
+    <p style="margin:0 0 12px;color:var(--muted)">Sign in once with a GitHub token so this page can save your schedule and upload your files.</p>
+    <ol>
+      <li>Create a <a href="https://github.com/settings/tokens/new?scopes=repo&description=Instagram%20Planner" target="_blank" rel="noopener">GitHub token</a> with the <b>repo</b> box ticked, then click <b>Generate token</b>.</li>
+      <li>Paste it below. It's kept only in this browser.</li>
+    </ol>
+    <input id="tokenIn" type="password" autocomplete="off" placeholder="ghp_…" aria-label="GitHub token">
+    <button class="primary" id="signInBtn" style="margin-top:12px;width:100%">Sign in</button>
+    <div id="signinMsg"></div>
+  </section>
+
+  <main id="app" hidden>
+    <div class="top">
+      <h1>Instagram Planner</h1>
+      <button id="runNow" title="Publish every post that is due right now, instead of waiting for the next automatic check"><svg class="i"><use href="#i-bolt"/></svg>Publish due now</button>
+      <button class="primary" id="newPost"><svg class="i"><use href="#i-plus"/></svg>Create post</button>
+    </div>
+    <div id="alert"></div>
+    <div class="bar">
+      <div class="chips" id="acctFilter"></div>
+      <div class="seg" id="viewSeg" role="group" aria-label="View">
+        <button data-view="month">Month</button><button data-view="week">Week</button><button data-view="list">List</button>
+      </div>
+    </div>
+    <div class="bar">
+      <div class="nav">
+        <button class="ghost" id="prev" aria-label="Previous"><svg class="i"><use href="#i-left"/></svg></button>
+        <button class="ghost" id="next" aria-label="Next"><svg class="i"><use href="#i-right"/></svg></button>
+        <h2 id="rangeTitle"></h2>
+        <button id="today" style="font-size:13px;padding:6px 11px">Today</button>
+      </div>
+      <div class="who"><span id="whoText"></span> · <button class="ghost" id="signOut" style="padding:2px 6px;font-size:13px;font-weight:500">Sign out</button></div>
+    </div>
+    <div id="view"></div>
+    <div class="legend">
+      <span class="s-scheduled"><i class="dot"></i>Scheduled</span>
+      <span class="s-due"><i class="dot"></i>Due, posting soon</span>
+      <span class="s-retry"><i class="dot"></i>Retrying</span>
+      <span class="s-posted"><i class="dot"></i>Posted</span>
+      <span class="s-problem"><i class="dot"></i>Needs attention</span>
+    </div>
+    <p class="hint" style="margin-top:14px">Times are India time. Posts go out automatically; GitHub can start its check late, so use <b>Publish due now</b> when a post must go out on the minute.</p>
+  </main>
+</div>
+
+<!-- composer -->
+<div class="scrim" id="composer" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cTitle">
+    <div class="mhead"><h2 id="cTitle">Create post</h2><button class="ghost" data-close aria-label="Close"><svg class="i"><use href="#i-close"/></svg></button></div>
+    <div class="mbody">
+      <div class="mform">
+        <div>
+          <div class="lab">Post to</div>
+          <div class="chips" id="cAccounts"></div>
+        </div>
+        <div>
+          <div class="lab">Type</div>
+          <div class="types" id="cTypes">
+            <button type="button" data-type="post"><svg class="i"><use href="#i-photo"/></svg>Photo</button>
+            <button type="button" data-type="carousel"><svg class="i"><use href="#i-carousel"/></svg>Carousel</button>
+            <button type="button" data-type="reel"><svg class="i"><use href="#i-reel"/></svg>Reel</button>
+            <button type="button" data-type="story"><svg class="i"><use href="#i-story"/></svg>Story</button>
+          </div>
+          <div class="hint" id="cTypeHint"></div>
+        </div>
+        <div>
+          <div class="lab">Media <small id="cMediaCount"></small></div>
+          <label class="drop" id="cDrop">
+            <svg class="i" style="width:26px;height:26px"><use href="#i-upload"/></svg>
+            <span><b>Drop photos or videos here</b> or click to choose</span>
+            <span style="font-size:12px">JPG, PNG or MP4 · PNGs are turned into JPGs for you</span>
+            <input type="file" id="cFile" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" multiple hidden>
+          </label>
+          <div class="mgrid" id="cMedia"></div>
+          <div class="issues" id="cIssues"></div>
+          <div class="linkadd"><input id="cLink" type="url" placeholder="…or paste a link to a file already online"><button type="button" id="cLinkAdd">Add</button></div>
+        </div>
+        <div id="cCaptionWrap">
+          <div class="lab"><span>Caption</span><small id="cCapCount">0 / 2,200 · 0 / 30 #</small></div>
+          <textarea id="cCaption" rows="6" placeholder="Write a caption…"></textarea>
+        </div>
+        <div id="cCommentWrap">
+          <div class="lab"><span>First comment <span style="font-weight:400;color:var(--muted)">(optional, good for hashtags)</span></span></div>
+          <input id="cComment" placeholder="#ajmer #education">
+        </div>
+        <div>
+          <div class="lab">When <small>India time</small></div>
+          <div class="whenrow"><input type="date" id="cDate" aria-label="Date"><input type="time" id="cTime" step="300" aria-label="Time"></div>
+          <div class="quick" id="cQuick"></div>
+        </div>
+      </div>
+      <div class="mside">
+        <div class="lbl"><span>Preview</span><span id="cPrevAcct"></span></div>
+        <div id="cPreview"></div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <span class="status" id="cStatus"></span>
+      <div class="progress" id="cProgress" hidden><i></i></div>
+      <button data-close>Cancel</button>
+      <button class="primary" id="cSave">Schedule</button>
+    </div>
+  </div>
+</div>
+
+<!-- details -->
+<div class="scrim" id="details" hidden>
+  <div class="modal small" role="dialog" aria-modal="true" aria-labelledby="dTitle">
+    <div class="mhead"><h2 id="dTitle">Post</h2><button class="ghost" data-close aria-label="Close"><svg class="i"><use href="#i-close"/></svg></button></div>
+    <div class="dgrid"><div class="dl" id="dInfo"></div><div id="dPreview"></div></div>
+    <div class="mfoot" id="dActions"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const GH = {owner: "dikshabhargava31-ops", repo: "claude-and-db", media: "instagram-media", branch: "main"};
+const API = "https://api.github.com/";
+const RAW = `https://raw.githubusercontent.com/${GH.owner}/${GH.media}/main/`;
+const AUTH_KEY = "ig-planner-token", BOARD_AUTH_KEY = "ipa-priority-board-user", PREF_KEY = "ig-planner-prefs";
+const COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment"];
+const IST = 330 * 60e3, LATE_LIMIT_MS = 12 * 3600e3, MAX_ATTEMPTS = 3, MAX_BYTES = 95 * 1024 * 1024;
+const VIDEO_RE = /\.(mp4|mov|m4v)$/i, NOT_JPEG_RE = /\.(png|webp|gif|heic|avif|bmp)$/i;
+const TYPE_LABEL = {post: "Photo", carousel: "Carousel", reel: "Reel", story: "Story"};
+const TYPE_ICON = {post: "photo", carousel: "carousel", reel: "reel", story: "story"};
+const TYPE_HINT = {
+  post: "One photo, 4:5 (1080×1350) to landscape. Square works too.",
+  carousel: "2 to 10 photos or videos. Drag the order with the arrows.",
+  reel: "One video, 9:16, 3 seconds to 15 minutes.",
+  story: "One photo or video (up to 60 s), 9:16. Stories have no caption.",
+};
+const STATUS = {
+  scheduled: {cls: "s-scheduled", label: "Scheduled"}, due: {cls: "s-due", label: "Due"},
+  retry: {cls: "s-retry", label: "Retrying"}, posted: {cls: "s-posted", label: "Posted"},
+  problem: {cls: "s-problem", label: "Needs attention"},
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const icon = (name, extra = "") => `<svg class="i" ${extra}><use href="#i-${name}"/></svg>`;
+const isVideoUrl = u => { try { return VIDEO_RE.test(new URL(u).pathname); } catch (_) { return false; } };
+
+/* ---------- prefs (per browser) ---------- */
+let prefs = {view: innerWidth < 720 ? "list" : "month"};
+try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREF_KEY) || "{}")); } catch (_) {}
+const savePrefs = () => { try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (_) {} };
+
+/* ---------- GitHub ---------- */
+function loadToken() {
+  try {
+    const own = localStorage.getItem(AUTH_KEY);
+    if (own) return own;
+    const board = JSON.parse(localStorage.getItem(BOARD_AUTH_KEY) || "null");
+    if (board && board.token) return board.token;
+  } catch (_) {}
+  return "";
+}
+let token = loadToken();
+async function gh(path, opts = {}) {
+  const r = await fetch(API + path, {cache: "no-store", ...opts,
+    headers: {Accept: "application/vnd.github+json", Authorization: "Bearer " + token, ...(opts.headers || {})}});
+  if (!r.ok) {
+    let detail = "";
+    try { detail = (await r.json()).message || ""; } catch (_) {}
+    throw Object.assign(new Error(detail || `GitHub said ${r.status}`), {status: r.status});
+  }
+  return r.status === 204 ? null : r.json();
+}
+const repoPath = (repo, p) => `repos/${GH.owner}/${repo}${p}`;
+
+const decode = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\n/g, "")), c => c.charCodeAt(0)));
+function encode(text) {
+  const bytes = new TextEncoder().encode(text);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+const blobToBase64 = blob => new Promise((res, rej) => {
+  const fr = new FileReader();
+  fr.onload = () => res(String(fr.result).split(",")[1]);
+  fr.onerror = () => rej(fr.error);
+  fr.readAsDataURL(blob);
+});
+
+// Uploads one file to the media repository, reporting progress; returns its public link.
+async function uploadMedia(blob, path, onProgress) {
+  const content = await blobToBase64(blob);
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", API + repoPath(GH.media, `/contents/${path}`));
+    xhr.setRequestHeader("Accept", "application/vnd.github+json");
+    xhr.setRequestHeader("Authorization", "Bearer " + token);
+    xhr.upload.onprogress = e => e.lengthComputable && onProgress(e.loaded / e.total);
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(RAW + path);
+      let m = ""; try { m = JSON.parse(xhr.responseText).message; } catch (_) {}
+      reject(new Error(xhr.status === 404 ? `Can't reach the ${GH.media} repository with this token.` : (m || `Upload failed (${xhr.status})`)));
+    };
+    xhr.onerror = () => reject(new Error("Upload failed. Check your connection."));
+    xhr.send(JSON.stringify({message: `Upload ${path}`, content, branch: "main"}));
+  });
+}
+
+/* ---------- CSV (same format Python's csv module reads) ---------- */
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", quoted = false;
+  text = text.replace(/^﻿/, "");
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else field += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.length > 1 || row[0] !== "") rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field !== "" || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+const csvField = v => /[",\r\n]/.test(v) || /^\s|\s$/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+const csvLine = values => values.map(v => csvField(String(v ?? ""))).join(",");
+
+/* ---------- time: everything is India time ---------- */
+const pad = n => String(n).padStart(2, "0");
+function parseWhen(s) {
+  s = (s || "").trim();
+  if (/[zZ]|[+-]\d\d:?\d\d$/.test(s)) return new Date(s.replace(" ", "T"));
+  const m = s.match(/^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)/);
+  return m ? new Date(Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5]) - IST) : null;
+}
+function ist(d) {
+  const t = new Date(d.getTime() + IST);
+  return {date: `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}`, time: `${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`, dow: (t.getUTCDay() + 6) % 7};
+}
+const dayAdd = (ds, n) => { const [y, m, d] = ds.split("-").map(Number); const t = new Date(Date.UTC(y, m - 1, d + n)); return `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}`; };
+const dayDow = ds => { const [y, m, d] = ds.split("-").map(Number); return (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7; };
+const fmt = (d, o) => d.toLocaleString("en-IN", {timeZone: "Asia/Kolkata", ...o});
+const fmtDay = ds => fmt(new Date(ds + "T12:00:00+05:30"), {weekday: "long", day: "numeric", month: "long"});
+const fmtWhen = d => fmt(d, {weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit"});
+const fmtTime = d => fmt(d, {hour: "numeric", minute: "2-digit"}).replace(" ", "").toLowerCase();
+const todayStr = () => ist(new Date()).date;
+const fmtSize = b => b < 1048576 ? `${Math.max(1, Math.round(b / 1024))} KB` : `${(b / 1048576).toFixed(1)} MB`;
+
+/* ---------- data ---------- */
+let accounts = {}, header = COLUMNS, rows = [], state = {published: {}, failed: {}}, posts = [];
+let cursor = todayStr();
+
+async function loadAll() {
+  const [acc, csv, pub] = await Promise.all([
+    gh(repoPath(GH.repo, `/contents/instagram/accounts.json?ref=${GH.branch}`)),
+    gh(repoPath(GH.repo, `/contents/instagram/posts.csv?ref=${GH.branch}`)),
+    gh(repoPath(GH.repo, `/contents/instagram/published.json?ref=${GH.branch}`)).catch(() => null),
+  ]);
+  accounts = JSON.parse(decode(acc.content));
+  const all = parseCSV(decode(csv.content));
+  header = all[0] || COLUMNS; rows = all.slice(1);
+  state = pub ? JSON.parse(decode(pub.content)) : {};
+  state.published ||= {}; state.failed ||= {};
+  buildPosts();
+}
+
+function buildPosts() {
+  const now = new Date();
+  posts = rows.map(r => Object.fromEntries(header.map((k, i) => [k, (r[i] || "").trim()])))
+    .filter(p => p.id && !p.id.startsWith("#"))
+    .map(p => {
+      const when = parseWhen(p.publish_at);
+      const media = p.media.split("|").map(s => s.trim()).filter(Boolean);
+      const pub = state.published[p.id], fail = state.failed[p.id];
+      let status, error = "";
+      if (pub) status = "posted";
+      else if (!when || isNaN(when)) { status = "problem"; error = `The date “${p.publish_at}” isn't valid.`; }
+      else if (fail && fail.attempts >= MAX_ATTEMPTS) { status = "problem"; error = fail.error; }
+      else if (fail) { status = "retry"; error = fail.error; }
+      else if (when > now) status = "scheduled";
+      else if (now - when > LATE_LIMIT_MS) { status = "problem"; error = "It was more than 12 hours late, so it was skipped. Use Post now or edit the time."; }
+      else status = "due";
+      const valid = when && !isNaN(when);
+      return {...p, when: valid ? when : null, day: valid ? ist(when).date : null, media, status, error, pub};
+    })
+    .sort((a, b) => (a.when || 0) - (b.when || 0));
+}
+
+// Re-reads posts.csv, applies the change and commits it; retries when someone else saved in between.
+async function savePosts(change, message) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const f = await gh(repoPath(GH.repo, `/contents/instagram/posts.csv?ref=${GH.branch}`));
+    const all = parseCSV(decode(f.content));
+    const h = all[0] || COLUMNS, body = change(all.slice(1), h);
+    const text = [h, ...body].map(csvLine).join("\n") + "\n";
+    try {
+      await gh(repoPath(GH.repo, "/contents/instagram/posts.csv"), {method: "PUT",
+        body: JSON.stringify({message, content: encode(text), sha: f.sha, branch: GH.branch})});
+      header = h; rows = body; buildPosts();
+      return;
+    } catch (e) {
+      if (e.status !== 409 && e.status !== 422) throw e;
+    }
+  }
+  throw new Error("Someone else was saving at the same time. Try again.");
+}
+const triggerRun = () => gh(repoPath(GH.repo, "/actions/workflows/instagram-scheduler.yml/dispatches"),
+  {method: "POST", body: JSON.stringify({ref: GH.branch, inputs: {mode: "publish"}})});
+
+/* ---------- accounts ---------- */
+const acctKeys = () => Object.keys(accounts);
+const acctColor = k => `var(--a${(acctKeys().indexOf(k) % 6) + 1})`;
+const acctUser = k => accounts[k] || k;
+const avatar = k => `<span class="av" style="--ac:${acctColor(k)}">${esc(acctUser(k).replace(/[^a-z0-9]/gi, "").slice(0, 1).toUpperCase() || "?")}</span>`;
+
+/* ---------- thumbnails ---------- */
+function thumb(media, cls = "th") {
+  const u = media[0];
+  if (!u) return `<span class="${cls}"></span>`;
+  if (isVideoUrl(u)) {
+    const poster = u.replace(VIDEO_RE, ".poster.jpg");
+    return `<span class="${cls}" style="background-image:url('${esc(poster)}')"><span class="play">${icon("play")}</span></span>`;
+  }
+  return `<span class="${cls}" style="background-image:url('${esc(u)}')"></span>`;
+}
+
+/* ---------- views ---------- */
+function visiblePosts() {
+  const f = prefs.accounts && prefs.accounts.length ? new Set(prefs.accounts) : null;
+  return posts.filter(p => !f || f.has(p.account));
+}
+function byDay(list) {
+  const m = {};
+  list.forEach(p => { if (p.day) (m[p.day] ||= []).push(p); });
+  return m;
+}
+function postChip(p) {
+  return `<button class="pc ${STATUS[p.status].cls}" data-open="${esc(p.id)}" title="${esc(acctUser(p.account))} · ${esc(TYPE_LABEL[p.type] || p.type)} · ${STATUS[p.status].label}">
+    ${thumb(p.media)}${avatar(p.account)}<span class="t">${p.when ? fmtTime(p.when) : "?"}</span><span class="ty">${icon(TYPE_ICON[p.type] || "photo")}</span></button>`;
+}
+
+function renderMonth() {
+  const [y, m] = cursor.split("-").map(Number);
+  const first = `${y}-${pad(m)}-01`;
+  const start = dayAdd(first, -dayDow(first));
+  const days = byDay(visiblePosts()), today = todayStr();
+  $("rangeTitle").textContent = new Date(Date.UTC(y, m - 1, 1)).toLocaleString("en-IN", {month: "long", year: "numeric", timeZone: "UTC"});
+  let html = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => `<div class="dow">${d}</div>`).join("");
+  const weeks = dayDow(dayAdd(first, new Date(Date.UTC(y, m, 0)).getUTCDate() - 1)) === 6 && false ? 5 : 6;
+  for (let i = 0; i < weeks * 7; i++) {
+    const ds = dayAdd(start, i), list = days[ds] || [], [, dm, dd] = ds.split("-").map(Number);
+    const shown = list.slice(0, 3);
+    html += `<div class="day${dm !== m ? " out" : ""}${ds === today ? " today" : ""}${ds < today ? " past" : ""}" data-day="${ds}">
+      <div class="dn"><b>${dd}</b>${ds >= today ? `<button class="add" data-new="${ds}" aria-label="Create post on ${fmtDay(ds)}">+</button>` : ""}</div>
+      ${shown.map(postChip).join("")}
+      ${list.length > 3 ? `<button class="more" data-dayjump="${ds}">+${list.length - 3} more</button>` : ""}
+    </div>`;
+  }
+  $("view").innerHTML = `<div class="month">${html}</div>`;
+}
+
+function renderWeek() {
+  const start = dayAdd(cursor, -dayDow(cursor)), days = byDay(visiblePosts()), today = todayStr();
+  const end = dayAdd(start, 6);
+  $("rangeTitle").textContent = `${fmt(new Date(start + "T12:00:00+05:30"), {day: "numeric", month: "short"})} – ${fmt(new Date(end + "T12:00:00+05:30"), {day: "numeric", month: "short", year: "numeric"})}`;
+  let html = "";
+  for (let i = 0; i < 7; i++) {
+    const ds = dayAdd(start, i), list = days[ds] || [];
+    html += `<div class="wcol${ds === today ? " today" : ""}">
+      <h3><span>${fmt(new Date(ds + "T12:00:00+05:30"), {weekday: "short"})}</span><b>${+ds.slice(8)}</b></h3>
+      ${list.map(p => `<button class="wcard ${STATUS[p.status].cls}" data-open="${esc(p.id)}">${thumb(p.media)}
+        <span class="wm">${avatar(p.account)}<b style="font-family:var(--f-mono);font-weight:500">${p.when ? fmtTime(p.when) : "?"}</b><span class="pill">${esc(TYPE_LABEL[p.type] || p.type)}</span></span>
+        ${p.caption ? `<span class="cap">${esc(p.caption)}</span>` : ""}</button>`).join("")}
+      ${ds >= today ? `<button class="wadd" data-new="${ds}">${icon("plus")}Add</button>` : ""}
+    </div>`;
+  }
+  $("view").innerHTML = `<div class="week">${html}</div>`;
+}
+
+function renderList() {
+  const [y, m] = cursor.split("-").map(Number);
+  const prefix = `${y}-${pad(m)}`;
+  $("rangeTitle").textContent = new Date(Date.UTC(y, m - 1, 1)).toLocaleString("en-IN", {month: "long", year: "numeric", timeZone: "UTC"});
+  const list = visiblePosts().filter(p => p.day && p.day.startsWith(prefix));
+  const undated = visiblePosts().filter(p => !p.day);
+  const days = byDay(list);
+  const keys = Object.keys(days).sort();
+  if (!keys.length && !undated.length) {
+    $("view").innerHTML = `<div class="empty">Nothing planned this month.<br><br><button class="primary" data-new="">${icon("plus")}Create post</button></div>`;
+    return;
+  }
+  const row = p => `<button class="lrow ${STATUS[p.status].cls}" data-open="${esc(p.id)}">${thumb(p.media)}
+    <span><span class="meta"><b>${p.when ? fmtTime(p.when) : esc(p.publish_at)}</b>${avatar(p.account)}<span>@${esc(acctUser(p.account))}</span>
+    <span class="pill" style="--ss:var(--sunk);--sc:var(--muted)">${esc(TYPE_LABEL[p.type] || p.type)}${p.media.length > 1 ? " · " + p.media.length : ""}</span><span class="pill">${STATUS[p.status].label}</span></span>
+    ${p.caption ? `<p>${esc(p.caption)}</p>` : ""}${p.error ? `<p style="color:var(--crit);font-size:13px">${esc(p.error)}</p>` : ""}</span></button>`;
+  $("view").innerHTML = `<div class="list">${keys.map(ds => `<div class="lday" id="d-${ds}"><h3>${fmtDay(ds)}${ds === todayStr() ? "<small>Today</small>" : ""}</h3>${days[ds].map(row).join("")}</div>`).join("")}
+    ${undated.length ? `<div class="lday"><h3>Date needs fixing</h3>${undated.map(row).join("")}</div>` : ""}</div>`;
+}
+
+function renderAlert() {
+  const bad = posts.filter(p => p.status === "problem");
+  $("alert").innerHTML = bad.length ? `<div class="alert">${icon("alert")}<span><b>${bad.length} post${bad.length > 1 ? "s" : ""}</b> didn't go out and need${bad.length > 1 ? "" : "s"} your attention.</span><button data-open="${esc(bad[0].id)}">Review</button></div>` : "";
+}
+
+function renderFilter() {
+  const sel = new Set(prefs.accounts || []);
+  $("acctFilter").innerHTML = `<button class="chip all" data-acct="" aria-pressed="${!sel.size}">All accounts</button>` +
+    acctKeys().map(k => `<button class="chip" data-acct="${esc(k)}" aria-pressed="${sel.has(k)}">${avatar(k)}@${esc(acctUser(k))}</button>`).join("");
+}
+
+function render() {
+  document.querySelectorAll("#viewSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === prefs.view));
+  renderFilter(); renderAlert();
+  ({month: renderMonth, week: renderWeek, list: renderList})[prefs.view]();
+}
+
+/* ---------- Instagram preview ---------- */
+function linkify(text) {
+  return esc(text).replace(/(^|\s)([#@][\w.]+)/g, '$1<span class="hash">$2</span>');
+}
+function previewHTML({account, type, media, caption, comment}, slide = 0) {
+  const user = account ? acctUser(account) : "your_account";
+  const av = account ? avatar(account) : `<span class="av">?</span>`;
+  const item = media[Math.min(slide, media.length - 1)];
+  const mediaEl = !item ? `<span>Your ${type === "reel" ? "video" : "photo"} shows here</span>`
+    : item.isVideo ? `<video src="${esc(item.src)}" ${item.poster ? `poster="${esc(item.poster)}"` : ""} muted autoplay loop playsinline></video>`
+    : `<img src="${esc(item.src)}" alt="">`;
+  if (type === "reel" || type === "story") {
+    return `<div class="phone tall"><div class="pm">${mediaEl}
+      <div class="top2">${type === "story" ? '<span class="bars"></span>' : ""}${av}<span>${esc(user)}</span></div>
+      ${type === "reel" ? `<div class="ov"><b>${av}${esc(user)}</b>${caption ? linkify(caption.length > 140 ? caption.slice(0, 140) + "… more" : caption) : ""}</div>` : ""}
+    </div></div>`;
+  }
+  const many = type === "carousel" && media.length > 1;
+  const short = caption.length > 125 ? caption.slice(0, 125) : caption;
+  return `<div class="phone"><div class="ph">${av}<span>${esc(user)}</span><span class="dots">···</span></div>
+    <div class="pm">${mediaEl}${many ? `<span class="cnt">${slide + 1}/${media.length}</span><div class="arrows"><button data-slide="-1" aria-label="Previous">‹</button><button data-slide="1" aria-label="Next">›</button></div>` : ""}</div>
+    ${many ? `<div class="pdots">${media.map((_, i) => `<i class="${i === slide ? "on" : ""}"></i>`).join("")}</div>` : ""}
+    <div class="pa">${icon("heart")}${icon("comment")}${icon("send")}<span class="bm">${icon("bookmark")}</span></div>
+    <div class="pc2"><b>${esc(user)}</b> ${linkify(short)}${caption.length > 125 ? '<span class="more2">… more</span>' : ""}</div>
+    ${comment ? `<div class="pcm">First comment: ${linkify(comment)}</div>` : ""}</div>`;
+}
+
+/* ---------- composer ---------- */
+let C = null; // composer state
+let previewSlide = 0;
+
+function newComposer(day) {
+  const now = new Date(), t = ist(new Date(now.getTime() + 3600e3));
+  const date = day && day > todayStr() ? day : t.date;
+  const time = day && day > todayStr() ? "18:30" : `${t.time.slice(0, 2)}:${t.time.slice(3) < "30" ? "30" : "00"}`;
+  const fixedTime = date === t.date && time <= t.time ? `${pad(Math.min(23, +t.time.slice(0, 2) + 1))}:00` : time;
+  return {editId: null, accounts: new Set(prefs.accounts && prefs.accounts.length ? prefs.accounts : acctKeys().slice(0, 1)),
+    type: "post", typeTouched: false, media: [], caption: "", comment: "", date, time: fixedTime, now: false};
+}
+
+function openComposer(c) {
+  C = c; previewSlide = 0;
+  $("cTitle").textContent = C.editId ? "Edit post" : "Create post";
+  $("cCaption").value = C.caption; $("cComment").value = C.comment;
+  $("cDate").value = C.date; $("cTime").value = C.time; $("cDate").min = todayStr();
+  $("cStatus").textContent = ""; $("cStatus").className = "status"; $("cProgress").hidden = true;
+  $("composer").hidden = false; document.body.style.overflow = "hidden";
+  drawComposer();
+}
+function closeModal(id) {
+  $(id).hidden = true;
+  if ($("composer").hidden && $("details").hidden) document.body.style.overflow = "";
+  if (id === "composer" && C) { C.media.forEach(m => m.file && URL.revokeObjectURL(m.src)); C = null; }
+}
+
+function autoType() {
+  if (C.typeTouched) return;
+  const n = C.media.length, v = C.media.filter(m => m.isVideo).length;
+  C.type = n > 1 ? "carousel" : n === 1 && v === 1 ? "reel" : "post";
+}
+
+function mediaIssues() {
+  const out = [], n = C.media.length, t = C.type;
+  const imgs = C.media.filter(m => !m.isVideo), vids = C.media.filter(m => m.isVideo);
+  if (!n) out.push({err: true, text: "Add a photo or video."});
+  if (t === "post" && (n > 1 || vids.length)) out.push({err: true, text: vids.length ? "A photo post can't have a video. Choose Reel." : "A photo post takes one photo. Choose Carousel for several."});
+  if (t === "carousel" && n === 1) out.push({err: true, text: "A carousel needs at least 2 photos or videos."});
+  if (t === "carousel" && n > 10) out.push({err: true, text: "A carousel can have at most 10 items."});
+  if (t === "reel" && (n !== 1 || imgs.length)) out.push({err: true, text: "A reel is one video."});
+  if (t === "story" && n > 1) out.push({err: true, text: "A story is one photo or video."});
+  C.media.forEach((m, i) => {
+    const label = n > 1 ? `Item ${i + 1}: ` : "";
+    if (m.error) out.push({err: true, text: label + m.error});
+    if (m.w && m.h && (t === "post" || t === "carousel") && !m.isVideo) {
+      const r = m.w / m.h;
+      if (r < 0.79 || r > 1.92) out.push({err: true, text: `${label}This photo is ${m.w}×${m.h}. Feed photos must be between 4:5 (portrait) and 1.91:1 (landscape); use Story for tall 9:16 images.`});
+    }
+    if (m.isVideo && m.dur) {
+      if (t === "reel" && (m.dur < 3 || m.dur > 900)) out.push({err: true, text: `${label}Reels must be 3 seconds to 15 minutes (this is ${Math.round(m.dur)} s).`});
+      if (t === "story" && m.dur > 60) out.push({err: true, text: `${label}Stories can be at most 60 seconds (this is ${Math.round(m.dur)} s).`});
+      if (t === "carousel" && m.dur > 60) out.push({err: true, text: `${label}Carousel videos can be at most 60 seconds.`});
+      if (t === "reel" && m.w && m.h && Math.abs(m.w / m.h - 9 / 16) > 0.05) out.push({err: false, text: `${label}Reels look best at 9:16 (this is ${m.w}×${m.h}).`});
+    }
+    if (m.file && m.converted) out.push({err: false, text: `${label}${m.file.name} will be uploaded as a JPG.`});
+  });
+  if (!C.accounts.size) out.push({err: true, text: "Pick at least one account."});
+  if (C.type !== "story" && C.caption.length > 2200) out.push({err: true, text: "The caption is over 2,200 characters."});
+  if ((C.caption.match(/#[\w]+/g) || []).length > 30) out.push({err: true, text: "Instagram allows at most 30 hashtags."});
+  return out;
+}
+
+function drawComposer() {
+  if (!C) return;
+  $("cAccounts").innerHTML = acctKeys().map(k => `<button type="button" class="chip" data-cacct="${esc(k)}" aria-pressed="${C.accounts.has(k)}" ${C.editId ? "disabled" : ""}>${avatar(k)}@${esc(acctUser(k))}</button>`).join("");
+  document.querySelectorAll("#cTypes button").forEach(b => b.setAttribute("aria-pressed", b.dataset.type === C.type));
+  $("cTypeHint").textContent = TYPE_HINT[C.type];
+  $("cCaptionWrap").hidden = $("cCommentWrap").hidden = C.type === "story";
+  $("cMediaCount").textContent = C.media.length ? `${C.media.length} item${C.media.length > 1 ? "s" : ""}` : "";
+  const car = C.media.length > 1;
+  $("cMedia").innerHTML = C.media.map((m, i) => `<div class="mi${m.error ? " bad" : ""}${car ? " carousel" : ""}">
+      ${m.isVideo ? `<span class="th"><video src="${esc(m.src)}" muted preload="metadata" ${m.poster ? `poster="${esc(m.poster)}"` : ""}></video><span class="play">${icon("play")}</span></span>` : `<span class="th" style="background-image:url('${esc(m.src)}')"></span>`}
+      ${car ? `<span class="n">${i + 1}</span>` : ""}
+      <button type="button" class="x" data-rm="${i}" aria-label="Remove">${icon("close", 'style="width:14px;height:14px"')}</button>
+      <span class="info">${m.w ? `${m.w}×${m.h}` : ""}${m.dur ? ` · ${Math.round(m.dur)}s` : ""}${m.size ? ` · ${fmtSize(m.size)}` : ""}</span>
+      ${car ? `<span class="mv"><button type="button" data-mv="${i}:-1" ${i === 0 ? "disabled" : ""} aria-label="Move earlier">‹</button><button type="button" data-mv="${i}:1" ${i === C.media.length - 1 ? "disabled" : ""} aria-label="Move later">›</button></span>` : ""}
+    </div>`).join("");
+  const issues = mediaIssues();
+  $("cIssues").innerHTML = issues.filter(x => x.text !== "Add a photo or video." && x.text !== "Pick at least one account.")
+    .map(x => `<div class="issue${x.err ? "" : " warn"}">${esc(x.text)}</div>`).join("");
+  const n = C.caption.length, tags = (C.caption.match(/#[\w]+/g) || []).length;
+  $("cCapCount").textContent = `${n.toLocaleString("en-IN")} / 2,200 · ${tags} / 30 #`;
+  $("cCapCount").classList.toggle("over", n > 2200 || tags > 30);
+  drawQuick(); drawPreview();
+  const when = C.now ? null : parseWhen(`${C.date} ${C.time}`);
+  $("cSave").textContent = C.now ? "Post now" : when && !isNaN(when) ? `${C.editId ? "Save" : "Schedule"} · ${fmtWhen(when)}` : "Schedule";
+  $("cDate").disabled = $("cTime").disabled = C.now;
+}
+
+function drawQuick() {
+  const t = todayStr(), tm = dayAdd(t, 1);
+  const opts = [["now", "Post now"], [`${t} 18:30`, "Today 6:30 pm"], [`${t} 21:00`, "Today 9:00 pm"], [`${tm} 09:00`, "Tomorrow 9:00 am"], [`${tm} 13:00`, "Tomorrow 1:00 pm"], [`${tm} 18:30`, "Tomorrow 6:30 pm"]]
+    .filter(([v]) => v === "now" || parseWhen(v) > new Date());
+  $("cQuick").innerHTML = opts.map(([v, l]) => `<button type="button" data-quick="${v}" aria-pressed="${v === "now" ? C.now : !C.now && v === `${C.date} ${C.time}`}">${l}</button>`).join("");
+}
+
+function drawPreview() {
+  const acct = [...C.accounts][0];
+  $("cPrevAcct").textContent = C.accounts.size > 1 ? `+${C.accounts.size - 1} more account${C.accounts.size > 2 ? "s" : ""}` : "";
+  $("cPreview").innerHTML = previewHTML({account: acct, type: C.type, media: C.media, caption: C.type === "story" ? "" : C.caption, comment: C.type === "story" ? "" : C.comment}, previewSlide);
+}
+
+// Reads size, duration and dimensions; converts non-JPEG photos to JPEG.
+async function addFiles(files) {
+  for (const file of files) {
+    const isVideo = file.type.startsWith("video/") || VIDEO_RE.test(file.name);
+    const item = {file, isVideo, src: URL.createObjectURL(file), size: file.size, name: file.name};
+    if (!isVideo && !file.type.startsWith("image/")) { item.error = `${file.name} isn't a photo or video.`; }
+    C.media.push(item);
+    autoType(); drawComposer();
+    try {
+      if (isVideo) {
+        if (!/\.(mp4|mov)$/i.test(file.name) && !/mp4|quicktime/.test(file.type)) item.error = "Videos must be MP4 or MOV.";
+        const meta = await videoMeta(item.src);
+        Object.assign(item, meta);
+        item.posterBlob = meta.posterBlob; item.poster = meta.posterBlob ? URL.createObjectURL(meta.posterBlob) : "";
+      } else if (!item.error) {
+        const img = await loadImage(item.src);
+        item.w = img.naturalWidth; item.h = img.naturalHeight;
+        if (file.type !== "image/jpeg") {
+          item.blob = await toJpeg(img);
+          item.converted = true;
+          URL.revokeObjectURL(item.src); item.src = URL.createObjectURL(item.blob); item.size = item.blob.size;
+        }
+      }
+      const bytes = item.blob ? item.blob.size : file.size;
+      if (bytes > MAX_BYTES) item.error = `${file.name} is ${(bytes / 1048576).toFixed(0)} MB; the limit here is 95 MB. Export it smaller.`;
+      if (!isVideo && bytes > 8 * 1048576) item.error = "Instagram photos can be at most 8 MB.";
+    } catch (_) {
+      item.error = `Couldn't read ${file.name}.`;
+    }
+    drawComposer();
+  }
+}
+const loadImage = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+function toJpeg(img) {
+  // Instagram's limit is 1440 px wide; larger photos are scaled down.
+  const scale = Math.min(1, 1440 / img.naturalWidth);
+  const cv = document.createElement("canvas");
+  cv.width = Math.round(img.naturalWidth * scale); cv.height = Math.round(img.naturalHeight * scale);
+  const ctx = cv.getContext("2d");
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height);   // transparent PNG areas become white
+  ctx.drawImage(img, 0, 0, cv.width, cv.height);
+  return new Promise(res => cv.toBlob(res, "image/jpeg", 0.92));
+}
+function videoMeta(src) {
+  return new Promise(res => {
+    const v = document.createElement("video");
+    v.muted = true; v.preload = "auto"; v.playsInline = true;
+    const done = posterBlob => res({w: v.videoWidth, h: v.videoHeight, dur: v.duration, posterBlob});
+    v.onloadedmetadata = () => { v.currentTime = Math.min(1, (v.duration || 2) / 2); };
+    v.onseeked = () => {
+      try {
+        const cv = document.createElement("canvas");
+        const s = Math.min(1, 540 / v.videoWidth);
+        cv.width = Math.round(v.videoWidth * s); cv.height = Math.round(v.videoHeight * s);
+        cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
+        cv.toBlob(b => done(b), "image/jpeg", 0.85);
+      } catch (_) { done(null); }
+    };
+    v.onerror = () => done(null);
+    setTimeout(() => done(null), 15000);
+    v.src = src;
+  });
+}
+
+function addLink() {
+  const u = $("cLink").value.trim();
+  if (!/^https:\/\/\S+$/.test(u)) return toast("Links must start with https://");
+  const isVideo = isVideoUrl(u);
+  const item = {src: u, url: u, isVideo};
+  if (!isVideo && NOT_JPEG_RE.test(new URL(u).pathname)) item.error = "Instagram only accepts JPG photos. Upload the file instead and it's converted for you.";
+  C.media.push(item); $("cLink").value = "";
+  autoType(); drawComposer();
+  if (!isVideo) loadImage(u).then(i => { item.w = i.naturalWidth; item.h = i.naturalHeight; drawComposer(); }).catch(() => { item.error = "That link doesn't open as an image, so Instagram couldn't use it either."; drawComposer(); });
+}
+
+async function saveComposer() {
+  const issues = mediaIssues().filter(x => x.err);
+  const status = $("cStatus");
+  if (issues.length) { status.className = "status err"; status.textContent = issues[0].text; return; }
+  const when = C.now ? new Date() : parseWhen(`${C.date} ${C.time}`);
+  if (!when || isNaN(when)) { status.className = "status err"; status.textContent = "Pick a date and time."; return; }
+  if (!C.now && !C.editId && when < new Date(Date.now() - 60e3)) { status.className = "status err"; status.textContent = "That time has passed. Pick a later time or Post now."; return; }
+  const btn = $("cSave"); btn.disabled = true; status.className = "status";
+  const t = ist(when), stamp = `${t.date.replace(/-/g, "")}-${t.time.replace(":", "")}`;
+  const base = C.editId || `${stamp}-${Math.random().toString(36).slice(2, 6)}`;
+  try {
+    // 1. upload files (once, shared by every account)
+    const uploads = C.media.filter(m => !m.url);
+    const bar = $("cProgress"), fill = bar.firstElementChild;
+    for (let i = 0; i < uploads.length; i++) {
+      const m = uploads[i], ext = m.isVideo ? (/\.mov$/i.test(m.name) || m.file.type === "video/quicktime" ? "mov" : "mp4") : "jpg";
+      const path = `media/${t.date.slice(0, 7)}/${base.replace(/[^\w-]/g, "")}-${C.media.indexOf(m) + 1}-${Date.now().toString(36)}.${ext}`;
+      status.textContent = `Uploading ${i + 1} of ${uploads.length}…`; bar.hidden = false; fill.style.width = "0%";
+      m.url = await uploadMedia(m.blob || m.file, path, p => fill.style.width = `${Math.round(p * 100)}%`);
+      if (m.isVideo && m.posterBlob) {
+        try { await uploadMedia(m.posterBlob, path.replace(VIDEO_RE, ".poster.jpg"), () => {}); } catch (_) {}
+      }
+    }
+    bar.hidden = true;
+    // 2. save the schedule
+    status.textContent = "Saving…";
+    const values = {publish_at: `${t.date} ${t.time}`, type: C.type, media: C.media.map(m => m.url).join("|"),
+      caption: C.type === "story" ? "" : C.caption, first_comment: C.type === "story" ? "" : C.comment.trim()};
+    const accts = [...C.accounts];
+    const newRows = accts.map(a => ({...values, account: a, id: C.editId || `${a}-${base}`}));
+    await savePosts((body, h) => {
+      const toRow = v => h.map(k => v[k] ?? "");
+      if (C.editId) return body.map(r => (r[0] || "").trim() === C.editId ? toRow(newRows[0]) : r);
+      return [...body, ...newRows.map(toRow)];
+    }, `Instagram: ${C.editId ? "update" : "schedule"} ${newRows.map(r => r.id).join(", ")}`);
+    let note = C.editId ? "Changes saved." : `Scheduled for ${fmtWhen(when)}${accts.length > 1 ? ` on ${accts.length} accounts` : ""}.`;
+    if (C.now) {
+      try { await triggerRun(); note = "Publishing now. It shows as Posted in a minute or two."; }
+      catch (_) { note = "Saved. It goes out on the next check; use Publish due now to send it sooner."; }
+    }
+    cursor = t.date;
+    closeModal("composer"); render(); toast(note);
+  } catch (e) {
+    status.className = "status err"; status.textContent = e.message;
+    $("cProgress").hidden = true;
+  } finally { btn.disabled = false; }
+}
+
+/* ---------- details ---------- */
+let D = null;
+function openDetails(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  D = p; previewSlide = 0;
+  $("dTitle").textContent = `${TYPE_LABEL[p.type] || p.type} on @${acctUser(p.account)}`;
+  const st = STATUS[p.status];
+  $("dInfo").innerHTML = `
+    <div><div class="k">Status</div><span class="pill ${st.cls}">${st.label}</span></div>
+    ${p.error ? `<div class="err-box">${esc(p.error)}</div>` : ""}
+    <div><div class="k">${p.pub ? "Posted" : "Scheduled for"}</div>${esc(p.pub ? fmtWhen(new Date(p.pub.published_at)) : p.when ? fmtWhen(p.when) : p.publish_at)}</div>
+    <div><div class="k">Account</div><span style="display:inline-flex;gap:6px;align-items:center">${avatar(p.account)}@${esc(acctUser(p.account))}</span></div>
+    ${p.caption ? `<div><div class="k">Caption</div><div style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(p.caption)}</div></div>` : ""}
+    ${p.first_comment ? `<div><div class="k">First comment</div>${esc(p.first_comment)}</div>` : ""}
+    ${p.pub && p.pub.permalink ? `<div><a href="${esc(p.pub.permalink)}" target="_blank" rel="noopener" style="color:var(--info)">Open on Instagram ↗</a></div>` : ""}`;
+  drawDetailPreview();
+  const live = !p.pub;
+  $("dActions").innerHTML = `
+    ${live ? `<button class="danger" data-act="delete">Delete</button>` : ""}
+    <span style="margin-right:auto"></span>
+    <button data-act="duplicate">Duplicate</button>
+    ${live ? `<button data-act="edit">Edit</button><button class="primary" data-act="now">${icon("bolt")}Post now</button>` : ""}`;
+  $("details").hidden = false; document.body.style.overflow = "hidden";
+}
+function drawDetailPreview() {
+  const p = D;
+  $("dPreview").innerHTML = previewHTML({account: p.account, type: p.type, caption: p.caption, comment: p.first_comment,
+    media: p.media.map(u => ({src: u, isVideo: isVideoUrl(u), poster: isVideoUrl(u) ? u.replace(VIDEO_RE, ".poster.jpg") : ""}))}, previewSlide);
+}
+function composerFrom(p, copy) {
+  const c = newComposer();
+  Object.assign(c, {editId: copy ? null : p.id, accounts: new Set([p.account]), type: p.type, typeTouched: true,
+    media: p.media.map(u => ({src: u, url: u, isVideo: isVideoUrl(u), poster: isVideoUrl(u) ? u.replace(VIDEO_RE, ".poster.jpg") : ""})),
+    caption: p.caption, comment: p.first_comment});
+  if (!copy && p.when && p.when > new Date()) { const t = ist(p.when); c.date = t.date; c.time = t.time; }
+  return c;
+}
+async function detailAction(act) {
+  const p = D;
+  if (act === "edit" || act === "duplicate") { closeModal("details"); openComposer(composerFrom(p, act === "duplicate")); return; }
+  if (act === "delete") {
+    if (!confirm("Delete this post from the schedule?")) return;
+    try { await savePosts(body => body.filter(r => (r[0] || "").trim() !== p.id), `Instagram: remove ${p.id}`); closeModal("details"); render(); toast("Deleted."); }
+    catch (e) { toast("Couldn't delete: " + e.message); }
+  }
+  if (act === "now") {
+    const t = ist(new Date());
+    // a post that failed before gets a fresh set of tries under a new id
+    const nid = state.failed[p.id] ? `${p.id.replace(/-r\w{4}$/, "")}-r${Date.now().toString(36).slice(-4)}` : p.id;
+    try {
+      await savePosts((body, h) => body.map(r => (r[0] || "").trim() !== p.id ? r
+        : h.map((k, i) => k === "publish_at" ? `${t.date} ${t.time}` : k === "id" ? nid : r[i])), `Instagram: post ${nid} now`);
+      await triggerRun().catch(() => {});
+      closeModal("details"); render(); toast("Publishing now. It shows as Posted in a minute or two.");
+    } catch (e) { toast("Couldn't start it: " + e.message); }
+  }
+}
+
+/* ---------- misc ---------- */
+let toastTimer;
+function toast(text) {
+  const t = $("toast"); t.textContent = text; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 4500);
+}
+async function refresh() { try { await loadAll(); render(); } catch (_) {} }
+
+/* ---------- events ---------- */
+document.addEventListener("click", e => {
+  const el = e.target.closest("button,[data-day]");
+  if (!el) return;
+  const d = el.dataset;
+  if (d.close !== undefined) return closeModal(el.closest(".scrim").id);
+  if (d.open) return openDetails(d.open);
+  if (d.new !== undefined) return openComposer(newComposer(d.new || null));
+  if (d.dayjump) { cursor = d.dayjump; prefs.view = "list"; savePrefs(); render(); const x = $("d-" + d.dayjump); x && x.scrollIntoView({block: "start"}); return; }
+  if (d.view) { prefs.view = d.view; savePrefs(); return render(); }
+  if (d.acct !== undefined) {
+    const s = new Set(prefs.accounts || []);
+    if (!d.acct) s.clear(); else s.has(d.acct) ? s.delete(d.acct) : s.add(d.acct);
+    prefs.accounts = [...s]; savePrefs(); return render();
+  }
+  if (d.slide) {
+    const n = C && !$("composer").hidden ? C.media.length : D ? D.media.length : 1;
+    previewSlide = (previewSlide + +d.slide + n) % n;
+    return C && !$("composer").hidden ? drawPreview() : drawDetailPreview();
+  }
+  if (d.act) return detailAction(d.act);
+  if (!C) return;
+  if (d.cacct) { C.accounts.has(d.cacct) ? C.accounts.delete(d.cacct) : C.accounts.add(d.cacct); return drawComposer(); }
+  if (d.type) { C.type = d.type; C.typeTouched = true; return drawComposer(); }
+  if (d.rm !== undefined) { const [m] = C.media.splice(+d.rm, 1); if (m.file) URL.revokeObjectURL(m.src); previewSlide = 0; autoType(); return drawComposer(); }
+  if (d.mv) { const [i, s] = d.mv.split(":").map(Number); const [m] = C.media.splice(i, 1); C.media.splice(i + s, 0, m); return drawComposer(); }
+  if (d.quick) {
+    if (d.quick === "now") C.now = !C.now;
+    else { C.now = false; [C.date, C.time] = d.quick.split(" "); $("cDate").value = C.date; $("cTime").value = C.time; }
+    return drawComposer();
+  }
+});
+// a click on a day's empty space opens the composer for that day
+$("view").addEventListener("click", e => {
+  const day = e.target.closest(".day");
+  if (day && !e.target.closest("button") && day.dataset.day >= todayStr()) openComposer(newComposer(day.dataset.day));
+});
+$("newPost").addEventListener("click", () => openComposer(newComposer(null)));
+$("prev").addEventListener("click", () => { cursor = prefs.view === "week" ? dayAdd(cursor, -7) : dayAdd(cursor.slice(0, 8) + "01", -1); render(); });
+$("next").addEventListener("click", () => { cursor = prefs.view === "week" ? dayAdd(cursor, 7) : dayAdd(cursor.slice(0, 8) + "28", 5); render(); });
+$("today").addEventListener("click", () => { cursor = todayStr(); render(); });
+$("runNow").addEventListener("click", async () => {
+  const b = $("runNow"); b.disabled = true;
+  try { await triggerRun(); toast("Started. Due posts go out within a minute or two."); setTimeout(refresh, 90e3); }
+  catch (e) { toast("Couldn't start it: " + e.message); }
+  setTimeout(() => b.disabled = false, 30e3);
+});
+$("signOut").addEventListener("click", () => { try { localStorage.removeItem(AUTH_KEY); } catch (_) {} location.reload(); });
+$("cFile").addEventListener("change", e => { addFiles([...e.target.files]); e.target.value = ""; });
+const drop = $("cDrop");
+["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => addFiles([...e.dataTransfer.files]));
+$("cLinkAdd").addEventListener("click", addLink);
+$("cLink").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addLink(); } });
+$("cCaption").addEventListener("input", e => { C.caption = e.target.value; drawComposer(); });
+$("cComment").addEventListener("input", e => { C.comment = e.target.value; drawPreview(); });
+$("cDate").addEventListener("change", e => { C.date = e.target.value; drawComposer(); });
+$("cTime").addEventListener("change", e => { C.time = e.target.value; drawComposer(); });
+$("cSave").addEventListener("click", saveComposer);
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!$("composer").hidden) closeModal("composer"); else if (!$("details").hidden) closeModal("details");
+});
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !$("app").hidden && $("composer").hidden) refresh(); });
+
+/* ---------- start ---------- */
+async function start() {
+  if (!token) { $("signin").hidden = false; return; }
+  try {
+    await loadAll();
+  } catch (e) {
+    if (e.status === 401 || e.status === 403 || e.status === 404) {
+      try { localStorage.removeItem(AUTH_KEY); } catch (_) {}
+      token = ""; $("signin").hidden = false;
+      $("signinMsg").innerHTML = `<div class="msg err">That token can't open the schedule. Create a new one with the repo box ticked.</div>`;
+      return;
+    }
+    $("signin").hidden = false;
+    $("signinMsg").innerHTML = `<div class="msg err">Couldn't load your posts: ${esc(e.message)}</div>`;
+    return;
+  }
+  gh("user").then(u => $("whoText").textContent = `Signed in as ${u.login}`).catch(() => {});
+  $("app").hidden = false;
+  render();
+  setInterval(refresh, 5 * 60e3);
+}
+$("signInBtn").addEventListener("click", async () => {
+  const t = $("tokenIn").value.trim();
+  if (!t) return;
+  token = t;
+  try {
+    const repo = await gh(repoPath(GH.repo, ""));
+    if (!repo.permissions || !repo.permissions.push) throw new Error("This token can read but not save. Tick the repo box when you create it.");
+    try { localStorage.setItem(AUTH_KEY, t); } catch (_) {}
+    $("signin").hidden = true; $("signinMsg").innerHTML = "";
+    start();
+  } catch (e) {
+    token = "";
+    $("signinMsg").innerHTML = `<div class="msg err">${esc(e.status === 401 ? "GitHub didn't accept that token." : e.message)}</div>`;
+  }
+});
+start();
+</script>
+</body>
+</html>
