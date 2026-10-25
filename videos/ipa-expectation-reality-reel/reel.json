@@ -1,0 +1,100 @@
+{
+  "hook": {
+    "small": "CA coaching",
+    "big": "expectation|vs reality",
+    "shot": {
+      "src": "V1_C0381",
+      "at": 6.0,
+      "len": 1.5
+    }
+  },
+  "pairs": [
+    {
+      "exp": "CA prep =|no life|outside books.",
+      "real": "sunday 8 am.|turf.",
+      "shots": [
+        {
+          "src": "A_20260823_091748",
+          "at": 1.4,
+          "len": 1.25,
+          "speed": 0.5
+        },
+        {
+          "src": "A_20260823_090525",
+          "at": 0.0,
+          "len": 1.25
+        }
+      ]
+    },
+    {
+      "exp": "teacher talks.|you just listen.",
+      "real": "you take|the board.",
+      "shots": [
+        {
+          "src": "V1_C0387",
+          "at": 3.0,
+          "len": 1.25
+        },
+        {
+          "src": "V1_C0395",
+          "at": 4.0,
+          "len": 1.25
+        }
+      ]
+    },
+    {
+      "exp": "study alone.|compete alone.",
+      "real": "teams. points.|bragging rights.",
+      "shots": [
+        {
+          "src": "V1_C0379",
+          "at": 4.0,
+          "len": 1.25
+        },
+        {
+          "src": "V1_C0388",
+          "at": 6.0,
+          "len": 1.25
+        }
+      ]
+    },
+    {
+      "exp": "tests =|just marks.",
+      "real": "every chapter test|comes with|its solution.",
+      "shots": [
+        {
+          "src": "A_C0135",
+          "at": 1.0,
+          "len": 1.25
+        },
+        {
+          "src": "S_screen4",
+          "at": 0.0,
+          "len": 1.5
+        }
+      ]
+    },
+    {
+      "exp": "no time|for friends.",
+      "real": "breakfast|with the batch.",
+      "shots": [
+        {
+          "src": "A_20260823_094014",
+          "at": 0.5,
+          "len": 2.5
+        }
+      ]
+    }
+  ],
+  "end": {
+    "small": "reality hits different at",
+    "big": "IPA INSTITUTE",
+    "place": "AJMER",
+    "cta": "tag someone who needs this reality",
+    "shot": {
+      "src": "A_C0144",
+      "at": 3.0,
+      "len": 3.5
+    }
+  }
+}
