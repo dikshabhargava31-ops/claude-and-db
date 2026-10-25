@@ -18,16 +18,22 @@ on:
 permissions:
   contents: write
 
+# One publishing run at a time; a test run (verify, probe, dry-run) never waits behind it.
 concurrency:
-  group: instagram-scheduler
+  group: instagram-${{ inputs.mode || 'publish' }}
   cancel-in-progress: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set the commit author
+        run: |
+          git config user.name "instagram-scheduler"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Publish due posts
         env:
@@ -39,15 +45,13 @@ jobs:
             verify) python3 instagram/ig_scheduler.py verify ;;
             probe) python3 instagram/ig_scheduler.py probe "$PROBE_URL" ;;
             dry-run) python3 instagram/ig_scheduler.py run --dry-run ;;
-            *) python3 instagram/ig_scheduler.py run ;;
+            *) python3 instagram/ig_scheduler.py run --watch-hours 5.5 --sync ;;
           esac
 
       - name: Save what was published
         if: always()
         run: |
           git diff --quiet instagram/published.json && exit 0
-          git config user.name "instagram-scheduler"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add instagram/published.json
           git commit -m "Instagram: record published posts"
           for i in 1 2 3; do git pull --rebase && git push && exit 0; sleep 5; done

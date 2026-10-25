@@ -280,7 +280,7 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
   <main id="app" hidden>
     <div class="top">
       <h1>Instagram Planner</h1>
-      <button id="runNow" title="Publish every post that is due right now, instead of waiting for the next automatic check"><svg class="i"><use href="#i-bolt"/></svg>Publish due now</button>
+      <button id="runNow" title="Publish every post that is already due, straight away"><svg class="i"><use href="#i-bolt"/></svg>Publish due now</button>
       <button class="primary" id="newPost"><svg class="i"><use href="#i-plus"/></svg>Create post</button>
     </div>
     <div id="alert"></div>
@@ -307,7 +307,7 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
       <span class="s-posted"><i class="dot"></i>Posted</span>
       <span class="s-problem"><i class="dot"></i>Needs attention</span>
     </div>
-    <p class="hint" style="margin-top:14px">Times are India time. Posts go out automatically; GitHub can start its check late, so use <b>Publish due now</b> when a post must go out on the minute.</p>
+    <p class="hint" style="margin-top:14px">Times are India time. Posts go out on time automatically; <b>Publish due now</b> sends anything already due straight away.</p>
   </main>
 </div>
 
@@ -927,9 +927,13 @@ async function saveComposer() {
       return [...body, ...newRows.map(toRow)];
     }, `Instagram: ${C.editId ? "update" : "schedule"} ${newRows.map(r => r.id).join(", ")}`);
     let note = C.editId ? "Changes saved." : `Scheduled for ${fmtWhen(when)}${accts.length > 1 ? ` on ${accts.length} accounts` : ""}.`;
-    if (C.now) {
-      try { await triggerRun(); note = "Publishing now. It shows as Posted in a minute or two."; }
-      catch (_) { note = "Saved. It goes out on the next check; use Publish due now to send it sooner."; }
+    // Start a run either way: it posts what's due and, for a post within the next few hours,
+    // stays up to publish it on time instead of relying on GitHub's late scheduled runs.
+    try {
+      await triggerRun();
+      if (C.now) note = "Publishing now. It shows as Posted within a few minutes.";
+    } catch (_) {
+      if (C.now) note = "Saved. It goes out on the next check; use Publish due now to send it sooner.";
     }
     cursor = t.date;
     closeModal("composer"); render(); toast(note);
@@ -1049,7 +1053,7 @@ $("next").addEventListener("click", () => { cursor = prefs.view === "week" ? day
 $("today").addEventListener("click", () => { cursor = todayStr(); render(); });
 $("runNow").addEventListener("click", async () => {
   const b = $("runNow"); b.disabled = true;
-  try { await triggerRun(); toast("Started. Due posts go out within a minute or two."); setTimeout(refresh, 90e3); }
+  try { await triggerRun(); toast("Started. Due posts go out within a few minutes."); setTimeout(refresh, 90e3); }
   catch (e) { toast("Couldn't start it: " + e.message); }
   setTimeout(() => b.disabled = false, 30e3);
 });

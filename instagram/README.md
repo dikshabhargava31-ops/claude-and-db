@@ -3,7 +3,7 @@
 This tool posts to any number of Instagram accounts on a schedule, for free. You list your posts in `posts.csv`. Every 15 minutes, GitHub Actions publishes the ones that are due through Instagram's official API, then records them in `published.json` so nothing is posted twice.
 
 - **Post types:** single photos, carousels (2–10 photos or videos), Reels and Stories, each with an optional first comment.
-- **Timing:** GitHub starts scheduled runs late when it is busy, sometimes by up to 2 hours. The scheduling page's *Publish due posts now* button posts straight away.
+- **Timing:** GitHub often starts scheduled runs hours late, so a run doesn't just post what's due. While a post is coming up in the next 5½ hours, the run stays open, re-reads the schedule every 2 minutes and publishes each post on time. The planner also starts a run whenever you save a post. Waiting uses free Actions minutes, because this repository is public.
 - **Safety:** a post that fails is retried in each of the next 2 runs, then left alone. A post more than 12 hours late is skipped, so an old date typed by mistake never posts.
 
 ## 1. Set up each Instagram account (once)
@@ -42,7 +42,7 @@ The easiest way is the **Instagram Planner**: https://dikshabhargava31-ops.githu
 - **Calendar:** month, week and list views of every post, colour-coded by account and status. Filter by account, and click a post to see its preview, edit it, duplicate it, delete it or post it now. Posts that failed are flagged at the top with Instagram's reason.
 - **Create post:** pick one or more accounts. Drop in JPG, PNG or MP4 files; PNGs become JPGs and large photos are scaled to 1440 px. The type (photo, carousel, reel or story) follows from the files, and you can change it. A live Instagram-style preview sits beside the form. Instagram's limits (photo shape, reel length, caption length, 30 hashtags) are checked before anything is saved.
 - **Files:** the page uploads them to the public repository [`instagram-media`](https://github.com/dikshabhargava31-ops/instagram-media), because Instagram only downloads media from a public link. Large media never goes into this repository.
-- **Publish due now:** runs the scheduler straight away, instead of waiting for GitHub's next check.
+- **Publish due now:** publishes anything already due straight away.
 - **Signing in:** the page uses a [classic token](https://github.com/settings/tokens/new?scopes=repo&description=Instagram%20Planner) with the `repo` box ticked. It's kept only in that browser. If you're already signed in to the IPA Priority Board in the same browser, the page reuses that sign-in.
 - **Accounts:** the account list comes from `accounts.json` (short name → Instagram username, no tokens). When you add an account to `IG_ACCOUNTS`, add it there too.
 
@@ -76,5 +76,5 @@ Instagram downloads each file from its link, so the link has to open the file it
 
 ## Good to know
 
-- **The schedule is public.** This repository is public, so anyone can read upcoming captions in `posts.csv`. To keep them private, copy `instagram/` and the two `.github/workflows/instagram-*.yml` files into a private repository. Private repositories get 2,000 free Actions minutes a month, so change the cron in `instagram-scheduler.yml` to `*/30 * * * *` there.
+- **The schedule is public.** This repository is public, so anyone can read upcoming captions in `posts.csv`. To keep them private, copy `instagram/` and the two `.github/workflows/instagram-*.yml` files into a private repository. Private repositories get only 2,000 free Actions minutes a month, and a waiting run uses them, so there lower `--watch-hours` in `instagram-scheduler.yml` (for example to 0.5) and change the cron to `*/30 * * * *`.
 - **Scheduled runs can switch off.** GitHub turns off scheduled workflows in a public repository after 60 days without commits. Each published post makes a commit. If nothing is posted for two months, re-enable the workflow from the Actions tab.

@@ -6,6 +6,7 @@ Commands:
   verify           log in to each account and show its posting quota (posts nothing)
   probe            have Instagram fetch and process a media link without publishing it
   run [--dry-run]  publish every post that is due and not yet published
+                   (--watch-hours keeps it running to publish upcoming posts on time)
   refresh-tokens   renew each account's 60-day token (writes the new accounts JSON to --out)
 
 Accounts come from the IG_ACCOUNTS environment variable (a JSON object) or --accounts <file>:
@@ -20,6 +21,7 @@ import argparse
 import csv
 import json
 import os
+import subprocess
 import sys
 import time
 import urllib.error
@@ -36,6 +38,9 @@ STATE_FILE = HERE / "published.json"
 GRAPH_VERSION = os.environ.get("IG_GRAPH_VERSION", "v23.0")
 DEFAULT_TZ = os.environ.get("IG_TIMEZONE", "Asia/Kolkata")
 MAX_ATTEMPTS = 3
+RETRY_GAP = timedelta(minutes=10)
+WATCH_POLL = timedelta(minutes=2)
+REPORTED_SKIPS = set()
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v"}
 TYPES = {"post", "carousel", "reel", "story"}
 COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment"]
@@ -255,32 +260,24 @@ def cmd_check(args):
     return 1 if problems else 0
 
 
-def cmd_run(args):
-    accounts = load_accounts(args.accounts)
-    posts, problems = load_posts(args.timezone)
-    if not accounts and not args.dry_run:
-        if not posts:
-            print("No accounts or posts yet. Add the IG_ACCOUNTS secret (see instagram/README.md).")
-            return 0
-        raise SystemExit("No accounts configured. Set the IG_ACCOUNTS secret (see instagram/README.md).")
-    for problem in problems:
-        print(f"PROBLEM  {problem}")
-    state = load_state()
+def publish_due(accounts, posts, state, args):
+    """Publish every post that is due now. Returns the number of failures."""
     now = datetime.now(timezone.utc)
     late_limit = timedelta(hours=args.max_late_hours)
     failures = 0
-
     for post in sorted(posts, key=lambda p: p["when"]):
         post_id = post["id"]
         if post_id in state["published"] or post["when"] > now:
             continue
         fail = state["failed"].get(post_id, {"attempts": 0})
-        if fail["attempts"] >= MAX_ATTEMPTS:
+        if fail["attempts"] >= MAX_ATTEMPTS or now < retry_time(fail):
             continue
         label = f"{post['account']} {post['type']} {post_id}"
         if now - post["when"] > late_limit:
-            print(f"SKIP     {label}: more than {args.max_late_hours}h past its time. "
-                  f"Give it a new publish_at to post it.")
+            if post_id not in REPORTED_SKIPS:
+                REPORTED_SKIPS.add(post_id)
+                print(f"SKIP     {label}: more than {args.max_late_hours}h past its time. "
+                      f"Give it a new publish_at to post it.")
             continue
         if post["account"] not in accounts:
             if not args.dry_run:
@@ -295,7 +292,8 @@ def cmd_run(args):
         try:
             result = publish(Graph(accounts[post["account"]]), post)
         except PostError as e:
-            fail = {"attempts": fail["attempts"] + 1, "error": str(e), "last_try": now.isoformat(timespec="minutes")}
+            fail = {"attempts": fail["attempts"] + 1, "error": str(e),
+                    "last_try": datetime.now(timezone.utc).isoformat(timespec="minutes")}
             state["failed"][post_id] = fail
             save_state(state)
             print(f"ERROR    {label} (try {fail['attempts']}/{MAX_ATTEMPTS}): {e}")
@@ -312,6 +310,82 @@ def cmd_run(args):
         print(f"POSTED   {label} {result.get('permalink', result['media_id'])}")
         if "comment_error" in result:
             print(f"WARNING  first comment failed: {result['comment_error']}")
+    return failures
+
+
+def retry_time(fail):
+    """A failed post is tried again RETRY_GAP after its last try."""
+    if not fail.get("last_try"):
+        return datetime.min.replace(tzinfo=timezone.utc)
+    return datetime.fromisoformat(fail["last_try"]) + RETRY_GAP
+
+
+def next_due(posts, state):
+    """When the next unpublished post (or retry) falls due in the future, or None."""
+    now = datetime.now(timezone.utc)
+    times = []
+    for post in posts:
+        if post["id"] in state["published"]:
+            continue
+        fail = state["failed"].get(post["id"], {"attempts": 0})
+        if fail["attempts"] >= MAX_ATTEMPTS:
+            continue
+        due = max(post["when"], retry_time(fail))
+        if due > now:
+            times.append(due)
+    return min(times, default=None)
+
+
+def git(*cmd):
+    return subprocess.run(["git", *cmd], cwd=HERE, capture_output=True, text=True)
+
+
+def git_sync():
+    """Commit published.json if it changed, then pull the latest schedule and push."""
+    if git("diff", "--quiet", "--", STATE_FILE.name).returncode:
+        git("add", STATE_FILE.name)
+        git("commit", "-qm", "Instagram: record published posts")
+    for _ in range(3):
+        if git("pull", "-q", "--rebase").returncode == 0:
+            ahead = git("rev-list", "--count", "@{u}..HEAD").stdout.strip()
+            if ahead == "0" or git("push", "-q").returncode == 0:
+                return
+        time.sleep(5)
+    print("WARNING  couldn't sync with GitHub; will try again")
+
+
+def cmd_run(args):
+    accounts = load_accounts(args.accounts)
+    posts, problems = load_posts(args.timezone)
+    if not accounts and not args.dry_run:
+        if not posts:
+            print("No accounts or posts yet. Add the IG_ACCOUNTS secret (see instagram/README.md).")
+            return 0
+        raise SystemExit("No accounts configured. Set the IG_ACCOUNTS secret (see instagram/README.md).")
+    for problem in problems:
+        print(f"PROBLEM  {problem}")
+
+    # GitHub often starts scheduled runs hours late, so with --watch-hours a run stays up while a
+    # post is coming and publishes it on time, re-reading the schedule for new posts as it waits.
+    deadline = datetime.now(timezone.utc) + timedelta(hours=args.watch_hours)
+    failures = 0
+    while True:
+        state = load_state()
+        failures += publish_due(accounts, posts, state, args)
+        if args.sync:
+            git_sync()
+        if args.dry_run or not args.watch_hours:
+            break
+        upcoming = next_due(posts, load_state())
+        now = datetime.now(timezone.utc)
+        if upcoming is None or upcoming > deadline:
+            print("DONE     nothing else due before this run ends" if upcoming else "DONE     nothing else scheduled")
+            break
+        wait = max(5, min(WATCH_POLL.total_seconds(), (upcoming - now).total_seconds()))
+        print(f"WAITING  next post at {upcoming.astimezone(ZoneInfo(args.timezone)):%d %b %H:%M}; "
+              f"checking again in {wait / 60:.0f} min" if wait >= 60 else f"checking again in {wait:.0f} s")
+        time.sleep(wait)
+        posts, _ = load_posts(args.timezone)
     return 1 if failures else 0
 
 
@@ -398,6 +472,10 @@ def main():
     run = sub.add_parser("run")
     run.add_argument("--dry-run", action="store_true", help="show what would be posted without posting")
     run.add_argument("--max-late-hours", type=float, default=12, help="skip posts more than this many hours late (default 12)")
+    run.add_argument("--watch-hours", type=float, default=0,
+                     help="keep running this long while posts are coming up, publishing each on time")
+    run.add_argument("--sync", action="store_true",
+                     help="commit published.json and pull the latest schedule after each round (used by the workflow)")
     refresh = sub.add_parser("refresh-tokens")
     refresh.add_argument("--out", required=True, help="file to write the renewed accounts JSON to")
     args = parser.parse_args()
