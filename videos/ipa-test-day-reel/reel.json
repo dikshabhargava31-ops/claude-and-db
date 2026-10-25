@@ -1,0 +1,27 @@
+{
+  "hook": {"small": "no shortcuts. it's", "big": "test|day.", "len": 2},
+  "hook_size": 200,
+  "shots": [
+    {"src": "A_C0138", "at": 3.0, "len": 2.0},
+    {"src": "A_C0134", "at": 0.5, "len": 1.0},
+    {"src": "A_C0135", "at": 1.0, "len": 1.0},
+    {"src": "A_C0139", "at": 2.0, "len": 1.0},
+    {"src": "A_C0142", "at": 2.0, "len": 1.0},
+    {"src": "A_C0140", "at": 1.0, "len": 1.0},
+    {"src": "A_C0137", "at": 1.5, "len": 1.0},
+    {"src": "A_C0147", "at": 1.0, "len": 1.0},
+    {"src": "A_C0149", "at": 13.0, "len": 1.0},
+    {"src": "A_C0145", "at": 10.5, "len": 2.0},
+    {"src": "A_C0144", "at": 3.5, "len": 1.0},
+    {"src": "A_C0146", "at": 15.0, "len": 3.0}
+  ],
+  "captions": [
+    {"at": 2.0, "len": 2.0, "small": "read twice.", "big": "write once."},
+    {"at": 4.0, "len": 2.0, "small": "stuck?", "big": "think."},
+    {"at": 6.0, "len": 2.0, "small": "every mark", "big": "matters."},
+    {"at": 8.0, "len": 2.0, "small": "pens down.", "big": "submit."},
+    {"at": 10.0, "len": 2.0, "small": "then we break it", "big": "down."},
+    {"at": 12.0, "len": 1.0, "small": "next time:", "big": "better."}
+  ],
+  "end": {"at": 13.0, "small": "every test, a step closer.", "big": "IPA INSTITUTE", "place": "AJMER"}
+}

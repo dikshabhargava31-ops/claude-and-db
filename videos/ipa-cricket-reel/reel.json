@@ -1,0 +1,101 @@
+{
+  "hook": {
+    "small": "they said toppers",
+    "big": "don't|play.",
+    "len": 2
+  },
+  "hook_size": 170,
+  "shots": [
+    {
+      "src": "A_20260823_075243",
+      "at": 0.0,
+      "len": 2.0
+    },
+    {
+      "src": "A_20260823_081143",
+      "at": 0.1,
+      "len": 1.0
+    },
+    {
+      "src": "A_20260823_091748",
+      "at": 1.4,
+      "len": 1.5,
+      "speed": 0.5
+    },
+    {
+      "src": "A_20260823_090525",
+      "at": 0.0,
+      "len": 1.5
+    },
+    {
+      "src": "A_20260823_092338",
+      "at": 0.4,
+      "len": 1.5,
+      "speed": 0.5
+    },
+    {
+      "src": "A_20260823_092338",
+      "at": 1.6,
+      "len": 1.5
+    },
+    {
+      "src": "A_20260823_081001",
+      "at": 0.2,
+      "len": 1.0
+    },
+    {
+      "src": "A_20260823_085931",
+      "at": 1.0,
+      "len": 1.0
+    },
+    {
+      "src": "A_20260823_094014",
+      "at": 0.5,
+      "len": 5.0
+    }
+  ],
+  "captions": [
+    {
+      "at": 2.0,
+      "len": 1.0,
+      "small": "sunday.",
+      "big": "bowl."
+    },
+    {
+      "at": 3.0,
+      "len": 1.5,
+      "small": "eyes on the ball.",
+      "big": "swing."
+    },
+    {
+      "at": 4.5,
+      "len": 1.5,
+      "small": "don't think,",
+      "big": "run!"
+    },
+    {
+      "at": 6.0,
+      "len": 3.0,
+      "small": "one more over.",
+      "big": "again."
+    },
+    {
+      "at": 9.0,
+      "len": 2.0,
+      "small": "game face on.",
+      "big": "team ipa."
+    },
+    {
+      "at": 11.0,
+      "len": 2.0,
+      "small": "and after the match,",
+      "big": "together."
+    }
+  ],
+  "end": {
+    "at": 13.0,
+    "small": "study hard. play harder.",
+    "big": "IPA INSTITUTE",
+    "place": "AJMER"
+  }
+}

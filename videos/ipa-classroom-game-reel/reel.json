@@ -1,0 +1,28 @@
+{
+  "hook": {"small": "this is not a normal", "big": "class.", "len": 2},
+  "hook_size": 220,
+  "shots": [
+    {"src": "V1_C0381", "at": 6.0, "len": 2.0},
+    {"src": "V1_C0374", "at": 0.0, "len": 1.0},
+    {"src": "V1_C0379", "at": 4.0, "len": 1.0},
+    {"src": "V1_C0407", "at": 3.0, "len": 1.0},
+    {"src": "V1_C0419", "at": 6.0, "len": 1.0},
+    {"src": "V1_C0387", "at": 3.0, "len": 1.0},
+    {"src": "V1_C0395", "at": 4.0, "len": 1.0},
+    {"src": "V1_C0371", "at": 9.0, "len": 1.0},
+    {"src": "V1_C0411", "at": 2.0, "len": 1.0},
+    {"src": "V1_C0400", "at": 3.0, "len": 1.0},
+    {"src": "V1_C0401", "at": 7.0, "len": 1.0},
+    {"src": "V1_C0388", "at": 6.0, "len": 1.0},
+    {"src": "V1_C0381", "at": 14.0, "len": 3.0}
+  ],
+  "captions": [
+    {"at": 2.0, "len": 2.0, "small": "split into", "big": "teams."},
+    {"at": 4.0, "len": 2.0, "small": "solve it", "big": "together."},
+    {"at": 6.0, "len": 2.0, "small": "then,", "big": "speak up."},
+    {"at": 8.0, "len": 2.0, "small": "defend your", "big": "answer."},
+    {"at": 10.0, "len": 2.0, "small": "the whole room", "big": "reacts."},
+    {"at": 12.0, "len": 1.0, "small": "on the", "big": "board."}
+  ],
+  "end": {"at": 13.0, "small": "learn it. say it. own it.", "big": "IPA INSTITUTE", "place": "AJMER"}
+}

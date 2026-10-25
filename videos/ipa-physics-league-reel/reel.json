@@ -1,0 +1,108 @@
+{
+  "hook": {
+    "small": "class 10 physics,",
+    "big": "the league|is on.",
+    "len": 2.5
+  },
+  "hook_size": 122,
+  "shots": [
+    {
+      "src": "A_C0070",
+      "at": 0.5,
+      "len": 2.5
+    },
+    {
+      "src": "A_C0072",
+      "at": 9.5,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0086",
+      "at": 2.0,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0007",
+      "at": 1.0,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0064",
+      "at": 3.0,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0077",
+      "at": 2.0,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0003",
+      "at": 6.0,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0002",
+      "at": 4.5,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0080",
+      "at": 6.0,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0081",
+      "at": 1.0,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0088",
+      "at": 0.5,
+      "len": 1.0
+    },
+    {
+      "src": "A_C0089",
+      "at": 12.5,
+      "len": 3.0
+    }
+  ],
+  "captions": [
+    {
+      "at": 2.5,
+      "len": 2.0,
+      "small": "one booklet.",
+      "big": "every|numerical."
+    },
+    {
+      "at": 4.5,
+      "len": 2.0,
+      "small": "no shortcuts,",
+      "big": "just logic."
+    },
+    {
+      "at": 6.5,
+      "len": 2.0,
+      "small": "heads down.",
+      "big": "pens up."
+    },
+    {
+      "at": 8.5,
+      "len": 2.0,
+      "small": "a whole room,",
+      "big": "pure focus."
+    },
+    {
+      "at": 10.5,
+      "len": 2.0,
+      "small": "and every attempt",
+      "big": "counts."
+    }
+  ],
+  "end": {
+    "at": 12.5,
+    "small": "think like a physicist.",
+    "big": "IPA INSTITUTE",
+    "place": "AJMER"
+  }
+}
