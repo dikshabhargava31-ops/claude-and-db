@@ -36,4 +36,4 @@ Claude Code makes videos here with HyperFrames (skills in `.claude/skills/`). Ea
 
 ## Instagram scheduler
 
-`instagram/` posts to several Instagram accounts on a schedule for free. A GitHub Actions workflow publishes each post in `instagram/posts.csv` through Instagram's official API when it is due. `schedule/index.html` is a page for adding posts with a form (no build step), and it shows what's upcoming, posted and failed. Setup and the CSV format are in `instagram/README.md`.
+`instagram/` posts to several Instagram accounts on a schedule for free. A GitHub Actions workflow publishes each post in `instagram/posts.csv` through Instagram's official API when it is due. `schedule/index.html` is the **Instagram Planner** (no build step): a month, week and list calendar of every post, plus a composer with file upload and a live preview. Uploaded files go to the public repository `dikshabhargava31-ops/instagram-media`, so large media stays out of this one. Setup, the planner and the CSV format are in `instagram/README.md`.

@@ -32,6 +32,16 @@ Read `.claude/skills/hyperframes/references/types/vertical.md` before any short-
 | Podcast clips / repurposing long videos | `auto-editor` + `scenedetect` to find the moments, then the vertical recipe |
 | Stem-separated remixes, dialogue cleanup | `demucs` (needs `--full`, run on the person's own computer) |
 
+## Scheduling to Instagram
+
+Finished posts and reels can be scheduled on the person's Instagram accounts (`instagram/README.md`; account short names are in `instagram/accounts.json`). When they ask to schedule something:
+
+1. Attach `dikshabhargava31-ops/instagram-media` with push access, clone it, and run `python3 instagram/prepare_media.py --repo <clone> --type <post|carousel|reel|story> <files>`. It converts photos to JPEG, checks Instagram's limits and prints the `media` value. Commit and push the media repository.
+2. Add a row to `instagram/posts.csv` on `main`, because the scheduler reads only `main`. Use the id format `<account>-<YYYYMMDD-HHMM>-<4 chars>`, India time, and one row per account. Run `python3 instagram/ig_scheduler.py check` first.
+3. To post right away, run the *Instagram scheduler* workflow on `main` with mode `publish`.
+
+Never publish without the person's go-ahead on the account, time and caption. To test a file without posting, use mode `probe`.
+
 ## Cloud session limits
 
 The cloud environment's network policy blocks `huggingface.co` (Whisper/Parakeet transcription models) and `dl.fbaipublicfiles.com` (Demucs models). Until the person allows those hosts in the environment's Network access settings, run transcription and stem separation on their own computer, and say so rather than inventing transcripts.

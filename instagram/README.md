@@ -37,10 +37,16 @@ If a token expires anyway, generate a new one (step 1.4) and update `IG_ACCOUNTS
 
 ## 4. Schedule posts
 
-The easiest way is the scheduling page, `schedule/` on this site. Pick the account, type, date and time, paste the media links and caption, and click *Schedule*. The page adds the row to `posts.csv` for you and lists what is upcoming, posted or failed. *Publish due posts now* runs the scheduler straight away instead of waiting for GitHub's next check.
+The easiest way is the **Instagram Planner**: https://dikshabhargava31-ops.github.io/claude-and-db/schedule/
 
-- **Signing in:** the page uses a [classic token](https://github.com/settings/tokens/new?scopes=repo&description=Instagram%20Scheduler) with the `repo` box ticked. It's kept only in that browser. If you're already signed in to the IPA Priority Board in the same browser, the page reuses that sign-in.
+- **Calendar:** month, week and list views of every post, colour-coded by account and status. Filter by account, and click a post to see its preview, edit it, duplicate it, delete it or post it now. Posts that failed are flagged at the top with Instagram's reason.
+- **Create post:** pick one or more accounts. Drop in JPG, PNG or MP4 files; PNGs become JPGs and large photos are scaled to 1440 px. The type (photo, carousel, reel or story) follows from the files, and you can change it. A live Instagram-style preview sits beside the form. Instagram's limits (photo shape, reel length, caption length, 30 hashtags) are checked before anything is saved.
+- **Files:** the page uploads them to the public repository [`instagram-media`](https://github.com/dikshabhargava31-ops/instagram-media), because Instagram only downloads media from a public link. Large media never goes into this repository.
+- **Publish due now:** runs the scheduler straight away, instead of waiting for GitHub's next check.
+- **Signing in:** the page uses a [classic token](https://github.com/settings/tokens/new?scopes=repo&description=Instagram%20Planner) with the `repo` box ticked. It's kept only in that browser. If you're already signed in to the IPA Priority Board in the same browser, the page reuses that sign-in.
 - **Accounts:** the account list comes from `accounts.json` (short name → Instagram username, no tokens). When you add an account to `IG_ACCOUNTS`, add it there too.
+
+For files made in a Claude Code session, `prepare_media.py` does the same conversion and checks, then copies the files into a clone of `instagram-media`. `CLAUDE.md` has the steps.
 
 You can also add rows to `posts.csv` by hand, on github.com or in Excel or Google Sheets (save as CSV):
 
@@ -56,7 +62,7 @@ You can also add rows to `posts.csv` by hand, on github.com or in Excel or Googl
 
 ### Media files
 
-Instagram downloads each file from its link, so the link has to open the file itself, not a preview page. Google Drive and Dropbox share links don't work. Free hosts that give direct links include [Cloudinary](https://cloudinary.com) and [ImgBB](https://imgbb.com) (images only).
+Instagram downloads each file from its link, so the link has to open the file itself, not a preview page. The planner and `prepare_media.py` handle this by putting files in `instagram-media`. If you add a link by hand, note that Google Drive and Dropbox share links don't work.
 
 - **Images:** JPEG only. Use a 4:5 ratio (1080×1350) for the feed and 9:16 (1080×1920) for Stories.
 - **Reels:** MP4 or MOV, 9:16, 3 seconds to 15 minutes. Videos rendered in `videos/<name>/renders/` are already the right size.
@@ -65,8 +71,8 @@ Instagram downloads each file from its link, so the link has to open the file it
 ## Check and run
 
 - **Check the list:** the *Actions* tab shows every run and what it posted or why it failed. On your own computer, `python3 instagram/ig_scheduler.py check` validates `posts.csv` and lists what is queued.
-- **Run it now:** go to *Actions → Instagram scheduler → Run workflow*. Choose *dry-run* to only see what would be posted, or *verify* to check that every account's token works without posting anything.
-- **Retry a failed post:** on the scheduling page, delete it under *Problems* and schedule it again. By hand: fix it in `posts.csv`, delete its entry under `"failed"` in `published.json`, and give it a new `publish_at` if it is more than 12 hours late.
+- **Run it now:** go to *Actions → Instagram scheduler → Run workflow*. Choose *dry-run* to only see what would be posted, *verify* to check that every account's token works, or *probe* with a link to have Instagram fetch and process that file. Verify and probe never publish anything.
+- **Retry a failed post:** in the planner, open it and click *Post now* (it gets a fresh set of tries), or *Edit* it. By hand: fix it in `posts.csv`, delete its entry under `"failed"` in `published.json`, and give it a new `publish_at` if it is more than 12 hours late.
 
 ## Good to know
 
