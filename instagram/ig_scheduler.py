@@ -3,6 +3,7 @@
 
 Commands:
   check            validate posts.csv and list what is queued
+  verify           log in to each account and show its posting quota (posts nothing)
   run [--dry-run]  publish every post that is due and not yet published
   refresh-tokens   renew each account's 60-day token (writes the new accounts JSON to --out)
 
@@ -49,7 +50,10 @@ def load_accounts(path):
     raw = Path(path).read_text() if path else os.environ.get("IG_ACCOUNTS", "")
     if not raw.strip():
         return {}
-    accounts = json.loads(raw)
+    try:
+        accounts = json.loads(raw)
+    except ValueError as e:
+        raise SystemExit(f"IG_ACCOUNTS is not valid JSON ({e}). Check the quotes, commas and braces.")
     for name, acc in accounts.items():
         if not acc.get("user_id") or not acc.get("token"):
             raise SystemExit(f"Account '{name}' needs both user_id and token.")
@@ -310,6 +314,25 @@ def cmd_run(args):
     return 1 if failures else 0
 
 
+def cmd_verify(args):
+    accounts = load_accounts(args.accounts)
+    if not accounts:
+        raise SystemExit("No accounts configured. Set the IG_ACCOUNTS secret (see instagram/README.md).")
+    failed = 0
+    for name, acc in accounts.items():
+        graph = Graph(acc)
+        try:
+            username = graph.call("GET", graph.user_id, fields="username").get("username", "?")
+            limit = graph.call("GET", f"{graph.user_id}/content_publishing_limit", fields="quota_usage,config")
+            usage = (limit.get("data") or [{}])[0]
+            total = usage.get("config", {}).get("quota_total", 50)
+            print(f"OK       {name}: @{username}, {usage.get('quota_usage', 0)}/{total} posts used in the last 24h")
+        except PostError as e:
+            print(f"ERROR    {name}: {e}")
+            failed += 1
+    return 1 if failed else 0
+
+
 def cmd_refresh_tokens(args):
     accounts = load_accounts(args.accounts)
     if not accounts:
@@ -346,13 +369,14 @@ def main():
     parser.add_argument("--timezone", default=DEFAULT_TZ, help=f"timezone for publish_at without an offset (default {DEFAULT_TZ})")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check")
+    sub.add_parser("verify")
     run = sub.add_parser("run")
     run.add_argument("--dry-run", action="store_true", help="show what would be posted without posting")
     run.add_argument("--max-late-hours", type=float, default=12, help="skip posts more than this many hours late (default 12)")
     refresh = sub.add_parser("refresh-tokens")
     refresh.add_argument("--out", required=True, help="file to write the renewed accounts JSON to")
     args = parser.parse_args()
-    handler = {"check": cmd_check, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
+    handler = {"check": cmd_check, "verify": cmd_verify, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
     sys.exit(handler(args))
 
 
