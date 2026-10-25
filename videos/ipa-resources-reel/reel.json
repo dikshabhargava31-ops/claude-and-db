@@ -1,0 +1,27 @@
+{
+  "hook": {"small": "her friend from another coaching asked:", "big": "where do you|get these tests?", "len": 2.5},
+  "hook_size": 104,
+  "shots": [
+    {"src": "S_video_20261008_155604", "at": 0.3, "len": 2.5},
+    {"src": "S_screen1", "at": 0.0, "len": 2.0},
+    {"src": "S_screen2", "at": 0.0, "len": 2.0},
+    {"src": "S_screen3", "at": 0.2, "len": 2.0},
+    {"src": "S_screen4", "at": 0.0, "len": 1.5},
+    {"src": "S_screen5", "at": 0.0, "len": 1.0},
+    {"src": "S_screen6", "at": 0.2, "len": 2.0},
+    {"src": "A_C0134", "at": 0.5, "len": 1.0},
+    {"src": "A_C0135", "at": 1.0, "len": 1.0},
+    {"src": "A_C0144", "at": 3.5, "len": 1.5},
+    {"src": "S_video_20261008_155109", "at": 42.6, "len": 3.0}
+  ],
+  "captions": [
+    {"at": 2.5, "len": 2.0, "small": "she opened", "big": "one link."},
+    {"at": 4.5, "len": 2.0, "small": "chapter tests, mock tests,", "big": "ICAI RTP & MTP."},
+    {"at": 6.5, "len": 2.0, "small": "pick a chapter,", "big": "any chapter."},
+    {"at": 8.5, "len": 2.5, "small": "the paper.", "big": "+ the solution."},
+    {"at": 11.0, "len": 2.0, "small": "90 minutes. 50 marks.", "big": "exam mode."},
+    {"at": 13.0, "len": 2.0, "small": "solve it.", "big": "check it."},
+    {"at": 15.0, "len": 1.5, "small": "her friend:", "big": "\"wait, it's free?\""}
+  ],
+  "end": {"at": 16.5, "small": "made at IPA, for every CA student.", "big": "IPA INSTITUTE", "place": "LINK IN BIO"}
+}
