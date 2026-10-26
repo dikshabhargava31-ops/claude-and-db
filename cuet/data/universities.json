@@ -1,0 +1,1968 @@
+{
+ "source": "https://cuet.nta.nic.in/participating-universities/",
+ "sourceName": "National Testing Agency (NTA), CUET (UG) participating universities",
+ "via": "CUET_UG_2026_Official_Data.xlsx",
+ "cycle": "2026",
+ "importedAt": "2026-10-26T05:31:38Z",
+ "counts": {
+  "Central": 49,
+  "State": 41,
+  "Deemed": 27,
+  "Private": 120,
+  "Government / other": 7
+ },
+ "universities": [
+  {
+   "id": "central-aligarh-muslim-university",
+   "name": "ALIGARH MUSLIM UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-assam-university-silchar",
+   "name": "ASSAM UNIVERSITY, SILCHAR",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-babasaheb-bhimrao-ambedkar-university",
+   "name": "BABASAHEB BHIMRAO AMBEDKAR UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-banaras-hindu-university",
+   "name": "BANARAS HINDU UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-sanskrit-university-new-delhi",
+   "name": "CENTRAL SANSKRIT UNIVERSITY, NEW DELHI",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-tribal-university-of-andhra-pradesh",
+   "name": "CENTRAL TRIBAL UNIVERSITY OF ANDHRA PRADESH",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-andhra-pradesh",
+   "name": "CENTRAL UNIVERSITY OF ANDHRA PRADESH",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-gujarat",
+   "name": "CENTRAL UNIVERSITY OF GUJARAT",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-haryana",
+   "name": "CENTRAL UNIVERSITY OF HARYANA",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-himachal-pradesh",
+   "name": "CENTRAL UNIVERSITY OF HIMACHAL PRADESH",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-jammu",
+   "name": "CENTRAL UNIVERSITY OF JAMMU",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-jharkhand",
+   "name": "CENTRAL UNIVERSITY OF JHARKHAND",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-karnataka",
+   "name": "CENTRAL UNIVERSITY OF KARNATAKA",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-kashmir",
+   "name": "CENTRAL UNIVERSITY OF KASHMIR",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-kerala",
+   "name": "CENTRAL UNIVERSITY OF KERALA",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-odisha",
+   "name": "CENTRAL UNIVERSITY OF ODISHA",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-punjab",
+   "name": "CENTRAL UNIVERSITY OF PUNJAB",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-rajasthan",
+   "name": "CENTRAL UNIVERSITY OF RAJASTHAN",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-south-bihar",
+   "name": "CENTRAL UNIVERSITY OF SOUTH BIHAR",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-central-university-of-tamil-nadu",
+   "name": "CENTRAL UNIVERSITY OF TAMIL NADU",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-dr-harisingh-gour-vishwavidyalaya",
+   "name": "DR. HARISINGH GOUR VISHWAVIDYALAYA",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-guru-ghasidas-vishwavidyalaya",
+   "name": "GURU GHASIDAS VISHWAVIDYALAYA",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-hnb-garhwal-university-srinagar-garhwal",
+   "name": "HNB GARHWAL UNIVERSITY SRINAGAR GARHWAL",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-iit-dharwad",
+   "name": "IIT DHARWAD",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-indira-gandhi-national-tribal-university",
+   "name": "INDIRA GANDHI NATIONAL TRIBAL UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-jamia-millia-islamia",
+   "name": "JAMIA MILLIA ISLAMIA",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-jawaharlal-nehru-university",
+   "name": "JAWAHARLAL NEHRU UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-mahatma-gandhi-antarrashtriya-hindi-vishwavidyalaya",
+   "name": "MAHATMA GANDHI ANTARRASHTRIYA HINDI VISHWAVIDYALAYA",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-mahatma-gandhi-central-university",
+   "name": "MAHATMA GANDHI CENTRAL UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-manipur-university",
+   "name": "MANIPUR UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-maulana-azad-national-urdu-university",
+   "name": "MAULANA AZAD NATIONAL URDU UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-mizoram-university",
+   "name": "MIZORAM UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-nagaland-university",
+   "name": "NAGALAND UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-national-sanskrit-university",
+   "name": "NATIONAL SANSKRIT UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-north-eastern-hill-university",
+   "name": "NORTH-EASTERN HILL UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-pondicherry-university",
+   "name": "PONDICHERRY UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-rajiv-gandhi-national-aviation-university",
+   "name": "RAJIV GANDHI NATIONAL AVIATION UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-rajiv-gandhi-university",
+   "name": "RAJIV GANDHI UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-sammakka-sarakka-central-tribal-university",
+   "name": "SAMMAKKA SARAKKA CENTRAL TRIBAL UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-shri-lal-bahadur-shastri-national-sanskrit-university",
+   "name": "SHRI LAL BAHADUR SHASTRI NATIONAL SANSKRIT UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-sikkim-university-gangtok",
+   "name": "SIKKIM UNIVERSITY, GANGTOK",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-south-asian-university",
+   "name": "SOUTH ASIAN UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-tezpur-university",
+   "name": "TEZPUR UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-the-english-and-foreign-languages-university-hyderabad",
+   "name": "THE ENGLISH AND FOREIGN LANGUAGES UNIVERSITY, HYDERABAD",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-tripura-university",
+   "name": "TRIPURA UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-university-of-allahabad",
+   "name": "UNIVERSITY OF ALLAHABAD",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-university-of-delhi",
+   "name": "UNIVERSITY OF DELHI",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-university-of-hyderabad",
+   "name": "UNIVERSITY OF HYDERABAD",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "central-visva-bharati-university",
+   "name": "VISVA-BHARATI UNIVERSITY",
+   "category": "Central",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-baba-ghulam-shah-university",
+   "name": "BABA GHULAM SHAH UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-barkatullah-university",
+   "name": "BARKATULLAH UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-bhattadev-university",
+   "name": "BHATTADEV UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-birangana-sati-sadhani-rajyik-vishwavidyalaya-golaghat-assam",
+   "name": "BIRANGANA SATI SADHANI RAJYIK VISHWAVIDYALAYA, GOLAGHAT, ASSAM",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-cluster-university-of-jammu",
+   "name": "CLUSTER UNIVERSITY OF JAMMU",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-cluster-university-of-srinagar",
+   "name": "CLUSTER UNIVERSITY OF SRINAGAR",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-delhi-teachers-university",
+   "name": "DELHI TEACHERS UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-delhi-technological-university",
+   "name": "DELHI TECHNOLOGICAL UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p",
+   "name": "DEVI AHILYA VISHWAVIDYALAYA, INDORE (M.P.)",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-dibrugarh-university-dibrugarh-assam",
+   "name": "DIBRUGARH UNIVERSITY, DIBRUGARH, ASSAM",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-dr-a-p-j-abdul-kalam-technical-university-uttar-pradesh-lucknow",
+   "name": "DR. A.P.J. ABDUL KALAM TECHNICAL UNIVERSITY, UTTAR PRADESH, LUCKNOW",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-dr-b-r-ambedkar-university-delhi",
+   "name": "DR. B.R. AMBEDKAR UNIVERSITY DELHI",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p",
+   "name": "DR. RAMMANOHAR LOHIA AVADH UNIVERSITY, AYODHYA(U.P.)",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-dr-shakuntala-misra-national-rehabilitation-university-lucknow",
+   "name": "DR. SHAKUNTALA MISRA NATIONAL REHABILITATION UNIVERSITY, LUCKNOW",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-dr-b-r-ambedkar-school-of-economics-university-bengaluru",
+   "name": "DR.B.R. AMBEDKAR SCHOOL OF ECONOMICS UNIVERSITY, BENGALURU",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-gautam-buddha-university",
+   "name": "GAUTAM BUDDHA UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-govt-degree-college-autonomous-baramulla",
+   "name": "GOVT. DEGREE COLLEGE (AUTONOMOUS) BARAMULLA",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-guru-gobind-singh-indraprastha-university",
+   "name": "GURU GOBIND SINGH INDRAPRASTHA UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-harcourt-butler-technical-university-kanpur-up",
+   "name": "HARCOURT BUTLER TECHNICAL UNIVERSITY KANPUR (UP)",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-indira-gandhi-delhi-technical-university-for-women",
+   "name": "INDIRA GANDHI DELHI TECHNICAL UNIVERSITY FOR WOMEN",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-islamia-college-of-science-and-commerce-srinagar",
+   "name": "ISLAMIA COLLEGE OF SCIENCE AND COMMERCE SRINAGAR",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-islamic-university-of-science-and-technology-kashmir",
+   "name": "ISLAMIC UNIVERSITY OF SCIENCE AND TECHNOLOGY, KASHMIR",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-jagadguru-rambhadracharya-divyang-state-university",
+   "name": "JAGADGURU RAMBHADRACHARYA DIVYANG STATE UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-jagannath-barooah-university-jorhat",
+   "name": "JAGANNATH BAROOAH UNIVERSITY, JORHAT",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-kumar-bhaskar-varma-sanskrit-and-ancient-studies-university",
+   "name": "KUMAR BHASKAR VARMA SANSKRIT AND ANCIENT STUDIES UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-madan-mohan-malaviya-university-of-technology",
+   "name": "MADAN MOHAN MALAVIYA UNIVERSITY OF TECHNOLOGY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-madhabdev-university",
+   "name": "MADHABDEV UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-maharaja-chhatrasal-bundelkhand-university",
+   "name": "MAHARAJA CHHATRASAL BUNDELKHAND UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-maharaja-surajmal-brij-university-bharatpur",
+   "name": "MAHARAJA SURAJMAL BRIJ UNIVERSITY BHARATPUR",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-maharana-pratap-horticultural-university-karnal",
+   "name": "MAHARANA PRATAP HORTICULTURAL UNIVERSITY, KARNAL",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-makhanlal-chaturvedi-university",
+   "name": "MAKHANLAL CHATURVEDI UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-nagaon-university",
+   "name": "NAGAON UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-north-lakhimpur-university",
+   "name": "NORTH LAKHIMPUR UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-ratan-tata-mahrashtra-state-skills-university",
+   "name": "RATAN TATA MAHRASHTRA STATE SKILLS UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp",
+   "name": "SAMRAT VIKRMADITYA VISHWAVIDYALAY, UJJAIN (MP)",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-sardar-patel-university-of-police-security-and-criminal-justice",
+   "name": "SARDAR PATEL UNIVERSITY OF POLICE, SECURITY AND CRIMINAL JUSTICE",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-shri-mata-vaishno-devi-university",
+   "name": "SHRI MATA VAISHNO DEVI UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-sibsagar-university",
+   "name": "SIBSAGAR UNIVERSITY",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-university-of-jammu",
+   "name": "UNIVERSITY OF JAMMU",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-university-of-kashmir",
+   "name": "UNIVERSITY OF KASHMIR",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "state-university-of-ladakh",
+   "name": "UNIVERSITY OF LADAKH",
+   "category": "State",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-avinashilingam-institute-for-home-science-and-higher-education-for-women",
+   "name": "AVINASHILINGAM INSTITUTE FOR HOME SCIENCE AND HIGHER EDUCATION FOR WOMEN",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-chinmaya-vishwavidyapeeth",
+   "name": "CHINMAYA VISHWAVIDYAPEETH",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-dayalbagh-educational-institute",
+   "name": "DAYALBAGH EDUCATIONAL INSTITUTE",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-gitam-vishakhapatnam",
+   "name": "GITAM (VISHAKHAPATNAM)",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-gitam-blr",
+   "name": "GITAM(BLR)",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-gitam-hyd",
+   "name": "GITAM(HYD)",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-gokhale-institute-of-politics-and-economics",
+   "name": "GOKHALE INSTITUTE OF POLITICS AND ECONOMICS",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-graphic-era-university-dehradun-uttarakhand",
+   "name": "GRAPHIC ERA UNIVERSITY, DEHRADUN, UTTARAKHAND",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-gujarat-vidyapith-university",
+   "name": "GUJARAT VIDYAPITH UNIVERSITY",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-gurukula-kangri-university",
+   "name": "GURUKULA KANGRI UNIVERSITY",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-icfai-hyderabad",
+   "name": "ICFAI(HYDERABAD)",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-iis-deemed-to-be-university-jaipur",
+   "name": "IIS (DEEMED TO BE UNIVERSITY), JAIPUR",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-jamia-hamdard",
+   "name": "JAMIA HAMDARD",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-jaypee-institute-of-information-technology",
+   "name": "JAYPEE INSTITUTE OF INFORMATION TECHNOLOGY",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-kiet-krishna-institute-of-engineering-technology",
+   "name": "KIET-KRISHNA INSTITUTE OF ENGINEERING & TECHNOLOGY",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-lakshmibai-national-institute-of-physical-education",
+   "name": "LAKSHMIBAI NATIONAL INSTITUTE OF PHYSICAL EDUCATION",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-lingya-s-vidyapeeth-university",
+   "name": "LINGYA'S VIDYAPEETH UNIVERSITY",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-maharishi-markandeshwar-deemed-to-be-university-mullana-ambala",
+   "name": "MAHARISHI MARKANDESHWAR (DEEMED TO BE UNIVERSITY), MULLANA - AMBALA",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-malla-reddy-vishwavidyapeeth",
+   "name": "MALLA REDDY VISHWAVIDYAPEETH",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-manav-rachna-international-institute-of-research-and-studies",
+   "name": "MANAV RACHNA INTERNATIONAL INSTITUTE OF RESEARCH AND STUDIES",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-nehru-gram-bharati-deemed-to-be-university",
+   "name": "NEHRU GRAM BHARATI (DEEMED TO BE UNIVERSITY)",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-shobhit-institute-of-engineering-and-technology",
+   "name": "SHOBHIT INSTITUTE OF ENGINEERING AND TECHNOLOGY",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-srm-institute-of-science-and-technology",
+   "name": "SRM INSTITUTE OF SCIENCE AND TECHNOLOGY",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-tata-institute-of-social-sciences-tiss",
+   "name": "TATA INSTITUTE OF SOCIAL SCIENCES (TISS)",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-teri-school-of-advanced-studies",
+   "name": "TERI SCHOOL OF ADVANCED STUDIES",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-the-gandhigram-rural-institute-dtbu",
+   "name": "THE GANDHIGRAM RURAL INSTITUTE (DTBU)",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "deemed-vinayaka-mission-s-research-foundation",
+   "name": "VINAYAKA MISSION'S RESEARCH FOUNDATION",
+   "category": "Deemed",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-abhyuday-university",
+   "name": "ABHYUDAY UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-ajeenkya-dy-patil-university",
+   "name": "AJEENKYA DY PATIL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-aks-university-satna-mp",
+   "name": "AKS UNIVERSITY, SATNA (MP)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-alliance-university",
+   "name": "ALLIANCE UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-amity-jharkhand",
+   "name": "AMITY JHARKHAND",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-amity-university-noida-campus",
+   "name": "AMITY UNIVERSITY (NOIDA CAMPUS)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-amity-university-hyderabad",
+   "name": "AMITY UNIVERSITY HYDERABAD",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-amity-university-kolkata",
+   "name": "AMITY UNIVERSITY KOLKATA",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-amity-university-punjab",
+   "name": "AMITY UNIVERSITY PUNJAB",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-amity-university-greater-noida",
+   "name": "AMITY UNIVERSITY, GREATER NOIDA",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-amity-universitypatna",
+   "name": "AMITY UNIVERSITYPATNA",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-apex-university",
+   "name": "APEX UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-arka-jain-university",
+   "name": "ARKA JAIN UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-arunachal-university-of-studies",
+   "name": "ARUNACHAL UNIVERSITY OF STUDIES",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-asbm-university",
+   "name": "ASBM UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-assam-down-town-university",
+   "name": "ASSAM DOWN TOWN UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-avantika-university",
+   "name": "AVANTIKA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-azim-prem-ji-university",
+   "name": "AZIM PREM JI UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-babu-banarasi-das-university",
+   "name": "BABU BANARASI DAS UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-bennet-university",
+   "name": "BENNET UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-bhagwant-global-university-kotdwar-uttarakhand",
+   "name": "BHAGWANT GLOBAL UNIVERSITY KOTDWAR (UTTARAKHAND)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-bhagwant-university",
+   "name": "BHAGWANT UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-birla-global-university",
+   "name": "BIRLA GLOBAL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-bml-munjal-university",
+   "name": "BML MUNJAL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-brainware-university",
+   "name": "BRAINWARE UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-carrer-college-bhopal",
+   "name": "CARRER COLLEGE BHOPAL",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-cgc-university-mohali",
+   "name": "CGC UNIVERSITY, MOHALI",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-chanakya-university",
+   "name": "CHANAKYA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-chandigarh-university-mapping",
+   "name": "CHANDIGARH UNIVERSITY -MAPPING",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-chhatrapati-shivaji-maharaj-university-panvel",
+   "name": "CHHATRAPATI SHIVAJI MAHARAJ UNIVERSITY, PANVEL",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-chitkara-university",
+   "name": "CHITKARA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-cmr-university",
+   "name": "CMR UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-ct-university-ludhiana",
+   "name": "CT UNIVERSITY(LUDHIANA)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-dbs-global-university",
+   "name": "DBS GLOBAL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-dit-dehradun",
+   "name": "DIT DEHRADUN",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-future-university",
+   "name": "FUTURE UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-g-d-goenka-university",
+   "name": "G D GOENKA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-galgotias-university",
+   "name": "GALGOTIAS UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-geeta-university",
+   "name": "GEETA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-gla-university-mathura",
+   "name": "GLA UNIVERSITY(MATHURA)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-gopal-narayan-singh-university",
+   "name": "GOPAL NARAYAN SINGH UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-graphic-era-hill-university",
+   "name": "GRAPHIC ERA HILL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-haridwar-university-roorkee",
+   "name": "HARIDWAR UNIVERSITY ROORKEE",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-himalayan-university",
+   "name": "HIMALAYAN UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-hrit-university-ghaziabad",
+   "name": "HRIT UNIVERSITY, GHAZIABAD",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-iftm-university-moradabad",
+   "name": "IFTM UNIVERSITY, MORADABAD",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-iilm-university",
+   "name": "IILM UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-iilm-university-gurugram",
+   "name": "IILM UNIVERSITY, GURUGRAM",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-iimt-university",
+   "name": "IIMT UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-invertis-university",
+   "name": "INVERTIS UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-itm-skills-university-navi-mumbai",
+   "name": "ITM SKILLS UNIVERSITY, NAVI MUMBAI",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-itm-university-raipur",
+   "name": "ITM UNIVERSITY, RAIPUR",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-itm-vocational-university-vadodara",
+   "name": "ITM VOCATIONAL UNIVERSITY, VADODARA",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-jagan-nath-university-jaipur",
+   "name": "JAGAN NATH UNIVERSITY, JAIPUR",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-jaganath-university-delhi-ncr",
+   "name": "JAGANATH UNIVERSITY(DELHI NCR)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-jaipur-national-university",
+   "name": "JAIPUR NATIONAL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-jecrc-university",
+   "name": "JECRC UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-jis-university-kolkata",
+   "name": "JIS UNIVERSITY, KOLKATA",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-k-r-mangalam-university",
+   "name": "K.R. MANGALAM UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-kalinga-university",
+   "name": "KALINGA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-karnavati-university",
+   "name": "KARNAVATI UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-lovely-professional-university",
+   "name": "LOVELY PROFESSIONAL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-madhav-university",
+   "name": "MADHAV UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-mahatma-jyoti-rao-phoole-university",
+   "name": "MAHATMA JYOTI RAO PHOOLE UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-mahindra-university",
+   "name": "MAHINDRA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-manav-rachna-university-faridabad",
+   "name": "MANAV RACHNA UNIVERSITY, FARIDABAD",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-mangalayatan-university-aligarh",
+   "name": "MANGALAYATAN UNIVERSITY, ALIGARH",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-mangalayatan-university-jabalpur",
+   "name": "MANGALAYATAN UNIVERSITY, JABALPUR",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-manipal-university-jaipur",
+   "name": "MANIPAL UNIVERSITY JAIPUR",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-mats-university-raipur",
+   "name": "MATS UNIVERSITY, RAIPUR",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-mewar-university-chittorgarh-rajasthan",
+   "name": "MEWAR UNIVERSITY, CHITTORGARH (RAJASTHAN)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-mnr-university",
+   "name": "MNR UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-mody-university",
+   "name": "MODY UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-niit-university-rajasthan",
+   "name": "NIIT UNIVERSITY, RAJASTHAN",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-noida-international-university",
+   "name": "NOIDA INTERNATIONAL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-om-sterling-global-university-hisar-haryana",
+   "name": "OM STERLING GLOBAL UNIVERSITY, HISAR, HARYANA",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-pearl-academy",
+   "name": "PEARL ACADEMY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-poornima-university",
+   "name": "POORNIMA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-r-v-university",
+   "name": "R V UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-rabindranath-tagore-university",
+   "name": "RABINDRANATH TAGORE UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-rakshpal-bahadur-management-institute",
+   "name": "RAKSHPAL BAHADUR MANAGEMENT INSTITUTE",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-rama-university-uttar-pradesh-kanpur",
+   "name": "RAMA UNIVERSITY UTTAR PRADESH KANPUR",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-ramaiah-university",
+   "name": "RAMAIAH UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-renaissance-university",
+   "name": "RENAISSANCE UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-reva-university",
+   "name": "REVA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-rishihood-university",
+   "name": "RISHIHOOD UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-rnb-global-university-bikaner-rajasthan",
+   "name": "RNB GLOBAL UNIVERSITY, BIKANER ( RAJASTHAN)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sage-university-indore",
+   "name": "SAGE UNIVERSITY, INDORE",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sanskriti-university",
+   "name": "SANSKRITI UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sant-baba-bhag-singh-university",
+   "name": "SANT BABA BHAG SINGH UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sardar-bhagwan-singh-university",
+   "name": "SARDAR BHAGWAN SINGH UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-saroj-international-university",
+   "name": "SAROJ INTERNATIONAL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-school-of-management-sciences-sms",
+   "name": "SCHOOL OF MANAGEMENT SCIENCES(SMS)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sharda-university-agra",
+   "name": "SHARDA UNIVERSITY (AGRA)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sharda-university-noida",
+   "name": "SHARDA UNIVERSITY NOIDA",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-shoolini-university-of-biotechnology-and-management-sciences",
+   "name": "SHOOLINI UNIVERSITY OF BIOTECHNOLOGY AND MANAGEMENT SCIENCES",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university",
+   "name": "SHREE GURU GOBIND SINGH TRICENTENARY (SGT) UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sikkim-global-technical-university",
+   "name": "SIKKIM GLOBAL TECHNICAL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sikkim-manipal-university",
+   "name": "SIKKIM MANIPAL UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-singhania-university",
+   "name": "SINGHANIA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sir-padampat-singhania-university-udaipur",
+   "name": "SIR PADAMPAT SINGHANIA UNIVERSITY, UDAIPUR",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sister-nivedita-university",
+   "name": "SISTER NIVEDITA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-srm-university-ap",
+   "name": "SRM UNIVERSITY - AP",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-srm-university-delhi-ncr-sonepat",
+   "name": "SRM UNIVERSITY DELHI NCR SONEPAT",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sunbeam-college-for-women",
+   "name": "SUNBEAM COLLEGE FOR WOMEN",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-suresh-gyan-vihar-university-jaipur",
+   "name": "SURESH GYAN VIHAR UNIVERSITY JAIPUR",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-sushant-university-gurugram",
+   "name": "SUSHANT UNIVERSITY(GURUGRAM)",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-swami-rama-himalayan-university",
+   "name": "SWAMI RAMA HIMALAYAN UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-swami-vivekanand-subharti-university",
+   "name": "SWAMI VIVEKANAND SUBHARTI UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-techno-india-university",
+   "name": "TECHNO INDIA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-teerthanker-mahaveer-university",
+   "name": "TEERTHANKER MAHAVEER UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-the-neotia-university",
+   "name": "THE NEOTIA UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-united-university-prayagraj",
+   "name": "UNITED UNIVERSITY, PRAYAGRAJ",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-university-of-engineering-management-jaipur",
+   "name": "UNIVERSITY OF ENGINEERING & MANAGEMENT, JAIPUR",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-upes-dehradun",
+   "name": "UPES - DEHRADUN",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-usha-martin-university",
+   "name": "USHA MARTIN UNIVERSITY",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-vidya-university-meerut",
+   "name": "VIDYA UNIVERSITY, MEERUT",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-vishwa-vishwani-institute-of-systems-and-management-hyderabad",
+   "name": "VISHWA VISHWANI INSTITUTE OF SYSTEMS AND MANAGEMENT, HYDERABAD",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-vivekananda-global-university-jaipur-rajasthan",
+   "name": "VIVEKANANDA GLOBAL UNIVERSITY, JAIPUR, RAJASTHAN",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "private-world-university-of-design",
+   "name": "WORLD UNIVERSITY OF DESIGN",
+   "category": "Private",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "government-other-footwear-design-and-development-institute",
+   "name": "FOOTWEAR DESIGN AND DEVELOPMENT INSTITUTE",
+   "category": "Government / other",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "government-other-govt-college-for-women-parade-ground-jammu",
+   "name": "GOVT. COLLEGE FOR WOMEN, PARADE GROUND, JAMMU",
+   "category": "Government / other",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "government-other-indian-council-of-agricultural-research-icar",
+   "name": "INDIAN COUNCIL OF AGRICULTURAL RESEARCH (ICAR)",
+   "category": "Government / other",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "government-other-indian-institute-of-tourism-travel-management-university",
+   "name": "INDIAN INSTITUTE OF TOURISM & TRAVEL MANAGEMENT UNIVERSITY",
+   "category": "Government / other",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "government-other-national-forensic-sciences-university-nfsu",
+   "name": "NATIONAL FORENSIC SCIENCES UNIVERSITY (NFSU)",
+   "category": "Government / other",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "government-other-national-institute-of-food-technology-entrepreneurship-and-mana",
+   "name": "NATIONAL INSTITUTE OF FOOD TECHNOLOGY ENTREPRENEURSHIP AND MANAGEMENT, KUNDLI, (NIFTEM-K)",
+   "category": "Government / other",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  },
+  {
+   "id": "government-other-rajiv-gandhi-institute-of-petroleum-technology",
+   "name": "RAJIV GANDHI INSTITUTE OF PETROLEUM TECHNOLOGY",
+   "category": "Government / other",
+   "state": "",
+   "website": "",
+   "source": "https://cuet.nta.nic.in/participating-universities/"
+  }
+ ]
+}

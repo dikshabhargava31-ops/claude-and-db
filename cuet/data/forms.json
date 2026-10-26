@@ -1,0 +1,636 @@
+{
+ "note": "UG 2027 application forms for colleges with their own admissions. links: official college or test pages only. deadlines: reported dates, each with the page it came from; confirm on the official site. status: open, upcoming (not open yet), closed, check (2027 dates not found).",
+ "checked": "2026-10-26",
+ "forms": [
+  {
+   "id": "iim-bangalore-ug",
+   "name": "IIM Bangalore — BSc (Hons) UG",
+   "type": "Management & economics",
+   "city": "Bengaluru",
+   "fromDoc": true,
+   "entrance": "IIMB UG entrance test + personal interview",
+   "status": "closed",
+   "links": [
+    [
+     "Admissions 2027",
+     "https://ug.iimb.ac.in/ug-admissions-2027/"
+    ],
+    [
+     "Admissions process (PDF)",
+     "https://ug.iimb.ac.in/wp-content/uploads/2026/10/UG-Admissions-Process-2026.pdf"
+    ],
+    [
+     "Registration",
+     "https://cdn.digialm.com/EForms/configuredHtml/1345/101967/Registration.html"
+    ]
+   ],
+   "deadlines": [
+    {
+     "label": "Applications closed",
+     "date": "2026-10-15T17:00:00+05:30",
+     "source": "https://news.careers360.com/iim-bangalore-ug-admissions-2026-applications-begin-august-17-bsc-hons-in-economics-data-science-courses-eligibility-entrance-test"
+    },
+    {
+     "label": "Entrance test (tentative)",
+     "date": "2026-11-15",
+     "source": "https://www.pw.live/ipmat/exams/iim-bangalore-bsc-ug-2027-form"
+    }
+   ],
+   "note": "Applications ran 17 Aug–15 Oct 2026. Interviews 2nd–3rd week of Jan 2027; offers expected 3rd week of Feb 2027 (tentative).",
+   "acceptsCuet": null
+  },
+  {
+   "id": "ashoka",
+   "name": "Ashoka University",
+   "type": "Liberal arts & sciences",
+   "city": "Sonipat",
+   "fromDoc": true,
+   "entrance": "Application + Ashoka Aptitude Assessment + interview",
+   "status": "open",
+   "links": [
+    [
+     "Apply",
+     "https://application.ashoka.edu.in/"
+    ],
+    [
+     "Admission timelines",
+     "https://www.ashoka.edu.in/undergraduate-admissions-timelines/"
+    ],
+    [
+     "Application guide (PDF)",
+     "https://www.ashoka.edu.in/wp-content/uploads/2021/05/Application-Guide-2026.pdf"
+    ],
+    [
+     "UG admissions",
+     "https://www.ashoka.edu.in/admissions/undergraduate-students/"
+    ]
+   ],
+   "deadlines": [
+    {
+     "label": "Round 1",
+     "date": "2026-11-23T23:59:00+05:30",
+     "source": "https://university.careers360.com/articles/ashoka-university-application-form-2027"
+    },
+    {
+     "label": "Round 2",
+     "date": "2027-01-20T23:59:00+05:30",
+     "source": "https://university.careers360.com/articles/ashoka-university-application-form-2027"
+    },
+    {
+     "label": "Round 3",
+     "date": "2027-04-14T23:59:00+05:30",
+     "source": "https://university.careers360.com/articles/ashoka-university-application-form-2027"
+    },
+    {
+     "label": "Round 4",
+     "date": "2027-05-23T23:59:00+05:30",
+     "source": "https://university.careers360.com/articles/ashoka-university-application-form-2027"
+    }
+   ],
+   "note": "Round 1 assessment reported for 6 Dec 2026.",
+   "acceptsCuet": null
+  },
+  {
+   "id": "iilm",
+   "name": "IILM University",
+   "type": "Management, liberal arts, design",
+   "city": "Gurugram / Greater Noida",
+   "fromDoc": true,
+   "entrance": "IILM aptitude test / interview",
+   "status": "check",
+   "links": [
+    [
+     "Apply now",
+     "https://iilm.edu/apply-now"
+    ],
+    [
+     "Admissions",
+     "https://iilm.edu/admissions"
+    ],
+    [
+     "Admission process",
+     "https://iilm.edu/admission-process"
+    ],
+    [
+     "Eligibility",
+     "https://iilm.edu/eligibility"
+    ],
+    [
+     "Scholarships",
+     "https://iilm.edu/scholarship"
+    ],
+    [
+     "Brochures",
+     "https://iilm.edu/iilm-brochures"
+    ]
+   ],
+   "note": "Also on NTA's CUET (UG) list (IILM University and IILM University, Gurugram). 2027 dates not published yet.",
+   "deadlines": [],
+   "acceptsCuet": null
+  },
+  {
+   "id": "ssla",
+   "name": "Symbiosis School for Liberal Arts (SSLA)",
+   "type": "Liberal arts",
+   "city": "Pune",
+   "fromDoc": true,
+   "entrance": "As per SSLA admissions 2027",
+   "status": "open",
+   "links": [
+    [
+     "Register (Admissions 2027)",
+     "https://dm.ssla.edu.in/admissions-2027/"
+    ],
+    [
+     "Admissions",
+     "https://www.ssla.edu.in/admissions"
+    ],
+    [
+     "Website",
+     "https://www.ssla.edu.in/"
+    ]
+   ],
+   "note": "2027 registration page is live. Dates not published in the sources found.",
+   "deadlines": [],
+   "acceptsCuet": null
+  },
+  {
+   "id": "bennett",
+   "name": "Bennett University",
+   "type": "Multidisciplinary",
+   "city": "Greater Noida",
+   "fromDoc": true,
+   "entrance": "Programme-wise: entrance score, Class 12 record, interview",
+   "status": "open",
+   "links": [
+    [
+     "Apply (2027)",
+     "https://applications.bennett.edu.in/bu2027"
+    ],
+    [
+     "Website",
+     "https://www.bennett.edu.in/"
+    ]
+   ],
+   "note": "Reported as rolling admissions with no fixed 2027 round dates. Also on NTA's CUET (UG) list.",
+   "deadlines": [],
+   "acceptsCuet": null
+  },
+  {
+   "id": "christ",
+   "name": "CHRIST (Deemed to be University)",
+   "type": "Multidisciplinary",
+   "city": "Bengaluru, Delhi NCR, Pune, Lavasa",
+   "fromDoc": true,
+   "entrance": "CHRIST's own entrance test (called CHRIST-CUET — not NTA's CUET) for ET programmes; non-ET programmes have their own selection",
+   "status": "open",
+   "links": [
+    [
+     "Apply",
+     "https://espro.christuniversity.in/Application/"
+    ],
+    [
+     "Admissions 2027",
+     "https://christuniversity.in/admission/2027-ugpgsp"
+    ],
+    [
+     "Selection dates 2027",
+     "https://christuniversity.in/admission/ugpg-selection-process-dates-2027"
+    ],
+    [
+     "Application process",
+     "https://christuniversity.in/admission/ugapppro2027"
+    ],
+    [
+     "Admission process",
+     "https://christuniversity.in/admission/ugadmpro2027"
+    ],
+    [
+     "Test pattern (PDF)",
+     "https://christuniversity.in/uploads/userfiles/file/ADMISSIONS/NEW/BCC/CHRIST-CUET%20GUIDELINES%20&%20TEST%20PATTERN%20-%202026.pdf"
+    ],
+    [
+     "Non-ET details 2027 (PDF)",
+     "https://christuniversity.in/uploads/userfiles/file/ADMISSIONS/2027/BCC/2%20BCC%20UG%20NONET%20DETAILS%202027.pdf"
+    ],
+    [
+     "UG programmes",
+     "https://christuniversity.in/our-programmes/UGP/1"
+    ]
+   ],
+   "deadlines": [
+    {
+     "label": "Entrance-test programmes",
+     "date": "2026-11-25T17:00:00+05:30",
+     "source": "https://matchtocollege.com/news-and-updates/christ-university-ug-admissions-2027-28-application-open"
+    },
+    {
+     "label": "Non-entrance-test programmes",
+     "date": "2026-12-06T17:00:00+05:30",
+     "source": "https://matchtocollege.com/news-and-updates/christ-university-ug-admissions-2027-28-application-open"
+    }
+   ],
+   "note": "Entrance test reported for 5 Dec 2026; selection 11–13 Dec; final list 21 Dec 2026, 10 PM.",
+   "acceptsCuet": null
+  },
+  {
+   "id": "flame",
+   "name": "FLAME University",
+   "type": "Liberal education",
+   "city": "Pune",
+   "fromDoc": true,
+   "entrance": "FLAME Entrance Aptitude Test (FEAT); BDes uses FDAT",
+   "status": "open",
+   "links": [
+    [
+     "Apply",
+     "https://www.flame.edu.in/admissions/apply"
+    ],
+    [
+     "Application login",
+     "https://application.flame.edu.in/application/LoginPage_1"
+    ],
+    [
+     "UG admissions",
+     "https://www.flame.edu.in/admissions/ug"
+    ],
+    [
+     "Admission schedule",
+     "https://www.flame.edu.in/admissions/ug/admission-schedule"
+    ]
+   ],
+   "note": "FLAME says the 2027–28 cycle begins Sep/Oct 2026; round dates were not yet in the sources found. Last cycle opened with an Early Decision round (deadline 30 Nov).",
+   "deadlines": [],
+   "acceptsCuet": null
+  },
+  {
+   "id": "krea",
+   "name": "Krea University (SIAS)",
+   "type": "Liberal arts & sciences",
+   "city": "Sri City",
+   "fromDoc": true,
+   "entrance": "Application + online assessment + interview",
+   "status": "check",
+   "links": [
+    [
+     "Apply",
+     "https://siasadmissions.krea.edu.in/applynow"
+    ],
+    [
+     "Applications",
+     "https://krea.edu.in/applications/"
+    ]
+   ],
+   "note": "Apply in only one round per cycle. 2027 round dates not published in the sources found.",
+   "deadlines": [],
+   "acceptsCuet": null
+  },
+  {
+   "id": "jgu",
+   "name": "O.P. Jindal Global University",
+   "type": "Law, business, liberal arts",
+   "city": "Sonipat",
+   "entrance": "JSAT / SAT / CUET for business and liberal arts; LNAT for law",
+   "acceptsCuet": true,
+   "status": "check",
+   "links": [
+    [
+     "Website",
+     "https://jgu.edu.in/"
+    ]
+   ],
+   "note": "Reported application fee ₹3,000 for most programmes. 2027 dates not published in the sources found.",
+   "deadlines": [],
+   "fromDoc": false
+  },
+  {
+   "id": "plaksha",
+   "name": "Plaksha University",
+   "type": "Technology (BTech)",
+   "city": "Mohali",
+   "entrance": "JEE Main / SAT / ACT + application",
+   "status": "check",
+   "links": [
+    [
+     "Admissions",
+     "https://plaksha.edu.in/admissions"
+    ],
+    [
+     "UG admissions policy (PDF)",
+     "https://media.plaksha.edu.in/Undergraduate_Admissions_Policy.pdf"
+    ]
+   ],
+   "note": "Last cycle had five rounds, the first closing 15 Dec. 2027 dates not published in the sources found.",
+   "deadlines": [],
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "snu",
+   "name": "Shiv Nadar University",
+   "type": "Multidisciplinary",
+   "city": "Delhi NCR / Chennai",
+   "entrance": "SNUSAT, JEE Main, CUET, SAT, ACT (programme-wise)",
+   "acceptsCuet": true,
+   "status": "open",
+   "links": [
+    [
+     "Website",
+     "https://snu.edu.in/"
+    ]
+   ],
+   "note": "2027–28 applications reported open from 16 Oct 2026. Application fee reports differ (₹1,500 / ₹2,500): check the portal.",
+   "deadlines": [],
+   "fromDoc": false
+  },
+  {
+   "id": "ahduni",
+   "name": "Ahmedabad University",
+   "type": "Multidisciplinary",
+   "city": "Ahmedabad",
+   "entrance": "AU-UAT, CUET (BA/BSc), JEE Main (BTech)",
+   "acceptsCuet": true,
+   "status": "upcoming",
+   "links": [
+    [
+     "Admission calendar",
+     "https://ahduni.edu.in/admission/undergraduate-admission/admission-calendar/"
+    ],
+    [
+     "Admissions team",
+     "https://ahduni.edu.in/admission/undergraduate-admission/admission-team/"
+    ]
+   ],
+   "note": "UG 2027 pre-registration reported open from 1 Oct 2026; full application expected Nov–Dec 2026.",
+   "deadlines": [],
+   "fromDoc": false
+  },
+  {
+   "id": "azim-premji",
+   "name": "Azim Premji University",
+   "type": "Humanities, social sciences, sciences",
+   "city": "Bengaluru / Bhopal",
+   "entrance": "University's National Entrance Test + interview",
+   "status": "open",
+   "links": [
+    [
+     "Website",
+     "https://azimpremjiuniversity.edu.in/"
+    ]
+   ],
+   "deadlines": [
+    {
+     "label": "Round 1",
+     "date": "2026-11-20T23:59:00+05:30",
+     "source": "https://matchtocollege.com/news-and-updates/azim-premji-university-ug-admissions-2027-round-1-applications"
+    }
+   ],
+   "note": "National Entrance Test reported for 20 Dec 2026; interviews 4–8 Jan 2027.",
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "masters-union",
+   "name": "Masters' Union — UG programme",
+   "type": "Business",
+   "city": "Gurugram",
+   "entrance": "Masters' Union test, JEE, SAT, ACT or CUET",
+   "acceptsCuet": true,
+   "status": "open",
+   "links": [
+    [
+     "Website",
+     "https://mastersunion.org/"
+    ]
+   ],
+   "deadlines": [
+    {
+     "label": "Round 1",
+     "date": "2026-12-15T23:59:00+05:30",
+     "source": "https://matchtocollege.com/news-and-updates/masters-union-ug-admissions-2027-round-1-open-apply-dec-15"
+    }
+   ],
+   "note": "Classes for the 2027 batch start August 2027.",
+   "fromDoc": false
+  },
+  {
+   "id": "atlas",
+   "name": "ATLAS SkillTech University",
+   "type": "Business, design, tech, law",
+   "city": "Mumbai",
+   "entrance": "uGDX / university aptitude test",
+   "status": "open",
+   "links": [
+    [
+     "BBA admissions (ISME)",
+     "https://www.atlasuniversity.edu.in/schools/isme/admissions/undergraduate/admissions-bba-bachelor-of-business-administration"
+    ],
+    [
+     "Website",
+     "https://www.atlasuniversity.edu.in/"
+    ]
+   ],
+   "deadlines": [
+    {
+     "label": "BBA (ISME)",
+     "date": "2026-11-11T23:59:00+05:30",
+     "source": "https://matchtocollege.com/news-and-updates/atlas-skilltech-university-mumbai-admissions-2027-open"
+    },
+    {
+     "label": "B.Tech (uGDX)",
+     "date": "2026-12-08T23:59:00+05:30",
+     "source": "https://matchtocollege.com/news-and-updates/atlas-skilltech-university-mumbai-admissions-2027-open"
+    }
+   ],
+   "note": "B.Des, B.Sc and BBA LL.B. deadlines for this round have passed.",
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "ipmat-indore",
+   "name": "IIM Indore — IPM (IPMAT Indore)",
+   "type": "Integrated management (IPM)",
+   "city": "Indore",
+   "entrance": "IPMAT Indore + interview",
+   "status": "upcoming",
+   "links": [
+    [
+     "Website",
+     "https://www.iimidr.ac.in/"
+    ]
+   ],
+   "note": "Not notified yet; registration expected around Feb–Mar 2027. IPMAT Indore scores are also used by IIM Ranchi, IIM Shillong, IIM Amritsar and IIM Sirmaur (each with its own form).",
+   "deadlines": [],
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "ipmat-rohtak",
+   "name": "IIM Rohtak — IPM (IPMAT Rohtak)",
+   "type": "Integrated management (IPM)",
+   "city": "Rohtak",
+   "entrance": "IPMAT Rohtak + interview",
+   "status": "upcoming",
+   "links": [
+    [
+     "Website",
+     "https://www.iimrohtak.ac.in/"
+    ]
+   ],
+   "note": "Not notified yet; registration expected Feb–Apr 2027. Separate form from IPMAT Indore.",
+   "deadlines": [],
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "jipmat",
+   "name": "JIPMAT — IIM Jammu & IIM Bodh Gaya IPM",
+   "type": "Integrated management (IPM)",
+   "city": "Jammu / Bodh Gaya",
+   "entrance": "JIPMAT, conducted by NTA",
+   "status": "upcoming",
+   "links": [
+    [
+     "NTA",
+     "https://nta.ac.in/"
+    ]
+   ],
+   "note": "One form covers both IIMs. NTA has not released the 2027 bulletin; registration expected Feb–Apr 2027.",
+   "deadlines": [],
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "set",
+   "name": "Symbiosis Entrance Test (SET) — BBA, BA, BCA, mass comm.",
+   "type": "Symbiosis institutes",
+   "city": "Pune and other campuses",
+   "entrance": "SET + personal interview",
+   "status": "upcoming",
+   "links": [
+    [
+     "SET",
+     "https://www.set-test.org/"
+    ]
+   ],
+   "note": "Not notified yet; registration expected Dec 2026–Apr 2027, exam in May 2027.",
+   "deadlines": [],
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "slat",
+   "name": "Symbiosis Law Admission Test (SLAT) — BA LLB, BBA LLB",
+   "type": "Law",
+   "city": "Pune, Noida, Hyderabad, Nagpur",
+   "entrance": "SLAT",
+   "status": "open",
+   "links": [
+    [
+     "SLAT",
+     "https://www.slat-test.org/"
+    ]
+   ],
+   "deadlines": [
+    {
+     "label": "Registration",
+     "date": "2026-12-04T23:59:00+05:30",
+     "source": "https://law.careers360.com/articles/slat-2027-registration"
+    }
+   ],
+   "note": "Tests reported for 19 and 26 Dec 2026.",
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "npat",
+   "name": "NMIMS NPAT — BBA, B.Com, BSc Finance",
+   "type": "Management & commerce",
+   "city": "Mumbai and other campuses",
+   "entrance": "NPAT",
+   "status": "upcoming",
+   "links": [
+    [
+     "NPAT",
+     "https://npat.nmims.edu/"
+    ]
+   ],
+   "note": "Not notified yet; registration expected Jan/Feb–May 2027.",
+   "deadlines": [],
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "mahindra",
+   "name": "Mahindra University",
+   "type": "Multidisciplinary",
+   "city": "Hyderabad",
+   "entrance": "JEE Main (BTech); programme-wise for others",
+   "status": "check",
+   "links": [
+    [
+     "Website",
+     "https://www.mahindrauniversity.edu.in/"
+    ]
+   ],
+   "note": "On NTA's CUET (UG) list. 2027 dates not published in the sources found.",
+   "deadlines": [],
+   "fromDoc": false,
+   "acceptsCuet": null
+  },
+  {
+   "id": "vijaybhoomi",
+   "name": "Vijaybhoomi University",
+   "type": "Multidisciplinary",
+   "city": "Karjat (Mumbai)",
+   "entrance": "VUSAT, SAT, CUET or MH-CET (past cycles)",
+   "acceptsCuet": true,
+   "status": "check",
+   "links": [
+    [
+     "Website",
+     "https://vijaybhoomi.edu.in/"
+    ]
+   ],
+   "note": "Admits in rolling rounds. 2027 rounds not announced in the sources found.",
+   "deadlines": [],
+   "fromDoc": false
+  },
+  {
+   "id": "sai",
+   "name": "Sai University",
+   "type": "Arts & sciences, computing, law",
+   "city": "Chennai",
+   "entrance": "SAT / ACT / CUET / Pearson UG (BA, BSc)",
+   "acceptsCuet": true,
+   "status": "check",
+   "links": [
+    [
+     "Website",
+     "https://saiuniversity.edu.in/"
+    ]
+   ],
+   "note": "2027 dates not published in the sources found.",
+   "deadlines": [],
+   "fromDoc": false
+  },
+  {
+   "id": "xaviers-mumbai",
+   "name": "St. Xavier's College, Mumbai",
+   "type": "Arts, science, BMS/BMM",
+   "city": "Mumbai",
+   "entrance": "Merit (BA, BSc); XET entrance for BMS/BMM/IT",
+   "status": "upcoming",
+   "links": [
+    [
+     "Admissions",
+     "https://www.xaviers.edu/main/admissions-and-courses"
+    ]
+   ],
+   "note": "Usually opens in May after Class 12 results; University of Mumbai pre-admission registration is also required.",
+   "deadlines": [],
+   "fromDoc": false,
+   "acceptsCuet": null
+  }
+ ]
+}
