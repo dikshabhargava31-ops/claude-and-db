@@ -56,6 +56,7 @@ class PostError(Exception):
 
 ACCOUNT_SLOT = re.compile(r"^IG_ACCOUNT_\d+$")
 ACCOUNT_NAME = re.compile(r"^[a-z0-9_]+$")
+ACCOUNT_PROBLEMS = []
 
 
 def parse_account(raw, source, name=None):
@@ -69,8 +70,15 @@ def parse_account(raw, source, name=None):
             raise SystemExit(f"{source} is not valid JSON. Check the quotes, commas and braces.")
         parts = raw.replace(",", " ").split()
         if len(parts) != 3:
+            hint = ""
+            if len(parts) == 2 and parts[0].isdigit():
+                hint = " It has the user ID and token but no short name at the start."
+            elif len(parts) == 1:
+                hint = " It has only one value; the user ID or the token is missing."
+            elif len(parts) > 3:
+                hint = f" It has {len(parts)} values; remove any extra words or spaces."
             raise SystemExit(f"{source} should be the short name, the Instagram user ID and the token, "
-                             f"separated by spaces.")
+                             f"separated by spaces, like: school 17841400000000003 IGAA...{hint}")
         acc = {"name": parts[0], "user_id": parts[1], "token": parts[2]}
     if not isinstance(acc, dict):
         raise SystemExit(f"{source} should describe one account.")
@@ -99,7 +107,13 @@ def load_accounts(path):
             accounts[name] = acc
     for key in sorted((k for k in os.environ if ACCOUNT_SLOT.match(k)), key=lambda k: int(k.rsplit("_", 1)[1])):
         if os.environ[key].strip():
-            name, acc = parse_account(os.environ[key], key)
+            # A badly filled slot only loses that account; the others still post.
+            try:
+                name, acc = parse_account(os.environ[key], key)
+            except SystemExit as e:
+                ACCOUNT_PROBLEMS.append(str(e))
+                print(f"ERROR    {e}")
+                continue
             accounts[name] = acc
     return accounts
 
@@ -442,6 +456,7 @@ def cmd_verify(args):
         except PostError as e:
             print(f"ERROR    {name}: {e}")
             failed += 1
+    failed += len(ACCOUNT_PROBLEMS)
     return 1 if failed else 0
 
 
