@@ -571,13 +571,13 @@
     const group = (C.groups || []).find(g => norm(g.university) === norm(u.name));
     const name = pretty(u.name), on = inDream(name);
     return `<div class="page"><div class="wrap">
-      <section class="hello on-red">
+      <section class="hello">
         <div class="eyebrow">✦ ${esc(u.category)} university</div>
         <h1>${esc(name)}</h1>
         <p style="font-size:.85rem">On NTA's CUET (UG) list as “${esc(u.name)}”</p>
         <div class="row">
-          <button class="btn white" data-act="star">${on ? '★ On My List' : '☆ Add to My List'}</button>
-          ${u.website ? `<a class="btn" style="background:transparent;border-color:rgba(255,255,255,.5);color:#fff" href="${esc(u.website)}" target="_blank" rel="noopener">Website ${ico('out', 'sm')}</a>` : ''}
+          <button class="btn pri" data-act="star">${on ? '★ On My List' : '☆ Add to My List'}</button>
+          ${u.website ? `<a class="btn" href="${esc(u.website)}" target="_blank" rel="noopener">Website ${ico('out', 'sm')}</a>` : ''}
         </div>
       </section>
       <div class="list section">

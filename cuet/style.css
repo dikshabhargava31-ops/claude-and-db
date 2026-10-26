@@ -360,3 +360,32 @@ ul.ticks li::before { content: "✦"; position: absolute; left: 0; color: var(--
 .page-head h1 { display: none; }
 .page-head p { font-size: .95rem; }
 @media (min-width: 960px) { .hscroll.cards { display: grid; grid-template-columns: repeat(3, 1fr); } .hscroll.cards .fcard { max-width: none; } }
+
+/* ---------- more white, less red: red only for actions, the active tab and deadlines ---------- */
+:root { --bg: #ffffff; --fill: #F4F2F0; --line: #ECE9E6; --sh: 0 1px 2px rgba(23, 19, 26, .04), 0 6px 20px -14px rgba(23, 19, 26, .18); }
+@media (prefers-color-scheme: dark) { :root { --bg: #111013; --fill: #242127; --line: #2B282F; } }
+.hello { background: var(--card); color: var(--ink); border: 1px solid var(--line); box-shadow: var(--sh); }
+.hello::after { color: var(--red); opacity: .07; }
+.hello h1 { color: var(--ink); }
+.hello p { color: var(--ink-2); }
+.hello .eyebrow { color: var(--red-ink); }
+.hello .search input { border: 1.5px solid var(--line); background: var(--fill); }
+.hello .search input:focus { background: var(--card); }
+.hello .cd span, .on-red .cd span { background: var(--fill); color: var(--ink); }
+.hello .cd span small, .on-red .cd span small { color: var(--ink-3); }
+.av { background: var(--fill); }
+.date-box { background: var(--fill); }
+.bot header { background: var(--card); color: var(--ink); border-bottom: 1px solid var(--line); }
+.bot header .icon-btn { color: var(--ink); }
+.cta-band { background: var(--fill); color: var(--ink); }
+.cta-band h3 { color: var(--ink); }
+.cta-band .btn.white { background: var(--red); border-color: var(--red); color: #fff; }
+@media (min-width: 960px) {
+  .rail { background: var(--card); color: var(--ink); border-right: 1px solid var(--line); }
+  .tabs a { color: var(--ink-2); }
+  .tabs a:hover { background: var(--fill); color: var(--ink); }
+  .tabs a[aria-current="page"] { background: var(--red-soft); color: var(--red-ink); }
+  .tabs .badge { background: var(--red); color: #fff; }
+  .rail-foot { color: var(--ink-3); }
+  .rail-foot a { color: var(--ink-2); }
+}
