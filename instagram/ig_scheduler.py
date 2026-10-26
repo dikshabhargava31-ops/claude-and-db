@@ -11,7 +11,7 @@ Commands:
 
 Accounts come from the IG_ACCOUNTS environment variable (a JSON object) or --accounts <file>:
   {"ipa": {"user_id": "1784...", "token": "IGAA...", "api": "instagram"}}
-and from IG_ACCOUNT_<NAME> secrets ("<user_id> <token>"), passed as JSON in IG_SECRETS.
+and from the IG_ACCOUNT_1 ... IG_ACCOUNT_10 secrets, one account each: "<name> <user_id> <token>".
 "api" is "instagram" (Instagram Login, default) or "facebook" (Facebook Login through a Page;
 token refresh then also needs "app_id" and "app_secret").
 
@@ -54,11 +54,13 @@ class PostError(Exception):
 
 # ---------- input ----------
 
-ACCOUNT_SECRET = re.compile(r"^IG_ACCOUNT_([A-Z0-9_]+)$")
+ACCOUNT_SLOT = re.compile(r"^IG_ACCOUNT_\d+$")
+ACCOUNT_NAME = re.compile(r"^[a-z0-9_]+$")
 
 
-def parse_account(name, raw, source):
-    """An account is JSON ({"user_id": ..., "token": ...}) or just "<user_id> <token>"."""
+def parse_account(raw, source, name=None):
+    """An account is JSON ({"user_id": ..., "token": ...}) or "<name> <user_id> <token>".
+    Returns (name, account)."""
     raw = raw.strip()
     try:
         acc = json.loads(raw)
@@ -66,19 +68,25 @@ def parse_account(name, raw, source):
         if raw.startswith("{"):
             raise SystemExit(f"{source} is not valid JSON. Check the quotes, commas and braces.")
         parts = raw.replace(",", " ").split()
-        if len(parts) != 2:
-            raise SystemExit(f"{source} should be the Instagram user ID, a space, then the token.")
-        acc = {"user_id": parts[0], "token": parts[1]}
-    if not isinstance(acc, dict) or not acc.get("user_id") or not acc.get("token"):
+        if len(parts) != 3:
+            raise SystemExit(f"{source} should be the short name, the Instagram user ID and the token, "
+                             f"separated by spaces.")
+        acc = {"name": parts[0], "user_id": parts[1], "token": parts[2]}
+    if not isinstance(acc, dict):
+        raise SystemExit(f"{source} should describe one account.")
+    name = (acc.pop("name", None) or name or "").lower()
+    if not ACCOUNT_NAME.match(name):
+        raise SystemExit(f"{source}: the short name '{name}' should use only lowercase letters, digits and _.")
+    if not acc.get("user_id") or not acc.get("token"):
         raise SystemExit(f"Account '{name}' ({source}) needs both user_id and token.")
     acc.setdefault("api", "instagram")
     acc["source"] = source
-    return acc
+    return name, acc
 
 
 def load_accounts(path):
-    """Accounts come from IG_ACCOUNTS (one JSON object) and from one IG_ACCOUNT_<NAME> secret per
-    account, which the workflows pass in IG_SECRETS. A per-account secret wins over IG_ACCOUNTS."""
+    """Accounts come from IG_ACCOUNTS (one JSON object) and from the IG_ACCOUNT_1 ... IG_ACCOUNT_10
+    secrets, one account each. An account in a numbered secret wins over IG_ACCOUNTS."""
     raw = Path(path).read_text() if path else os.environ.get("IG_ACCOUNTS", "")
     accounts = {}
     if raw.strip():
@@ -87,16 +95,12 @@ def load_accounts(path):
         except ValueError as e:
             raise SystemExit(f"IG_ACCOUNTS is not valid JSON ({e}). Check the quotes, commas and braces.")
         for name, acc in combined.items():
-            accounts[name] = parse_account(name, json.dumps(acc), "IG_ACCOUNTS")
-    try:
-        secrets = json.loads(os.environ.get("IG_SECRETS") or "{}")
-    except ValueError:
-        secrets = {}
-    for key, value in sorted(secrets.items()):
-        m = ACCOUNT_SECRET.match(key)
-        if m and value:
-            name = m.group(1).lower()
-            accounts[name] = parse_account(name, value, key)
+            name, acc = parse_account(json.dumps(acc), "IG_ACCOUNTS", name)
+            accounts[name] = acc
+    for key in sorted((k for k in os.environ if ACCOUNT_SLOT.match(k)), key=lambda k: int(k.rsplit("_", 1)[1])):
+        if os.environ[key].strip():
+            name, acc = parse_account(os.environ[key], key)
+            accounts[name] = acc
     return accounts
 
 
@@ -497,7 +501,7 @@ def cmd_refresh_tokens(args):
         (out / "IG_ACCOUNTS").write_text(json.dumps(combined))
     for name, acc in accounts.items():
         if acc["source"] != "IG_ACCOUNTS":
-            (out / acc["source"]).write_text(json.dumps(strip(acc)))
+            (out / acc["source"]).write_text(f"{name} {acc['user_id']} {acc['token']}")
     return 1 if failed else 0
 
 

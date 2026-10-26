@@ -29,10 +29,10 @@ In this repository, open Settings → *Secrets and variables → Actions → New
 You don't need to touch `IG_ACCOUNTS`, whose tokens have been renewed since you pasted them.
 
 1. **Connect it in Meta.** Do steps 1.1, 1.3 and 1.4 for the new account in the same Meta app: make it professional, add it as an Instagram Tester and accept the invite, then copy its user ID and token.
-2. **Give it its own secret.** Choose a short name in lowercase letters, digits or `_`. Create a repository secret named `IG_ACCOUNT_` plus the name in capitals (`IG_ACCOUNT_SCHOOL` for the name `school`). As its value, paste the user ID, a space, then the token: `17841400000000003 IGAA...`.
+2. **Give it its own secret.** Create a repository secret in the first free slot, from `IG_ACCOUNT_1` to `IG_ACCOUNT_10`. As its value, paste a short name (lowercase letters, digits or `_`), the user ID and the token, separated by spaces: `school 17841400000000003 IGAA...`.
 3. **Show it in the planner.** Add the short name and the Instagram username to `accounts.json` (`"school": "school_username"`).
 
-Run *Instagram scheduler* with mode *verify* to check it. The weekly renewal covers these secrets too.
+Run *Instagram scheduler* with mode *verify* to check it. The weekly renewal covers these secrets too. For more than 12 accounts in all, add `IG_ACCOUNT_11` and up to the `env` lists in both `instagram-*.yml` workflows.
 
 ## 3. Let tokens renew themselves (once)
 

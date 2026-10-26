@@ -38,7 +38,16 @@ jobs:
       - name: Publish due posts
         env:
           IG_ACCOUNTS: ${{ secrets.IG_ACCOUNTS }}
-          IG_SECRETS: ${{ toJSON(secrets) }}
+          IG_ACCOUNT_1: ${{ secrets.IG_ACCOUNT_1 }}
+          IG_ACCOUNT_2: ${{ secrets.IG_ACCOUNT_2 }}
+          IG_ACCOUNT_3: ${{ secrets.IG_ACCOUNT_3 }}
+          IG_ACCOUNT_4: ${{ secrets.IG_ACCOUNT_4 }}
+          IG_ACCOUNT_5: ${{ secrets.IG_ACCOUNT_5 }}
+          IG_ACCOUNT_6: ${{ secrets.IG_ACCOUNT_6 }}
+          IG_ACCOUNT_7: ${{ secrets.IG_ACCOUNT_7 }}
+          IG_ACCOUNT_8: ${{ secrets.IG_ACCOUNT_8 }}
+          IG_ACCOUNT_9: ${{ secrets.IG_ACCOUNT_9 }}
+          IG_ACCOUNT_10: ${{ secrets.IG_ACCOUNT_10 }}
           MODE: ${{ inputs.mode || 'publish' }}
           PROBE_URL: ${{ inputs.probe_url }}
         run: |
