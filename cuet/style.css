@@ -389,3 +389,17 @@ ul.ticks li::before { content: "✦"; position: absolute; left: 0; color: var(--
   .rail-foot { color: var(--ink-3); }
   .rail-foot a { color: var(--ink-2); }
 }
+
+/* ---------- log in ---------- */
+.pill.acct { display: inline-grid; place-items: center; text-decoration: none !important; background: var(--red); color: #fff; }
+.pill.acct.me { width: 36px; min-width: 36px; padding: 0; border-radius: 50%; }
+.login { text-align: center; }
+.login .stack, .login form { text-align: left; }
+.login-logo { width: 150px; height: auto; margin: 4px auto 18px; }
+.login h2 { margin-bottom: 6px; }
+.login > p.muted { margin-bottom: 18px; }
+.btn.google { min-height: 50px; gap: 10px; border-color: var(--line); font-size: .95rem; }
+.or { display: flex; align-items: center; gap: 12px; margin: 18px 0 12px; color: var(--ink-3); font-size: .8rem; font-weight: 700; }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.otp { text-align: center; font-size: 1.6rem; font-weight: 800; letter-spacing: .5em; padding-left: .5em; }
+.fine { font-size: .75rem; color: var(--ink-3); margin: 14px 0 0; }

@@ -40,7 +40,10 @@
   function load() {
     try { return Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { return defaults(); }
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private window: keep working in memory */ } }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private window: keep working in memory */ }
+    try { syncSoon(); } catch { /* accounts not started yet */ }
+  }
 
   /* ---------- data ---------- */
   const D = { universities: null, cutoffs: null, events: null, allotments: null, rules: null, official: null, forms: null };
@@ -127,58 +130,199 @@
   /* Sends a sign-up, order or request to the team: form endpoint first, else a prefilled WhatsApp message. */
   async function submit(kind, payload, waText) {
     let sent = false;
+    if (sb && user) {
+      const { error } = await sb.from('requests').insert({ kind, payload });
+      sent = !error;
+    }
     if (C.formEndpoint) {
       try {
         const r = await fetch(C.formEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ kind, ...payload, at: new Date().toISOString() }) });
         sent = r.ok;
       } catch { sent = false; }
     }
-    if (C.whatsapp && waText) { window.open(`https://wa.me/${C.whatsapp}?text=${encodeURIComponent(waText)}`, '_blank', 'noopener'); sent = true; }
+    if (C.whatsapp && waText && !sent) { window.open(`https://wa.me/${C.whatsapp}?text=${encodeURIComponent(waText)}`, '_blank', 'noopener'); sent = true; }
     toast(sent ? 'Sent to the Everything CUET team ✓' : 'Saved on this device. Online booking opens soon.');
     return sent;
   }
   const waShare = text => `https://wa.me/?text=${encodeURIComponent(text)}`;
 
-  /* Phone/email is asked only when a student saves a list or turns on reminders, never before results. */
-  function askLead(reason, after) {
+  /* ---------- accounts and leads ----------
+     Browsing is open. Saving, reminders, predictor results, bookings and orders ask the student to log in
+     (Google or a 6-digit email code through Supabase), then for name, phone and interests: that row is the lead.
+     Without Supabase settings in config.js the same steps fall back to a short unverified form. */
+  const SBC = C.supabase || {};
+  let sb = null, user = null, pending = null, isAdmin = false;
+  try {
+    if (SBC.url && SBC.anonKey && window.supabase) sb = window.supabase.createClient(SBC.url, SBC.anonKey, { auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: true } });
+  } catch (err) { console.warn('Supabase did not start', err); sb = null; }
+  const loggedIn = () => (sb ? !!user : !!S.profile.phone);
+  const profileDone = () => !!(S.profile.name && /\d{10}/.test(String(S.profile.phone).replace(/\D/g, '')));
+  const YEARS = ['2026', '2027', '2028'];
+  const INTERESTS = ['BA / Liberal arts', 'B.Com / Economics', 'BBA / Management (IPM)', 'B.Sc', 'B.Tech', 'Law', 'Design', 'Not sure yet'];
+
+  function requireLogin(reason, then) {
+    if (loggedIn() && profileDone()) { then && then(); return; }
+    pending = then || null;
+    S.afterLogin = location.hash || '#/'; save();
+    modal.open(`<div id="loginBox"></div>`, el => drawLogin($('#loginBox', el), reason));
+  }
+  /* Kept for the places that used to ask for a phone number: now they log the student in, then send the request. */
+  function askLead(reason) {
+    requireLogin(reason, () => submit('alerts', { dreamList: S.dream.map(d => d.uni) },
+      `Hi Everything CUET, please send me deadline alerts.\nName: ${S.profile.name}\nPhone: ${S.profile.phone}\nMy list: ${S.dream.map(d => d.uni).join(', ') || '—'}`));
+  }
+
+  function loginStart(reason) {
+    if (!sb) return profileStep(reason, true);
+    return `<div class="login">
+      <img class="login-logo" src="assets/wordmark-red.png" alt="Everything CUET" width="720" height="325">
+      <h2>${esc(reason || 'Log in to Everything CUET')}</h2>
+      <p class="muted">Save your colleges, get deadline reminders and track every form. Free.</p>
+      <button class="btn block google" data-act="google"><svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continue with Google</button>
+      <div class="or"><span>or use your email</span></div>
+      <form data-form="email" class="stack">
+        <label>Email<input name="email" type="email" required autocomplete="email" value="${esc(S.profile.email)}" placeholder="you@gmail.com"></label>
+        <button class="btn pri block" type="submit">Send me a code</button>
+      </form>
+      <p class="fine">By continuing you agree to get reminders about your colleges. We never sell your number.</p>
+    </div>`;
+  }
+  function codeStep(email) {
+    return `<div class="login">
+      <h2>Check your email</h2>
+      <p class="muted">We sent a 6-digit code to <b>${esc(email)}</b>.</p>
+      <form data-form="code" class="stack">
+        <input class="otp" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="\\d{6}" maxlength="6" required placeholder="••••••" aria-label="6-digit code">
+        <button class="btn pri block" type="submit">Verify</button>
+      </form>
+      <div class="row" style="justify-content:center;margin-top:10px"><button class="btn ghost sm" data-act="resend">Resend code</button><button class="btn ghost sm" data-act="back">Change email</button></div>
+    </div>`;
+  }
+  function profileStep(reason, withEmail) {
     const p = S.profile;
-    modal.open(`
-      <h2>${esc(reason)}</h2>
-      <p class="muted">Your list stays saved on this device either way. Leave your number to get WhatsApp, SMS and email reminders for the colleges on it.</p>
-      <form id="leadForm" class="stack">
+    return `<div class="login">
+      ${withEmail ? `<img class="login-logo" src="assets/wordmark-red.png" alt="Everything CUET" width="720" height="325">` : ''}
+      <h2>${withEmail ? esc(reason || 'Log in to Everything CUET') : 'One last step'}</h2>
+      <p class="muted">So we can remind you before every deadline.</p>
+      <form data-form="profile" class="stack">
+        <label>Full name<input name="name" required autocomplete="name" value="${esc(p.name)}"></label>
+        <label>Mobile number<input name="phone" required inputmode="tel" autocomplete="tel" pattern="[+0-9 ]{10,15}" placeholder="10-digit mobile" value="${esc(p.phone)}"></label>
+        ${withEmail ? `<label>Email<input name="email" type="email" autocomplete="email" value="${esc(p.email)}"></label>` : ''}
         <div class="form-grid">
-          <label>${t('Name')}<input name="name" value="${esc(p.name)}" autocomplete="name"></label>
-          <label>${t('Phone')}<input name="phone" value="${esc(p.phone)}" inputmode="tel" autocomplete="tel" pattern="[0-9+ ]{10,15}" placeholder="10-digit mobile"></label>
+          <label>Class 12 year<select name="class12_year">${YEARS.map(y => `<option ${String(p.class12_year || '2027') === y ? 'selected' : ''}>${y}</option>`).join('')}</select></label>
+          <label>${t('Your category')}<select name="category">${RES_CATS.map(c => `<option ${p.category === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
         </div>
-        <label>${t('Email')}<input name="email" type="email" value="${esc(p.email)}" autocomplete="email"></label>
-        <div class="chips">
-          <label class="check"><input type="checkbox" name="wa" ${p.optIn.wa !== false ? 'checked' : ''}>WhatsApp</label>
-          <label class="check"><input type="checkbox" name="sms" ${p.optIn.sms ? 'checked' : ''}>SMS</label>
-          <label class="check"><input type="checkbox" name="mail" ${p.optIn.mail !== false ? 'checked' : ''}>Email</label>
+        <div class="form-grid">
+          <label>State<input name="state" value="${esc(p.state)}" placeholder="e.g. Delhi"></label>
+          <label>Interested in<select name="interest">${INTERESTS.map(i => `<option ${p.interest === i ? 'selected' : ''}>${i}</option>`).join('')}</select></label>
         </div>
-        <small>Reminders go out 7 days, 48 hours and on the day of each deadline. No spam, no selling your number.</small>
-        <div class="row"><button class="btn pri" type="submit">${t('Save')}</button><button class="btn ghost" type="button" data-act="modal-close">Not now</button></div>
-      </form>`, el => {
-      $('#leadForm', el).addEventListener('submit', async e => {
-        e.preventDefault();
-        const f = new FormData(e.target);
-        Object.assign(S.profile, { name: f.get('name').trim(), phone: f.get('phone').trim(), email: f.get('email').trim(), optIn: { wa: !!f.get('wa'), sms: !!f.get('sms'), mail: !!f.get('mail') } });
-        S.leadAsked = true; save(); modal.close();
-        if (S.profile.phone || S.profile.email) {
-          await submit('alerts', { profile: S.profile, dreamList: S.dream.map(d => `${d.uni} – ${d.course || ''}`) },
-            `Hi Everything CUET, please send me deadline alerts.\nName: ${S.profile.name}\nPhone: ${S.profile.phone}\nEmail: ${S.profile.email}\nMy list: ${S.dream.map(d => d.uni).join(', ') || '—'}`);
-        }
-        after && after();
-      });
+        <label class="check"><input type="checkbox" name="whatsapp_ok" ${p.whatsapp_ok === false ? '' : 'checked'}>Send me reminders on WhatsApp</label>
+        <button class="btn pri block" type="submit">${withEmail ? 'Continue' : 'Save and continue'}</button>
+      </form>
+    </div>`;
+  }
+  function drawLogin(box, reason, step) {
+    step = step || (sb && user ? 'profile' : 'start');
+    box.innerHTML = step === 'profile' ? profileStep(reason, !sb) : step.startsWith('code:') ? codeStep(step.slice(5)) : loginStart(reason);
+    const busy = (btn, on) => { if (btn) { btn.disabled = on; btn.dataset.label = btn.dataset.label || btn.textContent; btn.textContent = on ? 'Please wait…' : btn.dataset.label; } };
+    box.onclick = async e => {
+      const a = e.target.closest('[data-act]'); if (!a) return;
+      if (a.dataset.act === 'google') {
+        const { error } = await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
+        if (error) toast(error.message);
+      }
+      if (a.dataset.act === 'back') drawLogin(box, reason, 'start');
+      if (a.dataset.act === 'resend') { const { error } = await sb.auth.signInWithOtp({ email: S.profile.email, options: { shouldCreateUser: true } }); toast(error ? error.message : 'New code sent'); }
+    };
+    box.onsubmit = async e => {
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(e.target)), btn = $('button[type=submit]', e.target);
+      if (e.target.dataset.form === 'email') {
+        busy(btn, true);
+        const { error } = await sb.auth.signInWithOtp({ email: f.email.trim(), options: { shouldCreateUser: true } });
+        busy(btn, false);
+        if (error) { toast(error.message); return; }
+        S.profile.email = f.email.trim(); save();
+        drawLogin(box, reason, 'code:' + S.profile.email);
+      }
+      if (e.target.dataset.form === 'code') {
+        busy(btn, true);
+        const { error } = await sb.auth.verifyOtp({ email: S.profile.email, token: f.code.trim(), type: 'email' });
+        busy(btn, false);
+        if (error) toast('That code did not work. Check it or resend.');
+        // onAuthStateChange takes it from here
+      }
+      if (e.target.dataset.form === 'profile') {
+        if (!/\d{10}/.test(f.phone.replace(/\D/g, ''))) { toast('Enter a 10-digit mobile number'); return; }
+        Object.assign(S.profile, { name: f.name.trim(), phone: f.phone.trim(), class12_year: f.class12_year, category: f.category, state: f.state.trim(), interest: f.interest, whatsapp_ok: !!f.whatsapp_ok, optIn: { wa: !!f.whatsapp_ok, mail: true } });
+        if (f.email != null) S.profile.email = f.email.trim();
+        S.leadAsked = true; save();
+        busy(btn, true);
+        if (sb && user) { const ok = await syncLead(); if (!ok) { busy(btn, false); toast('Could not save. Check your connection and try again.'); return; } }
+        else await submit('lead', { profile: S.profile }, `Hi Everything CUET, I just signed up.\nName: ${S.profile.name}\nPhone: ${S.profile.phone}\nEmail: ${S.profile.email}\nClass 12: ${S.profile.class12_year}\nInterested in: ${S.profile.interest}`);
+        finishLogin();
+      }
+    };
+  }
+  function finishLogin() {
+    const go = S.afterLogin, then = pending;
+    pending = null; S.afterLogin = null; save();
+    modal.close();
+    if (then) { then(); render(); }
+    else if (go && go !== location.hash) location.hash = go;
+    else render();
+    toast(`Welcome${S.profile.name ? ', ' + S.profile.name.split(' ')[0] : ''} ✓`);
+  }
+  const compactDream = () => S.dream.map(d => ({ uni: d.uni, course: d.course, col: d.col, deadline: d.deadline, status: d.status || 0 }));
+  async function syncLead() {
+    if (!sb || !user) return false;
+    const p = S.profile;
+    const { error } = await sb.from('leads').upsert({
+      id: user.id, email: user.email || p.email, name: p.name, phone: p.phone, class12_year: p.class12_year, category: p.category, state: p.state,
+      interest: p.interest, whatsapp_ok: p.whatsapp_ok !== false, dream_list: compactDream(), source: location.host + location.pathname, updated_at: new Date().toISOString()
     });
-    S.leadAsked = true; save();
+    if (error) console.warn('lead not saved', error);
+    return !error;
+  }
+  let syncTimer = null;
+  function syncSoon() { if (sb && user && profileDone()) { clearTimeout(syncTimer); syncTimer = setTimeout(syncLead, 1500); } }
+  async function onSignedIn() {
+    const { data } = await sb.from('leads').select('*').eq('id', user.id).maybeSingle();
+    if (data) {
+      ['name', 'phone', 'class12_year', 'category', 'state', 'interest', 'whatsapp_ok'].forEach(k => { if (data[k] != null && data[k] !== '') S.profile[k] = data[k]; });
+      if (!S.dream.length && Array.isArray(data.dream_list) && data.dream_list.length) {
+        S.dream = data.dream_list.map(d => ({ id: uid(), uniId: '', uni: d.uni, college: '', course: d.course || '', col: d.col || 'target', deadline: d.deadline || '', cutoff: null, predicted: null, gap: null, eligible: null, fees: null, hostel: null, portal: '', status: d.status || 0, docs: {}, notes: '', added: Date.now() }));
+      }
+    }
+    S.profile.email = user.email || S.profile.email; save();
+    isAdmin = !!(await sb.rpc('is_admin')).data;
+    if (!profileDone()) { modal.open(`<div id="loginBox"></div>`, el => drawLogin($('#loginBox', el), '', 'profile')); return; }
+    if (S.dream.length) syncSoon();
+    if (pending || S.afterLogin) finishLogin(); else render();
+  }
+  async function initAuth() {
+    if (!sb) return;
+    const { data } = await sb.auth.getSession();
+    user = data.session ? data.session.user : null;
+    if (/[?&]code=/.test(location.search)) history.replaceState(null, '', location.pathname + (S.afterLogin || location.hash));
+    sb.auth.onAuthStateChange((ev, session) => {
+      const was = user; user = session ? session.user : null;
+      if (!was && user) setTimeout(onSignedIn, 0);
+      if (was && !user) { isAdmin = false; render(); }
+    });
+    if (user) await onSignedIn();
+  }
+  async function signOut() {
+    if (sb) await sb.auth.signOut();
+    S.profile = defaults().profile; S.leadAsked = false; save(); user = null; isAdmin = false;
+    toast('Signed out'); location.hash = '#/';
   }
 
   /* ---------- router ---------- */
   const ico = (n, cls = '') => `<svg class="i ${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
   const TABS = [['', 'Home', 'home'], ['colleges', 'Colleges', 'cap'], ['dream', 'My List', 'star'], ['calendar', 'Deadlines', 'cal'], ['more', 'More', 'grid']];
-  const TAB_OF = { college: 'colleges', forms: 'colleges', applications: 'dream', parent: 'dream' };
-  const TITLES = { '': 'Home', colleges: 'Colleges', forms: 'Colleges', college: 'College', dream: 'My List', applications: 'My List', calendar: 'Deadlines', more: 'More', predictor: 'Find my colleges', tools: 'Tools', resources: 'CUET guide', seniors: 'Talk to a senior', community: 'Community', pricing: 'Plans', parent: 'Parent view' };
+  const TAB_OF = { college: 'colleges', forms: 'colleges', applications: 'dream', parent: 'dream', login: 'more', account: 'more', admin: 'more' };
+  const TITLES = { '': 'Home', colleges: 'Colleges', forms: 'Colleges', college: 'College', dream: 'My List', applications: 'My List', calendar: 'Deadlines', more: 'More', predictor: 'Find my colleges', tools: 'Tools', resources: 'CUET guide', seniors: 'Talk to a senior', community: 'Community', pricing: 'Plans', parent: 'Parent view', login: 'Log in', account: 'Account', admin: 'Leads' };
   const NAV = Object.entries(TITLES).map(([r, l]) => [r, l]);
   function parseHash() {
     const h = location.hash.replace(/^#\/?/, '');
@@ -199,6 +343,11 @@
     const title = t(TITLES[route] || 'Everything CUET');
     $('#barTitle').textContent = route ? title : '';
     $('#langBtn').textContent = S.lang === 'hi' ? 'EN' : 'हि';
+    const acct = $('#acctBtn'), inAs = loggedIn() && profileDone();
+    acct.href = inAs ? '#/account' : '#/login';
+    acct.textContent = inAs ? (S.profile.name || '?')[0].toUpperCase() : 'Log in';
+    acct.classList.toggle('me', inAs);
+    acct.setAttribute('aria-label', inAs ? 'Your account' : 'Log in');
     $('[data-t="bot.title"]').textContent = t('Admission assistant');
     // A fresh element each time, so a page's listeners never pile up on re-render.
     const old = $('#view'), view = old.cloneNode(false);
@@ -237,6 +386,7 @@
   function inDream(uniName) { return S.dream.some(d => norm(d.uni) === norm(uniName)); }
 
   function addToDream(prefill) {
+    if (!(loggedIn() && profileDone())) { requireLogin('Log in to save your list', () => addToDream(prefill)); return; }
     const p = Object.assign({ col: 'target' }, prefill);
     modal.open(`
       <h2>${t('Add to Dream List')}</h2>
@@ -270,7 +420,6 @@
           fees: num(f.fees), hostel: f.hostel === 'yes' ? true : f.hostel === 'no' ? false : null, portal: f.portal, status: 0, docs: {}, notes: '', added: Date.now()
         });
         save(); modal.close(); toast('Added to your Dream List ✓'); render();
-        if (!S.leadAsked) setTimeout(() => askLead('Save your list and get reminders?'), 400);
       });
     });
   }
@@ -291,13 +440,13 @@
     $('#cartCount').textContent = S.cart.length;
   }
   /* One tap adds a college or form to My List; a second tap removes it. */
-  function toggleStar(p) {
+  function toggleStar(p, done) {
     const i = S.dream.findIndex(d => norm(d.uni) === norm(p.uni));
+    if (i < 0 && !(loggedIn() && profileDone())) { requireLogin('Log in to save your list', () => { toggleStar(p); done && done(); }); return false; }
     if (i >= 0) { S.dream.splice(i, 1); save(); toast('Removed from My List'); }
     else {
       S.dream.push({ id: uid(), uniId: p.uniId || '', uni: p.uni, college: '', course: '', col: p.col || 'target', deadline: p.deadline || '', cutoff: null, predicted: null, gap: null, eligible: null, fees: null, hostel: null, portal: p.portal || '', status: 0, docs: {}, notes: '', added: Date.now() });
       save(); toast('★ Added to My List');
-      if (!S.leadAsked) setTimeout(() => askLead('Get reminders for your list?'), 600);
     }
     renderTabs(parseHash().route);
     return i < 0;
@@ -420,6 +569,7 @@
     });
     $('#alertForm').addEventListener('submit', async e => {
       e.preventDefault();
+      if (sb) { askLead('Log in to get deadline alerts'); return; }
       const f = new FormData(e.target);
       Object.assign(S.profile, { phone: f.get('phone').trim(), email: f.get('email').trim() });
       if (!S.profile.phone && !S.profile.email) { toast('Add a phone number or email'); return; }
@@ -452,6 +602,7 @@
         ${s !== 'closed' ? `<button class="btn sun" data-act="fassist">We'll fill it · ${inr(P.assistedForm)}</button>` : ''}
       </div>`, el => {
       el.onclick = e => {
+        if (e.target.closest('[data-act="fstar"]') && !inDream(f.name) && !(loggedIn() && profileDone())) { requireLogin('Log in to save your list', () => toggleStar({ uni: f.name, portal: f.links[0][1], deadline: nd ? toLocalInput(nd.when) : '', col: 'dream' })); return; }
         if (e.target.closest('[data-act="fstar"]')) { toggleStar({ uni: f.name, portal: f.links[0][1], deadline: nd ? toLocalInput(nd.when) : '', col: 'dream' }); modal.close(); render(); }
         if (e.target.closest('[data-act="fassist"]')) { addCart({ type: 'form', label: `${f.name} application form`, price: P.assistedForm }); modal.close(); }
       };
@@ -714,7 +865,7 @@
       };
     };
     const form = $('#predForm');
-    form.addEventListener('submit', e => { e.preventDefault(); show.lim = {}; show(); });
+    form.addEventListener('submit', e => { e.preventDefault(); show.lim = {}; requireLogin('Log in to see your colleges', () => setTimeout(() => $('#predForm') && $('#predForm').requestSubmit(), 0)); });
     form.addEventListener('click', e => {
       const r = e.target.closest('[data-unscore]');
       if (r) { readForm(); delete S.scores[r.dataset.unscore]; save(); render(); }
@@ -983,7 +1134,6 @@
         const perm = await Notification.requestPermission();
         S.notify = perm === 'granted'; save(); render();
         toast(S.notify ? 'Reminders on: 7 days, 2 days and on the day' : 'Notifications are blocked in this browser');
-        if (S.notify && !S.leadAsked) askLead('Also get reminders on your phone?');
       }
     });
   };
@@ -1277,6 +1427,7 @@
   ROUTES['seniors:mount'] = () => {
     $('#srForm').addEventListener('submit', async e => {
       e.preventDefault();
+      if (!(loggedIn() && profileDone())) { requireLogin('Log in to book a senior'); return; }
       const f = Object.fromEntries(new FormData(e.target));
       Object.assign(S.profile, { name: f.name, phone: f.phone }); save();
       await submit('senior-call', f, `Hi Everything CUET, I'd like a ${inr(P.seniorCall)} senior call.\nCollege: ${f.college}\nCourse: ${f.course}\nQuestion: ${f.ask}\nName: ${f.name}\nPhone: ${f.phone}`);
@@ -1322,9 +1473,10 @@
     </div></div>`;
   };
   ROUTES['community:mount'] = () => {
-    $('#grpForm').addEventListener('submit', async e => { e.preventDefault(); const c = new FormData(e.target).get('college'); await submit('group-request', { college: c, profile: S.profile }, `Hi Everything CUET, please start a student group for ${c}.`); });
+    $('#grpForm').addEventListener('submit', async e => { e.preventDefault(); if (!(loggedIn() && profileDone())) { requireLogin('Log in to join a group'); return; } const c = new FormData(e.target).get('college'); await submit('group-request', { college: c, profile: S.profile }, `Hi Everything CUET, please start a student group for ${c}.`); });
     $('#alForm').addEventListener('submit', async e => {
-      e.preventDefault(); const f = Object.fromEntries(new FormData(e.target));
+      e.preventDefault();
+      if (!(loggedIn() && profileDone())) { requireLogin('Log in to share your allotment'); return; } const f = Object.fromEntries(new FormData(e.target));
       S.myAllotments.push(f); save();
       await submit('allotment', f, `Allotment report (Everything CUET)\n${f.university} · ${f.college}\n${f.program} · ${f.category} · Round ${f.round} · Score ${f.score}`);
       render();
@@ -1384,6 +1536,7 @@
     $('#view').addEventListener('submit', async e => {
       if (e.target.id !== 'coForm') return;
       e.preventDefault();
+      if (!(loggedIn() && profileDone())) { requireLogin('Log in to place your order'); return; }
       const f = Object.fromEntries(new FormData(e.target));
       Object.assign(S.profile, { name: f.name, phone: f.phone, email: f.email }); save();
       const tt = cartTotals();
@@ -1393,9 +1546,80 @@
     if (parseHash().q.get('cart')) setTimeout(() => $('#cart') && $('#cart').scrollIntoView({ behavior: 'smooth' }), 50);
   };
 
+  /* ---------- Log in, account, leads ---------- */
+  ROUTES.login = () => {
+    if (loggedIn() && profileDone()) return ROUTES.account();
+    return `<div class="page"><div class="wrap" style="max-width:440px"><div class="card" id="loginPage"></div></div></div>`;
+  };
+  ROUTES['login:mount'] = () => { const b = $('#loginPage'); if (b) { S.afterLogin = '#/'; save(); drawLogin(b, 'Log in to Everything CUET', sb && user ? 'profile' : 'start'); } else ROUTES['account:mount'](); };
+  ROUTES.account = () => {
+    if (!(loggedIn() && profileDone())) return ROUTES.login();
+    const p = S.profile;
+    return `<div class="page"><div class="wrap" style="max-width:560px">
+      <div class="card" style="display:flex;gap:14px;align-items:center">
+        <span class="av" style="width:56px;height:56px;font-size:1.3rem;background:var(--red);color:#fff">${esc((p.name || '?')[0].toUpperCase())}</span>
+        <div><h2 style="margin:0">${esc(p.name)}</h2><small>${esc(p.email || '')}${p.email ? ' · ' : ''}${esc(p.phone)}</small></div>
+      </div>
+      <div class="list section">
+        <button class="list-row" data-act="edit"><span class="av">${ico('grid')}</span><span class="grow"><span class="t">Edit my details</span><span class="s">Class 12 ${esc(p.class12_year || '')} · ${esc(p.category || '')} · ${esc(p.interest || '')}</span></span>${ico('right', 'chev')}</button>
+        <a class="list-row" href="#/dream"><span class="av">${ico('star')}</span><span class="grow"><span class="t">My List</span><span class="s">${S.dream.length} saved${sb ? ' · synced to your account' : ' · on this device'}</span></span>${ico('right', 'chev')}</a>
+        ${isAdmin ? `<a class="list-row" href="#/admin"><span class="av">${ico('cap')}</span><span class="grow"><span class="t">Leads</span><span class="s">Everyone who signed up</span></span>${ico('right', 'chev')}</a>` : ''}
+        <button class="list-row" data-act="signout"><span class="av">${ico('x')}</span><span class="grow"><span class="t">Sign out</span></span></button>
+      </div>
+    </div></div>`;
+  };
+  ROUTES['account:mount'] = () => $('#view').addEventListener('click', e => {
+    const a = e.target.closest('[data-act]'); if (!a) return;
+    if (a.dataset.act === 'signout') signOut();
+    if (a.dataset.act === 'edit') { pending = null; S.afterLogin = '#/account'; modal.open(`<div id="loginBox"></div>`, el => drawLogin($('#loginBox', el), '', 'profile')); }
+  });
+  let leadRows = [];
+  ROUTES.admin = () => `<div class="page"><div class="wrap"><div id="adminBox"><div class="empty"><b>Loading leads…</b></div></div></div></div>`;
+  ROUTES['admin:mount'] = async () => {
+    const box = $('#adminBox');
+    if (!sb) { box.innerHTML = `<div class="notice"><span>Connect Supabase in <b>config.js</b> to collect leads in one place. Until then, sign-ups go to WhatsApp or your form endpoint.</span></div>`; return; }
+    if (!user) { box.innerHTML = `<div class="empty"><b>Admins only</b><a class="btn pri" href="#/login" style="margin-top:12px">Log in</a></div>`; return; }
+    const [{ data: leads, error }, { data: reqs }] = await Promise.all([
+      sb.from('leads').select('*').order('created_at', { ascending: false }).limit(5000),
+      sb.from('requests').select('*').order('created_at', { ascending: false }).limit(2000)
+    ]);
+    if (error) { box.innerHTML = `<div class="notice"><span>${esc(error.message)}</span></div>`; return; }
+    if (!isAdmin) { box.innerHTML = `<div class="empty"><b>Admins only</b>Add your email to the admins table in Supabase.</div>`; return; }
+    leadRows = leads || [];
+    const byKind = {};
+    (reqs || []).forEach(r => { byKind[r.kind] = (byKind[r.kind] || 0) + 1; });
+    const today = leadRows.filter(l => new Date(l.created_at) > Date.now() - 864e5).length;
+    box.innerHTML = `
+      <div class="stats"><div class="stat"><b>${leadRows.length}</b><span>leads</span></div><div class="stat"><b>${today}</b><span>in the last 24 h</span></div>
+        <div class="stat"><b>${byKind.order || 0}</b><span>form-filling orders</span></div><div class="stat"><b>${byKind['senior-call'] || 0}</b><span>senior calls</span></div></div>
+      <div class="row section" style="margin-bottom:12px"><div class="search" style="flex:1;min-width:200px">${ico('search')}<input id="lq" placeholder="Search name, phone, email, state"></div><button class="btn pri" data-act="csv">Download CSV</button><button class="btn" data-act="csvreq">Requests CSV</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Joined</th><th>Name</th><th>Phone</th><th>Email</th><th>Class 12</th><th>Cat.</th><th>State</th><th>Interest</th><th>List</th><th>WA</th></tr></thead><tbody id="ltb"></tbody></table></div>`;
+    const drawRows = () => {
+      const term = norm($('#lq').value);
+      $('#ltb').innerHTML = leadRows.filter(l => !term || norm([l.name, l.phone, l.email, l.state, l.interest].join(' ')).includes(term)).map(l => `<tr>
+        <td><small>${fmtDate(l.created_at)}</small></td><td><b>${esc(l.name)}</b></td><td class="num"><a href="tel:${esc(l.phone)}">${esc(l.phone)}</a></td><td><small>${esc(l.email)}</small></td>
+        <td>${esc(l.class12_year)}</td><td>${esc(l.category)}</td><td>${esc(l.state)}</td><td><small>${esc(l.interest)}</small></td><td class="num">${(l.dream_list || []).length}</td><td>${l.whatsapp_ok ? '✓' : ''}</td></tr>`).join('');
+    };
+    const csv = (rows, cols) => {
+      const q = v => `"${String(v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : v).replace(/"/g, '""')}"`;
+      const blob = new Blob(['﻿' + [cols.join(','), ...rows.map(r => cols.map(c => q(r[c])).join(','))].join('\n')], { type: 'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `everything-cuet-${cols.includes('kind') ? 'requests' : 'leads'}-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+    };
+    $('#lq').addEventListener('input', drawRows);
+    box.addEventListener('click', e => {
+      const a = e.target.closest('[data-act]'); if (!a) return;
+      if (a.dataset.act === 'csv') csv(leadRows, ['created_at', 'name', 'phone', 'email', 'class12_year', 'category', 'state', 'interest', 'whatsapp_ok', 'dream_list']);
+      if (a.dataset.act === 'csvreq') csv(reqs || [], ['created_at', 'user_id', 'kind', 'payload']);
+    });
+    drawRows();
+  };
+
   /* ---------- More ---------- */
   const menuRow = ([r, i, l, d]) => `<a class="list-row" href="${/^https?:/.test(r) ? esc(r) + '" target="_blank" rel="noopener' : '#/' + r}"><span class="av">${ico(i)}</span><span class="grow"><span class="t">${l}</span>${d ? `<span class="s">${d}</span>` : ''}</span>${ico(/^https?:/.test(r) ? 'out' : 'right', 'chev')}</a>`;
   ROUTES.more = () => `<div class="page"><div class="wrap">
+    <div class="list" style="margin-bottom:16px">${loggedIn() && profileDone()
+      ? `<a class="list-row" href="#/account"><span class="av" style="background:var(--red);color:#fff">${esc((S.profile.name || '?')[0].toUpperCase())}</span><span class="grow"><span class="t">${esc(S.profile.name)}</span><span class="s">${esc(S.profile.email || S.profile.phone)}</span></span>${ico('right', 'chev')}</a>`
+      : `<a class="list-row" href="#/login"><span class="av">${ico('star')}</span><span class="grow"><span class="t">Log in or sign up</span><span class="s">Save your list and get reminders</span></span>${ico('right', 'chev')}</a>`}</div>
     <div class="list">${[
       ['predictor', 'bolt', 'Find my colleges', 'Dream, Target and Safe from your scores'],
       ['tools/marks', 'grid', t('Marks calculator'), '+5 / −1 from the answer key'],
@@ -1483,5 +1707,5 @@
   $('#langBtn').addEventListener('click', () => { S.lang = S.lang === 'hi' ? 'en' : 'hi'; save(); render(); });
 
   HI.Closed = 'बंद'; HI.Seniors = 'सीनियर्स';
-  loadData().then(() => { render(); checkReminders(); });
+  Promise.all([loadData(), initAuth().catch(err => console.warn('login unavailable', err))]).then(() => { render(); checkReminders(); });
 })();
