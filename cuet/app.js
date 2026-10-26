@@ -97,7 +97,8 @@
     clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 3200);
   }
   const modal = {
-    open(html, onMount) { $('#modalBody').innerHTML = html; const d = $('#modal'); if (!d.open) d.showModal(); onMount && onMount($('#modalBody')); },
+    open(html, onMount) {
+      $('#modalBody').onclick = null; $('#modalBody').innerHTML = html; const d = $('#modal'); if (!d.open) d.showModal(); onMount && onMount($('#modalBody')); },
     close() { const d = $('#modal'); if (d.open) d.close(); }
   };
   $('#modal').addEventListener('click', e => { if (e.target.id === 'modal' || e.target.closest('[data-act="modal-close"]')) modal.close(); });
@@ -174,7 +175,11 @@
   }
 
   /* ---------- router ---------- */
-  const NAV = [['', 'Home'], ['colleges', 'Colleges'], ['forms', 'College forms'], ['predictor', 'Predictor'], ['dream', 'Dream List'], ['calendar', 'Calendar'], ['applications', 'Applications'], ['tools', 'Tools'], ['resources', 'Resources'], ['seniors', 'Seniors'], ['community', 'Community'], ['pricing', 'Pricing']];
+  const ico = (n, cls = '') => `<svg class="i ${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+  const TABS = [['', 'Home', 'home'], ['colleges', 'Colleges', 'cap'], ['dream', 'My List', 'star'], ['calendar', 'Deadlines', 'cal'], ['more', 'More', 'grid']];
+  const TAB_OF = { college: 'colleges', forms: 'colleges', applications: 'dream', parent: 'dream' };
+  const TITLES = { '': 'Home', colleges: 'Colleges', forms: 'Colleges', college: 'College', dream: 'My List', applications: 'My List', calendar: 'Deadlines', more: 'More', predictor: 'Find my colleges', tools: 'Tools', resources: 'CUET guide', seniors: 'Talk to a senior', community: 'Community', pricing: 'Plans', parent: 'Parent view' };
+  const NAV = Object.entries(TITLES).map(([r, l]) => [r, l]);
   function parseHash() {
     const h = location.hash.replace(/^#\/?/, '');
     const [path, qs] = h.split('?');
@@ -182,24 +187,30 @@
     return { route: parts[0] || '', arg: parts.slice(1).join('/'), q: new URLSearchParams(qs || '') };
   }
   const ROUTES = {};
+  function renderTabs(route) {
+    const tab = route in TAB_OF ? TAB_OF[route] : TABS.some(x => x[0] === route) ? route : 'more';
+    $('#tabs').innerHTML = TABS.map(([r, l, i]) => `<a href="#/${r}" ${r === tab ? 'aria-current="page"' : ''}>${ico(i)}<span>${t(l)}</span>${r === 'dream' && S.dream.length ? `<span class="badge">${S.dream.length}</span>` : ''}</a>`).join('');
+  }
   function render() {
-    const { route, arg, q } = parseHash();
+    let { route, arg, q } = parseHash();
+    if (!ROUTES[route]) route = '';
     document.documentElement.lang = S.lang;
-    $('#nav').innerHTML = NAV.map(([r, l]) => `<a href="#/${r}" ${r === route ? 'aria-current="page"' : ''}>${t(l)}</a>`).join('');
-    $('#nav').classList.remove('open');
-    $('#langBtn').textContent = S.lang === 'hi' ? 'English' : 'हिंदी';
+    renderTabs(route);
+    const title = t(TITLES[route] || 'Everything CUET');
+    $('#barTitle').textContent = route ? title : '';
+    $('#langBtn').textContent = S.lang === 'hi' ? 'EN' : 'हि';
     $('[data-t="bot.title"]').textContent = t('Admission assistant');
-    const fn = ROUTES[route] || ROUTES[''];
     // A fresh element each time, so a page's listeners never pile up on re-render.
     const old = $('#view'), view = old.cloneNode(false);
     old.replaceWith(view);
-    view.innerHTML = fn(arg, q) || '';
+    view.innerHTML = ROUTES[route](arg, q) || '';
     const mount = ROUTES[route + ':mount'];
     mount && mount(arg, q);
-    document.title = (route ? t((NAV.find(n => n[0] === route) || [, ''])[1]) + ' · ' : '') + 'Everything CUET';
+    document.title = (route ? title + ' · ' : '') + 'Everything CUET';
     renderFoot(); updateCart(); tick();
   }
   window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+  window.addEventListener('scroll', () => $('#bar').classList.toggle('scrolled', window.scrollY > 4), { passive: true });
 
   /* ---------- shared bits ---------- */
   function upcomingEvents(onlyMine) {
@@ -213,7 +224,8 @@
     }));
     S.customEvents.forEach(e => evs.push({ ...e, kind: 'custom', status: 'yours' }));
     forms().forEach(f => f.deadlines.forEach((d, i) => evs.push({ id: `form-${f.id}-${i}`, title: `${f.name}: ${d.label}`, group: f.name, date: d.date, status: 'reported', kind: 'master', formId: f.id, note: 'Reported date — confirm on the official site.', source: d.source })));
-    S.dream.filter(d => d.deadline).forEach(d => evs.push({ id: 'dl-' + d.id, title: `${d.uni}${d.course ? ' – ' + d.course : ''}: application deadline`, group: d.uni, date: d.deadline, status: 'yours', kind: 'dream', dreamId: d.id, source: d.portal }));
+    const formDates = new Set(forms().flatMap(f => f.deadlines.map(d => norm(f.name) + '|' + evDate(d).getTime())));
+    S.dream.filter(d => d.deadline && !formDates.has(norm(d.uni) + '|' + new Date(d.deadline).getTime())).forEach(d => evs.push({ id: 'dl-' + d.id, title: `${d.uni}${d.course ? ' – ' + d.course : ''}: application deadline`, group: d.uni, date: d.deadline, status: 'yours', kind: 'dream', dreamId: d.id, source: d.portal }));
     const mine = new Set(S.dream.map(d => norm(d.uni)));
     return evs
       .filter(e => !onlyMine || e.kind !== 'master' || e.group === 'NTA' || mine.has(norm(e.group)))
@@ -275,8 +287,20 @@
     return { sub, bundle, total: sub - bundle, forms: forms.length };
   }
   function updateCart() {
-    $('#cartFab').hidden = !S.cart.length;
+    $('#cartBtn').hidden = !S.cart.length;
     $('#cartCount').textContent = S.cart.length;
+  }
+  /* One tap adds a college or form to My List; a second tap removes it. */
+  function toggleStar(p) {
+    const i = S.dream.findIndex(d => norm(d.uni) === norm(p.uni));
+    if (i >= 0) { S.dream.splice(i, 1); save(); toast('Removed from My List'); }
+    else {
+      S.dream.push({ id: uid(), uniId: p.uniId || '', uni: p.uni, college: '', course: '', col: p.col || 'target', deadline: p.deadline || '', cutoff: null, predicted: null, gap: null, eligible: null, fees: null, hostel: null, portal: p.portal || '', status: 0, docs: {}, notes: '', added: Date.now() });
+      save(); toast('★ Added to My List');
+      if (!S.leadAsked) setTimeout(() => askLead('Get reminders for your list?'), 600);
+    }
+    renderTabs(parseHash().route);
+    return i < 0;
   }
 
   /* ---------- predictor engine ---------- */
@@ -344,297 +368,244 @@
   }
 
   /* ---------- pages ---------- */
+  const greet = () => { const h = +new Date().toLocaleString('en-US', { hour: 'numeric', hourCycle: 'h23', timeZone: 'Asia/Kolkata' }); return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'; };
+  const daysLeft = d => { const n = Math.ceil((d - Date.now()) / 864e5); return n <= 1 ? (n <= 0 ? 'Today' : '1 day left') : n + ' days left'; };
   function homeStats() {
     const sum = ((off().stats && off().stats.blocks) || [])[0];
     if (!sum) return '';
     const v = name => (sum.rows.find(r => r[0] === name) || [])[2];
-    return `<section class="section" style="padding-bottom:0"><div class="wrap grid g4">
-      <div class="card stat"><b>${unis().length || v('No. of universities')}</b><span>institutions take CUET (UG) ${esc(off().cycle)}</span></div>
-      <div class="card stat"><b>${lakh(v('Registered candidates (unique)'))}</b><span>students registered in ${esc(off().cycle)}</span></div>
-      <div class="card stat"><b>${offRows('subjects').length}</b><span>subjects; choose up to 5</span></div>
-      <div class="card stat"><b>${v('Exam cities')}</b><span>exam cities</span></div>
-    </div><p class="wrap muted" style="font-size:.78rem;margin-top:8px">Official NTA figures for CUET (UG) ${esc(off().cycle)}.</p></section>`;
+    return `<section class="section"><div class="section-head"><h2>CUET ${esc(off().cycle)} in numbers</h2><a href="#/resources">Guide</a></div><div class="stats">
+      <div class="stat"><b>${unis().length || v('No. of universities')}</b><span>universities</span></div>
+      <div class="stat"><b>${lakh(v('Registered candidates (unique)'))}</b><span>students</span></div>
+      <div class="stat"><b>${offRows('subjects').length}</b><span>subjects</span></div>
+      <div class="stat"><b>${v('Exam cities')}</b><span>exam cities</span></div></div></section>`;
   }
   ROUTES[''] = () => {
-    const evs = upcomingEvents(false).filter(e => !e.past).slice(0, 3);
-    const n = unis().length;
-    const counts = (D.universities && D.universities.counts) || {};
-    return `
-    <section class="hero"><div class="wrap hero-in">
-      <div>
-        <div class="eyebrow">${t('Free · No login')}</div>
-        <h1>Everything you need for <span>CUET admissions</span>, in one place.</h1>
-        <p class="lead">Predict your colleges, build a Dream List, get a reminder before every deadline, make your CSAS preference order and get forms filled by our team when you want help.</p>
-        <div class="badges"><span>🎯 College predictor</span><span>🏛️ NTA university list</span><span>⏰ Deadline reminders</span><span>📝 ₹${P.assistedForm} assisted filling</span><span>🇮🇳 Hindi + English</span></div>
-        <div class="row"><a class="btn pri" href="#/predictor">${t('Predict my colleges')}</a><a class="btn" href="#/colleges">${t('Find colleges')}</a></div>
-      </div>
-      <form class="card quick" id="heroSearch">
-        <h3>${t('Search universities')}</h3>
-        <label>University or state<input name="q" placeholder="e.g. Delhi, Banaras, Jamia"></label>
-        <label style="margin-top:12px">Type<select name="cat"><option value="">${t('All')}</option>${CATS.map(c => `<option>${c}</option>`).join('')}</select></label>
-        <button class="btn pri block" style="margin-top:14px" type="submit">${t('Find colleges')}</button>
-        <p class="muted" style="margin:10px 0 0;font-size:.82rem">${n ? `${n} universities and institutions from NTA's CUET (UG) ${esc(D.universities.cycle)} list.` : 'University list comes from NTA\'s official participating-universities page.'}</p>
-      </form>
-    </div></section>
-
-    ${homeStats()}
-    <section class="section"><div class="wrap">
-      <div class="row between"><h2>${t('Next deadlines')}</h2><a href="#/calendar">Full calendar →</a></div>
-      ${evs.length ? `<div class="grid g3">${evs.map(e => `
-        <div class="card cd-card">
-          <div class="row between"><b>${esc(e.title)}</b>${statusTag(e.status)}</div>
-          <small>${fmtDate(e.when)} · ${esc(e.group || '')}</small>
-          ${countdown(e.when.toISOString(), true)}
-          ${e.note ? `<small>${esc(e.note)}</small>` : ''}
-        </div>`).join('')}</div>` : `<div class="empty"><b>No upcoming dates yet</b>Add colleges to your Dream List and their deadlines show here.</div>`}
-    </div></section>
-
-    <section class="section"><div class="wrap">
-      <h2>${t('Predict → shortlist → reminders → apply → track')}</h2>
-      <div class="loop">
-        <div>${t('Predictor')}<small>Your score, category and subjects → Dream / Target / Safe</small></div>
-        <div>${t('Dream List')}<small>One board for every college you want</small></div>
-        <div>Reminders<small>7 days, 48 hours and on the day</small></div>
-        <div>Apply<small>Yourself, or our team fills it for ₹${P.assistedForm}</small></div>
-        <div>Track<small>Status, documents and allotment rounds</small></div>
-      </div>
-    </div></section>
-
-    <section class="section"><div class="wrap">
-      <h2>Free tools</h2>
-      <div class="grid g4">
-        ${[['predictor', '🎯', 'College predictor', 'DU, BHU, JMI and more. Subject eligibility check and round-wise chances.'],
-           ['colleges', '🏛️', 'NTA participating universities', `Every university on NTA's CUET (UG) list${n ? ` — ${Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(', ')}` : ''}.`],
-           ['dream', '⭐', 'Dream List + CSAS order', 'Drag colleges into Dream / Target / Safe and print your preference order.'],
-           ['calendar', '⏰', 'Deadline calendar', 'Every NTA and university date with live countdowns and reminders.'],
-           ['tools/marks', '🧮', t('Marks calculator'), 'Count your score from the answer key: +5 right, −1 wrong.'],
-           ['forms', '📝', 'College forms 2027', `${forms().length} colleges with their own UG forms — live deadlines and official apply links.`],
-           ['tools/subjects', '✅', t('Subject combination checker'), 'Which CUET subjects does your course need?'],
-           ['applications', '📋', 'Application tracker', 'Status for each university and a document checklist.'],
-           ['community', '👥', 'Allotment-day tracker', 'See what others got, round by round.']]
-          .map(([r, i, h, p]) => `<a class="card tool" href="#/${r}"><span class="ico">${i}</span><h3>${h}</h3><p>${p}</p></a>`).join('')}
-      </div>
-    </div></section>
-
-    <section class="section"><div class="wrap grid g2">
-      <div class="card">
-        <div class="eyebrow">Help when you want it</div>
-        <h2>Our team fills your forms</h2>
-        <p>CUET registration, DU CSAS, BHU, JMI and private-university forms — filled with you, checked twice, before the deadline. ₹${P.assistedForm} a form, ${Math.round(P.bundleDiscount * 100)}% off for ${P.bundleMinForms} or more.</p>
-        <div class="row"><a class="btn sun" href="#/pricing">See plans</a><a class="btn" href="#/seniors">${t('Talk to a senior')}</a></div>
-      </div>
-      <form class="card" id="alertForm">
-        <div class="eyebrow">Never miss a deadline</div>
-        <h2>${t('Get free deadline alerts')}</h2>
-        <div class="form-grid"><label>${t('Name')}<input name="name" value="${esc(S.profile.name)}"></label><label>${t('Phone')}<input name="phone" inputmode="tel" value="${esc(S.profile.phone)}"></label></div>
-        <label style="margin-top:12px">${t('Email')}<input name="email" type="email" value="${esc(S.profile.email)}"></label>
-        <button class="btn pri" style="margin-top:14px" type="submit">${t('Get free deadline alerts')}</button>
-      </form>
-    </div></section>
-
-    <section class="section"><div class="wrap">
-      <h2>Questions students ask</h2>
-      <div class="grid g2">
-        ${[['Is it really free?', 'The predictor, university list, Dream List, calendar, calculators and email reminders are free with no login. You pay only if you want our team to fill forms or counsel you.'],
-           ['Where does the university list come from?', `From the National Testing Agency's official CUET (UG) participating-universities page (<a href="${NTA_UNIS}" target="_blank" rel="noopener">cuet.nta.nic.in</a>). We don't add or remove universities.`],
-           ['Are you part of NTA?', 'No. Everything CUET is an independent student service. Always confirm dates and rules on NTA\'s and each university\'s own website.'],
-           ['Where is my Dream List saved?', 'In this browser. Use "Parent view link" to share it, and leave your number if you want reminders on WhatsApp or SMS.']]
-          .map(([q, a]) => `<div class="card flat"><h3>${q}</h3><p class="muted" style="margin:0">${a}</p></div>`).join('')}
-      </div>
-    </div></section>`;
+    const upcoming = upcomingEvents(!!S.dream.length).filter(e => !e.past);
+    const next = upcoming[0] || upcomingEvents(false).find(e => !e.past);
+    const closing = forms().filter(f => formStatus(f) === 'open').map(f => ({ f, nd: nextDeadline(f) })).filter(x => x.nd).sort((a, b) => a.nd.when - b.nd.when).slice(0, 6);
+    const name = (S.profile.name || '').split(' ')[0];
+    return `<div class="page"><div class="wrap">
+      <section class="hello">
+        <div class="eyebrow">✦ ${t('Free · No login')}</div>
+        <h1>${esc(greet())}${name ? ', ' + esc(name) : ''}</h1>
+        <p>Find your college. Never miss a form.</p>
+        <form class="search" id="heroSearch" role="search">${ico('search')}<input name="q" placeholder="Search ${unis().length || ''} universities" aria-label="Search colleges"></form>
+      </section>
+      ${next ? `<a class="card next" href="#/calendar${S.dream.length ? '?mine=1' : ''}" style="color:inherit;text-decoration:none">
+        <div class="lbl"><span class="eyebrow" style="margin:0">${S.dream.length ? 'Your next deadline' : 'Next deadline'}</span>${statusTag(next.status)}</div>
+        <h3>${esc(next.title)}</h3>
+        ${countdown(next.when.toISOString(), true)}
+      </a>` : ''}
+      <section class="section"><div class="tiles">
+        ${[['predictor', 'bolt', 'Find my colleges'], ['forms', 'cap', 'Open forms'], ['dream', 'star', 'My List'], ['tools/marks', 'grid', 'Marks calculator']]
+          .map(([r, i, l]) => `<a class="tile" href="#/${r}"><span class="av">${ico(i)}</span>${t(l)}</a>`).join('')}
+      </div></section>
+      ${closing.length ? `<section class="section"><div class="section-head"><h2>Forms closing soon</h2><a href="#/forms">See all</a></div>
+        <div class="hscroll cards">${closing.map(({ f, nd }) => `<a class="card fcard" href="#/forms?open=${esc(f.id)}" style="color:inherit;text-decoration:none">
+          <div class="row between"><span class="tag safe">Open</span><span class="days">${daysLeft(nd.when)}</span></div>
+          <h3 style="margin:0">${esc(f.name)}</h3><small>${esc(nd.label)} · ${fmtDate(nd.when)}</small></a>`).join('')}</div></section>` : ''}
+      ${homeStats()}
+      <section class="section"><div class="cta-band"><div><h3>We'll fill your forms</h3><p>${inr(P.assistedForm)} a form · ${Math.round(P.bundleDiscount * 100)}% off on ${P.bundleMinForms}+</p></div><a class="btn white" href="#/pricing">See plans</a></div></section>
+      <section class="section"><form class="card" id="alertForm"><h2>${t('Get free deadline alerts')}</h2>
+        <div class="form-grid"><label>${t('Phone')}<input name="phone" inputmode="tel" value="${esc(S.profile.phone)}" placeholder="10-digit mobile"></label><label>${t('Email')}<input name="email" type="email" value="${esc(S.profile.email)}"></label></div>
+        <button class="btn dark block" style="margin-top:12px" type="submit">Notify me</button></form></section>
+    </div></div>`;
   };
   ROUTES[':mount'] = () => {
     $('#heroSearch').addEventListener('submit', e => {
       e.preventDefault();
-      const f = new FormData(e.target);
-      const q = new URLSearchParams(); if (f.get('q')) q.set('q', f.get('q')); if (f.get('cat')) q.set('cat', f.get('cat'));
-      location.hash = '#/colleges?' + q;
+      const v = String(new FormData(e.target).get('q') || '').trim();
+      location.hash = '#/colleges' + (v ? '?q=' + encodeURIComponent(v) : '');
     });
     $('#alertForm').addEventListener('submit', async e => {
       e.preventDefault();
       const f = new FormData(e.target);
-      Object.assign(S.profile, { name: f.get('name').trim(), phone: f.get('phone').trim(), email: f.get('email').trim() });
-      S.leadAsked = true; save();
+      Object.assign(S.profile, { phone: f.get('phone').trim(), email: f.get('email').trim() });
       if (!S.profile.phone && !S.profile.email) { toast('Add a phone number or email'); return; }
-      await submit('alerts', { profile: S.profile }, `Hi Everything CUET, please send me free deadline alerts.\nName: ${S.profile.name}\nPhone: ${S.profile.phone}\nEmail: ${S.profile.email}`);
+      S.leadAsked = true; save();
+      await submit('alerts', { profile: S.profile }, `Hi Everything CUET, please send me free deadline alerts.\nPhone: ${S.profile.phone}\nEmail: ${S.profile.email}`);
     });
   };
 
-  /* Colleges: NTA participating universities */
+  /* Colleges: NTA participating universities, and colleges with their own forms */
+  const initials = n => pretty(n).replace(/\b(of|and|the|for|in|university|universities)\b/gi, ' ').split(/[^A-Za-z]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '✦';
+  const collegeSeg = active => `<nav class="seg" aria-label="Colleges"><a href="#/colleges" ${active === 'unis' ? 'aria-current="page"' : ''}>Universities <small>${unis().length}</small></a><a href="#/forms" ${active === 'forms' ? 'aria-current="page"' : ''}>Forms 2027 <small>${forms().length}</small></a></nav>`;
+  const starBtn = (key, on, label) => `<button class="star-btn ${on ? 'on' : ''}" type="button" data-star="${esc(key)}" aria-pressed="${on}" aria-label="${on ? 'Remove ' : 'Add '}${esc(label)} ${on ? 'from' : 'to'} My List">${ico('star')}</button>`;
   function ntaPending() {
-    return `<div class="notice"><b>The university list is imported from NTA.</b> Everything CUET lists exactly the universities on the National Testing Agency's
-      <a href="${NTA_UNIS}" target="_blank" rel="noopener">CUET (UG) participating universities</a> page. The import hasn't run yet, so the list is empty —
-      open NTA's page for now. <small>(Site owner: run the "CUET NTA universities import" GitHub Action.)</small></div>`;
+    return `<div class="notice"><span>NTA's university list hasn't been imported yet. <a href="${NTA_UNIS}" target="_blank" rel="noopener">See it on cuet.nta.nic.in</a>.</span></div>`;
+  }
+  function formSheet(f) {
+    const s = formStatus(f), [sl, sc] = FORM_STATUS[s], nd = nextDeadline(f);
+    modal.open(`
+      <div class="meta row" style="gap:6px;margin-bottom:8px"><span class="tag ${sc}">${sl}</span>${f.acceptsCuet ? '<span class="tag safe">Accepts CUET</span>' : ''}<span class="tag">${esc(f.type)}</span></div>
+      <h2 style="margin-bottom:2px">${esc(f.name)}</h2>
+      <p class="muted" style="margin:0 0 14px">${esc(f.city)}</p>
+      ${nd ? `<div class="card flat cd-card" style="margin-bottom:14px"><div class="row between"><b>${esc(nd.label)}</b><small>${fmtDate(nd.when)}</small></div>${countdown(nd.when.toISOString(), true)}
+        <small>${ico('info', 'sm')} Reported date — <a href="${esc(nd.source)}" target="_blank" rel="noopener">source</a>. Confirm on the official site.</small></div>` : ''}
+      <p style="margin-bottom:6px"><b>How to get in:</b> ${esc(f.entrance)}</p>
+      ${f.note ? `<p class="muted" style="font-size:.88rem">${esc(f.note)}</p>` : ''}
+      ${f.deadlines.length > 1 ? `<details style="margin-bottom:12px"><summary class="muted" style="font-weight:700;font-size:.85rem">All dates (${f.deadlines.length})</summary><div class="list" style="margin-top:8px">${f.deadlines.map(d => `<a class="list-row" href="${esc(d.source)}" target="_blank" rel="noopener" style="min-height:52px"><span class="grow"><span class="t">${esc(d.label)}</span></span><small>${fmtDate(evDate(d))}</small></a>`).join('')}</div></details>` : ''}
+      <div class="list" style="margin-bottom:14px">${f.links.map(([l, u]) => `<a class="list-row" href="${esc(u)}" target="_blank" rel="noopener" style="min-height:52px"><span class="grow"><span class="t">${esc(l)}</span></span>${ico('out', 'sm chev')}</a>`).join('')}</div>
+      <div class="row">
+        <button class="btn pri" data-act="fstar">${inDream(f.name) ? '★ On My List' : '☆ Add to My List'}</button>
+        ${s !== 'closed' ? `<button class="btn sun" data-act="fassist">We'll fill it · ${inr(P.assistedForm)}</button>` : ''}
+      </div>`, el => {
+      el.onclick = e => {
+        if (e.target.closest('[data-act="fstar"]')) { toggleStar({ uni: f.name, portal: f.links[0][1], deadline: nd ? toLocalInput(nd.when) : '', col: 'dream' }); modal.close(); render(); }
+        if (e.target.closest('[data-act="fassist"]')) { addCart({ type: 'form', label: `${f.name} application form`, price: P.assistedForm }); modal.close(); }
+      };
+      tick();
+    });
   }
   ROUTES.forms = (arg, q) => {
-    const st = q.get('status') || '';
     const counts = {};
     forms().forEach(f => { const k = formStatus(f); counts[k] = (counts[k] || 0) + 1; });
     return `<div class="page"><div class="wrap">
-      <div class="page-head">
-        <div class="eyebrow">UG admissions 2027</div>
-        <h1>College application forms</h1>
-        <p>Colleges and programmes that run their own admission forms, alongside or instead of CUET. Every link goes to the college's or test's official site. Dates marked <span class="tag target">${t('Reported')}</span> come from education news sites and are linked to where we found them — always confirm on the official page before you apply.</p>
-      </div>
-      <div class="card flat no-print" style="margin-bottom:18px">
-        <label>Search<input id="fq" placeholder="College, city or course type"></label>
-        <div class="row between" style="margin-top:12px">
-          <div class="chips" id="fst"><button class="chip ${!st ? 'on' : ''}" data-st="">${t('All')} (${forms().length})</button>${Object.entries(FORM_STATUS).filter(([k]) => counts[k]).map(([k, [l]]) => `<button class="chip ${st === k ? 'on' : ''}" data-st="${k}">${l} (${counts[k]})</button>`).join('')}</div>
-          <label class="check"><input type="checkbox" id="fcuet">Accepts NTA CUET score</label>
-        </div>
+      ${collegeSeg('forms')}
+      <div class="search" style="margin-bottom:12px">${ico('search')}<input id="fq" placeholder="Search forms" aria-label="Search forms"></div>
+      <div class="hscroll" id="fst" style="margin-bottom:14px">
+        <button class="chip on" data-st="">${t('All')}</button>
+        ${Object.entries(FORM_STATUS).filter(([k]) => counts[k]).map(([k, [l]]) => `<button class="chip" data-st="${k}">${l} <b>${counts[k]}</b></button>`).join('')}
+        <button class="chip" id="fcuet" aria-pressed="false">Accepts CUET</button>
       </div>
       <div class="grid g3" id="flist" style="align-items:start"></div>
-      <p class="muted" style="font-size:.8rem;margin-top:16px">Checked ${D.forms ? fmtDate(D.forms.checked) : ''}. Want a college added? <a href="#/community">Tell us</a>.</p>
+      <p class="muted" style="font-size:.78rem;margin-top:14px">Links go to official sites. Deadlines are reported dates; tap a form to see the source.</p>
     </div></div>`;
   };
   ROUTES['forms:mount'] = (arg, q) => {
-    let st = q.get('status') || '';
+    let st = '', cuet = false;
     const order = { open: 0, upcoming: 1, check: 2, closed: 3 };
     const draw = () => {
-      const term = norm($('#fq').value), cuet = $('#fcuet').checked;
+      const term = norm($('#fq').value);
       const list = forms().filter(f => (!st || formStatus(f) === st) && (!cuet || f.acceptsCuet) && (!term || norm([f.name, f.city, f.type, f.entrance].join(' ')).includes(term)))
         .sort((a, b) => order[formStatus(a)] - order[formStatus(b)] || ((nextDeadline(a) || {}).when || 9e15) - ((nextDeadline(b) || {}).when || 9e15) || cmp(a.name, b.name));
       $('#flist').innerHTML = list.map(f => {
         const s = formStatus(f), [sl, sc] = FORM_STATUS[s], nd = nextDeadline(f);
-        const [primary, ...rest] = f.links;
-        return `<article class="card uni" data-form="${esc(f.id)}">
-          <div class="meta"><span class="tag ${sc}">${sl}</span><span class="tag">${esc(f.type)}</span>${f.acceptsCuet ? '<span class="tag safe">Accepts CUET</span>' : ''}</div>
-          <h3>${esc(f.name)}</h3>
-          <div class="meta">📍 ${esc(f.city)}</div>
-          ${nd ? `<div class="cd-card"><small><b>${esc(nd.label)}</b> · ${fmtDate(nd.when)} <a href="${esc(nd.source)}" target="_blank" rel="noopener" class="tag target" style="text-decoration:none">${t('Reported')} ↗</a></small>${countdown(nd.when.toISOString(), true)}</div>` : ''}
-          <small><b>Admission:</b> ${esc(f.entrance)}</small>
-          ${f.note ? `<small class="muted">${esc(f.note)}</small>` : ''}
-          ${f.deadlines.length > 1 ? `<details><summary><small>All reported dates</small></summary><ul style="margin:6px 0 0;padding-left:18px;font-size:.84rem">${f.deadlines.map(d => `<li>${esc(d.label)}: ${fmtDate(evDate(d))} <a href="${esc(d.source)}" target="_blank" rel="noopener">source</a></li>`).join('')}</ul></details>` : ''}
-          <div class="acts">
-            <a class="btn sm pri" href="${esc(primary[1])}" target="_blank" rel="noopener">${esc(primary[0])} ↗</a>
-            ${inDream(f.name) ? `<span class="tag safe">★ ${t('On your Dream List')}</span>` : `<button class="btn sm" data-fdream>＋ ${t('Dream List')}</button>`}
-            ${s !== 'closed' ? `<button class="btn sm sun" data-fassist>${t('Fill via Assistant')} ${inr(P.assistedForm)}</button>` : ''}
-          </div>
-          ${rest.length ? `<div class="chips">${rest.map(([l, u]) => `<a class="chip" style="font-size:.76rem;text-decoration:none" href="${esc(u)}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join('')}</div>` : ''}
+        return `<article class="card uni" data-form="${esc(f.id)}" tabindex="0" role="button" aria-label="${esc(f.name)}" style="cursor:pointer">
+          <div class="meta"><span class="tag ${sc}">${sl}</span>${f.acceptsCuet ? '<span class="tag safe">CUET</span>' : ''}<span style="flex:1"></span>${nd ? `<span class="days">${daysLeft(nd.when)}</span>` : ''}</div>
+          <div class="row" style="flex-wrap:nowrap;align-items:flex-start;gap:12px"><div class="grow" style="flex:1;min-width:0"><h3>${esc(f.name)}</h3><small>${esc(f.city)}</small></div>${starBtn(f.id, inDream(f.name), f.name)}</div>
+          ${nd ? `<small><b style="color:var(--ink)">${esc(nd.label)}</b> · ${fmtDate(nd.when)}</small>` : `<small>${esc(f.type)}</small>`}
         </article>`;
       }).join('') || `<div class="empty" style="grid-column:1/-1"><b>No match</b>Try another search or filter.</div>`;
     };
     $('#fq').addEventListener('input', draw);
-    $('#fcuet').addEventListener('change', draw);
-    $('#fst').addEventListener('click', e => { const b = e.target.closest('[data-st]'); if (!b) return; st = b.dataset.st; $$('#fst .chip').forEach(c => c.classList.toggle('on', c === b)); draw(); });
-    $('#flist').addEventListener('click', e => {
-      const card = e.target.closest('[data-form]'); if (!card) return;
-      const f = forms().find(x => x.id === card.dataset.form), nd = nextDeadline(f);
-      if (e.target.closest('[data-fdream]')) addToDream({ uni: f.name, portal: f.links[0][1], deadline: nd ? toLocalInput(nd.when) : '', col: 'dream' });
-      if (e.target.closest('[data-fassist]')) addCart({ type: 'form', label: `${f.name} application form`, price: P.assistedForm });
+    $('#fst').addEventListener('click', e => {
+      const b = e.target.closest('.chip'); if (!b) return;
+      if (b.id === 'fcuet') { cuet = !cuet; b.classList.toggle('on', cuet); b.setAttribute('aria-pressed', cuet); }
+      else { st = b.dataset.st; $$('#fst [data-st]').forEach(c => c.classList.toggle('on', c === b)); }
+      draw();
     });
+    const open = e => {
+      const card = e.target.closest('[data-form]'); if (!card) return;
+      const f = forms().find(x => x.id === card.dataset.form);
+      if (e.target.closest('[data-star]')) { const nd = nextDeadline(f); toggleStar({ uni: f.name, portal: f.links[0][1], deadline: nd ? toLocalInput(nd.when) : '', col: 'dream' }); draw(); return; }
+      formSheet(f);
+    };
+    $('#flist').addEventListener('click', open);
+    $('#flist').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('[data-form]')) open(e); });
     draw();
+    const want = forms().find(f => f.id === q.get('open'));
+    if (want) formSheet(want);
   };
 
   ROUTES.colleges = (arg, q) => {
     const counts = {};
     unis().forEach(u => { counts[u.category] = (counts[u.category] || 0) + 1; });
-    const states = [...new Set(unis().map(u => u.state).filter(Boolean))].sort();
     const cat = q.get('cat') || '';
     return `<div class="page"><div class="wrap">
-      <div class="page-head">
-        <div class="eyebrow">Source: NTA</div>
-        <h1>CUET (UG) participating universities</h1>
-        <p>Every university, as listed by the National Testing Agency. ${D.universities && D.universities.importedAt ? `CUET (UG) ${esc(D.universities.cycle)} list, updated ${fmtDate(D.universities.importedAt)} from <a href="${esc(D.universities.source)}" target="_blank" rel="noopener">cuet.nta.nic.in</a>.` : ''}</p>
-      </div>
+      ${collegeSeg('unis')}
       ${unis().length ? '' : ntaPending()}
-      <div class="card flat no-print" style="margin:18px 0">
-        <div class="form-grid">
-          <label>${t('Search universities')}<input id="uq" value="${esc(q.get('q') || '')}" placeholder="Name or state"></label>
-          ${states.length ? '' : '<input type="hidden" id="ust" value="">'}<label ${states.length ? '' : 'hidden'}>State<select ${states.length ? 'id="ust"' : ''}><option value="">${t('All states')}</option>${states.map(s => `<option ${q.get('state') === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></label>
-        </div>
-        <div class="chips" style="margin-top:12px" id="ucat">
-          <button class="chip ${!cat ? 'on' : ''}" data-cat="">${t('All')} ${unis().length ? `(${unis().length})` : ''}</button>
-          ${CATS.map(c => `<button class="chip ${cat === c ? 'on' : ''}" data-cat="${c}">${c}${counts[c] ? ` (${counts[c]})` : ''}</button>`).join('')}
-        </div>
+      <div class="search" style="margin-bottom:12px">${ico('search')}<input id="uq" value="${esc(q.get('q') || '')}" placeholder="${t('Search universities')}" aria-label="${t('Search universities')}"></div>
+      <div class="hscroll" id="ucat" style="margin-bottom:14px">
+        <button class="chip ${!cat ? 'on' : ''}" data-cat="">${t('All')}</button>
+        ${CATS.map(c => `<button class="chip ${cat === c ? 'on' : ''}" data-cat="${c}">${c === 'Government / other' ? 'Govt. & other' : c} <b>${counts[c] || 0}</b></button>`).join('')}
+        <button class="chip ${S.compare.length ? '' : 'hide-empty'}" id="cmpBtn" ${S.compare.length ? '' : 'hidden'}>Compare <b>${S.compare.length}</b></button>
       </div>
-      <div class="row between no-print" id="cmpBar" style="margin-bottom:12px"></div>
-      <div class="grid g3" id="ulist"></div>
+      <div id="umatch"></div>
+      <div class="list" id="ulist"></div>
       <div class="pager" id="upager"></div>
+      ${unis().length ? `<p class="muted" style="font-size:.78rem;margin-top:14px">Source: <a href="${esc(D.universities.source)}" target="_blank" rel="noopener">NTA</a> · CUET (UG) ${esc(D.universities.cycle)} list</p>` : ''}
     </div></div>`;
   };
   ROUTES['colleges:mount'] = (arg, q) => {
-    let cat = q.get('cat') || '', page = 0;
+    let cat = q.get('cat') || '', lim = 40;
     const draw = () => {
-      const term = norm($('#uq').value), st = $('#ust').value;
-      const list = unis().filter(u => (!cat || u.category === cat) && (!st || u.state === st) && (!term || norm(u.name + ' ' + u.state).includes(term)));
-      const per = 24, pages = Math.max(1, Math.ceil(list.length / per));
-      page = Math.min(page, pages - 1);
-      $('#ulist').innerHTML = list.slice(page * per, page * per + per).map(u => `
-        <article class="card uni">
-          <div class="meta"><span class="tag">${esc(u.category)}</span>${u.state ? `<span>📍 ${esc(u.state)}</span>` : ''}</div>
-          <h3><a href="#/college/${esc(u.id)}" style="color:inherit;text-decoration:none">${esc(pretty(u.name))}</a></h3>
-          <div class="acts">
-            ${inDream(u.name) ? `<span class="tag safe">★ ${t('On your Dream List')}</span>` : `<button class="btn sm pri" data-dream="${esc(u.id)}">＋ ${t('Add to Dream List')}</button>`}
-            <a class="btn sm" href="#/college/${esc(u.id)}">${t('Details')}</a>
-            <label class="check" style="font-size:.8rem"><input type="checkbox" data-cmp="${esc(u.id)}" ${S.compare.includes(u.id) ? 'checked' : ''}>${t('Compare')}</label>
-          </div>
-        </article>`).join('') || (unis().length ? `<div class="empty" style="grid-column:1/-1"><b>No match</b>Try another name or state.</div>` : '');
-      $('#upager').innerHTML = pages > 1 ? `<button class="btn sm" data-pg="-1" ${page ? '' : 'disabled'}>←</button><span>${page + 1} / ${pages} · ${list.length}</span><button class="btn sm" data-pg="1" ${page < pages - 1 ? '' : 'disabled'}>→</button>` : '';
-      $('#cmpBar').innerHTML = S.compare.length ? `<span>${S.compare.length} selected to compare</span><a class="btn sm pri" href="#/tools/compare">${t('Compare')} →</a>` : '';
+      const term = norm($('#uq').value);
+      const list = unis().filter(u => (!cat || u.category === cat) && (!term || norm(pretty(u.name) + ' ' + u.name + ' ' + u.state).includes(term)));
+      const fm = term ? forms().filter(f => norm(f.name + ' ' + f.city).includes(term)).slice(0, 4) : [];
+      $('#umatch').innerHTML = fm.length ? `<div class="section-head" style="margin-top:0"><h3 style="margin:0">Forms</h3><a href="#/forms">All forms</a></div><div class="list" style="margin-bottom:16px">${fm.map(f => `<a class="list-row" href="#/forms?open=${esc(f.id)}"><span class="av">${ico('cap')}</span><span class="grow"><span class="t">${esc(f.name)}</span><span class="s"><span class="tag ${FORM_STATUS[formStatus(f)][1]}">${FORM_STATUS[formStatus(f)][0]}</span></span></span>${ico('right', 'chev')}</a>`).join('')}</div>${list.length ? '<h3>Universities</h3>' : ''}` : '';
+      $('#ulist').hidden = !list.length && !!fm.length;
+      $('#ulist').innerHTML = list.slice(0, lim).map(u => `
+        <div class="list-row">
+          <a href="#/college/${esc(u.id)}" style="display:flex;gap:12px;align-items:center;flex:1;min-width:0;color:inherit;text-decoration:none">
+            <span class="av">${esc(initials(u.name))}</span>
+            <span class="grow"><span class="t">${esc(pretty(u.name))}</span><span class="s">${esc(u.category)}${S.compare.includes(u.id) ? ' · <span class="tag target">Comparing</span>' : ''}</span></span>
+          </a>
+          ${starBtn(u.id, inDream(pretty(u.name)), pretty(u.name))}
+        </div>`).join('') || (unis().length ? `<div class="empty" style="border:0"><b>No match</b>Try another name.</div>` : '');
+      $('#upager').innerHTML = list.length > lim ? `<button class="btn" data-more>Show more · ${list.length - lim} left</button>` : (list.length ? `<span>${list.length} universities</span>` : '');
     };
-    $('#uq').addEventListener('input', () => { page = 0; draw(); });
-    $('#ust').addEventListener('change', () => { page = 0; draw(); });
+    $('#uq').addEventListener('input', () => { lim = 40; draw(); });
     $('#ucat').addEventListener('click', e => {
+      if (e.target.closest('#cmpBtn')) { location.hash = '#/tools/compare'; return; }
       const b = e.target.closest('[data-cat]'); if (!b) return;
-      cat = b.dataset.cat; page = 0;
-      $$('#ucat .chip').forEach(c => c.classList.toggle('on', c === b)); draw();
+      cat = b.dataset.cat; lim = 40;
+      $$('#ucat [data-cat]').forEach(c => c.classList.toggle('on', c === b)); draw();
     });
-    $('#upager').addEventListener('click', e => { const b = e.target.closest('[data-pg]'); if (b) { page += +b.dataset.pg; draw(); window.scrollTo(0, 0); } });
+    $('#upager').addEventListener('click', e => { if (e.target.closest('[data-more]')) { lim += 60; draw(); } });
     $('#ulist').addEventListener('click', e => {
-      const b = e.target.closest('[data-dream]');
-      if (b) { const u = uniById(b.dataset.dream); addToDream({ uni: pretty(u.name), uniId: u.id, portal: u.website }); }
-    });
-    $('#ulist').addEventListener('change', e => {
-      const c = e.target.closest('[data-cmp]'); if (!c) return;
-      const id = c.dataset.cmp;
-      S.compare = c.checked ? [...new Set([...S.compare, id])].slice(-3) : S.compare.filter(x => x !== id);
-      save(); draw();
+      const b = e.target.closest('[data-star]'); if (!b) return;
+      const u = uniById(b.dataset.star);
+      const on = toggleStar({ uni: pretty(u.name), uniId: u.id, portal: u.website });
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
     });
     draw();
   };
 
   ROUTES.college = id => {
     const u = uniById(id);
-    if (!u) return `<div class="page"><div class="wrap"><div class="empty"><b>University not found</b><a href="#/colleges">Back to the list</a></div></div></div>`;
+    if (!u) return `<div class="page"><div class="wrap"><div class="empty"><b>University not found</b><a href="#/colleges">Back to colleges</a></div></div></div>`;
     const rows = cutRows().filter(r => norm(r.university) === norm(u.name));
-    const programs = [...new Set(rows.map(r => `${r.college}|${r.program}`))];
     const promo = (C.partnerCodes || []).filter(p => norm(p.college) === norm(u.name));
     const group = (C.groups || []).find(g => norm(g.university) === norm(u.name));
+    const name = pretty(u.name), on = inDream(name);
     return `<div class="page"><div class="wrap">
-      <a href="#/colleges">← ${t('Colleges')}</a>
-      <div class="page-head" style="margin-top:12px">
-        <div class="row"><span class="tag">${esc(u.category)} university</span>${u.state ? `<span class="tag sun">📍 ${esc(u.state)}</span>` : ''}</div>
-        <h1 style="margin-top:10px">${esc(pretty(u.name))}</h1>
-        <p class="muted" style="margin:-4px 0 8px;font-size:.85rem">On NTA's list as: <b>${esc(u.name)}</b></p>
-        <p class="muted">Listed on NTA's CUET (UG) participating universities — <a href="${esc(u.source)}" target="_blank" rel="noopener">${t('Source')}</a>. Programs, seats and eligibility are on the university's own admission page.</p>
+      <section class="hello on-red">
+        <div class="eyebrow">✦ ${esc(u.category)} university</div>
+        <h1>${esc(name)}</h1>
+        <p style="font-size:.85rem">On NTA's CUET (UG) list as “${esc(u.name)}”</p>
         <div class="row">
-          ${inDream(u.name) ? `<a class="btn" href="#/dream">★ ${t('On your Dream List')}</a>` : `<button class="btn pri" data-act="dream-add">＋ ${t('Add to Dream List')}</button>`}
-          ${u.website ? `<a class="btn" href="${esc(u.website)}" target="_blank" rel="noopener">${t('Apply directly')} ↗</a>` : ''}
-          <button class="btn sun" data-act="assist">${t('Fill via Assistant')} (${inr(P.assistedForm)})</button>
-          <a class="btn" href="#/seniors?college=${encodeURIComponent(u.name)}">${t('Talk to a senior')}</a>
+          <button class="btn white" data-act="star">${on ? '★ On My List' : '☆ Add to My List'}</button>
+          ${u.website ? `<a class="btn" style="background:transparent;border-color:rgba(255,255,255,.5);color:#fff" href="${esc(u.website)}" target="_blank" rel="noopener">Website ${ico('out', 'sm')}</a>` : ''}
         </div>
+      </section>
+      <div class="list section">
+        <button class="list-row" data-act="assist"><span class="av">${ico('bolt')}</span><span class="grow"><span class="t">We'll fill your form</span><span class="s">${inr(P.assistedForm)} · checked twice, before the deadline</span></span>${ico('plus', 'chev')}</button>
+        <a class="list-row" href="#/seniors?college=${encodeURIComponent(name)}"><span class="av">${ico('chat')}</span><span class="grow"><span class="t">${t('Talk to a senior')}</span><span class="s">${inr(P.seniorCall)} for 20 minutes</span></span>${ico('right', 'chev')}</a>
+        ${group ? `<a class="list-row" href="${esc(group.link)}" target="_blank" rel="noopener"><span class="av">${ico('cap')}</span><span class="grow"><span class="t">Join the student group</span></span>${ico('out', 'chev')}</a>`
+          : `<a class="list-row" href="#/community?college=${encodeURIComponent(name)}"><span class="av">${ico('cap')}</span><span class="grow"><span class="t">Ask for a student group</span></span>${ico('right', 'chev')}</a>`}
+        <button class="list-row" data-act="compare"><span class="av">${ico('grid')}</span><span class="grow"><span class="t">${S.compare.includes(u.id) ? 'In compare' : 'Compare'}</span><span class="s">Side by side with up to 3</span></span>${ico(S.compare.includes(u.id) ? 'check' : 'plus', 'chev')}</button>
       </div>
-      <div class="grid g2">
-        <div class="card"><h3>Programs and last cutoffs</h3>
-          ${programs.length ? `<div class="table-wrap"><table><tr><th>College</th><th>Program</th><th>Category</th><th>Round</th><th>Cutoff</th></tr>
-            ${rows.slice(0, 60).map(r => `<tr><td>${esc(r.college)}</td><td>${esc(r.program)}</td><td>${esc(r.category)}</td><td>${esc(r.round)}</td><td class="num">${esc(r.cutoff)}</td></tr>`).join('')}</table></div>`
-            : `<p class="muted">No cutoff data for this university yet. We add round-wise closing scores from official allotment lists only.</p>`}
-        </div>
-        <div class="stack">
-          ${promo.map(p => `<div class="card"><div class="eyebrow">Partner offer</div><h3>${esc(p.saving)}</h3><p>Code <b style="font-family:var(--mono)">${esc(p.code)}</b> <button class="btn sm" data-copy="${esc(p.code)}">Copy</button></p>${p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">Apply with the code ↗</a>` : ''}</div>`).join('')}
-          <div class="card"><h3>Student group</h3>${group ? `<a class="btn pri" href="${esc(group.link)}" target="_blank" rel="noopener">Join the ${esc(pretty(u.name))} group</a>` : `<p class="muted">No group yet for this university.</p><a class="btn" href="#/community?college=${encodeURIComponent(u.name)}">Ask for one</a>`}</div>
-          ${(C.youtubeVideos || []).length ? `<div class="card"><h3>Watch on Everything CUET</h3><iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px" src="https://www.youtube-nocookie.com/embed/${esc(C.youtubeVideos[0])}" title="Everything CUET video" allowfullscreen loading="lazy"></iframe></div>` : ''}
-        </div>
-      </div>
+      ${promo.map(p => `<div class="card section"><div class="eyebrow">Partner offer</div><h3>${esc(p.saving)}</h3><div class="row"><b style="font-size:1.1rem;letter-spacing:.04em">${esc(p.code)}</b><button class="btn sm" data-copy="${esc(p.code)}">Copy</button>${p.url ? `<a class="btn sm pri" href="${esc(p.url)}" target="_blank" rel="noopener">Apply</a>` : ''}</div></div>`).join('')}
+      <section class="section"><div class="section-head"><h2>Cutoffs</h2></div>
+        ${rows.length ? `<div class="table-wrap"><table><tr><th>Course</th><th>Cat.</th><th>Round</th><th>Cutoff</th></tr>
+          ${rows.slice(0, 60).map(r => `<tr><td><b>${esc(r.program)}</b><br><small>${esc(r.college)}</small></td><td>${esc(r.category)}</td><td>${esc(r.round)}</td><td class="num">${esc(r.cutoff)}</td></tr>`).join('')}</table></div>`
+          : `<div class="notice"><span>Cutoffs for this university are coming soon, from official allotment lists only.</span></div>`}
+      </section>
+      ${(C.youtubeVideos || []).length ? `<section class="section"><iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:18px" src="https://www.youtube-nocookie.com/embed/${esc(C.youtubeVideos[0])}" title="Everything CUET video" allowfullscreen loading="lazy"></iframe></section>` : ''}
     </div></div>`;
   };
   ROUTES['college:mount'] = id => {
     const u = uniById(id); if (!u) return;
     $('#view').addEventListener('click', e => {
       const a = e.target.closest('[data-act]');
-      if (a && a.dataset.act === 'dream-add') addToDream({ uni: pretty(u.name), uniId: u.id, portal: u.website });
-      if (a && a.dataset.act === 'assist') addCart({ type: 'form', label: `${u.name} application form`, price: P.assistedForm });
+      if (a && a.dataset.act === 'star') { toggleStar({ uni: pretty(u.name), uniId: u.id, portal: u.website }); render(); }
+      if (a && a.dataset.act === 'assist') addCart({ type: 'form', label: `${pretty(u.name)} application form`, price: P.assistedForm });
+      if (a && a.dataset.act === 'compare') {
+        S.compare = S.compare.includes(u.id) ? S.compare.filter(x => x !== u.id) : [...S.compare, u.id].slice(-3);
+        save(); toast(S.compare.includes(u.id) ? 'Added to compare' : 'Removed from compare'); render();
+      }
       const c = e.target.closest('[data-copy]');
       if (c) { navigator.clipboard && navigator.clipboard.writeText(c.dataset.copy); toast('Code copied'); }
     });
@@ -783,35 +754,40 @@
         <button class="btn sm" data-del aria-label="${t('Remove')}">✕</button>
       </div></div>`;
   }
-  ROUTES.dream = () => {
+  const listSeg = active => `<nav class="seg" aria-label="My List"><a href="#/dream" ${active === 'board' ? 'aria-current="page"' : ''}>Board <small>${S.dream.length}</small></a><a href="#/applications" ${active === 'tracker' ? 'aria-current="page"' : ''}>Tracker</a></nav>`;
+  const emptyList = () => `<div class="empty"><b>Your list is empty</b>Tap ☆ on any college or form to add it here.
+    <div class="row" style="justify-content:center;margin-top:14px"><a class="btn pri" href="#/colleges">Browse colleges</a><a class="btn" href="#/forms">Open forms</a></div></div>`;
+  ROUTES.dream = (arg, q) => {
     const list = orderedDream();
+    if (!list.length) return `<div class="page"><div class="wrap">${listSeg('board')}${emptyList()}</div></div>`;
+    const show = q.get('col') || (COLS.find(([k]) => list.some(d => d.col === k)) || COLS[0])[0];
     return `<div class="page"><div class="wrap">
-      <div class="page-head row between">
-        <div><h1>${t('Dream List')}</h1><p>Drag colleges between Dream, Target and Safe. Your CSAS preference order is built from this board: Dream first, Safe last, top to bottom.</p></div>
-        <div class="row no-print"><button class="btn pri" data-act="add">＋ Add a college</button></div>
-      </div>
-      <div class="board no-print">${COLS.map(([k, l]) => {
+      ${listSeg('board')}
+      <nav class="seg col-tabs no-print">${COLS.map(([k, l]) => `<a href="#/dream?col=${k}" ${k === show ? 'aria-current="page"' : ''}>${t(l)} <small>${list.filter(d => d.col === k).length}</small></a>`).join('')}</nav>
+      <div class="board no-print" data-show="${show}">${COLS.map(([k, l]) => {
         const items = list.filter(d => d.col === k);
         return `<section class="col" data-col="${k}"><div class="col-head"><h3>${t(l)}</h3><span class="tag ${k}">${items.length}</span></div>
-          ${items.map(dreamCard).join('') || `<div class="empty" style="padding:18px">Drop colleges here</div>`}</section>`;
+          ${items.map(dreamCard).join('') || `<div class="empty" style="padding:22px 12px;border:0;background:transparent">Nothing in ${t(l)} yet</div>`}</section>`;
       }).join('')}</div>
+      <div class="row no-print" style="margin-top:12px"><button class="btn sm" data-act="add">${ico('plus', 'sm')} Add manually</button></div>
 
-      <div class="card no-print" style="margin-top:22px">
-        <div class="row between"><h2 style="margin:0">CSAS preference order</h2>
-          <div class="row"><label class="check"><input type="checkbox" id="fHostel">Hostel only</label><label class="row" style="gap:6px">Max fee ₹<input id="fFee" inputmode="numeric" style="width:110px;margin:0"></label></div></div>
-        <ol id="prefList" style="margin:14px 0"></ol>
+      <section class="section card no-print">
+        <div class="section-head"><h2>Preference order</h2><span class="tag">Dream → Safe</span></div>
+        <div class="row" style="margin-bottom:6px"><label class="check"><input type="checkbox" id="fHostel">Hostel only</label><label class="row" style="gap:6px">Max fee ₹<input id="fFee" inputmode="numeric" style="width:110px;margin:0;min-height:38px"></label></div>
+        <ol id="prefList" style="margin:10px 0 14px;padding-left:22px"></ol>
         <div class="row">
-          <button class="btn pri" data-act="print">${t('Print preference sheet')}</button>
-          <button class="btn" data-act="copy">${t('Copy as text')}</button>
-          <a class="btn" id="waList" target="_blank" rel="noopener">${t('Share on WhatsApp')}</a>
-          <button class="btn" data-act="parent">${t('Parent view link')}</button>
-          <button class="btn sun" data-act="review">CSAS preference review (${inr(P.csasPro)} plan)</button>
+          <button class="btn pri sm" data-act="print">Print</button>
+          <button class="btn sm" data-act="copy">Copy</button>
+          <a class="btn sm" id="waList" target="_blank" rel="noopener">WhatsApp</a>
+          <button class="btn sm" data-act="parent">Parent link</button>
+          <button class="btn sm sun" data-act="review">Expert review · ${inr(P.csasPro)}</button>
         </div>
-      </div>
+      </section>
       <div class="print-only"><h1>My CSAS preference order — Everything CUET</h1><p>${esc(S.profile.name)} · ${new Date().toLocaleDateString('en-IN')}</p><ol id="printList"></ol></div>
     </div></div>`;
   };
   ROUTES['dream:mount'] = () => {
+    if (!$('#prefList')) return;
     const prefs = () => {
       const hostel = $('#fHostel').checked, max = num($('#fFee').value);
       return orderedDream().filter(d => (!hostel || d.hostel !== false) && (max == null || d.fees == null || d.fees <= max));
@@ -930,50 +906,85 @@
     a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' })); a.download = 'everything-cuet-deadlines.ics'; a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
+  let calEvents = [];
   ROUTES.calendar = (arg, q) => {
     const mine = q.get('mine') === '1', past = q.get('past') === '1';
-    const evs = upcomingEvents(mine).filter(e => past || !e.past);
+    calEvents = upcomingEvents(mine).filter(e => past || !e.past);
+    const months = [];
+    calEvents.forEach((e, i) => {
+      const m = ist(e.when, { month: 'long', year: 'numeric' });
+      if (!months.length || months[months.length - 1].m !== m) months.push({ m, items: [] });
+      months[months.length - 1].items.push([e, i]);
+    });
+    const link = (m, p) => `#/calendar?${[m && 'mine=1', p && 'past=1'].filter(Boolean).join('&')}`;
     return `<div class="page"><div class="wrap">
-      <div class="page-head"><h1>CUET master calendar</h1><p>NTA dates, university portals and your own deadlines in one list. <b>Expected</b> dates are estimates from earlier years until NTA or the university announces them.</p></div>
-      <div class="row between no-print" style="margin-bottom:16px">
-        <div class="chips"><a class="chip ${!mine ? 'on' : ''}" href="#/calendar${past ? '?past=1' : ''}">${t('All')}</a><a class="chip ${mine ? 'on' : ''}" href="#/calendar?mine=1${past ? '&past=1' : ''}">${t('Only my list')}</a>
-          <a class="chip ${past ? 'on' : ''}" href="#/calendar?${mine ? 'mine=1&' : ''}${past ? '' : 'past=1'}">Show past dates</a></div>
-        <div class="row"><button class="btn sm" data-act="ics">${t('Download calendar (.ics)')}</button><button class="btn sm" data-act="notify">${S.notify ? '🔔 Reminders on' : t('Turn on browser reminders')}</button><button class="btn sm pri" data-act="alerts">WhatsApp / SMS / email alerts</button></div>
+      <div class="hscroll no-print" style="margin-bottom:14px">
+        <a class="chip ${!mine ? 'on' : ''}" href="${link(false, past)}">${t('All')}</a>
+        <a class="chip ${mine ? 'on' : ''}" href="${link(true, past)}">${t('Only my list')}</a>
+        <a class="chip ${past ? 'on' : ''}" href="${link(mine, !past)}">Past dates</a>
+        <button class="chip" data-act="add-ev">${ico('plus', 'sm')} Add</button>
       </div>
-      <div class="cal-list">${evs.map(e => `
-        <div class="card ev ${e.past ? 'past' : ''}">
-          <div class="ev-date"><small>${ist(e.when, { month: 'short' })}</small><b>${ist(e.when, { day: 'numeric' })}</b><small>${ist(e.when, { year: 'numeric' })}</small></div>
-          <div><div class="row" style="gap:6px"><b>${esc(e.title)}</b>${statusTag(e.status)}</div>
-            <small>${esc(e.group || '')}${e.end ? ` · until ${fmtDate(e.end)}` : ''}${e.note ? ' · ' + esc(e.note) : ''}</small>
-            ${e.source ? `<br><small><a href="${esc(e.source)}" target="_blank" rel="noopener">${t('Source')}</a></small>` : ''}
-            ${!e.past ? `<div>${countdown(e.when.toISOString())}</div>` : ''}</div>
-          <div class="row" style="gap:6px">${!e.past ? `<a class="btn sm" href="${gcal(e)}" target="_blank" rel="noopener">${t('Add to Google Calendar')}</a>` : ''}${e.kind === 'custom' ? `<button class="btn sm" data-delev="${esc(e.id)}">✕</button>` : ''}</div>
-        </div>`).join('') || `<div class="empty"><b>Nothing here yet</b>Add your own deadline below, or add colleges with deadlines to your Dream List.</div>`}</div>
-      <form class="card no-print" id="evForm" style="margin-top:22px"><h3>${t('Add your own deadline')}</h3>
-        <div class="form-grid"><label>What<input name="title" required placeholder="e.g. BHU UET form closes"></label><label>University<input name="group" placeholder="e.g. Banaras Hindu University"></label><label>Date<input name="date" type="date" required></label></div>
-        <button class="btn pri" style="margin-top:12px">＋ Add</button></form>
+      <div class="card no-print" style="margin-bottom:18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <span class="av">${ico('cal')}</span>
+        <div style="flex:1;min-width:160px"><b>Never miss a date</b><br><small>Reminders 7 days, 2 days and on the day</small></div>
+        <div class="row" style="gap:6px"><button class="btn sm" data-act="notify">${S.notify ? '✓ On' : 'This device'}</button><button class="btn sm" data-act="ics">Calendar app</button><button class="btn sm pri" data-act="alerts">WhatsApp</button></div>
+      </div>
+      ${months.map(({ m, items }) => `<div class="month">${esc(m)}</div><div class="list">${items.map(([e, i]) => `
+        <button class="list-row ${e.past ? 'past' : ''}" data-ev="${i}">
+          <span class="date-box"><b>${ist(e.when, { day: 'numeric' })}</b><small>${ist(e.when, { month: 'short' })}</small></span>
+          <span class="grow"><span class="t">${esc(e.title)}</span><span class="s">${statusTag(e.status)}${!e.past ? `<span class="days">${daysLeft(e.when)}</span>` : ''}</span></span>
+          ${ico('right', 'chev')}
+        </button>`).join('')}</div>`).join('') || `<div class="empty"><b>Nothing here yet</b>Add colleges with deadlines to My List, or add your own date.</div>`}
     </div></div>`;
   };
+  function eventSheet(e) {
+    modal.open(`
+      <div class="row" style="gap:6px;margin-bottom:8px">${statusTag(e.status)}</div>
+      <h2>${esc(e.title)}</h2>
+      <p class="muted" style="margin-bottom:12px">${fmtDate(e.when)}${e.end ? ` – ${fmtDate(e.end)}` : ''}${e.group ? ' · ' + esc(e.group) : ''}</p>
+      ${!e.past ? `<div style="margin-bottom:14px">${countdown(e.when.toISOString(), true)}</div>` : ''}
+      ${e.note ? `<p style="font-size:.9rem">${esc(e.note)}</p>` : ''}
+      <div class="row">
+        ${!e.past ? `<a class="btn pri" href="${gcal(e)}" target="_blank" rel="noopener">Add to Google Calendar</a>` : ''}
+        ${e.source ? `<a class="btn" href="${esc(e.source)}" target="_blank" rel="noopener">${t('Source')} ${ico('out', 'sm')}</a>` : ''}
+        ${e.formId ? `<a class="btn" href="#/forms?open=${esc(e.formId)}" data-act="modal-close">See form</a>` : ''}
+        ${e.kind === 'custom' ? `<button class="btn" data-delev="${esc(e.id)}">${t('Remove')}</button>` : ''}
+      </div>`, el => {
+      tick();
+      el.onclick = ev => { if (ev.target.closest('[data-delev]')) { S.customEvents = S.customEvents.filter(x => x.id !== e.id); save(); modal.close(); render(); } };
+    });
+  }
+  function addEventSheet() {
+    modal.open(`<h2>${t('Add your own deadline')}</h2>
+      <form id="evForm" class="stack">
+        <label>What<input name="title" required placeholder="e.g. BHU form closes"></label>
+        <label>University<input name="group" placeholder="Optional"></label>
+        <label>Date<input name="date" type="date" required></label>
+        <button class="btn pri block">Add</button>
+      </form>`, el => {
+      $('#evForm', el).addEventListener('submit', e => {
+        e.preventDefault();
+        const f = Object.fromEntries(new FormData(e.target));
+        S.customEvents.push({ id: uid(), title: f.title.trim(), group: f.group.trim(), date: f.date });
+        save(); modal.close(); render(); toast('Deadline added');
+      });
+    });
+  }
   ROUTES['calendar:mount'] = () => {
     $('#view').addEventListener('click', async e => {
-      const a = e.target.closest('[data-act]');
-      if (a && a.dataset.act === 'ics') { const evs = upcomingEvents(false).filter(x => !x.past); evs.length ? downloadIcs(evs) : toast('No upcoming dates to export'); }
-      if (a && a.dataset.act === 'alerts') askLead('Get WhatsApp, SMS and email reminders');
-      if (a && a.dataset.act === 'notify') {
+      const ev = e.target.closest('[data-ev]');
+      if (ev) { eventSheet(calEvents[+ev.dataset.ev]); return; }
+      const a = e.target.closest('[data-act]'); if (!a) return;
+      if (a.dataset.act === 'add-ev') addEventSheet();
+      if (a.dataset.act === 'ics') { const evs = upcomingEvents(false).filter(x => !x.past); evs.length ? downloadIcs(evs) : toast('No upcoming dates to export'); }
+      if (a.dataset.act === 'alerts') askLead('Get WhatsApp, SMS and email reminders');
+      if (a.dataset.act === 'notify') {
         if (!('Notification' in window)) { toast('This browser has no notifications'); return; }
         const perm = await Notification.requestPermission();
         S.notify = perm === 'granted'; save(); render();
-        toast(S.notify ? 'Reminders on: 7 days, 48 hours and on the day' : 'Notifications were blocked in this browser');
+        toast(S.notify ? 'Reminders on: 7 days, 2 days and on the day' : 'Notifications are blocked in this browser');
         if (S.notify && !S.leadAsked) askLead('Also get reminders on your phone?');
       }
-      const del = e.target.closest('[data-delev]');
-      if (del) { S.customEvents = S.customEvents.filter(x => x.id !== del.dataset.delev); save(); render(); }
-    });
-    $('#evForm').addEventListener('submit', e => {
-      e.preventDefault();
-      const f = Object.fromEntries(new FormData(e.target));
-      S.customEvents.push({ id: uid(), title: f.title.trim(), group: f.group.trim(), date: f.date });
-      save(); render(); toast('Deadline added');
     });
   };
   /* Shows a reminder 7 days, 48 hours and on the day of each upcoming date, once per stage. */
@@ -995,7 +1006,7 @@
   ROUTES.applications = () => {
     const list = orderedDream();
     return `<div class="page"><div class="wrap">
-      <div class="page-head"><h1>Application tracker</h1><p>Tap a step to update each application, and tick documents as you collect them.</p></div>
+      ${listSeg('tracker')}
       ${list.length ? `<div class="grid g2">${list.map(d => {
         const docs = [...DOCS, ...(d.customDocs || [])];
         const have = docs.filter(x => d.docs[x]).length;
@@ -1008,7 +1019,7 @@
             <div class="row" style="margin-top:8px"><input data-newdoc placeholder="Add a document" style="flex:1;margin:0"><button class="btn sm" data-adddoc>＋</button></div></div></details>
           <div class="row" style="margin-top:12px">${d.portal ? `<a class="btn sm" href="${esc(d.portal)}" target="_blank" rel="noopener">Open portal ↗</a>` : ''}<button class="btn sm sun" data-assist>Get it filled · ${inr(P.assistedForm)}</button></div>
         </div>`;
-      }).join('')}</div>` : `<div class="empty"><b>No applications yet</b>Add colleges to your <a href="#/dream">Dream List</a> and track them here.</div>`}
+      }).join('')}</div>` : emptyList()}
     </div></div>`;
   };
   ROUTES['applications:mount'] = () => {
@@ -1381,16 +1392,30 @@
     });
     if (parseHash().q.get('cart')) setTimeout(() => $('#cart') && $('#cart').scrollIntoView({ behavior: 'smooth' }), 50);
   };
-  $('#cartFab').addEventListener('click', () => { location.hash = '#/pricing?cart=1'; if (parseHash().route === 'pricing') $('#cart') && $('#cart').scrollIntoView({ behavior: 'smooth' }); });
 
-  /* ---------- footer ---------- */
+  /* ---------- More ---------- */
+  const menuRow = ([r, i, l, d]) => `<a class="list-row" href="${/^https?:/.test(r) ? esc(r) + '" target="_blank" rel="noopener' : '#/' + r}"><span class="av">${ico(i)}</span><span class="grow"><span class="t">${l}</span>${d ? `<span class="s">${d}</span>` : ''}</span>${ico(/^https?:/.test(r) ? 'out' : 'right', 'chev')}</a>`;
+  ROUTES.more = () => `<div class="page"><div class="wrap">
+    <div class="list">${[
+      ['predictor', 'bolt', 'Find my colleges', 'Dream, Target and Safe from your scores'],
+      ['tools/marks', 'grid', t('Marks calculator'), '+5 / −1 from the answer key'],
+      ['tools/fees', 'grid', 'CUET fee calculator', 'By category and number of subjects'],
+      ['tools', 'grid', 'More tools', 'Subjects, compare, same course elsewhere'],
+      ['resources', 'info', 'CUET guide', 'Pattern, fees, 37 subjects, rules']].map(menuRow).join('')}</div>
+    <div class="list section">${[
+      ['pricing', 'bolt', 'Plans & form filling', `From ${inr(P.assistedForm)} a form`],
+      ['seniors', 'chat', t('Talk to a senior'), `${inr(P.seniorCall)} for 20 minutes`],
+      ['community', 'cap', t('Community'), 'Groups and allotment-day tracker']].map(menuRow).join('')}</div>
+    <div class="list section">
+      <button class="list-row" data-act="lang"><span class="av">अ</span><span class="grow"><span class="t">Language</span><span class="s">${S.lang === 'hi' ? 'हिंदी' : 'English'}</span></span><span class="tag">${S.lang === 'hi' ? 'Switch to English' : 'हिंदी में देखें'}</span></button>
+      ${[[C.instagram, 'spark', 'Instagram', '@everythingcuet'], [C.youtube, 'spark', 'YouTube', 'Everything CUET']].filter(x => x[0]).map(menuRow).join('')}
+    </div>
+    <p class="muted" style="font-size:.78rem;margin-top:16px">Everything CUET is independent and not affiliated with the National Testing Agency or any university. University list from <a href="${NTA_UNIS}" target="_blank" rel="noopener">NTA</a>. Always confirm dates on official websites.</p>
+  </div></div>`;
+  ROUTES['more:mount'] = () => $('#view').addEventListener('click', e => { if (e.target.closest('[data-act="lang"]')) { S.lang = S.lang === 'hi' ? 'en' : 'hi'; save(); render(); } });
+
   function renderFoot() {
-    $('#foot').innerHTML = `
-      <div><div class="logo"><span class="logo-mark">E</span><span class="logo-text"><b>Everything</b> CUET</span></div>
-        <p style="margin-top:10px">Predict, shortlist, get reminded and apply — for every university that takes CUET (UG).</p>
-        <p style="font-size:.8rem">Independent service, not affiliated with the National Testing Agency or any university. University list from <a style="display:inline" href="${NTA_UNIS}" target="_blank" rel="noopener">NTA</a>. Always confirm dates on the official website.</p></div>
-      <div><b>Tools</b>${NAV.slice(1, 7).map(([r, l]) => `<a href="#/${r}">${t(l)}</a>`).join('')}</div>
-      <div><b>Follow</b><a href="${esc(C.instagram)}" target="_blank" rel="noopener">Instagram @everythingcuet</a><a href="${esc(C.youtube)}" target="_blank" rel="noopener">YouTube</a>${C.whatsapp ? `<a href="https://wa.me/${esc(C.whatsapp)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}<a href="#/pricing">${t('Pricing')}</a><a href="#/seniors">${t('Seniors')}</a></div>`;
+    $('#railFoot').innerHTML = `<p>Free · no login · not affiliated with NTA</p><p><a href="${esc(C.instagram)}" target="_blank" rel="noopener">Instagram</a> · <a href="${esc(C.youtube)}" target="_blank" rel="noopener">YouTube</a></p>`;
   }
 
   /* ---------- assistant ---------- */
@@ -1456,7 +1481,6 @@
 
   /* ---------- top bar ---------- */
   $('#langBtn').addEventListener('click', () => { S.lang = S.lang === 'hi' ? 'en' : 'hi'; save(); render(); });
-  $('#menuBtn').addEventListener('click', () => { const n = $('#nav'); n.classList.toggle('open'); $('#menuBtn').setAttribute('aria-expanded', n.classList.contains('open')); });
 
   HI.Closed = 'बंद'; HI.Seniors = 'सीनियर्स';
   loadData().then(() => { render(); checkReminders(); });
