@@ -1,9 +1,8 @@
 name: CUET NTA universities import
 
 # Refreshes cuet/data/universities.json from NTA's official participating-universities list.
+# Manual only: the list on the site comes from the official-data workbook, so a run replaces it only when asked.
 on:
-  schedule:
-    - cron: "17 3 * * 1"
   workflow_dispatch:
     inputs:
       year:

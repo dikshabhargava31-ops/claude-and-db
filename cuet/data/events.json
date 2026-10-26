@@ -1,10 +1,41 @@
 {
- "note": "Master calendar. status: official (from the notice in source), expected (an estimate from earlier years, not official) or past (last cycle, for reference).",
+ "note": "Master calendar for university and expected dates. NTA's official CUET (UG) dates come from official.json. status: official, expected (an estimate from earlier years, not official) or past (last cycle, for reference).",
  "events": [
-  {"id": "cuet27-reg", "title": "CUET (UG) 2027 registration opens", "group": "NTA", "date": "2027-02-01", "status": "expected", "note": "Expected in February 2027 from earlier years' pattern; NTA has not announced dates.", "source": "https://university.careers360.com/articles/expected-cuet-ug-2027-exam-date-based-on-previous-years-trends"},
-  {"id": "cuet27-exam", "title": "CUET (UG) 2027 exam window begins", "group": "NTA", "date": "2027-05-10", "status": "expected", "note": "Expected May to early June 2027; NTA has not announced dates.", "source": "https://university.careers360.com/articles/expected-cuet-ug-2027-exam-date-based-on-previous-years-trends"},
-  {"id": "cuet26-exam", "title": "CUET (UG) 2026 exam window", "group": "NTA", "date": "2026-05-11", "end": "2026-05-31", "status": "past", "note": "Last cycle, for reference.", "source": "https://news.careers360.com/cuet-ug-2026-exam-date-registration-begins-nta-hold-exams-from-may-11-31-admission-central-state-universities-cbt-link"},
-  {"id": "csas26-p1", "title": "DU CSAS 2026 Phase 1 closed", "group": "University of Delhi", "date": "2026-07-11", "status": "past", "note": "Last cycle, for reference: preference change 12-13 July.", "source": "https://www.pw.live/cuet/exams/cuet-counselling-2026"},
-  {"id": "csas26-l1", "title": "DU CSAS 2026 first allocation list", "group": "University of Delhi", "date": "2026-07-16", "status": "past", "note": "Last cycle, for reference: accept by 18 July, fee by 21 July.", "source": "https://www.pw.live/cuet/exams/cuet-counselling-2026"}
+  {
+   "id": "cuet27-reg",
+   "title": "CUET (UG) 2027 registration opens",
+   "group": "NTA",
+   "date": "2027-02-01",
+   "status": "expected",
+   "note": "Expected in February 2027 from earlier years' pattern; NTA had not notified CUET (UG) 2027 as of 26 Oct 2026.",
+   "source": "https://university.careers360.com/articles/expected-cuet-ug-2027-exam-date-based-on-previous-years-trends"
+  },
+  {
+   "id": "cuet27-exam",
+   "title": "CUET (UG) 2027 exam window begins",
+   "group": "NTA",
+   "date": "2027-05-10",
+   "status": "expected",
+   "note": "Expected May to early June 2027; NTA had not notified CUET (UG) 2027 as of 26 Oct 2026.",
+   "source": "https://university.careers360.com/articles/expected-cuet-ug-2027-exam-date-based-on-previous-years-trends"
+  },
+  {
+   "id": "csas26-p1",
+   "title": "DU CSAS 2026 Phase 1 closed",
+   "group": "University of Delhi",
+   "date": "2026-07-11",
+   "status": "past",
+   "note": "Last cycle, for reference: preference change 12-13 July.",
+   "source": "https://www.pw.live/cuet/exams/cuet-counselling-2026"
+  },
+  {
+   "id": "csas26-l1",
+   "title": "DU CSAS 2026 first allocation list",
+   "group": "University of Delhi",
+   "date": "2026-07-16",
+   "status": "past",
+   "note": "Last cycle, for reference: accept by 18 July, fee by 21 July.",
+   "source": "https://www.pw.live/cuet/exams/cuet-counselling-2026"
+  }
  ]
 }

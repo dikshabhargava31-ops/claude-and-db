@@ -43,8 +43,8 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private window: keep working in memory */ } }
 
   /* ---------- data ---------- */
-  const D = { universities: null, cutoffs: null, events: null, allotments: null, rules: null };
-  const FILES = { universities: 'universities.json', cutoffs: 'cutoffs.json', events: 'events.json', allotments: 'allotments.json', rules: 'subject-rules.json' };
+  const D = { universities: null, cutoffs: null, events: null, allotments: null, rules: null, official: null };
+  const FILES = { universities: 'universities.json', cutoffs: 'cutoffs.json', events: 'events.json', allotments: 'allotments.json', rules: 'subject-rules.json', official: 'official.json' };
   async function loadData() {
     await Promise.all(Object.entries(FILES).map(async ([k, f]) => {
       try { const r = await fetch('data/' + f, { cache: 'no-cache' }); D[k] = r.ok ? await r.json() : null; } catch { D[k] = null; }
@@ -53,6 +53,23 @@
   const unis = () => (D.universities && D.universities.universities) || [];
   const cutRows = () => (D.cutoffs && D.cutoffs.rows) || [];
   const uniById = id => unis().find(u => u.id === id);
+  const off = () => D.official || {};
+  const offRows = k => (off()[k] && off()[k].rows) || [];
+  const subjectNames = () => (offRows('subjects').length ? offRows('subjects').map(r => r.subject) : SUBJECTS);
+  const firstUrl = s => (String(s || '').match(/https?:\/\/[^\s;]+/) || [''])[0];
+  const lakh = n => (n / 1e5).toFixed(2).replace(/\.?0+$/, '') + ' lakh';
+  // NTA lists names in capitals; show them in title case, keeping acronyms and initials.
+  const ACRONYMS = new Set(['IIT', 'SRM', 'GITAM', 'ICFAI', 'IIS', 'KIET', 'TERI', 'TISS', 'UPES', 'BML', 'CGC', 'CMR', 'DBS', 'DIT', 'GLA', 'HRIT', 'IFTM', 'IILM', 'IIMT', 'ITM', 'JECRC', 'JIS', 'MNR', 'NIIT', 'RNB', 'SGT', 'SMS', 'ICAR', 'NFSU', 'NIFTEM-K', 'HNB', 'DTBU', 'ASBM', 'AKS', 'RV', 'DY', 'NCR', 'AP', 'MP', 'UP', 'BLR', 'HYD', 'CT', 'G', 'D', 'R', 'V', 'II', 'III']);
+  const SMALL = new Set(['of', 'and', 'for', 'the', 'in', 'to', 'at']);
+  function pretty(name) {
+    return String(name || '').toLowerCase().split(/(\s+|[(),/-])/).map((w, i) => {
+      const up = w.toUpperCase();
+      if (!/[a-z]/.test(w)) return w;
+      if (ACRONYMS.has(up) || /\./.test(w)) return up;
+      if (i && SMALL.has(w)) return w;
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join('');
+  }
 
   /* ---------- Hindi ---------- */
   const HI = {
@@ -184,6 +201,11 @@
     const now = Date.now();
     const evs = [];
     ((D.events && D.events.events) || []).forEach(e => evs.push({ ...e, kind: 'master' }));
+    const sch = off().schedule || {};
+    (sch.rows || []).filter(r => r.startDate || r.endDate).forEach((r, i) => evs.push({
+      id: 'nta-' + i, title: `CUET (UG) ${off().cycle || ''}: ${r.event}`.replace('  ', ' '), group: 'NTA', kind: 'master', status: 'official',
+      date: r.startDate || r.endDate, end: r.startDate ? r.endDate : null, note: r.notes || '', source: firstUrl(sch.source)
+    }));
     S.customEvents.forEach(e => evs.push({ ...e, kind: 'custom', status: 'yours' }));
     S.dream.filter(d => d.deadline).forEach(d => evs.push({ id: 'dl-' + d.id, title: `${d.uni}${d.course ? ' – ' + d.course : ''}: application deadline`, group: d.uni, date: d.deadline, status: 'yours', kind: 'dream', dreamId: d.id, source: d.portal }));
     const mine = new Set(S.dream.map(d => norm(d.uni)));
@@ -191,7 +213,7 @@
       .filter(e => !onlyMine || e.kind !== 'master' || e.group === 'NTA' || mine.has(norm(e.group)))
       .map(e => ({ ...e, when: evDate(e) }))
       .sort((a, b) => a.when - b.when)
-      .map(e => ({ ...e, past: (e.end ? new Date(e.end + 'T23:59:59+05:30') : e.when) < now }));
+      .map(e => ({ ...e, past: (e.end ? new Date(/T/.test(e.end) ? e.end : e.end + 'T23:59:59+05:30') : e.when) < now }));
   }
   const statusTag = s => ({ official: `<span class="tag safe">${t('Official')}</span>`, expected: `<span class="tag sun">${t('Expected')}</span>`, past: `<span class="tag">${t('Last year')}</span>`, yours: `<span class="tag dream">Yours</span>` }[s] || '');
   function inDream(uniName) { return S.dream.some(d => norm(d.uni) === norm(uniName)); }
@@ -202,7 +224,7 @@
       <h2>${t('Add to Dream List')}</h2>
       <form id="dreamForm" class="stack">
         <label>University<input name="uni" required value="${esc(p.uni || '')}" list="uniList" placeholder="Start typing a university"></label>
-        <datalist id="uniList">${unis().slice(0, 2000).map(u => `<option value="${esc(u.name)}">`).join('')}</datalist>
+        <datalist id="uniList">${unis().slice(0, 2000).map(u => `<option value="${esc(pretty(u.name))}">`).join('')}</datalist>
         <div class="form-grid">
           <label>College / department<input name="college" value="${esc(p.college || '')}"></label>
           <label>Course<input name="course" value="${esc(p.course || '')}" placeholder="e.g. B.Com (Hons.)"></label>
@@ -223,6 +245,7 @@
         e.preventDefault();
         const f = Object.fromEntries(new FormData(e.target));
         const u = unis().find(x => norm(x.name) === norm(f.uni));
+        if (u) f.uni = pretty(u.name);
         S.dream.push({
           id: uid(), uniId: u ? u.id : (p.uniId || ''), uni: f.uni.trim(), college: f.college.trim(), course: f.course.trim(), col: f.col,
           deadline: f.deadline, cutoff: num(f.cutoff), predicted: p.predicted ?? null, gap: p.gap ?? null, eligible: p.eligible ?? null,
@@ -315,6 +338,17 @@
   }
 
   /* ---------- pages ---------- */
+  function homeStats() {
+    const sum = ((off().stats && off().stats.blocks) || [])[0];
+    if (!sum) return '';
+    const v = name => (sum.rows.find(r => r[0] === name) || [])[2];
+    return `<section class="section" style="padding-bottom:0"><div class="wrap grid g4">
+      <div class="card stat"><b>${unis().length || v('No. of universities')}</b><span>institutions take CUET (UG) ${esc(off().cycle)}</span></div>
+      <div class="card stat"><b>${lakh(v('Registered candidates (unique)'))}</b><span>students registered in ${esc(off().cycle)}</span></div>
+      <div class="card stat"><b>${offRows('subjects').length}</b><span>subjects; choose up to 5</span></div>
+      <div class="card stat"><b>${v('Exam cities')}</b><span>exam cities</span></div>
+    </div><p class="wrap muted" style="font-size:.78rem;margin-top:8px">Official NTA figures for CUET (UG) ${esc(off().cycle)}.</p></section>`;
+  }
   ROUTES[''] = () => {
     const evs = upcomingEvents(false).filter(e => !e.past).slice(0, 3);
     const n = unis().length;
@@ -333,10 +367,11 @@
         <label>University or state<input name="q" placeholder="e.g. Delhi, Banaras, Jamia"></label>
         <label style="margin-top:12px">Type<select name="cat"><option value="">${t('All')}</option>${CATS.map(c => `<option>${c}</option>`).join('')}</select></label>
         <button class="btn pri block" style="margin-top:14px" type="submit">${t('Find colleges')}</button>
-        <p class="muted" style="margin:10px 0 0;font-size:.82rem">${n ? `${n} universities from NTA's CUET (UG) ${esc(D.universities.cycle)} list.` : 'University list comes from NTA\'s official participating-universities page.'}</p>
+        <p class="muted" style="margin:10px 0 0;font-size:.82rem">${n ? `${n} universities and institutions from NTA's CUET (UG) ${esc(D.universities.cycle)} list.` : 'University list comes from NTA\'s official participating-universities page.'}</p>
       </form>
     </div></section>
 
+    ${homeStats()}
     <section class="section"><div class="wrap">
       <div class="row between"><h2>${t('Next deadlines')}</h2><a href="#/calendar">Full calendar →</a></div>
       ${evs.length ? `<div class="grid g3">${evs.map(e => `
@@ -439,7 +474,7 @@
       <div class="card flat no-print" style="margin:18px 0">
         <div class="form-grid">
           <label>${t('Search universities')}<input id="uq" value="${esc(q.get('q') || '')}" placeholder="Name or state"></label>
-          <label>State<select id="ust"><option value="">${t('All states')}</option>${states.map(s => `<option ${q.get('state') === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></label>
+          ${states.length ? '' : '<input type="hidden" id="ust" value="">'}<label ${states.length ? '' : 'hidden'}>State<select ${states.length ? 'id="ust"' : ''}><option value="">${t('All states')}</option>${states.map(s => `<option ${q.get('state') === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></label>
         </div>
         <div class="chips" style="margin-top:12px" id="ucat">
           <button class="chip ${!cat ? 'on' : ''}" data-cat="">${t('All')} ${unis().length ? `(${unis().length})` : ''}</button>
@@ -461,7 +496,7 @@
       $('#ulist').innerHTML = list.slice(page * per, page * per + per).map(u => `
         <article class="card uni">
           <div class="meta"><span class="tag">${esc(u.category)}</span>${u.state ? `<span>📍 ${esc(u.state)}</span>` : ''}</div>
-          <h3><a href="#/college/${esc(u.id)}" style="color:inherit;text-decoration:none">${esc(u.name)}</a></h3>
+          <h3><a href="#/college/${esc(u.id)}" style="color:inherit;text-decoration:none">${esc(pretty(u.name))}</a></h3>
           <div class="acts">
             ${inDream(u.name) ? `<span class="tag safe">★ ${t('On your Dream List')}</span>` : `<button class="btn sm pri" data-dream="${esc(u.id)}">＋ ${t('Add to Dream List')}</button>`}
             <a class="btn sm" href="#/college/${esc(u.id)}">${t('Details')}</a>
@@ -481,7 +516,7 @@
     $('#upager').addEventListener('click', e => { const b = e.target.closest('[data-pg]'); if (b) { page += +b.dataset.pg; draw(); window.scrollTo(0, 0); } });
     $('#ulist').addEventListener('click', e => {
       const b = e.target.closest('[data-dream]');
-      if (b) { const u = uniById(b.dataset.dream); addToDream({ uni: u.name, uniId: u.id, portal: u.website }); }
+      if (b) { const u = uniById(b.dataset.dream); addToDream({ uni: pretty(u.name), uniId: u.id, portal: u.website }); }
     });
     $('#ulist').addEventListener('change', e => {
       const c = e.target.closest('[data-cmp]'); if (!c) return;
@@ -503,7 +538,8 @@
       <a href="#/colleges">← ${t('Colleges')}</a>
       <div class="page-head" style="margin-top:12px">
         <div class="row"><span class="tag">${esc(u.category)} university</span>${u.state ? `<span class="tag sun">📍 ${esc(u.state)}</span>` : ''}</div>
-        <h1 style="margin-top:10px">${esc(u.name)}</h1>
+        <h1 style="margin-top:10px">${esc(pretty(u.name))}</h1>
+        <p class="muted" style="margin:-4px 0 8px;font-size:.85rem">On NTA's list as: <b>${esc(u.name)}</b></p>
         <p class="muted">Listed on NTA's CUET (UG) participating universities — <a href="${esc(u.source)}" target="_blank" rel="noopener">${t('Source')}</a>. Programs, seats and eligibility are on the university's own admission page.</p>
         <div class="row">
           ${inDream(u.name) ? `<a class="btn" href="#/dream">★ ${t('On your Dream List')}</a>` : `<button class="btn pri" data-act="dream-add">＋ ${t('Add to Dream List')}</button>`}
@@ -520,7 +556,7 @@
         </div>
         <div class="stack">
           ${promo.map(p => `<div class="card"><div class="eyebrow">Partner offer</div><h3>${esc(p.saving)}</h3><p>Code <b style="font-family:var(--mono)">${esc(p.code)}</b> <button class="btn sm" data-copy="${esc(p.code)}">Copy</button></p>${p.url ? `<a href="${esc(p.url)}" target="_blank" rel="noopener">Apply with the code ↗</a>` : ''}</div>`).join('')}
-          <div class="card"><h3>Student group</h3>${group ? `<a class="btn pri" href="${esc(group.link)}" target="_blank" rel="noopener">Join the ${esc(u.name)} group</a>` : `<p class="muted">No group yet for this university.</p><a class="btn" href="#/community?college=${encodeURIComponent(u.name)}">Ask for one</a>`}</div>
+          <div class="card"><h3>Student group</h3>${group ? `<a class="btn pri" href="${esc(group.link)}" target="_blank" rel="noopener">Join the ${esc(pretty(u.name))} group</a>` : `<p class="muted">No group yet for this university.</p><a class="btn" href="#/community?college=${encodeURIComponent(u.name)}">Ask for one</a>`}</div>
           ${(C.youtubeVideos || []).length ? `<div class="card"><h3>Watch on Everything CUET</h3><iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:10px" src="https://www.youtube-nocookie.com/embed/${esc(C.youtubeVideos[0])}" title="Everything CUET video" allowfullscreen loading="lazy"></iframe></div>` : ''}
         </div>
       </div>
@@ -530,7 +566,7 @@
     const u = uniById(id); if (!u) return;
     $('#view').addEventListener('click', e => {
       const a = e.target.closest('[data-act]');
-      if (a && a.dataset.act === 'dream-add') addToDream({ uni: u.name, uniId: u.id, portal: u.website });
+      if (a && a.dataset.act === 'dream-add') addToDream({ uni: pretty(u.name), uniId: u.id, portal: u.website });
       if (a && a.dataset.act === 'assist') addCart({ type: 'form', label: `${u.name} application form`, price: P.assistedForm });
       const c = e.target.closest('[data-copy]');
       if (c) { navigator.clipboard && navigator.clipboard.writeText(c.dataset.copy); toast('Code copied'); }
@@ -545,7 +581,7 @@
       <input style="width:110px;margin:0" inputmode="decimal" data-score="${esc(s)}" value="${esc(S.scores[s])}" placeholder="out of 250">
       <button class="icon-btn" type="button" data-unscore="${esc(s)}" aria-label="Remove ${esc(s)}">✕</button></div>`).join('')}</div>
       <div class="row" style="margin-top:10px"><input list="subjList" id="addSubj" placeholder="Add a subject" style="flex:1;margin:0"><button class="btn sm" type="button" id="addSubjBtn">＋</button></div>
-      <datalist id="subjList">${SUBJECTS.map(s => `<option value="${esc(s)}">`).join('')}</datalist>`;
+      <datalist id="subjList">${subjectNames().map(s => `<option value="${esc(s)}">`).join('')}</datalist>`;
   }
   ROUTES.predictor = (arg, q) => {
     const p = S.profile;
@@ -931,7 +967,7 @@
   /* Tools */
   ROUTES.tools = arg => {
     const tab = arg || 'marks';
-    const tabs = [['marks', t('Marks calculator')], ['subjects', t('Subject combination checker')], ['compare', 'Compare universities'], ['equivalent', t('Same course at other universities')], ['normalisation', 'Score & percentile guide']];
+    const tabs = [['marks', t('Marks calculator')], ['fees', 'Application fee'], ['subjects', t('Subject combination checker')], ['compare', 'Compare universities'], ['equivalent', t('Same course at other universities')], ['normalisation', 'Score & percentile guide']];
     return `<div class="page"><div class="wrap">
       <div class="page-head"><h1>CUET tools</h1></div>
       <div class="chips no-print" style="margin-bottom:20px">${tabs.map(([k, l]) => `<a class="chip ${k === tab ? 'on' : ''}" href="#/tools/${k}">${l}</a>`).join('')}</div>
@@ -944,7 +980,7 @@
     return `<div class="side-layout">
       <div class="card"><h3>Paper pattern</h3>
         <div class="form-grid"><label>Questions per paper<input id="mq" value="50" inputmode="numeric"></label><label>Marks for right<input id="mr" value="5" inputmode="decimal"></label><label>Marks for wrong<input id="mw" value="-1" inputmode="decimal"></label></div>
-        <p class="muted" style="font-size:.82rem;margin:10px 0 0">Set to the CUET (UG) 2025–26 pattern: 50 compulsory questions, +5 for right, −1 for wrong, 0 for unanswered. Check the current NTA information bulletin and change these if the pattern changes.</p></div>
+        <p class="muted" style="font-size:.82rem;margin:10px 0 0">Set to the official CUET (UG) 2026 pattern from NTA's information bulletin: 50 compulsory questions, +5 for right, −1 for wrong, 0 for unanswered. Change these if a later bulletin changes the pattern.</p></div>
       <div class="card"><h3>Your answers, from the answer key</h3>
         <div id="mrows" class="stack"></div>
         <div class="row" style="margin-top:12px"><button class="btn sm" data-act="mrow">＋ Subject</button><button class="btn sm pri" data-act="mpred">Use in predictor →</button></div>
@@ -964,7 +1000,7 @@
     const rowsFor = u => cutRows().filter(r => norm(r.university) === norm(u.name) && (r.category || 'UR') === S.profile.category);
     const line = (label, f) => `<tr><th style="position:static">${label}</th>${sel.map(u => `<td>${f(u)}</td>`).join('')}</tr>`;
     return `<div class="table-wrap"><table>
-      <tr><th style="position:static"></th>${sel.map(u => `<td><b>${esc(u.name)}</b><br><button class="btn sm" data-uncmp="${esc(u.id)}">${t('Remove')}</button></td>`).join('')}</tr>
+      <tr><th style="position:static"></th>${sel.map(u => `<td><b>${esc(pretty(u.name))}</b><br><button class="btn sm" data-uncmp="${esc(u.id)}">${t('Remove')}</button></td>`).join('')}</tr>
       ${line('Type', u => esc(u.category))}${line('State', u => esc(u.state || '—'))}
       ${line('Website', u => u.website ? `<a href="${esc(u.website)}" target="_blank" rel="noopener">Open ↗</a>` : '—')}
       ${line(`Courses with cutoffs (${esc(S.profile.category)})`, u => new Set(rowsFor(u).map(r => r.program)).size || '—')}
@@ -977,9 +1013,21 @@
     const q = parseHash().q.get('program') || '';
     return `<div class="card" style="margin-bottom:16px"><label>Course<input id="eq" value="${esc(q)}" placeholder="e.g. B.Sc (Hons.) Physics"></label></div><div id="eqout"></div>`;
   };
+  TOOLS.fees = () => {
+    const f = off().fees;
+    if (!f || !f.rows) return `<div class="notice info">Fee details load from NTA's information bulletin.</div>`;
+    return `<div class="side-layout">
+      <div class="card"><h3>CUET (UG) ${esc(off().cycle || '')} application fee</h3>
+        <label>Category<select id="feeCat">${f.rows.map((r, i) => `<option value="${i}" ${i === (S.profile.category === 'UR' ? 0 : ['OBC-NCL', 'EWS'].includes(S.profile.category) ? 1 : 2) ? 'selected' : ''}>${esc(r[0])}</option>`).join('')}</select></label>
+        <label style="margin-top:12px">Number of subjects<select id="feeN">${[1, 2, 3, 4, 5].map(n => `<option ${n === 5 ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+        <div class="stat" style="margin-top:16px"><b id="feeOut"></b><span>excluding bank charges and GST</span></div></div>
+      <div class="card"><div class="table-wrap"><table><tr>${f.header.map(h => `<th>${esc(h)}</th>`).join('')}</tr>${f.rows.map(r => `<tr>${r.map((c, i) => `<td class="${i ? 'num' : ''}">${i ? inr(c) : esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>
+        <p class="muted" style="font-size:.82rem;margin-top:10px">${esc(f.note)}. <a href="${esc(firstUrl(f.source))}" target="_blank" rel="noopener">Information bulletin</a></p></div></div>`;
+  };
   TOOLS.normalisation = () => `<div class="grid g2">
     <div class="card"><h3>Raw score vs normalised score</h3><p>When a subject is held in several shifts, NTA converts raw scores to normalised scores so that harder and easier shifts are compared fairly. Universities admit on the normalised score shown on your scorecard.</p><p>Use the <a href="#/tools/marks">marks calculator</a> to see your raw score from the answer key, then enter your scorecard's normalised scores in the <a href="#/predictor">predictor</a>.</p></div>
-    <div class="card"><h3>Why we don't show a percentile estimate</h3><p>NTA does not publish a marks-to-percentile table for CUET (UG), and any "percentile predictor" without one is a guess. We show your gap to real closing scores instead.</p><p>DU uses a combined merit score built from the subjects its course requires; BHU and JMI often use the score of a single subject. The predictor handles both.</p></div></div>`;
+    <div class="card"><h3>Why we don't show a percentile estimate</h3><p>NTA does not publish a marks-to-percentile table for CUET (UG), and any "percentile predictor" without one is a guess. We show your gap to real closing scores instead.</p><p>DU uses a combined merit score built from the subjects its course requires; BHU and JMI often use the score of a single subject. The predictor handles both.</p></div></div>
+    ${offRows('subjects').length ? `<h3 style="margin-top:24px">Highest NTA score in each subject, CUET (UG) ${esc(off().cycle)}</h3><div class="table-wrap" style="max-height:420px"><table><tr><th>Code</th><th>Subject</th><th>Appeared</th><th>Highest (of 250)</th></tr>${offRows('subjects').map(r => `<tr><td class="num">${esc(r.code)}</td><td>${esc(r.subject)}</td><td class="num">${Number(r.appeared).toLocaleString('en-IN')}</td><td class="num">${esc(r.highest)}</td></tr>`).join('')}</table></div><p class="muted" style="font-size:.8rem">Source: <a href="${esc(firstUrl(off().subjects.source.split(';').pop()))}" target="_blank" rel="noopener">NTA result press release</a></p>` : ''}`;
 
   ROUTES['tools:mount'] = arg => {
     const tab = arg || 'marks';
@@ -995,7 +1043,7 @@
             <b style="min-width:70px;text-align:right;padding-bottom:10px;color:var(--${bad ? 'bad' : 'ink'})">${bad ? 'Over ' + Q : r * R + w * W}</b>
             <button class="icon-btn" data-rm="${i}" style="margin-bottom:2px" aria-label="Remove">✕</button></div>
             ${bad ? '' : `<small class="muted">${Math.max(0, Q - r - w)} unanswered · out of ${Q * R}</small>`}`;
-        }).join('') + `<datalist id="subjList">${SUBJECTS.map(s => `<option value="${esc(s)}">`).join('')}</datalist>`;
+        }).join('') + `<datalist id="subjList">${subjectNames().map(s => `<option value="${esc(s)}">`).join('')}</datalist>`;
         total();
       };
       const total = () => {
@@ -1019,6 +1067,13 @@
         }
       });
       drawRows();
+    }
+    if (tab === 'fees' && $('#feeCat')) {
+      const calc = () => {
+        const r = off().fees.rows[+$('#feeCat').value], n = +$('#feeN').value;
+        $('#feeOut').textContent = inr(r[1] + Math.max(0, n - 3) * r[2]);
+      };
+      $('#feeCat').addEventListener('change', calc); $('#feeN').addEventListener('change', calc); calc();
     }
     if (tab === 'subjects' && $('#rq')) {
       const rules = D.rules.rules;
@@ -1053,6 +1108,41 @@
   };
 
   /* Resources */
+  function officialSections() {
+    const o = off(), src = (x, label) => x && x.source ? `<p class="muted" style="font-size:.8rem;margin-top:8px">Source: <a href="${esc(firstUrl(x.source))}" target="_blank" rel="noopener">${label}</a></p>` : '';
+    if (!o.pattern) return `<div class="notice info">The exam pattern, fees and subjects load from NTA's information bulletin.</div>`;
+    const sum = ((o.stats && o.stats.blocks) || [])[0];
+    const stat = name => sum && sum.rows.find(r => r[0] === name);
+    const reg = stat('Registered candidates (unique)'), app = stat('Unique candidates appeared');
+    const subj = offRows('subjects');
+    const types = [...new Set(subj.map(r => r.type))];
+    const rulesBy = {};
+    offRows('rules').forEach(r => { (rulesBy[r.area] = rulesBy[r.area] || []).push(r.rule); });
+    return `
+      <h2 style="margin-top:34px">CUET (UG) ${esc(o.cycle)} exam pattern</h2>
+      <div class="table-wrap"><table>${offRows('pattern').map(r => `<tr><th style="position:static;width:30%">${esc(r.parameter)}</th><td>${esc(r.detail)}</td></tr>`).join('')}</table></div>
+      ${src(o.pattern, 'CUET (UG) ' + esc(o.cycle) + ' Information Bulletin')}
+      <h2 style="margin-top:34px">Application fee</h2>
+      <div class="table-wrap"><table><tr>${o.fees.header.map(h => `<th>${esc(h)}</th>`).join('')}</tr>${o.fees.rows.map(r => `<tr>${r.map((c, i) => `<td class="${i ? 'num' : ''}">${i ? inr(c) : esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>
+      <p class="muted" style="font-size:.8rem;margin-top:8px">${esc(o.fees.note)}. <a href="#/tools/fees">Fee calculator →</a></p>
+      <h2 style="margin-top:34px">The ${subj.length} CUET subjects</h2>
+      <div class="grid g3">${types.map(tp => `<div class="card"><h3>${esc(tp)} <span class="tag">${subj.filter(r => r.type === tp).length}</span></h3><ul style="margin:0;padding-left:18px;font-size:.9rem">${subj.filter(r => r.type === tp).map(r => `<li><span class="muted" style="font-family:var(--mono)">${esc(r.code)}</span> ${esc(r.subject)}</li>`).join('')}</ul></div>`).join('')}</div>
+      ${src({ source: o.subjects.source }, 'NTA syllabus page')}
+      ${reg ? `<h2 style="margin-top:34px">CUET (UG) ${esc(o.cycle)} in numbers</h2>
+      <div class="grid g4">
+        <div class="card stat"><b>${lakh(reg[2])}</b><span>registered (${lakh(reg[1])} in 2025)</span></div>
+        <div class="card stat"><b>${lakh(app[2])}</b><span>appeared</span></div>
+        <div class="card stat"><b>${esc((stat('No. of universities') || [])[2] ?? unis().length)}</b><span>participating institutions</span></div>
+        <div class="card stat"><b>${esc((stat('Exam cities') || [])[2] ?? '')}</b><span>exam cities, ${esc((stat('Exam cities outside India') || [])[2] ?? '')} outside India</span></div>
+      </div>
+      <details class="card" style="margin-top:12px"><summary><b>All 2025 vs 2026 figures</b></summary>${o.stats.blocks.map(b => `${b.label ? `<h3 style="margin-top:16px">${esc(b.label)}</h3>` : ''}<div class="table-wrap" style="margin-top:8px"><table><tr>${b.header.map(h => `<th>${esc(h)}</th>`).join('')}</tr>${b.rows.map(r => `<tr>${r.map((c, i) => `<td class="${i ? 'num' : ''}">${typeof c === 'number' ? (/%/.test(b.header[i]) ? (c * 100).toFixed(1) + '%' : c.toLocaleString('en-IN')) : esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`).join('')}</details>
+      ${src(o.stats, 'NTA result press release')}` : ''}
+      <h2 style="margin-top:34px">Rules to know</h2>
+      <div class="grid g2">${Object.entries(rulesBy).map(([a, rs]) => `<div class="card"><h3>${esc(a)}</h3><ul class="ticks">${rs.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>`).join('')}</div>
+      ${src(o.rules, 'Information Bulletin')}
+      <h2 style="margin-top:34px">Official links and helpdesk</h2>
+      <div class="table-wrap"><table>${offRows('links').map(r => `<tr><td>${esc(r.item)}</td><td>${/^https?:/.test(r.url || '') ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.url.replace(/^https?:\/\//, '').slice(0, 60))}</a>` : /@/.test(r.url || '') ? `<a href="mailto:${esc(r.url)}">${esc(r.url)}</a>` : esc(r.url)}</td><td><small>${esc(r.notes || '')}</small></td></tr>`).join('')}</table></div>`;
+  }
   ROUTES.resources = () => {
     const rows = cutRows().filter(r => (r.category || 'UR') === S.profile.category);
     const webinars = (C.webinars || []).filter(w => new Date(w.date) > Date.now());
@@ -1063,14 +1153,7 @@
         <a class="card tool" href="${NTA_UNIS}" target="_blank" rel="noopener"><span class="ico">📜</span><h3>Participating universities</h3><p>NTA's official lists — the source of our <a href="#/colleges">college list</a>.</p></a>
         <a class="card tool" href="${SATHEE}" target="_blank" rel="noopener"><span class="ico">📝</span><h3>Free mocks and PYQs (SATHEE, IIT Kanpur)</h3><p>Full mock tests, subject tests and previous-year papers, free from the Government of India's SATHEE platform.</p></a>
       </div>
-      <h2 style="margin-top:34px">Exam pattern at a glance</h2>
-      <div class="grid g4">
-        <div class="card stat"><b>5</b><span>subjects at most, plus the General Test</span></div>
-        <div class="card stat"><b>50</b><span>compulsory questions per paper</span></div>
-        <div class="card stat"><b>+5 / −1</b><span>right / wrong, 0 if unanswered</span></div>
-        <div class="card stat"><b>60 min</b><span>per paper, computer-based</span></div>
-      </div>
-      <p class="muted" style="font-size:.82rem;margin-top:8px">As per the CUET (UG) 2025–26 pattern. Always check the latest information bulletin on <a href="${NTA}" target="_blank" rel="noopener">cuet.nta.nic.in</a>.</p>
+      ${officialSections()}
       <h2 style="margin-top:34px">Choosing your subjects</h2>
       <div class="card"><ul class="ticks">
         <li>Pick the course first, then the subjects its eligibility rule asks for — DU and BHU publish them course by course in their bulletins.</li>
@@ -1099,7 +1182,7 @@
       <div class="side-layout">
         <form class="card sticky" id="srForm"><h3>Book a call</h3>
           <label>College or university<input name="college" required value="${esc(q.get('college') || '')}" list="uniList2"></label>
-          <datalist id="uniList2">${unis().slice(0, 2000).map(u => `<option value="${esc(u.name)}">`).join('')}</datalist>
+          <datalist id="uniList2">${unis().slice(0, 2000).map(u => `<option value="${esc(pretty(u.name))}">`).join('')}</datalist>
           <label style="margin-top:12px">Course you want<input name="course"></label>
           <label style="margin-top:12px">What do you want to ask?<textarea name="ask" rows="3" placeholder="Hostel, campus life, which college to put first…"></textarea></label>
           <div class="form-grid" style="margin-top:12px"><label>${t('Name')}<input name="name" value="${esc(S.profile.name)}" required></label><label>${t('Phone')}<input name="phone" value="${esc(S.profile.phone)}" inputmode="tel" required></label></div>
@@ -1249,7 +1332,7 @@
     const m = document.createElement('div'); m.className = 'msg ' + (me ? 'me' : 'bot-m'); m.innerHTML = html;
     bot.log.appendChild(m); bot.log.scrollTop = bot.log.scrollHeight;
   }
-  const SUGG = ['Can I get B.Com Hons with 720?', 'When is CUET 2027 registration?', 'Central universities in Uttar Pradesh', 'How is CUET marked?', 'How much does form filling cost?'];
+  const SUGG = ['Can I get B.Com Hons with 720?', 'When is CUET 2027 registration?', 'List of central universities', 'What is the CUET application fee?', 'How is CUET marked?', 'How much does form filling cost?'];
   function botHello() {
     say(`Hi! I answer from Everything CUET's own data — universities from NTA, the calendar, cutoffs and our plans. Try:<div class="sugg" style="margin-top:8px">${SUGG.map(s => `<button type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>`);
   }
@@ -1275,13 +1358,16 @@
     const cat = CATS.find(c => q.includes(c.toLowerCase().split(' ')[0]));
     const states = [...new Set(unis().map(u => u.state).filter(Boolean))];
     const st = states.find(s => q.includes(s.toLowerCase()));
-    if (/universit|college|list/.test(q) && (cat || st)) {
+    if (/universit|college|list|institut/.test(q) && (cat || st)) {
       if (!unis().length) return `NTA's university list is being imported. See it on <a href="${NTA_UNIS}" target="_blank" rel="noopener">cuet.nta.nic.in</a>.`;
       const list = unis().filter(u => (!cat || u.category === cat) && (!st || u.state === st));
       const p = new URLSearchParams(); cat && p.set('cat', cat); st && p.set('state', st);
-      return `${list.length} ${cat || ''} universit${list.length === 1 ? 'y' : 'ies'}${st ? ' in ' + esc(st) : ''} on NTA's list:\n${list.slice(0, 6).map(u => '• ' + esc(u.name)).join('\n')}${list.length > 6 ? '\n…' : ''}\n<a href="#/colleges?${p}">See all →</a>`;
+      return `${list.length} ${cat || ''} universit${list.length === 1 ? 'y' : 'ies'}${st ? ' in ' + esc(st) : ''} on NTA's list:\n${list.slice(0, 6).map(u => '• ' + esc(pretty(u.name))).join('\n')}${list.length > 6 ? '\n…' : ''}\n<a href="#/colleges?${p}">See all →</a>`;
     }
-    if (/mark|negative|pattern|question|paper|kitne/.test(q)) return `Each paper has 50 compulsory questions in 60 minutes: +5 for a right answer, −1 for a wrong one, 0 if left blank — so 250 per subject (CUET UG 2025–26 pattern; check NTA's bulletin). <a href="#/tools/marks">Count your marks →</a>`;
+    if (/mark|negative|pattern|question|paper|kitne/.test(q)) return `Each paper has 50 compulsory questions in 60 minutes: +5 for a right answer, −1 for a wrong one, 0 if left blank — so 250 per subject (official CUET UG ${esc(off().cycle || '2026')} pattern). <a href="#/tools/marks">Count your marks →</a> · <a href="#/resources">Full pattern →</a>`;
+    if (/application fee|cuet fee|exam fee|registration fee|form fee/.test(q) && off().fees) return `CUET (UG) ${esc(off().cycle)} application fee:\n${off().fees.rows.map(r => `• ${esc(r[0])}: ${inr(r[1])} for up to 3 subjects, +${inr(r[2])} per extra subject (${inr(r[3])} for 5)`).join('\n')}\n<a href="#/tools/fees">Fee calculator →</a>`;
+    if (/helpline|helpdesk|contact|phone number|email nta|nta contact/.test(q) && offRows('links').length) { const h = offRows('links').find(r => /helpdesk email/i.test(r.item)); return h ? `NTA CUET (UG) helpdesk: <a href="mailto:${esc(h.url)}">${esc(h.url)}</a> · ${esc(h.notes || '')}` : `<a href="#/resources">Official links →</a>`; }
+    if (/how many|subjects list|which subjects|kitne subject/.test(q) && offRows('subjects').length) return `CUET (UG) ${esc(off().cycle)} has ${offRows('subjects').length} subjects (${[...new Set(offRows('subjects').map(r => r.type))].map(tp => `${offRows('subjects').filter(r => r.type === tp).length} ${tp.toLowerCase()}`).join(', ')}); you can take up to 5. <a href="#/resources">See the list →</a>`;
     if (/price|cost|fee|pay|form fill|assist|plan|kitna/.test(q)) return `• Assisted form: ${inr(P.assistedForm)} each, ${Math.round(P.bundleDiscount * 100)}% off for ${P.bundleMinForms}+\n• CSAS Pro: ${inr(P.csasPro)}\n• Admission Mentor: ${inr(P.mentor)}–${inr(P.mentorPlus).slice(1)}\n• Senior call: ${inr(P.seniorCall)} / 20 min\n<a href="#/pricing">See plans →</a>`;
     if (/senior|alumni|student|mentor/.test(q)) return `Book a ${inr(P.seniorCall)}, 20-minute call with a verified senior: <a href="#/seniors">Talk to a senior →</a>`;
     if (/subject|eligib|combination/.test(q)) return `Use the <a href="#/tools/subjects">subject combination checker</a>; it lists each course's required CUET subjects from the university's bulletin.`;
