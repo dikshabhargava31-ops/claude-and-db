@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Gochi Hand"; src: url("assets/fonts/gochi-hand.woff2") format("woff2"); }
+      @font-face { font-family: "Patrick Hand"; src: url("assets/fonts/patrick-hand.woff2") format("woff2"); }
+      :root {
+        --ground: #0b1430;
+        --yellow: #ffd21f;
+        --ink: #111111;
+        --hand: "Gochi Hand", cursive;
+        --note: "Patrick Hand", cursive;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 100%; height: 100%; background: var(--ground); }
+      .bg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+      #scrim {
+        position: absolute; left: 0; top: 0; width: 1080px; height: 760px; z-index: 5;
+        background: linear-gradient(to bottom, rgba(8, 12, 30, 0.7) 0%, rgba(8, 12, 30, 0.35) 60%, rgba(8, 12, 30, 0) 100%);
+      }
+      .cardwrap { position: absolute; z-index: 10; }
+      .card { display: block; border-radius: 26px; border: 6px solid var(--ink); box-shadow: 14px 16px 0 rgba(0, 0, 0, 0.35); }
+      .title {
+        position: absolute; left: 0; top: 190px; width: 1080px; z-index: 30; text-align: center;
+        font-family: var(--hand); font-size: 116px; line-height: 1.02; color: var(--yellow);
+        text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 5px 0 rgba(0, 0, 0, 0.35); padding: 0 40px;
+      }
+      .title .sub {
+        display: block; font-family: var(--note); font-size: 56px; line-height: 1.15; color: #fff;
+        text-transform: none; letter-spacing: 0; margin-top: 18px; text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+      }
+      .wave { display: block; margin: 6px auto 0; overflow: visible; }
+      .toon { position: absolute; top: 1270px; width: 270px; height: 624px; z-index: 20; }
+      .toon svg { width: 270px; height: 624px; overflow: visible; }
+      .bubble {
+        position: absolute; z-index: 35; background: #fff; border: 6px solid var(--ink); border-radius: 44px;
+        font-family: var(--note); font-size: 58px; line-height: 1.1; color: var(--ink); padding: 18px 34px 22px; text-align: center;
+      }
+      .bubble::after {
+        content: ""; position: absolute; bottom: -34px; width: 0; height: 0;
+        border-left: 22px solid transparent; border-right: 22px solid transparent; border-top: 36px solid var(--ink);
+      }
+      #bub-free::after { left: 60px; }
+      #bub-link::after { right: 70px; }
+      #rating {
+        position: absolute; left: 190px; top: 640px; width: 700px; z-index: 30; text-align: center;
+        border: 6px dashed #fff; border-radius: 22px; padding: 18px 0 26px; background: rgba(10, 14, 32, 0.45);
+      }
+      #rating .label { display: block; font-family: var(--note); font-size: 52px; color: #fff; }
+      #rating .score { display: block; font-family: var(--hand); font-size: 120px; line-height: 1; color: #fff; margin: 8px 0 6px; }
+      #rating .score b { color: #ff3b30; font-weight: 400; }
+      #stars { display: block; margin: 0 auto; overflow: visible; }
+      #burst { position: absolute; left: 440px; top: 1410px; width: 200px; height: 200px; z-index: 25; overflow: visible; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="22.8" data-width="1080" data-height="1920">
+      <!-- Backgrounds: no faces anywhere (blurred desk, hands, a far-away turf) -->
+      <video id="bg-desk" class="clip bg" src="raw/shots/bg_desk.mp4" data-start="0" data-duration="14.4" data-track-index="1" muted playsinline></video>
+      <video id="bg-pen1" class="clip bg" src="raw/shots/bg_pen1.mp4" data-start="14.4" data-duration="2.4" data-track-index="1" muted playsinline></video>
+      <video id="bg-pen2" class="clip bg" src="raw/shots/bg_pen2.mp4" data-start="16.8" data-duration="2.4" data-track-index="1" muted playsinline></video>
+      <video id="bg-turf" class="clip bg" src="raw/shots/bg_turf.mp4" data-start="19.2" data-duration="3.6" data-track-index="1" muted playsinline></video>
+      <div id="scrim" class="clip" data-start="0" data-duration="22.8" data-track-index="2"></div>
+
+      <!-- The website, as tilted cards -->
+      <div id="cw1" class="cardwrap" style="left: 190px; top: 560px"><video id="card1" class="clip card" src="raw/shots/card1.mp4" width="700" data-start="2.4" data-duration="2.4" data-track-index="3" muted playsinline></video></div>
+      <div id="cw2" class="cardwrap" style="left: 190px; top: 560px"><video id="card2" class="clip card" src="raw/shots/card2.mp4" width="700" data-start="4.8" data-duration="2.4" data-track-index="3" muted playsinline></video></div>
+      <div id="cw3" class="cardwrap" style="left: 190px; top: 560px"><video id="card3" class="clip card" src="raw/shots/card3.mp4" width="700" data-start="7.2" data-duration="2.4" data-track-index="3" muted playsinline></video></div>
+      <div id="cw4" class="cardwrap" style="left: 190px; top: 560px"><video id="card4" class="clip card" src="raw/shots/card4.mp4" width="700" data-start="9.6" data-duration="1.2" data-track-index="3" muted playsinline></video></div>
+      <div id="cw5" class="cardwrap" style="left: 190px; top: 560px"><video id="card5" class="clip card" src="raw/shots/card5.mp4" width="700" data-start="10.8" data-duration="1.2" data-track-index="3" muted playsinline></video></div>
+      <div id="cw6" class="cardwrap" style="left: 90px; top: 720px"><video id="card6" class="clip card" src="raw/shots/card6.mp4" width="900" data-start="12" data-duration="2.4" data-track-index="3" muted playsinline></video></div>
+
+      <!-- Titles: hand-lettered yellow, white note underneath -->
+      <div id="t1" class="clip title" data-start="0" data-duration="2.4" data-track-index="4">where do you<br />get these tests?
+        <svg class="wave" width="760" height="30" viewBox="0 0 760 30"><path class="wv" d="M5 15 Q 30 0 55 15 T 105 15 T 155 15 T 205 15 T 255 15 T 305 15 T 355 15 T 405 15 T 455 15 T 505 15 T 555 15 T 605 15 T 655 15 T 705 15 T 755 15" fill="none" stroke="#ffd21f" stroke-width="9" stroke-linecap="round" /></svg>
+        <span class="sub">my friend from another coaching, every week</span></div>
+      <div id="t2" class="clip title" data-start="2.4" data-duration="2.4" data-track-index="4">one link.<span class="sub">that's the whole secret.</span></div>
+      <div id="t3" class="clip title" data-start="4.8" data-duration="2.4" data-track-index="4">chapter tests +<br />mock tests<span class="sub">plus ICAI RTPs, MTPs &amp; model papers</span></div>
+      <div id="t4" class="clip title" data-start="7.2" data-duration="2.4" data-track-index="4">any chapter.<span class="sub">pick. click. done.</span></div>
+      <div id="t5" class="clip title" data-start="9.6" data-duration="2.4" data-track-index="4">paper + solution<span class="sub">you get both. every time.</span></div>
+      <div id="t6" class="clip title" data-start="12" data-duration="2.4" data-track-index="4">exam mode: on<span class="sub">90 minutes. 50 marks. real format.</span></div>
+      <div id="t7" class="clip title" data-start="14.4" data-duration="2.4" data-track-index="4">solve. check.<br />repeat.</div>
+      <div id="t9" class="clip title" data-start="19.6" data-duration="3.2" data-track-index="4"><span class="sub" style="margin: 0 0 14px">made at IPA, for every CA student.</span>IPA institute
+        <svg class="wave" width="640" height="30" viewBox="0 0 640 30"><path class="wv9" d="M5 15 Q 30 0 55 15 T 105 15 T 155 15 T 205 15 T 255 15 T 305 15 T 355 15 T 405 15 T 455 15 T 505 15 T 555 15 T 605 15 T 635 15" fill="none" stroke="#ffd21f" stroke-width="9" stroke-linecap="round" /></svg>
+        <span class="sub">link in bio</span></div>
+
+      <!-- Speech bubbles and the rating -->
+      <div id="bub-link" class="clip bubble" style="left: 560px; top: 1130px" data-start="2.7" data-duration="2.1" data-track-index="5">one link!</div>
+      <div id="bub-free" class="clip bubble" style="left: 60px; top: 1120px" data-start="16.85" data-duration="2.35" data-track-index="5">wait... it's FREE?!</div>
+      <div id="rating" class="clip" data-start="16.9" data-duration="2.3" data-track-index="4">
+        <span class="label">my friend's rating:</span>
+        <span class="score">(<b>11</b>/10)</span>
+        <svg id="stars" width="560" height="100" viewBox="0 0 560 100">
+          <g id="st1" transform="translate(56 50)"><path d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" /><path class="fill" d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="#ffd21f" stroke="#111" stroke-width="5" stroke-linejoin="round" /></g>
+          <g id="st2" transform="translate(168 50)"><path d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" /><path class="fill" d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="#ffd21f" stroke="#111" stroke-width="5" stroke-linejoin="round" /></g>
+          <g id="st3" transform="translate(280 50)"><path d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" /><path class="fill" d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="#ffd21f" stroke="#111" stroke-width="5" stroke-linejoin="round" /></g>
+          <g id="st4" transform="translate(392 50)"><path d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" /><path class="fill" d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="#ffd21f" stroke="#111" stroke-width="5" stroke-linejoin="round" /></g>
+          <g id="st5" transform="translate(504 50)"><path d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" /><path class="fill" d="M0 -40 L11 -13 L40 -12 L17 6 L25 35 L0 18 L-25 35 L-17 6 L-40 -12 L-11 -13 Z" fill="#ffd21f" stroke="#111" stroke-width="5" stroke-linejoin="round" /></g>
+        </svg>
+      </div>
+
+      <!-- Aarav: the friend from another coaching (red hoodie) -->
+      <div id="aarav" class="clip toon" style="left: 70px" data-start="0" data-duration="22.8" data-track-index="6">
+        <svg id="a-svg" viewBox="0 0 320 740">
+          <g stroke="#111" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+            <g id="a-armL">
+              <path d="M73 280 L117 280 L113 460 L77 460 Z" fill="#d93a3a" />
+              <path d="M77 448 L113 448" fill="none" stroke-width="6" />
+              <circle cx="95" cy="482" r="23" fill="#c98b5a" />
+            </g>
+            <path d="M92 700 Q86 728 118 728 L168 728 Q178 726 174 712 L162 700 Z" fill="#ffffff" />
+            <path d="M172 700 Q166 728 198 728 L248 728 Q258 726 254 712 L242 700 Z" fill="#ffffff" />
+            <path d="M108 470 L98 706 L160 706 L162 540 L166 706 L228 706 L214 470 Z" fill="#3d6fb5" />
+            <path d="M163 548 L163 690" fill="none" stroke-width="4" />
+            <path d="M84 270 Q160 236 236 270 L250 486 Q160 506 70 486 Z" fill="#d93a3a" />
+            <path d="M118 262 Q160 300 202 262" fill="#b52b2b" />
+            <path d="M120 400 L200 400 L214 462 L106 462 Z" fill="none" stroke-width="6" />
+            <path d="M146 282 L141 350 M174 282 L179 350" fill="none" stroke="#fff" stroke-width="6" />
+            <circle cx="141" cy="354" r="5" fill="#fff" stroke-width="3" />
+            <circle cx="179" cy="354" r="5" fill="#fff" stroke-width="3" />
+            <g id="a-armR">
+              <path d="M203 280 L247 280 L243 460 L207 460 Z" fill="#d93a3a" />
+              <path d="M207 448 L243 448" fill="none" stroke-width="6" />
+              <circle cx="225" cy="482" r="23" fill="#c98b5a" />
+            </g>
+            <g id="a-head">
+              <rect x="142" y="226" width="36" height="40" fill="#c98b5a" />
+              <ellipse cx="94" cy="178" rx="14" ry="20" fill="#c98b5a" />
+              <ellipse cx="226" cy="178" rx="14" ry="20" fill="#c98b5a" />
+              <ellipse cx="160" cy="170" rx="66" ry="74" fill="#c98b5a" />
+              <path d="M92 150 L98 104 L118 120 L126 82 L146 108 L160 70 L174 106 L194 80 L202 118 L222 100 L228 150 Q210 120 160 124 Q110 120 92 150 Z" fill="#1d1d1d" />
+              <path d="M124 160 L148 154 M172 154 L196 160" fill="none" stroke-width="8" />
+              <ellipse cx="136" cy="180" rx="7" ry="9" fill="#111" stroke="none" />
+              <ellipse cx="184" cy="180" rx="7" ry="9" fill="#111" stroke="none" />
+              <path d="M156 186 Q152 204 162 206" fill="none" stroke-width="5" />
+              <path id="a-smile" d="M138 218 Q160 236 182 218" fill="none" stroke-width="6" />
+              <ellipse id="a-o" cx="160" cy="222" rx="12" ry="15" fill="#5a1a1a" />
+            </g>
+            <g id="a-shock" stroke="#ffd21f" stroke-width="9">
+              <path d="M238 92 L262 70" fill="none" />
+              <path d="M248 126 L280 120" fill="none" />
+              <path d="M226 64 L234 34" fill="none" />
+            </g>
+            <g id="a-q" stroke="none">
+              <text x="250" y="80" font-family="Gochi Hand" font-size="90" fill="#ffd21f" stroke="#111" stroke-width="3">?</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Riya: the IPA student (navy polo, yellow trim) -->
+      <div id="riya" class="clip toon" style="left: 740px" data-start="0" data-duration="22.8" data-track-index="6">
+        <svg id="r-svg" viewBox="0 0 320 740">
+          <g stroke="#111" stroke-width="7" stroke-linejoin="round" stroke-linecap="round">
+            <path d="M232 120 Q290 160 262 260 Q254 290 236 300 Q246 240 216 170 Z" fill="#1d1d1d" />
+            <g id="r-armR">
+              <path d="M203 280 L245 280 L241 350 L207 350 Z" fill="#1f2f63" />
+              <path d="M207 350 L241 350" fill="none" stroke="#ffd21f" stroke-width="8" />
+              <path d="M210 352 L238 352 L236 462 L212 462 Z" fill="#b97a4c" />
+              <circle cx="224" cy="482" r="22" fill="#b97a4c" />
+            </g>
+            <path d="M96 700 Q90 728 120 728 L166 728 Q176 726 172 712 L160 700 Z" fill="#7a4a2a" />
+            <path d="M168 700 Q162 728 194 728 L240 728 Q250 726 246 712 L234 700 Z" fill="#7a4a2a" />
+            <path d="M112 470 L102 706 L160 706 L162 540 L164 706 L222 706 L210 470 Z" fill="#6b6f78" />
+            <path d="M88 272 Q160 244 232 272 L240 484 Q160 500 80 484 Z" fill="#1f2f63" />
+            <path d="M132 262 L160 310 L188 262" fill="#1f2f63" stroke="#ffd21f" stroke-width="8" />
+            <text x="160" y="362" text-anchor="middle" font-family="Gochi Hand" font-size="40" fill="#ffffff" stroke="none">IPA</text>
+            <path d="M84 300 L80 300" fill="none" />
+            <g id="r-armL">
+              <path d="M75 280 L117 280 L113 350 L79 350 Z" fill="#1f2f63" />
+              <path d="M79 350 L113 350" fill="none" stroke="#ffd21f" stroke-width="8" />
+              <path d="M82 352 L110 352 L108 462 L84 462 Z" fill="#b97a4c" />
+              <g id="r-phone">
+                <rect x="70" y="440" width="52" height="88" rx="9" fill="#2b2b2b" />
+                <rect x="78" y="450" width="36" height="62" rx="4" fill="#7fd3ff" stroke-width="3" />
+              </g>
+              <circle cx="96" cy="482" r="22" fill="#b97a4c" />
+            </g>
+            <g id="r-head">
+              <rect x="143" y="226" width="34" height="40" fill="#b97a4c" />
+              <ellipse cx="160" cy="172" rx="64" ry="72" fill="#b97a4c" />
+              <path d="M94 172 Q90 96 160 92 Q232 96 226 172 Q214 120 170 122 Q150 140 108 136 Q98 150 94 172 Z" fill="#1d1d1d" />
+              <circle cx="136" cy="180" r="19" fill="#fff" fill-opacity="0.25" stroke-width="6" />
+              <circle cx="184" cy="180" r="19" fill="#fff" fill-opacity="0.25" stroke-width="6" />
+              <path d="M155 180 L165 180" fill="none" stroke-width="5" />
+              <circle cx="136" cy="182" r="5" fill="#111" stroke="none" />
+              <circle cx="184" cy="182" r="5" fill="#111" stroke="none" />
+              <path d="M124 152 L146 148 M174 148 L196 152" fill="none" stroke-width="6" />
+              <path d="M140 214 Q160 232 180 214" fill="none" stroke-width="6" />
+              <circle cx="118" cy="204" r="9" fill="#e57c6c" stroke="none" opacity="0.7" />
+              <circle cx="202" cy="204" r="9" fill="#e57c6c" stroke="none" opacity="0.7" />
+            </g>
+            <g id="r-spark" stroke="#ffd21f" stroke-width="9">
+              <path d="M58 92 L36 70" fill="none" />
+              <path d="M46 128 L16 124" fill="none" />
+              <path d="M84 62 L78 30" fill="none" />
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <svg id="burst" class="clip" viewBox="-100 -100 200 200" data-start="19.75" data-duration="1" data-track-index="7">
+        <g stroke="#ffd21f" stroke-width="10" stroke-linecap="round">
+          <path d="M0 -40 L0 -90" /><path d="M28 -28 L64 -64" /><path d="M40 0 L90 0" /><path d="M28 28 L64 64" />
+          <path d="M0 40 L0 90" /><path d="M-28 28 L-64 64" /><path d="M-40 0 L-90 0" /><path d="M-28 -28 L-64 -64" />
+        </g>
+      </svg>
+
+      <!-- Sound: original beat + effects on the visible actions -->
+      <audio id="beat" class="clip" src="assets/beat.m4a" data-start="0" data-duration="22.8" data-track-index="10" data-volume="0.9"></audio>
+      <audio id="sfx-q" class="clip" src="assets/sfx/pop.mp3" data-start="0.55" data-track-index="11"  data-duration="1.6" data-volume="0.5"></audio>
+      <audio id="sfx-drop" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="2.4" data-track-index="12"  data-duration="1.6" data-volume="0.45"></audio>
+      <audio id="sfx-w1" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="2.38" data-track-index="13"  data-duration="1.6" data-volume="0.55"></audio>
+      <audio id="sfx-w2" class="clip" src="assets/sfx/whoosh.mp3" data-start="4.75" data-track-index="14"  data-duration="1.6" data-volume="0.45"></audio>
+      <audio id="sfx-shock" class="clip" src="assets/sfx/pop.mp3" data-start="5.1" data-track-index="15"  data-duration="1.6" data-volume="0.5"></audio>
+      <audio id="sfx-w3" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="7.18" data-track-index="16"  data-duration="1.6" data-volume="0.55"></audio>
+      <audio id="sfx-w4" class="clip" src="assets/sfx/whoosh.mp3" data-start="9.55" data-track-index="17"  data-duration="1.6" data-volume="0.45"></audio>
+      <audio id="sfx-click" class="clip" src="assets/sfx/click-soft.mp3" data-start="10.78" data-track-index="18"  data-duration="1.6" data-volume="0.6"></audio>
+      <audio id="sfx-w5" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="11.98" data-track-index="19"  data-duration="1.6" data-volume="0.55"></audio>
+      <audio id="sfx-bub" class="clip" src="assets/sfx/pop.mp3" data-start="16.85" data-track-index="20"  data-duration="1.6" data-volume="0.6"></audio>
+      <audio id="sfx-stars" class="clip" src="assets/sfx/sparkle.mp3" data-start="17.2" data-track-index="21"  data-duration="1.6" data-volume="0.4"></audio>
+      <audio id="sfx-bump" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="19.78" data-track-index="22"  data-duration="1.6" data-volume="0.55"></audio>
+    </div>
+    <script>
+      const B = 0.6; // one beat at 100 bpm
+      const tl = gsap.timeline({ paused: true, defaults: { immediateRender: false } });
+      const at = (sel, vars, t) => tl.set(sel, vars, t);
+
+      // Rest poses (arms hang slightly outward; shoulders are the pivots)
+      at("#a-armL", { rotation: 8, svgOrigin: "95 285" }, 0);
+      at("#a-armR", { rotation: -8, svgOrigin: "225 285" }, 0);
+      at("#r-armL", { rotation: 8, svgOrigin: "96 285" }, 0);
+      at("#r-armR", { rotation: -8, svgOrigin: "224 285" }, 0);
+      at("#a-o, #a-shock, #r-phone, #r-spark", { opacity: 0 }, 0);
+      at("#a-q", { opacity: 1 }, 0);
+      at(".wv", { strokeDasharray: 900, strokeDashoffset: 0 }, 0);
+      at("#a-head, #r-head", { rotation: 0, svgOrigin: "160 240" }, 0);
+      at("#a-svg, #r-svg", { x: 0, y: 0, rotation: 0 }, 0);
+      at("#a-smile", { opacity: 1 }, 0);
+      at(".fill", { opacity: 0 }, 0);
+      at("#a-q", { scale: 1, svgOrigin: "270 50" }, 0);
+
+      // Bar 1 (0-2.4): Aarav points at Riya, question mark already up (the hook is frame 0)
+      tl.fromTo("#a-armR", { rotation: -8 }, { rotation: -92, svgOrigin: "225 285", duration: 0.3, ease: "back.out(2)" }, 0.3);
+      tl.fromTo("#a-q", { scale: 1 }, { scale: 1.3, svgOrigin: "270 50", duration: 0.15, yoyo: true, repeat: 1 }, 0.55);
+      tl.fromTo("#a-head", { rotation: 0 }, { rotation: 6, svgOrigin: "160 240", duration: 0.3, yoyo: true, repeat: 3, ease: "sine.inOut" }, 0.6);
+      tl.to("#a-armR", { rotation: -8, svgOrigin: "225 285", duration: 0.25 }, 2.15);
+      tl.to("#a-q", { opacity: 0, duration: 0.15 }, 2.2);
+
+      // Bar 2 (2.4-4.8): Riya holds up her phone - "one link"
+      tl.fromTo("#r-armL", { rotation: 8 }, { rotation: 150, svgOrigin: "96 285", duration: 0.3, ease: "back.out(1.8)" }, 2.45);
+      tl.to("#r-phone", { opacity: 1, duration: 0.05 }, 2.5);
+      tl.fromTo("#r-spark", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, svgOrigin: "60 80", duration: 0.2, ease: "back.out(3)" }, 2.75);
+      tl.to("#r-spark", { opacity: 0, duration: 0.2 }, 4.4);
+      tl.to("#r-armL", { rotation: 8, svgOrigin: "96 285", duration: 0.25 }, 4.5);
+      tl.to("#r-phone", { opacity: 0, duration: 0.05 }, 4.7);
+
+      // Bar 3 (4.8-7.2): Aarav is shocked
+      tl.to("#a-smile", { opacity: 0, duration: 0.05 }, 5.05);
+      tl.to("#a-o", { opacity: 1, duration: 0.05 }, 5.05);
+      tl.fromTo("#a-shock", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, svgOrigin: "240 90", duration: 0.2, ease: "back.out(3)" }, 5.1);
+      tl.fromTo("#a-armL", { rotation: 8 }, { rotation: 168, svgOrigin: "95 285", duration: 0.3, ease: "power2.out" }, 5.1);
+      tl.fromTo("#a-armR", { rotation: -8 }, { rotation: -168, svgOrigin: "225 285", duration: 0.3, ease: "power2.out" }, 5.1);
+      tl.to("#a-shock", { opacity: 0, duration: 0.2 }, 6.8);
+      tl.to("#a-armL", { rotation: 8, svgOrigin: "95 285", duration: 0.3 }, 6.9);
+      tl.to("#a-armR", { rotation: -8, svgOrigin: "225 285", duration: 0.3 }, 6.9);
+      tl.to("#a-o", { opacity: 0, duration: 0.05 }, 7.0);
+      tl.to("#a-smile", { opacity: 1, duration: 0.05 }, 7.0);
+
+      // Bar 4 (7.2-9.6): Riya points up at the chapter list
+      tl.fromTo("#r-armL", { rotation: 8 }, { rotation: 135, svgOrigin: "96 285", duration: 0.3, ease: "back.out(1.8)" }, 7.3);
+      tl.to("#r-armL", { rotation: 8, svgOrigin: "96 285", duration: 0.3 }, 9.3);
+
+      // Bar 5 (9.6-12): Aarav leans in to look
+      tl.fromTo("#a-svg", { rotation: 0 }, { rotation: 7, transformOrigin: "50% 95%", duration: 0.4, ease: "power2.out" }, 9.7);
+      tl.to("#a-svg", { rotation: 0, transformOrigin: "50% 95%", duration: 0.3 }, 11.7);
+
+      // Bar 6 (12-14.4): both nod on the beat
+      tl.fromTo("#a-head", { rotation: 0 }, { rotation: -5, svgOrigin: "160 240", duration: B / 2, yoyo: true, repeat: 7, ease: "sine.inOut" }, 12);
+      tl.fromTo("#r-head", { rotation: 0 }, { rotation: 5, svgOrigin: "160 240", duration: B / 2, yoyo: true, repeat: 7, ease: "sine.inOut" }, 12);
+
+      // Bar 7 (14.4-16.8): Riya thumbs up, Aarav scratches his head
+      tl.fromTo("#r-armL", { rotation: 8 }, { rotation: 120, svgOrigin: "96 285", duration: 0.3, ease: "back.out(2)" }, 14.5);
+      tl.fromTo("#a-armL", { rotation: 8 }, { rotation: 160, svgOrigin: "95 285", duration: 0.35, ease: "power2.out" }, 14.6);
+      tl.fromTo("#a-armL", { rotation: 160 }, { rotation: 150, svgOrigin: "95 285", duration: 0.15, yoyo: true, repeat: 5 }, 15.0);
+      tl.to("#r-armL", { rotation: 8, svgOrigin: "96 285", duration: 0.25 }, 16.5);
+      tl.to("#a-armL", { rotation: 8, svgOrigin: "95 285", duration: 0.25 }, 16.5);
+
+      // Bar 8 (16.8-19.2): "wait... it's FREE?!" and the stars, one per pluck
+      tl.to("#a-smile", { opacity: 0, duration: 0.05 }, 16.85);
+      tl.to("#a-o", { opacity: 1, duration: 0.05 }, 16.85);
+      tl.fromTo("#bub-free", { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(2.5)" }, 16.85);
+      tl.fromTo("#rating", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power3.out" }, 16.95);
+      ["#st1", "#st2", "#st3", "#st4", "#st5"].forEach((s, k) => {
+        const t = 16.8 + B * (0.75 + 0.6 * k);
+        tl.fromTo(`${s} .fill`, { opacity: 0 }, { opacity: 1, duration: 0.05 }, t);
+        tl.fromTo(s, { scale: 1 }, { scale: 1.35, transformOrigin: "50% 50%", duration: 0.12, yoyo: true, repeat: 1 }, t);
+      });
+      tl.to("#a-o", { opacity: 0, duration: 0.05 }, 19.15);
+      tl.to("#a-smile", { opacity: 1, duration: 0.05 }, 19.15);
+
+      // Bar 9 (19.2-22.8): they step in and fist-bump on the drop
+      tl.fromTo("#a-svg", { x: 0 }, { x: 110, duration: 0.4, ease: "power2.out" }, 19.2);
+      tl.fromTo("#r-svg", { x: 0 }, { x: -110, duration: 0.4, ease: "power2.out" }, 19.2);
+      tl.fromTo("#a-armR", { rotation: -8 }, { rotation: -90, svgOrigin: "225 285", duration: 0.2, ease: "power3.in" }, 19.58);
+      tl.fromTo("#r-armL", { rotation: 8 }, { rotation: 90, svgOrigin: "96 285", duration: 0.2, ease: "power3.in" }, 19.58);
+      tl.fromTo("#burst", { scale: 0.2, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.6, ease: "power2.out" }, 19.78);
+      tl.fromTo("#r-spark", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, svgOrigin: "60 80", duration: 0.2, ease: "back.out(3)" }, 19.85);
+      tl.fromTo("#a-shock", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, svgOrigin: "240 90", duration: 0.2, ease: "back.out(3)" }, 19.85);
+
+      // Gentle bob on every beat while the groove plays
+      tl.fromTo("#aarav svg, #riya svg", { y: 0 }, { y: -10, duration: B / 2, yoyo: true, repeat: 31, ease: "sine.inOut" }, 2.4);
+
+      // Titles: pop in on the downbeat; the hook is already on screen at frame 0
+      tl.fromTo("#t1 .sub", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 0.4);
+      ["#t2", "#t3", "#t4", "#t5", "#t6", "#t7"].forEach((id, k) => {
+        const t = [2.4, 4.8, 7.2, 9.6, 12, 14.4][k];
+        tl.fromTo(id, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, transformOrigin: "50% 30%", duration: 0.25, ease: "back.out(2.2)" }, t);
+        tl.fromTo(`${id} .sub`, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, t + 0.3);
+      });
+      tl.fromTo("#bub-link", { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(2.5)" }, 2.7);
+      tl.fromTo("#t9", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, transformOrigin: "50% 30%", duration: 0.3, ease: "back.out(2.2)" }, 19.8);
+      tl.fromTo(".wv9", { strokeDasharray: 800, strokeDashoffset: 800 }, { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 20.1);
+
+      // Cards slide in with a tilt, alternating sides
+      [["#cw1", 2.4, -1], ["#cw2", 4.8, 1], ["#cw3", 7.2, -1], ["#cw4", 9.6, 1], ["#cw5", 10.8, 0], ["#cw6", 12, -1]].forEach(([id, t, side]) => {
+        if (side === 0) {
+          tl.fromTo(id, { scale: 0.92, rotation: 2 }, { scale: 1, rotation: 2, duration: 0.2, ease: "back.out(2)" }, t);
+        } else {
+          tl.fromTo(id, { x: side * 900, rotation: side * 12 }, { x: 0, rotation: side * -2.5, duration: 0.32, ease: "power3.out" }, t);
+        }
+      });
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
