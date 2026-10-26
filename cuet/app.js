@@ -43,8 +43,8 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private window: keep working in memory */ } }
 
   /* ---------- data ---------- */
-  const D = { universities: null, cutoffs: null, events: null, allotments: null, rules: null, official: null };
-  const FILES = { universities: 'universities.json', cutoffs: 'cutoffs.json', events: 'events.json', allotments: 'allotments.json', rules: 'subject-rules.json', official: 'official.json' };
+  const D = { universities: null, cutoffs: null, events: null, allotments: null, rules: null, official: null, forms: null };
+  const FILES = { universities: 'universities.json', cutoffs: 'cutoffs.json', events: 'events.json', allotments: 'allotments.json', rules: 'subject-rules.json', official: 'official.json', forms: 'forms.json' };
   async function loadData() {
     await Promise.all(Object.entries(FILES).map(async ([k, f]) => {
       try { const r = await fetch('data/' + f, { cache: 'no-cache' }); D[k] = r.ok ? await r.json() : null; } catch { D[k] = null; }
@@ -54,6 +54,11 @@
   const cutRows = () => (D.cutoffs && D.cutoffs.rows) || [];
   const uniById = id => unis().find(u => u.id === id);
   const off = () => D.official || {};
+  const forms = () => (D.forms && D.forms.forms) || [];
+  const nextDeadline = f => f.deadlines.map(d => ({ ...d, when: evDate(d) })).filter(d => d.when > Date.now()).sort((a, b) => a.when - b.when)[0];
+  const formStatus = f => (f.status === 'open' && f.deadlines.length && !nextDeadline(f) ? 'closed' : f.status);
+  const FORM_STATUS = { open: ['Open', 'safe'], upcoming: ['Opening soon', 'sun'], closed: ['Closed', 'bad'], check: ['2027 dates not out', ''] };
+  const toLocalInput = d => { const x = new Date(d), p = n => String(n).padStart(2, '0'); return isNaN(x) ? '' : `${x.getFullYear()}-${p(x.getMonth() + 1)}-${p(x.getDate())}T${p(x.getHours())}:${p(x.getMinutes())}`; };
   const offRows = k => (off()[k] && off()[k].rows) || [];
   const subjectNames = () => (offRows('subjects').length ? offRows('subjects').map(r => r.subject) : SUBJECTS);
   const firstUrl = s => (String(s || '').match(/https?:\/\/[^\s;]+/) || [''])[0];
@@ -82,7 +87,7 @@
     'Same course at other universities': 'दूसरी यूनिवर्सिटी में यही कोर्स', 'Free · No login': 'मुफ़्त · लॉगिन नहीं', 'Cart': 'कार्ट', 'Checkout': 'चेकआउट', 'Add to cart': 'कार्ट में जोड़ें', 'Total': 'कुल',
     'Document checklist': 'दस्तावेज़ सूची', 'Status': 'स्थिति', 'Deadline': 'अंतिम तिथि', 'Upcoming': 'आने वाले', 'Only my list': 'सिर्फ़ मेरी लिस्ट', 'Download calendar (.ics)': 'कैलेंडर डाउनलोड करें (.ics)', 'Add to Google Calendar': 'Google Calendar में जोड़ें', 'Turn on browser reminders': 'ब्राउज़र रिमाइंडर चालू करें',
     'Add your own deadline': 'अपनी डेडलाइन जोड़ें', 'Expected': 'अनुमानित', 'Official': 'आधिकारिक', 'Last year': 'पिछला साल', 'Source': 'स्रोत', 'Ask': 'पूछें', 'Send': 'भेजें', 'Name': 'नाम', 'Phone': 'फ़ोन', 'Email': 'ईमेल',
-    'Predict → shortlist → reminders → apply → track': 'प्रेडिक्ट → शॉर्टलिस्ट → रिमाइंडर → आवेदन → ट्रैक'
+    'Predict → shortlist → reminders → apply → track': 'प्रेडिक्ट → शॉर्टलिस्ट → रिमाइंडर → आवेदन → ट्रैक', 'College forms': 'कॉलेज फ़ॉर्म', 'Reported': 'रिपोर्टेड'
   };
   const t = s => (S.lang === 'hi' && HI[s]) || s;
 
@@ -169,7 +174,7 @@
   }
 
   /* ---------- router ---------- */
-  const NAV = [['', 'Home'], ['colleges', 'Colleges'], ['predictor', 'Predictor'], ['dream', 'Dream List'], ['calendar', 'Calendar'], ['applications', 'Applications'], ['tools', 'Tools'], ['resources', 'Resources'], ['seniors', 'Seniors'], ['community', 'Community'], ['pricing', 'Pricing']];
+  const NAV = [['', 'Home'], ['colleges', 'Colleges'], ['forms', 'College forms'], ['predictor', 'Predictor'], ['dream', 'Dream List'], ['calendar', 'Calendar'], ['applications', 'Applications'], ['tools', 'Tools'], ['resources', 'Resources'], ['seniors', 'Seniors'], ['community', 'Community'], ['pricing', 'Pricing']];
   function parseHash() {
     const h = location.hash.replace(/^#\/?/, '');
     const [path, qs] = h.split('?');
@@ -207,6 +212,7 @@
       date: r.startDate || r.endDate, end: r.startDate ? r.endDate : null, note: r.notes || '', source: firstUrl(sch.source)
     }));
     S.customEvents.forEach(e => evs.push({ ...e, kind: 'custom', status: 'yours' }));
+    forms().forEach(f => f.deadlines.forEach((d, i) => evs.push({ id: `form-${f.id}-${i}`, title: `${f.name}: ${d.label}`, group: f.name, date: d.date, status: 'reported', kind: 'master', formId: f.id, note: 'Reported date — confirm on the official site.', source: d.source })));
     S.dream.filter(d => d.deadline).forEach(d => evs.push({ id: 'dl-' + d.id, title: `${d.uni}${d.course ? ' – ' + d.course : ''}: application deadline`, group: d.uni, date: d.deadline, status: 'yours', kind: 'dream', dreamId: d.id, source: d.portal }));
     const mine = new Set(S.dream.map(d => norm(d.uni)));
     return evs
@@ -215,7 +221,7 @@
       .sort((a, b) => a.when - b.when)
       .map(e => ({ ...e, past: (e.end ? new Date(/T/.test(e.end) ? e.end : e.end + 'T23:59:59+05:30') : e.when) < now }));
   }
-  const statusTag = s => ({ official: `<span class="tag safe">${t('Official')}</span>`, expected: `<span class="tag sun">${t('Expected')}</span>`, past: `<span class="tag">${t('Last year')}</span>`, yours: `<span class="tag dream">Yours</span>` }[s] || '');
+  const statusTag = s => ({ reported: `<span class="tag target">${t('Reported')}</span>`, official: `<span class="tag safe">${t('Official')}</span>`, expected: `<span class="tag sun">${t('Expected')}</span>`, past: `<span class="tag">${t('Last year')}</span>`, yours: `<span class="tag dream">Yours</span>` }[s] || '');
   function inDream(uniName) { return S.dream.some(d => norm(d.uni) === norm(uniName)); }
 
   function addToDream(prefill) {
@@ -402,6 +408,7 @@
            ['dream', '⭐', 'Dream List + CSAS order', 'Drag colleges into Dream / Target / Safe and print your preference order.'],
            ['calendar', '⏰', 'Deadline calendar', 'Every NTA and university date with live countdowns and reminders.'],
            ['tools/marks', '🧮', t('Marks calculator'), 'Count your score from the answer key: +5 right, −1 wrong.'],
+           ['forms', '📝', 'College forms 2027', `${forms().length} colleges with their own UG forms — live deadlines and official apply links.`],
            ['tools/subjects', '✅', t('Subject combination checker'), 'Which CUET subjects does your course need?'],
            ['applications', '📋', 'Application tracker', 'Status for each university and a document checklist.'],
            ['community', '👥', 'Allotment-day tracker', 'See what others got, round by round.']]
@@ -459,6 +466,66 @@
       <a href="${NTA_UNIS}" target="_blank" rel="noopener">CUET (UG) participating universities</a> page. The import hasn't run yet, so the list is empty —
       open NTA's page for now. <small>(Site owner: run the "CUET NTA universities import" GitHub Action.)</small></div>`;
   }
+  ROUTES.forms = (arg, q) => {
+    const st = q.get('status') || '';
+    const counts = {};
+    forms().forEach(f => { const k = formStatus(f); counts[k] = (counts[k] || 0) + 1; });
+    return `<div class="page"><div class="wrap">
+      <div class="page-head">
+        <div class="eyebrow">UG admissions 2027</div>
+        <h1>College application forms</h1>
+        <p>Colleges and programmes that run their own admission forms, alongside or instead of CUET. Every link goes to the college's or test's official site. Dates marked <span class="tag target">${t('Reported')}</span> come from education news sites and are linked to where we found them — always confirm on the official page before you apply.</p>
+      </div>
+      <div class="card flat no-print" style="margin-bottom:18px">
+        <label>Search<input id="fq" placeholder="College, city or course type"></label>
+        <div class="row between" style="margin-top:12px">
+          <div class="chips" id="fst"><button class="chip ${!st ? 'on' : ''}" data-st="">${t('All')} (${forms().length})</button>${Object.entries(FORM_STATUS).filter(([k]) => counts[k]).map(([k, [l]]) => `<button class="chip ${st === k ? 'on' : ''}" data-st="${k}">${l} (${counts[k]})</button>`).join('')}</div>
+          <label class="check"><input type="checkbox" id="fcuet">Accepts NTA CUET score</label>
+        </div>
+      </div>
+      <div class="grid g3" id="flist" style="align-items:start"></div>
+      <p class="muted" style="font-size:.8rem;margin-top:16px">Checked ${D.forms ? fmtDate(D.forms.checked) : ''}. Want a college added? <a href="#/community">Tell us</a>.</p>
+    </div></div>`;
+  };
+  ROUTES['forms:mount'] = (arg, q) => {
+    let st = q.get('status') || '';
+    const order = { open: 0, upcoming: 1, check: 2, closed: 3 };
+    const draw = () => {
+      const term = norm($('#fq').value), cuet = $('#fcuet').checked;
+      const list = forms().filter(f => (!st || formStatus(f) === st) && (!cuet || f.acceptsCuet) && (!term || norm([f.name, f.city, f.type, f.entrance].join(' ')).includes(term)))
+        .sort((a, b) => order[formStatus(a)] - order[formStatus(b)] || ((nextDeadline(a) || {}).when || 9e15) - ((nextDeadline(b) || {}).when || 9e15) || cmp(a.name, b.name));
+      $('#flist').innerHTML = list.map(f => {
+        const s = formStatus(f), [sl, sc] = FORM_STATUS[s], nd = nextDeadline(f);
+        const [primary, ...rest] = f.links;
+        return `<article class="card uni" data-form="${esc(f.id)}">
+          <div class="meta"><span class="tag ${sc}">${sl}</span><span class="tag">${esc(f.type)}</span>${f.acceptsCuet ? '<span class="tag safe">Accepts CUET</span>' : ''}</div>
+          <h3>${esc(f.name)}</h3>
+          <div class="meta">📍 ${esc(f.city)}</div>
+          ${nd ? `<div class="cd-card"><small><b>${esc(nd.label)}</b> · ${fmtDate(nd.when)} <a href="${esc(nd.source)}" target="_blank" rel="noopener" class="tag target" style="text-decoration:none">${t('Reported')} ↗</a></small>${countdown(nd.when.toISOString(), true)}</div>` : ''}
+          <small><b>Admission:</b> ${esc(f.entrance)}</small>
+          ${f.note ? `<small class="muted">${esc(f.note)}</small>` : ''}
+          ${f.deadlines.length > 1 ? `<details><summary><small>All reported dates</small></summary><ul style="margin:6px 0 0;padding-left:18px;font-size:.84rem">${f.deadlines.map(d => `<li>${esc(d.label)}: ${fmtDate(evDate(d))} <a href="${esc(d.source)}" target="_blank" rel="noopener">source</a></li>`).join('')}</ul></details>` : ''}
+          <div class="acts">
+            <a class="btn sm pri" href="${esc(primary[1])}" target="_blank" rel="noopener">${esc(primary[0])} ↗</a>
+            ${inDream(f.name) ? `<span class="tag safe">★ ${t('On your Dream List')}</span>` : `<button class="btn sm" data-fdream>＋ ${t('Dream List')}</button>`}
+            ${s !== 'closed' ? `<button class="btn sm sun" data-fassist>${t('Fill via Assistant')} ${inr(P.assistedForm)}</button>` : ''}
+          </div>
+          ${rest.length ? `<div class="chips">${rest.map(([l, u]) => `<a class="chip" style="font-size:.76rem;text-decoration:none" href="${esc(u)}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join('')}</div>` : ''}
+        </article>`;
+      }).join('') || `<div class="empty" style="grid-column:1/-1"><b>No match</b>Try another search or filter.</div>`;
+    };
+    $('#fq').addEventListener('input', draw);
+    $('#fcuet').addEventListener('change', draw);
+    $('#fst').addEventListener('click', e => { const b = e.target.closest('[data-st]'); if (!b) return; st = b.dataset.st; $$('#fst .chip').forEach(c => c.classList.toggle('on', c === b)); draw(); });
+    $('#flist').addEventListener('click', e => {
+      const card = e.target.closest('[data-form]'); if (!card) return;
+      const f = forms().find(x => x.id === card.dataset.form), nd = nextDeadline(f);
+      if (e.target.closest('[data-fdream]')) addToDream({ uni: f.name, portal: f.links[0][1], deadline: nd ? toLocalInput(nd.when) : '', col: 'dream' });
+      if (e.target.closest('[data-fassist]')) addCart({ type: 'form', label: `${f.name} application form`, price: P.assistedForm });
+    });
+    draw();
+  };
+
   ROUTES.colleges = (arg, q) => {
     const counts = {};
     unis().forEach(u => { counts[u.category] = (counts[u.category] || 0) + 1; });
@@ -1332,7 +1399,7 @@
     const m = document.createElement('div'); m.className = 'msg ' + (me ? 'me' : 'bot-m'); m.innerHTML = html;
     bot.log.appendChild(m); bot.log.scrollTop = bot.log.scrollHeight;
   }
-  const SUGG = ['Can I get B.Com Hons with 720?', 'When is CUET 2027 registration?', 'List of central universities', 'What is the CUET application fee?', 'How is CUET marked?', 'How much does form filling cost?'];
+  const SUGG = ['Which college forms are open?', 'Can I get B.Com Hons with 720?', 'When is CUET 2027 registration?', 'List of central universities', 'What is the CUET application fee?', 'How is CUET marked?', 'How much does form filling cost?'];
   function botHello() {
     say(`Hi! I answer from Everything CUET's own data — universities from NTA, the calendar, cutoffs and our plans. Try:<div class="sugg" style="margin-top:8px">${SUGG.map(s => `<button type="button" data-q="${esc(s)}">${esc(s)}</button>`).join('')}</div>`);
   }
@@ -1351,6 +1418,10 @@
       }
     }
     if (score && /get|chance|admission|seat|milega|hons|college/.test(q)) return `Cutoff data from official allotment lists is still being added, so I can't check that score yet. Meanwhile, <a href="#/predictor">save your scores in the predictor</a> and you'll see results as soon as it's live.`;
+    if (/\bforms?\b|ashoka|christ|flame|ipm|ipmat|private college|apply to|open now/.test(q) && forms().length) {
+      const open = forms().filter(f => formStatus(f) === 'open').map(f => ({ f, nd: nextDeadline(f) })).sort((a, b) => ((a.nd || {}).when || 9e15) - ((b.nd || {}).when || 9e15));
+      return `${open.length} college forms are open now:\n${open.slice(0, 6).map(({ f, nd }) => `• ${esc(f.name)}${nd ? ` — ${esc(nd.label)} by ${fmtDate(nd.when)} (reported)` : ''}`).join('\n')}\n<a href="#/forms">All college forms →</a>`;
+    }
     if (/when|date|kab|registration|exam|result|deadline|admit|answer key/.test(q)) {
       const evs = upcomingEvents(false).filter(e => !e.past).slice(0, 4);
       return evs.length ? evs.map(e => `• <b>${esc(e.title)}</b> — ${fmtDate(e.when)}${e.status === 'expected' ? ' (expected, not official yet)' : ''}`).join('\n') + `\n<a href="#/calendar">Full calendar →</a>` : `No upcoming dates are announced yet. <a href="#/calendar">Turn on reminders</a> and we'll tell you.`;
