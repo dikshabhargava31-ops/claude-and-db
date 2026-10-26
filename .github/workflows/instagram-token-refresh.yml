@@ -1,7 +1,7 @@
 name: Instagram token refresh
 
-# Instagram tokens last 60 days. This renews them every Monday and saves them back
-# into the IG_ACCOUNTS secret, which needs a GH_PAT secret allowed to edit secrets.
+# Instagram tokens last 60 days. This renews them every Monday and saves them back into
+# IG_ACCOUNTS and IG_ACCOUNT_1 ... IG_ACCOUNT_10, which needs a GH_PAT secret allowed to edit secrets.
 
 on:
   schedule:
@@ -20,17 +20,29 @@ jobs:
       - name: Renew tokens
         env:
           IG_ACCOUNTS: ${{ secrets.IG_ACCOUNTS }}
-        run: python3 instagram/ig_scheduler.py refresh-tokens --out "$RUNNER_TEMP/accounts.json"
+          IG_ACCOUNT_1: ${{ secrets.IG_ACCOUNT_1 }}
+          IG_ACCOUNT_2: ${{ secrets.IG_ACCOUNT_2 }}
+          IG_ACCOUNT_3: ${{ secrets.IG_ACCOUNT_3 }}
+          IG_ACCOUNT_4: ${{ secrets.IG_ACCOUNT_4 }}
+          IG_ACCOUNT_5: ${{ secrets.IG_ACCOUNT_5 }}
+          IG_ACCOUNT_6: ${{ secrets.IG_ACCOUNT_6 }}
+          IG_ACCOUNT_7: ${{ secrets.IG_ACCOUNT_7 }}
+          IG_ACCOUNT_8: ${{ secrets.IG_ACCOUNT_8 }}
+          IG_ACCOUNT_9: ${{ secrets.IG_ACCOUNT_9 }}
+          IG_ACCOUNT_10: ${{ secrets.IG_ACCOUNT_10 }}
+        run: python3 instagram/ig_scheduler.py refresh-tokens --out-dir "$RUNNER_TEMP/renewed"
 
       - name: Save renewed tokens
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          [ -s "$RUNNER_TEMP/accounts.json" ] || exit 0
+          [ -n "$(ls -A "$RUNNER_TEMP/renewed" 2>/dev/null)" ] || exit 0
           if [ -z "$GH_TOKEN" ]; then
             echo "::error::Add a GH_PAT secret (see instagram/README.md) so renewed tokens can be saved."
             exit 1
           fi
-          gh secret set IG_ACCOUNTS --repo "$GITHUB_REPOSITORY" < "$RUNNER_TEMP/accounts.json"
-          rm "$RUNNER_TEMP/accounts.json"
+          for f in "$RUNNER_TEMP/renewed"/*; do
+            gh secret set "$(basename "$f")" --repo "$GITHUB_REPOSITORY" < "$f"
+          done
+          rm -r "$RUNNER_TEMP/renewed"
