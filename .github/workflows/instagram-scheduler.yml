@@ -38,6 +38,7 @@ jobs:
       - name: Publish due posts
         env:
           IG_ACCOUNTS: ${{ secrets.IG_ACCOUNTS }}
+          IG_SECRETS: ${{ toJSON(secrets) }}
           MODE: ${{ inputs.mode || 'publish' }}
           PROBE_URL: ${{ inputs.probe_url }}
         run: |

@@ -7,10 +7,11 @@ Commands:
   probe            have Instagram fetch and process a media link without publishing it
   run [--dry-run]  publish every post that is due and not yet published
                    (--watch-hours keeps it running to publish upcoming posts on time)
-  refresh-tokens   renew each account's 60-day token (writes the new accounts JSON to --out)
+  refresh-tokens   renew each account's 60-day token (writes one file per secret to --out-dir)
 
 Accounts come from the IG_ACCOUNTS environment variable (a JSON object) or --accounts <file>:
   {"ipa": {"user_id": "1784...", "token": "IGAA...", "api": "instagram"}}
+and from IG_ACCOUNT_<NAME> secrets ("<user_id> <token>"), passed as JSON in IG_SECRETS.
 "api" is "instagram" (Instagram Login, default) or "facebook" (Facebook Login through a Page;
 token refresh then also needs "app_id" and "app_secret").
 
@@ -21,6 +22,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -52,18 +54,49 @@ class PostError(Exception):
 
 # ---------- input ----------
 
-def load_accounts(path):
-    raw = Path(path).read_text() if path else os.environ.get("IG_ACCOUNTS", "")
-    if not raw.strip():
-        return {}
+ACCOUNT_SECRET = re.compile(r"^IG_ACCOUNT_([A-Z0-9_]+)$")
+
+
+def parse_account(name, raw, source):
+    """An account is JSON ({"user_id": ..., "token": ...}) or just "<user_id> <token>"."""
+    raw = raw.strip()
     try:
-        accounts = json.loads(raw)
-    except ValueError as e:
-        raise SystemExit(f"IG_ACCOUNTS is not valid JSON ({e}). Check the quotes, commas and braces.")
-    for name, acc in accounts.items():
-        if not acc.get("user_id") or not acc.get("token"):
-            raise SystemExit(f"Account '{name}' needs both user_id and token.")
-        acc.setdefault("api", "instagram")
+        acc = json.loads(raw)
+    except ValueError:
+        if raw.startswith("{"):
+            raise SystemExit(f"{source} is not valid JSON. Check the quotes, commas and braces.")
+        parts = raw.replace(",", " ").split()
+        if len(parts) != 2:
+            raise SystemExit(f"{source} should be the Instagram user ID, a space, then the token.")
+        acc = {"user_id": parts[0], "token": parts[1]}
+    if not isinstance(acc, dict) or not acc.get("user_id") or not acc.get("token"):
+        raise SystemExit(f"Account '{name}' ({source}) needs both user_id and token.")
+    acc.setdefault("api", "instagram")
+    acc["source"] = source
+    return acc
+
+
+def load_accounts(path):
+    """Accounts come from IG_ACCOUNTS (one JSON object) and from one IG_ACCOUNT_<NAME> secret per
+    account, which the workflows pass in IG_SECRETS. A per-account secret wins over IG_ACCOUNTS."""
+    raw = Path(path).read_text() if path else os.environ.get("IG_ACCOUNTS", "")
+    accounts = {}
+    if raw.strip():
+        try:
+            combined = json.loads(raw)
+        except ValueError as e:
+            raise SystemExit(f"IG_ACCOUNTS is not valid JSON ({e}). Check the quotes, commas and braces.")
+        for name, acc in combined.items():
+            accounts[name] = parse_account(name, json.dumps(acc), "IG_ACCOUNTS")
+    try:
+        secrets = json.loads(os.environ.get("IG_SECRETS") or "{}")
+    except ValueError:
+        secrets = {}
+    for key, value in sorted(secrets.items()):
+        m = ACCOUNT_SECRET.match(key)
+        if m and value:
+            name = m.group(1).lower()
+            accounts[name] = parse_account(name, value, key)
     return accounts
 
 
@@ -455,7 +488,16 @@ def cmd_refresh_tokens(args):
         except (urllib.error.URLError, KeyError, ValueError) as e:
             print(f"ERROR    {name}: {getattr(e, 'reason', e)}")
             failed.append(name)
-    Path(args.out).write_text(json.dumps(accounts))
+    # One file per secret, named after it, so the workflow can save each one back.
+    out = Path(args.out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    strip = lambda acc: {k: v for k, v in acc.items() if k != "source"}
+    combined = {n: strip(a) for n, a in accounts.items() if a["source"] == "IG_ACCOUNTS"}
+    if combined:
+        (out / "IG_ACCOUNTS").write_text(json.dumps(combined))
+    for name, acc in accounts.items():
+        if acc["source"] != "IG_ACCOUNTS":
+            (out / acc["source"]).write_text(json.dumps(strip(acc)))
     return 1 if failed else 0
 
 
@@ -477,7 +519,7 @@ def main():
     run.add_argument("--sync", action="store_true",
                      help="commit published.json and pull the latest schedule after each round (used by the workflow)")
     refresh = sub.add_parser("refresh-tokens")
-    refresh.add_argument("--out", required=True, help="file to write the renewed accounts JSON to")
+    refresh.add_argument("--out-dir", required=True, help="folder to write one file per renewed secret to")
     args = parser.parse_args()
     handler = {"check": cmd_check, "verify": cmd_verify, "probe": cmd_probe, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
     sys.exit(handler(args))
