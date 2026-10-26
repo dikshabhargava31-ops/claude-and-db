@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Everything CUET</title>
+  <meta name="description" content="Free CUET college predictor, NTA participating universities, dream list, deadline reminders, preference builder and assisted form filling. No login needed.">
+  <meta name="theme-color" content="#1f1b4d">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#view">Skip to content</a>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="#/">
+      <span class="logo-mark">E</span>
+      <span class="logo-text"><b>Everything</b> CUET</span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Main"></nav>
+    <div class="top-act">
+      <button class="chip" id="langBtn" type="button" aria-label="Switch language">हिंदी</button>
+      <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
+<main id="view" tabindex="-1"></main>
+
+<footer class="foot">
+  <div class="wrap foot-in" id="foot"></div>
+</footer>
+
+<button class="cart-fab" id="cartFab" type="button" hidden>🛒 <span id="cartCount">0</span></button>
+<button class="bot-fab" id="botFab" type="button" aria-label="Admission assistant">💬</button>
+<section class="bot" id="bot" hidden aria-label="Admission assistant">
+  <header><b data-t="bot.title">Admission assistant</b><button class="icon-btn" type="button" data-act="bot-close" aria-label="Close">✕</button></header>
+  <div class="bot-log" id="botLog"></div>
+  <form class="bot-form" id="botForm"><input id="botIn" autocomplete="off" placeholder="Ask about colleges, dates, marks…"><button class="btn pri" type="submit">→</button></form>
+</section>
+
+<dialog class="modal" id="modal"><div id="modalBody"></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

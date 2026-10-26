@@ -1,0 +1,18 @@
+{
+ "note": "Round-wise closing scores from official allotment data. One row per university + college + program + category + round + year. Fill from the universities' published allotment lists; the predictor reads only this file.",
+ "fields": {
+  "university": "as named in universities.json, e.g. University of Delhi",
+  "college": "college or department",
+  "program": "e.g. B.Com (Hons.)",
+  "category": "UR | OBC-NCL | EWS | SC | ST | PwBD",
+  "round": "1, 2, 3 ...",
+  "year": "allotment year",
+  "cutoff": "closing score",
+  "scoreType": "merit (DU combined merit score) | subject (single-subject NTA score)",
+  "subjects": "required CUET subjects; each inner list means 'any one of', e.g. [[\"Mathematics\"], [\"English\", \"Hindi\"]]",
+  "fees": "annual fee in rupees (optional)",
+  "hostel": "true / false (optional)",
+  "source": "link to the official allotment list"
+ },
+ "rows": []
+}
