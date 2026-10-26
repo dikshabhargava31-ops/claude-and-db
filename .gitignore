@@ -1,3 +1,4 @@
 .venv-video/
 videos/*/renders/
 videos/*/raw/
+__pycache__/
