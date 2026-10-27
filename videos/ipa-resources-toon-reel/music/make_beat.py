@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Original lo-fi beat for the IPA resources toon reel (100 bpm, 23 s).
+"""Original fast-paced beat for the IPA resources toon reel (200 bpm double-time, 23 s).
 
-    python3 music/make_beat.py assets/beat.wav
+    python3 music/make_beat.py raw/beat_raw.wav
 
-Bar map (2.4 s bars) follows the reel: bar 0 intro (filtered keys + hats),
-drop at 2.4 s when the website appears, full groove to 16.8 s, a stop for
-"wait... it's free?" with one rising pluck per star, full again for the fist
-bump at 19.2 s, then the last chord rings out. Everything is synthesised here,
-so the track is ours to use.
+The reel changes scene every 2.4 s, which is exactly two bars at 200 bpm, so
+every scene change lands on a downbeat. Scene map: 0-2.4 s intro (filtered arp,
+riser, snare roll), drop at 2.4 s when the website appears, full groove to
+16.8 s, a dead stop for "wait... it's free?" with one rising pluck per star
+(17.25-18.69 s), a roll into the second drop at 19.2 s for the fist bump, then
+a last stab. Everything is synthesised here, so the track is ours to use.
 """
 import sys
 import wave
@@ -15,15 +16,14 @@ import wave
 import numpy as np
 
 SR = 44100
-BPM = 100
-BEAT = 60 / BPM
-BAR = 4 * BEAT
+SCENE = 2.4
+STEP = SCENE / 32          # a 16th note at 200 bpm
 LENGTH = 23.0
-rng = np.random.default_rng(7)
 N = int(LENGTH * SR)
-mix_drums = np.zeros(N)
-mix_keys = np.zeros(N)
-mix_bass = np.zeros(N)
+rng = np.random.default_rng(11)
+drums = np.zeros(N)
+bass = np.zeros(N)
+music = np.zeros(N)
 
 
 def midi(n):
@@ -32,20 +32,19 @@ def midi(n):
 
 def place(buf, sig, t, gain=1.0):
     i = int(t * SR)
-    if i >= N:
+    if i >= N or i < 0:
         return
     j = min(N, i + len(sig))
     buf[i:j] += gain * sig[: j - i]
 
 
-def env(length, decay):
-    t = np.arange(int(length * SR)) / SR
-    return np.exp(-t / decay), t
+def ts(length):
+    return np.arange(int(length * SR)) / SR
 
 
-def onepole_lp(x, cutoff):
+def lp(x, cutoff):
     a = np.exp(-2 * np.pi * cutoff / SR)
-    y = np.zeros_like(x)
+    y = np.empty_like(x)
     acc = 0.0
     for k in range(len(x)):
         acc = (1 - a) * x[k] + a * acc
@@ -54,121 +53,142 @@ def onepole_lp(x, cutoff):
 
 
 def kick():
-    e, t = env(0.45, 0.11)
-    f = 45 + 105 * np.exp(-t / 0.03)
-    ph = 2 * np.pi * np.cumsum(f) / SR
-    click = np.exp(-t / 0.002) * 0.4
-    return np.tanh(1.6 * (np.sin(ph) * e + click))
+    t = ts(0.32)
+    f = 48 + 140 * np.exp(-t / 0.025)
+    body = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.13)
+    click = rng.standard_normal(len(t)) * np.exp(-t / 0.0015) * 0.5
+    return np.tanh(2.2 * (body + click))
 
 
-def snare():
-    e, t = env(0.3, 0.07)
-    noise = rng.standard_normal(len(t))
-    body = noise - onepole_lp(noise, 1800)          # high-passed noise
-    body = onepole_lp(body, 7000)
-    tone = np.sin(2 * np.pi * 190 * t) * np.exp(-t / 0.04)
-    return 0.55 * body * e + 0.5 * tone
+def clap():
+    t = ts(0.28)
+    n = rng.standard_normal(len(t))
+    band = lp(n - lp(n, 900), 4200)
+    env = np.zeros(len(t))
+    for d in (0.0, 0.011, 0.022):
+        env += np.where(t >= d, np.exp(-(t - d) / (0.012 if d < 0.02 else 0.09)), 0)
+    return band * env * 1.4
 
 
-def hat(open_=False):
-    e, t = env(0.25 if open_ else 0.08, 0.06 if open_ else 0.018)
-    noise = rng.standard_normal(len(t))
-    return (noise - onepole_lp(noise, 6500)) * e
+def hat(length=0.05, decay=0.012):
+    t = ts(length)
+    n = rng.standard_normal(len(t))
+    return (n - lp(n, 7500)) * np.exp(-t / decay)
 
 
-def ep_note(freq, length, decay=1.1):
-    e, t = env(length, decay)
-    wob = 1 + 0.004 * np.sin(2 * np.pi * 5.5 * t)
-    s = (np.sin(2 * np.pi * freq * wob * t) + 0.28 * np.sin(4 * np.pi * freq * t)
-         + 0.08 * np.sin(6 * np.pi * freq * t))
-    attack = np.minimum(1, t / 0.006)
-    return s * e * attack
+def b808(note, length, glide_to=None):
+    t = ts(length)
+    f = midi(note) * (1 + 0.5 * np.exp(-t / 0.02))
+    if glide_to is not None:
+        g = np.clip((t - length * 0.6) / (length * 0.3), 0, 1)
+        f = f * (1 - g) + midi(glide_to) * g
+    s = np.sin(2 * np.pi * np.cumsum(f) / SR)
+    return np.tanh(2.5 * s) * np.exp(-t / 0.45) * np.minimum(1, t / 0.004)
 
 
-def chord(notes, t0, length, gain):
-    for k, n in enumerate(notes):
-        place(mix_keys, ep_note(midi(n), length), t0 + k * 0.018, gain)
+def pluck(note, length=0.22, decay=0.09, bright=1.0):
+    t = ts(length)
+    f = midi(note)
+    s = sum((0.9 ** h) * np.sin(2 * np.pi * f * h * t) * np.exp(-t * h * 6 / bright) for h in range(1, 8))
+    return s * np.exp(-t / decay) * np.minimum(1, t / 0.002)
 
 
-def bass_note(n, t0, length):
-    e, t = env(length, 0.5)
-    s = np.tanh(1.8 * np.sin(2 * np.pi * midi(n) * t)) * e * np.minimum(1, t / 0.01)
-    place(mix_bass, s, t0, 0.55)
+def stab(notes, length=0.5):
+    t = ts(length)
+    s = sum(np.sign(np.sin(2 * np.pi * midi(n) * t * (1 + 0.003 * k))) for k, n in enumerate(notes))
+    return lp(s * np.exp(-t / 0.16), 3200) * 0.35
 
 
-CHORDS = [[53, 57, 60, 64], [52, 55, 59, 62], [50, 53, 57, 60], [48, 52, 55, 59]]  # Fmaj7 Em7 Dm7 Cmaj7
-ROOTS = [41, 40, 38, 36]
-K, S, H, HO = kick(), snare(), hat(), hat(True)
+def riser(length):
+    t = ts(length)
+    n = rng.standard_normal(len(t))
+    out = np.empty_like(n)
+    acc, chunk = 0.0, 512
+    for i in range(0, len(n), chunk):                      # noise sweeping up
+        c = 300 + 9000 * (i / len(n)) ** 2
+        a = np.exp(-2 * np.pi * c / SR)
+        for k in range(i, min(len(n), i + chunk)):
+            acc = (1 - a) * n[k] + a * acc
+            out[k] = acc
+    return out * (t / length) ** 2 * 1.8
 
 
-def groove_bar(b, drums=True, hats=True, bass=True, keys_gain=0.16):
-    t0 = b * BAR
-    c = CHORDS[b % 4]
-    chord(c, t0, BAR * 0.95, keys_gain)
-    chord([n + 12 for n in c[1:3]], t0 + 2.5 * BEAT, BEAT * 1.2, keys_gain * 0.45)
-    if bass:
-        bass_note(ROOTS[b % 4], t0, BEAT * 1.6)
-        bass_note(ROOTS[b % 4], t0 + 2.5 * BEAT, BEAT * 0.9)
-        bass_note(ROOTS[b % 4] + 7, t0 + 3.5 * BEAT, BEAT * 0.45)
-    if drums:
-        for q in (0, 2.5):
-            place(mix_drums, K, t0 + q * BEAT, 0.9)
-        for q in (1, 3):
-            place(mix_drums, S, t0 + q * BEAT + 0.01, 0.55)
-    if hats:
-        for e8 in range(8):
-            swing = 0.07 * BEAT if e8 % 2 else 0
-            vel = 0.16 + 0.06 * ((e8 * 5) % 3) / 2
-            sig = HO if (e8 == 7 and b % 2) else H
-            place(mix_drums, sig, t0 + e8 * BEAT / 2 + swing, vel)
+CHORDS = [[57, 60, 64], [57, 60, 65], [55, 60, 64], [55, 59, 62]]   # Am F C G
+ROOTS = [33, 29, 36, 31]
+KICKS = [0, 6, 10, 16, 22, 26]
+CLAPS = [4, 12, 20, 28]
+ARP = [0, 1, 2, 3, 2, 1, 0, 1]
+K, C = kick(), clap()
 
 
-# bar 0: intro, keys filtered later, soft hats, snare pickup into the drop
-groove_bar(0, drums=False, bass=False, keys_gain=0.14)
-for q in (3.0, 3.25, 3.5, 3.75):
-    place(mix_drums, S, q * BEAT, 0.12 + 0.08 * (q - 3) * 4)
-# bars 1-6: full groove
-for b in range(1, 7):
-    groove_bar(b)
-# bar 7: the stop, then one rising pluck per star (beats 1-4 of the bar, plus the 'and')
-t7 = 7 * BAR
+def scene(i, full=True, filt=False):
+    t0 = i * SCENE
+    ch, root = CHORDS[i % 4], ROOTS[i % 4]
+    tones = ch + [ch[0] + 12]
+    arp_buf = np.zeros(N)
+    for s in range(0, 32, 2):                                # 8th-note arp at 200 bpm
+        note = tones[ARP[(s // 2) % 8]] + 12
+        place(arp_buf, pluck(note, bright=0.6 if filt else 1.0), t0 + s * STEP, 0.28)
+    music[:] += lp(arp_buf, 1100) * 1.8 if filt else arp_buf
+    for s in range(0, 32, 2):                                # hats, accented off-beats
+        place(drums, hat(), t0 + s * STEP, 0.22 if s % 4 else 0.13)
+    if i % 2:
+        for s in (28, 29, 30, 31):                           # 16th roll into the next scene
+            place(drums, hat(0.04, 0.01), t0 + s * STEP, 0.16)
+    if not full:
+        return
+    place(music, stab(ch), t0, 0.9)
+    place(music, stab(ch), t0 + 16 * STEP, 0.6)
+    for s in KICKS:
+        place(drums, K, t0 + s * STEP, 0.95)
+    for s in CLAPS:
+        place(drums, C, t0 + s * STEP, 0.7)
+    nxt = ROOTS[(i + 1) % 4]
+    for k, s in enumerate(KICKS):
+        length = ((KICKS[k + 1] if k + 1 < len(KICKS) else 32) - s) * STEP
+        place(bass, b808(root, length, glide_to=nxt if s == 26 else None), t0 + s * STEP, 0.75)
+
+
+# 0-2.4 s: intro (filtered arp, hats), riser and snare roll into the drop
+scene(0, full=False, filt=True)
+place(music, riser(1.2), 1.2, 0.35)
+for k, s in enumerate([16, 20, 24, 26, 28, 29, 30, 31]):
+    place(drums, C, s * STEP, 0.18 + 0.05 * k)
+# 2.4-16.8 s: full groove, six scenes
+for i in range(1, 7):
+    scene(i)
+# 16.8-19.2 s: dead stop, one rising pluck per star, then a roll into the drop
 for k, n in enumerate([72, 74, 76, 79, 84]):
-    place(mix_keys, ep_note(midi(n), 0.8, 0.35), t7 + BEAT * (0.75 + 0.6 * k), 0.22)
-# bar 8: drop again for the fist bump
-groove_bar(8)
-# tail: last chord rings out
-chord([48, 52, 55, 59, 64], 9 * BAR, 2.0, 0.17)
-bass_note(36, 9 * BAR, 1.5)
-place(mix_drums, K, 9 * BAR, 0.8)
+    place(music, pluck(n, 0.6, 0.25), 17.25 + 0.36 * k, 0.55)
+place(music, riser(0.5), 18.7, 0.3)
+for k, d in enumerate([0.0, 0.075, 0.15, 0.2, 0.25, 0.2875, 0.325, 0.3625]):
+    place(drums, C, 18.8 + d, 0.2 + 0.06 * k)
+# 19.2-21.6 s: second drop for the fist bump
+scene(8)
+# tail: final stab and 808
+place(music, stab(CHORDS[0], 1.0), 9 * SCENE, 1.0)
+place(bass, b808(ROOTS[0], 1.2), 9 * SCENE, 0.8)
+place(drums, K, 9 * SCENE, 1.0)
 
-# sidechain-style duck on keys and bass after each kick
+# sidechain pump on music and bass from every kick
 duck = np.ones(N)
-for b in list(range(1, 7)) + [8, 9]:
-    for q in (0, 2.5):
-        i = int((b * BAR + q * BEAT) * SR)
-        if i >= N:
+for i in list(range(1, 7)) + [8, 9]:
+    for s in KICKS:
+        a = int((i * SCENE + s * STEP) * SR)
+        if a >= N:
             continue
-        e, _ = env(0.25, 0.08)
-        j = min(N, i + len(e))
-        duck[i:j] = np.minimum(duck[i:j], 1 - 0.45 * e[: j - i])
+        e = np.exp(-ts(0.18) / 0.06)
+        b = min(N, a + len(e))
+        duck[a:b] = np.minimum(duck[a:b], 1 - 0.5 * e[: b - a])
 
-intro_end = int(BAR * SR)
-mix_keys[:intro_end] = onepole_lp(mix_keys[:intro_end], 900) * 1.6   # muffled intro
-keys = onepole_lp(mix_keys, 5000)
-crackle = np.zeros(N)
-for t in rng.uniform(0, LENGTH, 140):
-    place(crackle, rng.standard_normal(30) * np.exp(-np.arange(30) / 6), t, 0.05)
-
-mix = mix_drums + (keys + mix_bass) * duck + crackle
-fade = int(1.2 * SR)
+mix = drums + (music + bass) * duck
+fade = int(0.8 * SR)
 mix[-fade:] *= np.linspace(1, 0, fade)
-mix = np.tanh(1.2 * mix / np.max(np.abs(mix))) * 0.85
-
-# light stereo: keys slightly wider than drums and bass
-left = mix + 0.06 * np.roll(keys, 300)
-right = mix + 0.06 * np.roll(keys, -300)
+mix = np.tanh(1.6 * mix / np.max(np.abs(mix)))
+left = mix + 0.08 * np.roll(music, 220)
+right = mix + 0.08 * np.roll(music, -220)
 st = np.stack([left, right], 1)
-st = st / np.max(np.abs(st)) * 0.89
+st = st / np.max(np.abs(st)) * 0.95
 with wave.open(sys.argv[1], "wb") as w:
     w.setnchannels(2)
     w.setsampwidth(2)
