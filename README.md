@@ -34,6 +34,10 @@ Data is saved in the browser's local storage. Use **Settings & backup** to expor
 
 Claude Code makes videos here with HyperFrames (skills in `.claude/skills/`). Each video lives in `videos/<name>/`. `CLAUDE.md` maps trending styles (vertical reels, word-by-word captions, kinetic type, beat-synced edits, launch promos) to the right tool. `scripts/setup-video-tools.sh` installs auto-editor, PySceneDetect and yt-dlp (`--full` adds Demucs); cloud sessions run it automatically. To control DaVinci Resolve or transcribe locally, see `docs/local-video-setup.md`.
 
+## Creator Research Studio
+
+`studio/` is a private Node.js web app (not a GitHub Pages site) for researching, planning and scripting YouTube and Instagram content, with one workspace per brand or channel. It runs content research on your behalf (your channel, saved competitors and inspiration channels, outliers, audience questions, current developments), recommends topics with evidence, prepares hooks, outlines and scripts, and tracks each item from idea to published results. Instagram scheduling goes through the Instagram scheduler below, only after the owner approves a post. Setup, credentials, costs and limits are in `studio/README.md`; its data and keys stay on the server, in the git-ignored `studio/data/` and `studio/.env`.
+
 ## Instagram scheduler
 
 `instagram/` posts to several Instagram accounts on a schedule for free. A GitHub Actions workflow publishes each post in `instagram/posts.csv` through Instagram's official API when it is due. `schedule/index.html` is the **Instagram Planner** (no build step): a month, week and list calendar of every post, plus a composer with file upload and a live preview. Uploaded files go to the public repository `dikshabhargava31-ops/instagram-media`, so large media stays out of this one. Setup, the planner and the CSV format are in `instagram/README.md`.

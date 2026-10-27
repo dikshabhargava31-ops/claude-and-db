@@ -45,3 +45,7 @@ Never publish without the person's go-ahead on the account, time and caption. To
 ## Cloud session limits
 
 The cloud environment's network policy blocks `huggingface.co` (Whisper/Parakeet transcription models) and `dl.fbaipublicfiles.com` (Demucs models). Until the person allows those hosts in the environment's Network access settings, run transcription and stem separation on their own computer, and say so rather than inventing transcripts.
+
+## Creator Research Studio
+
+`studio/` is the private research and planning app (`studio/README.md`). Run `npm test` and `npm run test:e2e` in `studio/` after changing it. Its data (`studio/data/`) and keys (`studio/.env`) are git-ignored and must never be committed. It hands Instagram posts to the existing scheduler only after the owner approves them; don't add a second scheduler.
