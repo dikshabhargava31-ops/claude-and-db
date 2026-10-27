@@ -44,15 +44,56 @@ function profile(el, ctx) {
   };
 }
 
+// Step-by-step setup instructions shown under each connection that isn't live yet.
+const step = (n, html) => `<li>${html}</li>`;
+const GUIDES = {
+  youtubeData: `<ol>
+    ${step(1, `In <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">Google Cloud</a>, pick your project at the top and click <b>Enable</b> on YouTube Data API v3.`)}
+    ${step(2, `Open <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Credentials</a> → <b>Create credentials</b> → <b>API key</b>. Under API restrictions choose <b>YouTube Data API v3</b>, keep Application restrictions on <b>None</b>, click <b>Create</b> and copy the key.`)}
+    ${step(3, `Add to <code>.env</code>:<pre>YOUTUBE_API_KEY=AIza...your key...</pre>Restart the app. Free: 10,000 units a day.`)}</ol>`,
+  youtubeAnalytics: `<p>Unlocks retention, traffic sources, watch time, % viewed, subscribers gained and first-7/28-day views for <b>your own</b> channel. Free and read-only. About 10 minutes, once.</p><ol>
+    ${step(1, `In the same Google Cloud project, click <b>Enable</b> on <a href="https://console.cloud.google.com/apis/library/youtubeanalytics.googleapis.com" target="_blank" rel="noopener">YouTube Analytics API</a> and on <a href="https://console.cloud.google.com/apis/library/youtubereporting.googleapis.com" target="_blank" rel="noopener">YouTube Reporting API</a>.`)}
+    ${step(2, `Open <a href="https://console.cloud.google.com/auth/overview" target="_blank" rel="noopener">Google Auth Platform</a> → <b>Get started</b>. App name: <code>Creator Studio</code>, support email: yours. Audience: <b>External</b>. Contact email: yours. Agree and <b>Create</b>.`)}
+    ${step(3, `Go to <b>Audience</b> → <b>Test users</b> → <b>Add users</b> and add the Google account that manages your YouTube channel.`)}
+    ${step(4, `Go to <b>Clients</b> → <b>Create client</b> → Application type <b>Web application</b>. Under <b>Authorised redirect URIs</b> click <b>Add URI</b> and paste exactly:<pre>http://localhost:4317/oauth/google/callback</pre>Click <b>Create</b>, then copy the <b>Client ID</b> and <b>Client secret</b>.`)}
+    ${step(5, `Add to <code>.env</code> (three lines):<pre>GOOGLE_CLIENT_ID=...apps.googleusercontent.com\nGOOGLE_CLIENT_SECRET=GOCSPX-...\nPUBLIC_URL=http://localhost:4317</pre>Restart the app.`)}
+    ${step(6, `Come back here and click <b>Connect my YouTube channel</b> (below). Google will say it hasn't verified the app — that's expected for your own private app: click <b>Continue</b>. If your channel is a Brand Account, pick the channel when asked.`)}</ol>
+    <p class="faint">While the Google app is in “Testing”, Google ends the connection after 7 days, so you'll click <b>Reconnect</b> once a week. Publishing the app in Google Auth Platform removes that limit.</p>`,
+  impressions: `<ol>${step(1, `Connect your YouTube channel first (above).`)}${step(2, `Then click <b>Start impressions/CTR reports</b> in the YouTube channel box below. YouTube adds daily reports from that day; the first appears within about 48 hours.`)}${step(3, `Meanwhile you can import a YouTube Studio export: Studio → Analytics → <b>Advanced mode</b> → Export → CSV, then <b>Channels → Import CSV</b> on your channel.`)}</ol>`,
+  transcripts: `<p>Other channels' transcripts: paste them or upload a .txt/.srt file in <b>Script Studio → Study a reference script</b>. YouTube doesn't allow downloading other channels' captions.</p><p>Your own videos: after connecting your channel, click <b>Grant caption permission</b> below (it uses a broader Google permission, so it's optional).</p>`,
+  ai: `<p>Powers topic recommendations, web research with sources, hooks, scripts and the AI Assistant. Paid per use; you control the monthly limit.</p><ol>
+    ${step(1, `Sign up at <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>.`)}
+    ${step(2, `Open <b>Billing</b> and add credit (for example $10–20 to start).`)}
+    ${step(3, `Open <b>API keys</b> → <b>Create key</b>, name it <code>Creator Studio</code>, and copy it (it starts with <code>sk-ant-</code>; it's shown only once).`)}
+    ${step(4, `Add to <code>.env</code>:<pre>ANTHROPIC_API_KEY=sk-ant-...</pre>Restart the app.`)}
+    ${step(5, `Open <b>Settings → AI & budget</b>, enter a monthly limit (e.g. 20) and click <b>Approve budget</b>. AI stays off until you do this.`)}</ol>`,
+  webSearch: `<p>Turns on automatically once the AI connection above is live and a budget is approved.</p>`,
+  instagramPlanner: `<p>Reading your Instagram Planner already works. To let the app add posts <b>you approve</b> to the scheduler:</p><ol>
+    ${step(1, `Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → New fine-grained token</a>. Name: <code>Creator Studio</code>. Expiration: up to a year.`)}
+    ${step(2, `Repository access: <b>Only select repositories</b> → <code>dikshabhargava31-ops/claude-and-db</code>.`)}
+    ${step(3, `Permissions → Repository permissions: <b>Contents: Read and write</b> and <b>Actions: Read and write</b>. Click <b>Generate token</b> and copy it.`)}
+    ${step(4, `Add to <code>.env</code>:<pre>GITHUB_TOKEN=github_pat_...</pre>Restart the app.`)}</ol>`,
+  instagramInsights: `<p>Optional. Brings each post's reach, views, saves and shares into Analytics. Until then, you can import a CSV in <b>Analytics → Instagram</b>.</p><ol>
+    ${step(1, `Open your Meta app (the one the Instagram scheduler uses) at <a href="https://developers.facebook.com/apps" target="_blank" rel="noopener">developers.facebook.com/apps</a>.`)}
+    ${step(2, `Go to <b>Instagram → API setup with Instagram business login</b>. In the permissions for the use case, make sure <code>instagram_business_manage_insights</code> is added.`)}
+    ${step(3, `Under <b>Generate access tokens</b>, click <b>Generate token</b> for the account, log in, allow the insights permission, and copy the <b>token</b> and the account's <b>Instagram user ID</b> (the number).`)}
+    ${step(4, `Add one line to <code>.env</code> (use the account short names from your planner, e.g. <code>ipa</code>):<pre>IG_INSIGHTS_ACCOUNTS={"ipa":{"user_id":"1784...","token":"IGAA..."}}</pre>For several accounts: <code>{"ipa":{...},"parthu":{...}}</code> on the same line. Restart the app.`)}</ol>
+    <p class="faint">These tokens last 60 days; generate a new one when insights stop updating.</p>`,
+};
+
 async function connections(el, ctx) {
   const st = ctx.ws.status;
   const yt = st.youtubeAnalytics;
   let accounts = {};
   try { accounts = (await get(`${ctx.base}/instagram/planner`)).accounts; } catch { /* shown in status */ }
   const rows = ["youtubeData", "youtubeAnalytics", "impressions", "transcripts", "ai", "webSearch", "instagramPlanner", "instagramInsights"];
+  const tone = (state) => (state === "live" ? "live" : state === "unavailable" ? "off" : "part");
   el.innerHTML = `
-    <div class="card"><h2>Connection status</h2><p class="muted">Every feature shows whether it uses live connected data, imported data, demo data, or is unavailable. Keys and tokens are kept on the server and never sent to the browser.</p>
-      <div class="table-wrap"><table><tbody>${rows.map((k) => `<tr><td><b>${esc(st[k].label)}</b><div class="faint">${esc(st[k].detail)}</div></td><td>${source(st[k].state)}</td><td class="faint" style="font-size:.85rem">${st[k].state === "live" ? "" : "Needs: " + esc(st[k].needs)}</td></tr>`).join("")}</tbody></table></div>
+    <div class="card"><h2>Connection status</h2><p class="muted">Each connection shows whether it uses live data, imported data, demo data, or is unavailable. Open <b>How to connect</b> for step-by-step instructions. Keys stay in the <code>.env</code> file on your computer and are never sent to the browser.</p>
+      <div class="notice info"><b>Adding a key, in short:</b> stop the app in Terminal (Control + C), type <code>open -e .env</code> and press Enter, add the line, save (Cmd + S), then type <code>npm start</code>. Each key goes on its own line, like <code>NAME=value</code>, with no spaces around the <code>=</code>.</div>
+      ${rows.map((k) => `<div class="conn-row ${tone(st[k].state)}"><div class="row between"><b>${esc(st[k].label)}</b>${source(st[k].state)}</div>
+        <div class="faint">${esc(st[k].detail)}</div>
+        ${GUIDES[k] && st[k].state !== "live" ? `<details class="guide"><summary>How to connect</summary>${GUIDES[k]}</details>` : ""}</div>`).join("")}
       ${st.lastRun ? `<p class="faint">Last research run: ${ago(st.lastRun.at)} (${esc(st.lastRun.status)}).</p>` : ""}</div>
     <div class="card"><h2>YouTube channel (authorised analytics)</h2>
       <p>Connecting asks Google for <b>read-only</b> access: <code>youtube.readonly</code> and <code>yt-analytics.readonly</code>. It unlocks retention and drop-offs, traffic sources, watch time, average percentage viewed, subscribers gained and first-7/28-day views for your own videos. Free; the YouTube Analytics API has its own generous quota.</p>

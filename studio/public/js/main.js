@@ -86,7 +86,7 @@ function shell() {
         <a class="pill" href="#/settings" title="Live connections">Connections ${liveCount(ws.status)} live</a>
         <span class="grow"></span>
         ${ws.status.lastRun ? `<span class="faint" style="font-size:.85rem">Last research run ${esc(new Date(ws.status.lastRun.at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }))}</span>` : ""}
-        ${canEdit ? `<button class="btn primary" id="runResearch" ${ws.running ? "disabled" : ""}>${ws.running ? "Research running…" : "Run my content research"}</button>` : ""}
+        ${canEdit ? `<button class="btn cta" id="runResearch" ${ws.running ? "disabled" : ""}>${ws.running ? "Research running…" : "Run my content research"}</button>` : ""}
       </header>
       <main class="page" id="view"></main>
     </div></div>`;
