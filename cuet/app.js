@@ -479,7 +479,7 @@
   }
   const otherColleges = () => (D.other && D.other.colleges) || [];
   /* Every college that offers a course: NTA CUET universities, colleges with their own 2027 form, and other well-known colleges. */
-  const GROUPS = [['Central', 'Central universities'], ['State', 'State universities'], ['Government / other', 'Government institutes'], ['Deemed', 'Deemed universities'], ['Private', 'Private universities'], ['own', 'Own entrance or merit']];
+  const GROUPS = [['Central', 'Central universities'], ['own', 'Top colleges with their own entrance'], ['Government / other', 'Government institutes'], ['State', 'State universities'], ['Deemed', 'Deemed universities'], ['Private', 'Private universities']];
   function offeringsFor(key) {
     const list = ((D.offerings && D.offerings.offers) || {})[key] || [];
     return list.map(o => {
@@ -516,7 +516,7 @@
   function courseBox(placeholder) {
     return `<form class="search course-search" data-course-search role="search">${ico('search')}<input name="course" list="courseList" autocomplete="off" placeholder="${esc(placeholder || 'Type a course, e.g. B.Com, Psychology')}" aria-label="Type a course">
       <datalist id="courseList">${courses().map(c => `<option value="${esc(c.name)}">`).join('')}</datalist></form>
-      <div class="hscroll" style="margin-top:10px">${POPULAR.map(courseByKey).filter(Boolean).map(c => `<a class="chip" href="#/course/${c.key}">${esc(c.name.split(' /')[0])}</a>`).join('')}</div>`;
+      <div class="hscroll" style="margin-top:10px">${POPULAR.map(courseByKey).filter(Boolean).map(c => `<a class="chip" href="#/course/${c.key}">${esc(c.name.split(' (')[0].split(' /')[0])}</a>`).join('')}</div>`;
   }
   function bindCourseSearch(root) {
     $$('[data-course-search]', root || document).forEach(f => {
@@ -731,7 +731,7 @@
         <p style="margin:12px 0 0;font-size:.88rem"><b>Good for:</b> ${esc(c.fits)}</p>
       </section>
       <section class="section">
-        <div class="section-head"><h2>${all.length} colleges offer ${esc(c.name.split(' /')[0])}</h2></div>
+        <div class="section-head"><h2>${all.length} colleges offer ${esc(c.name.split(' (')[0].split(' /')[0])}</h2></div>
         <div class="search" style="margin-bottom:12px">${ico('search')}<input id="cq" placeholder="Search by college or city" aria-label="Search colleges"></div>
         <div class="hscroll" id="cf" style="margin-bottom:14px">
           <button class="chip on" data-f="">${t('All')} <b>${all.length}</b></button>
@@ -744,7 +744,7 @@
         <div class="pager" id="cmore"></div>
         <p class="muted" style="font-size:.8rem;margin-top:12px">Tap ☆ to save a college to My List. Course details can change each year, so confirm on the college's official website before you apply.</p>
       </section>
-      <section class="section"><a class="card choice" href="#/start"><span class="av big">${ico('bolt')}</span><span class="grow"><b>Not sure about ${esc(c.name.split(' /')[0])}?</b><small>Take the 2-minute quiz.</small></span>${ico('right', 'chev')}</a></section>
+      <section class="section"><a class="card choice" href="#/start"><span class="av big">${ico('bolt')}</span><span class="grow"><b>Not sure about ${esc(c.name.split(' (')[0].split(' /')[0])}?</b><small>Take the 2-minute quiz.</small></span>${ico('right', 'chev')}</a></section>
     </div></div>`;
   };
   function otherSheet(x, c) {
