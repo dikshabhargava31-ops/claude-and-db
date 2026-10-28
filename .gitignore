@@ -5,3 +5,4 @@ __pycache__/
 videos/*/assets/*.mp4
 videos/*/assets/*.m4a
 videos/*/.hyperframes/
+videos/*/.transcode-cache/
