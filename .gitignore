@@ -4,3 +4,5 @@ videos/*/raw/
 __pycache__/
 videos/*/assets/footage/
 videos/*/.hyperframes/
+videos/*/renders.log
+videos/*/.transcode-cache/

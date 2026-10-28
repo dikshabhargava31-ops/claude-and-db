@@ -42,7 +42,8 @@ def fetch():
         if out.exists() and out.stat().st_size > 100_000:
             continue
         tmp = out.with_suffix(".part")
-        subprocess.run(["curl", "-sS", "--retry", "3", "-o", str(tmp), drive_url(file_id)], check=True)
+        source = CONFIG.get("copies", {}).get(file_id, file_id)
+        subprocess.run(["curl", "-sS", "--retry", "3", "-o", str(tmp), drive_url(source)], check=True)
         if tmp.read_bytes()[:15].startswith(b"<!DOCTYPE"):
             tmp.unlink()
             print("Drive refused", file_id, "(quota exceeded); run fetch again later")
@@ -85,6 +86,11 @@ def shot_filter(shot, src_w, src_h):
         ch = round(src_w * H / W / 2) * 2
         y = round((src_h - ch) * shot.get("cy", 0.5))
         chain.append(f"crop={src_w}:{ch}:0:{y}")
+    zoom = shot.get("zoom", 1)
+    if zoom > 1:
+        # Punch in to lose something at the frame edge; zx/zy place the window (0..1).
+        zx, zy = shot.get("zx", 0.5), shot.get("zy", 0.5)
+        chain.append(f"crop=iw/{zoom}:ih/{zoom}:(iw-iw/{zoom})*{zx}:(ih-ih/{zoom})*{zy}")
     chain += [f"scale={W}:{H}:flags=lanczos", f"fps={FPS}", "format=yuv420p"]
     return ",".join(chain)
 
@@ -118,7 +124,7 @@ ROOT_TEMPLATE = """<!doctype html>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
     <title>{title}</title>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/vendor/gsap.min.js"></script>
     <style>
       * {{ margin: 0; padding: 0; box-sizing: border-box; }}
       html, body {{ width: 1080px; height: 1920px; overflow: hidden; background: #0b0b0b; }}
@@ -162,11 +168,16 @@ TEXT_TEMPLATE = """<template>
       font-weight: 800; font-size: 40px; letter-spacing: 0.04em;
       padding: 10px 24px; border-radius: 999px; margin-bottom: 6px;
     }}
+    #root .chip.num {{
+      width: 120px; height: 120px; padding: 0; display: flex; align-items: center; justify-content: center;
+      background: #ffd400; color: #111111; font-size: 72px; font-weight: 900; letter-spacing: 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    }}
     #root .hook .line {{ font-size: 78px; }}
     #root .hook .line:first-of-type {{ background: #ffd400; }}
     #root .hook .line:first-of-type em {{ background: #ffffff; }}
-    #root .good .line {{ background: #19c26b; color: #ffffff; font-size: 92px; }}
-    #root .bad .line {{ background: #ff3b47; color: #ffffff; font-size: 92px; }}
+    #root .good .line {{ background: #0b8a4c; color: #ffffff; font-size: 92px; }}
+    #root .bad .line {{ background: #e0202e; color: #ffffff; font-size: 92px; }}
     #root .count .big {{
       font-weight: 900; font-size: 300px; line-height: 0.9; color: #ffd400;
       -webkit-text-stroke: 6px #111111; paint-order: stroke fill; letter-spacing: -0.04em;
@@ -216,7 +227,8 @@ def build_html(name=None):
             if c.get("big"):
                 inner.append(f'<div id="c{i}-big" class="big">{html.escape(c["big"])}</div>')
             if c.get("chip"):
-                inner.append(f'<div id="c{i}-chip" class="chip">{html.escape(c["chip"])}</div>')
+                num = " num" if c["chip"].isdigit() else ""
+                inner.append(f'<div id="c{i}-chip" class="chip{num}">{html.escape(c["chip"])}</div>')
             for k, line in enumerate(c["lines"], 1):
                 inner.append(f'<div id="c{i}-l{k}" class="line">{marked(line)}</div>')
             if style == "end":
