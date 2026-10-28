@@ -46,8 +46,8 @@
   }
 
   /* ---------- data ---------- */
-  const D = { universities: null, cutoffs: null, events: null, allotments: null, rules: null, official: null, forms: null, courses: null, info: null };
-  const FILES = { universities: 'universities.json', cutoffs: 'cutoffs.json', events: 'events.json', allotments: 'allotments.json', rules: 'subject-rules.json', official: 'official.json', forms: 'forms.json', courses: 'courses.json', info: 'college-info.json' };
+  const D = { universities: null, cutoffs: null, events: null, allotments: null, rules: null, official: null, forms: null, courses: null, info: null, offerings: null, other: null };
+  const FILES = { universities: 'universities.json', cutoffs: 'cutoffs.json', events: 'events.json', allotments: 'allotments.json', rules: 'subject-rules.json', official: 'official.json', forms: 'forms.json', courses: 'courses.json', info: 'college-info.json', offerings: 'course-offerings.json', other: 'other-colleges.json' };
   async function loadData() {
     await Promise.all(Object.entries(FILES).map(async ([k, f]) => {
       try { const r = await fetch('data/' + f, { cache: 'no-cache' }); D[k] = r.ok ? await r.json() : null; } catch { D[k] = null; }
@@ -71,25 +71,6 @@
   }
   const infoFor = id => ((D.info && D.info.colleges) || {})[id] || {};
   const GOV = new Set(['Central', 'State', 'Government / other']);
-  /* A suggested pick -> what the page needs to show and link it. */
-  function pickInfo(p) {
-    if (p.kind === 'form') {
-      const f = forms().find(x => x.id === p.id) || {};
-      return { name: f.name || p.id, href: `#/forms?open=${p.id}`, sub: f.city || '', gov: false, portal: f.links ? f.links[0][1] : '', deadline: (nextDeadline(f) || {}).when, isForm: true };
-    }
-    const u = uniById(p.id) || { name: p.id, category: '' }, inf = infoFor(p.id);
-    return { name: pretty(u.name), href: `#/college/${p.id}`, sub: [inf.city, u.category].filter(Boolean).join(' · '), gov: GOV.has(u.category), portal: inf.website || u.website || '', uniId: p.id };
-  }
-  /* 3–4 picks for a course: one Dream, two Target, one Safe; government first if the student asked for low fees. */
-  function topPicks(c) {
-    const pref = (S.quiz && S.quiz.answers && S.quiz.answers.fees) || 'either';
-    const by = tier => c.picks.filter(p => p.tier === tier).map(p => ({ ...p, ...pickInfo(p) }))
-      .sort((a, b) => (pref === 'gov' ? (b.gov - a.gov) : pref === 'private' ? (a.gov - b.gov) : 0));
-    const out = [...by('dream').slice(0, 1), ...by('target').slice(0, 2), ...by('safe').slice(0, 1)];
-    const rest = c.picks.map(p => ({ ...p, ...pickInfo(p) })).filter(p => !out.some(o => o.id === p.id));
-    while (out.length < 3 && rest.length) out.push(rest.shift());
-    return { top: out, more: rest };
-  }
   const forms = () => (D.forms && D.forms.forms) || [];
   const nextDeadline = f => f.deadlines.map(d => ({ ...d, when: evDate(d) })).filter(d => d.when > Date.now()).sort((a, b) => a.when - b.when)[0];
   const formStatus = f => (f.status === 'open' && f.deadlines.length && !nextDeadline(f) ? 'closed' : f.status);
@@ -496,6 +477,27 @@
     $('#cartBtn').hidden = !S.cart.length;
     $('#cartCount').textContent = S.cart.length;
   }
+  const otherColleges = () => (D.other && D.other.colleges) || [];
+  /* Every college that offers a course: NTA CUET universities, colleges with their own 2027 form, and other well-known colleges. */
+  const GROUPS = [['Central', 'Central universities'], ['State', 'State universities'], ['Government / other', 'Government institutes'], ['Deemed', 'Deemed universities'], ['Private', 'Private universities'], ['own', 'Own entrance or merit']];
+  function offeringsFor(key) {
+    const list = ((D.offerings && D.offerings.offers) || {})[key] || [];
+    return list.map(o => {
+      if (o.kind === 'uni') {
+        const u = uniById(o.id); if (!u) return null;
+        const inf = infoFor(o.id);
+        return { kind: 'uni', id: o.id, name: pretty(u.name), group: u.category, cuet: true, gov: GOV.has(u.category), sub: [inf.city, u.category].filter(Boolean).join(' · '), href: `#/college/${o.id}`, portal: inf.website || '' };
+      }
+      if (o.kind === 'form') {
+        const f = forms().find(x => x.id === o.id); if (!f) return null;
+        const nd = nextDeadline(f);
+        return { kind: 'form', id: o.id, name: f.name, group: 'own', cuet: !!f.acceptsCuet, gov: /^IIM|JIPMAT/.test(f.name), sub: [f.city, nd ? `form closes ${fmtDate(nd.when)}` : FORM_STATUS[formStatus(f)][0]].filter(Boolean).join(' · '), href: `#/forms?open=${o.id}`, portal: f.links[0][1], deadline: nd && nd.when };
+      }
+      const c = otherColleges().find(x => x.id === o.id); if (!c) return null;
+      return { kind: 'other', id: o.id, name: c.name, group: 'own', cuet: false, gov: !!c.gov, sub: `${c.city} · ${c.entrance}`, href: '', portal: c.website };
+    }).filter(Boolean).sort((a, b) => GROUPS.findIndex(g => g[0] === a.group) - GROUPS.findIndex(g => g[0] === b.group) || cmp(a.name, b.name));
+  }
+
   /* Adds a course's suggested colleges to My List in one go. */
   function addPicks(c, picks) {
     if (!(loggedIn() && profileDone())) { requireLogin('Log in to save these colleges', () => addPicks(c, picks)); return; }
@@ -635,7 +637,7 @@
       <div class="hero-copy">
         <div class="eyebrow">✦ Free for every CUET student</div>
         <h1>${name ? `Hi ${esc(name)}, let's` : "Let's"} find your college.</h1>
-        <p class="lead">Tell us what you want to study. We'll pick your colleges, remind you of every form and help you apply.</p>
+        <p class="lead">Tell us what you want to study. See every college that offers it, get reminded of every form and get help applying.</p>
         ${courseBox('What do you want to study? e.g. B.Com, Psychology')}
         <div class="row hero-btns"><a class="btn pri" href="#/start">Not sure? Take the 2-min quiz</a><a class="btn" href="#/seniors">Talk to a senior</a></div>
       </div>
@@ -660,7 +662,7 @@
       <div class="block-head"><div class="eyebrow">✦ How it works</div><h2>Three steps. No confusion.</h2></div>
       <div class="steps3">
         <div><span class="num">1</span><b>Pick a course</b><small>Type it, or take the quiz if you're not sure.</small></div>
-        <div><span class="num">2</span><b>Get your colleges</b><small>We pick Dream, Target and Safe options for you.</small></div>
+        <div><span class="num">2</span><b>See every college</b><small>All colleges that offer it, CUET and non-CUET.</small></div>
         <div><span class="num">3</span><b>Apply on time</b><small>We remind you, and can fill the forms for you.</small></div>
       </div>
     </div></section>
@@ -715,44 +717,82 @@
 
   /* ---------- course -> colleges ---------- */
   const TIER_LABEL = { dream: 'Dream', target: 'Target', safe: 'Safe' };
-  const TIER_HINT = { dream: 'Very competitive', target: 'Good chance', safe: 'Easier to get' };
   ROUTES.course = key => {
     const c = courseByKey(key);
     if (!c) return `<div class="page"><div class="wrap"><div class="empty"><b>Pick a course</b>${courseBox()}</div></div></div>`;
-    const { top, more } = topPicks(c);
-    const row = p => `<div class="list-row">
-        <span class="tier ${p.tier}">${TIER_LABEL[p.tier]}</span>
-        <a href="${p.href}" class="grow" style="color:inherit;text-decoration:none"><span class="t">${esc(p.name)}</span><span class="s">${esc(p.why)}${p.sub ? ' · ' + esc(p.sub) : ''}</span></a>
-        ${starBtn('p:' + p.kind + ':' + p.id, inDream(p.name), p.name)}
-      </div>`;
+    const all = offeringsFor(key);
+    const nCuet = all.filter(x => x.cuet).length, nOwn = all.filter(x => x.group === 'own').length;
     return `<div class="page"><div class="wrap">
       <section class="hello">
-        <div class="eyebrow">✦ Your course</div>
+        <div class="eyebrow">✦ Course</div>
         <h1>${esc(c.name)}</h1>
         <p style="margin-bottom:10px">${esc(c.what)}</p>
         <div class="chips">${c.careers.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</div>
         <p style="margin:12px 0 0;font-size:.88rem"><b>Good for:</b> ${esc(c.fits)}</p>
       </section>
       <section class="section">
-        <div class="section-head"><h2>Your ${top.length} colleges</h2></div>
-        <div class="list" id="picks">${top.map(row).join('')}</div>
-        <button class="btn pri block" style="margin-top:12px;min-height:52px" data-act="add-all">★ Add all ${top.length} to My List</button>
-        <p class="muted" style="font-size:.78rem;margin-top:8px">Dream = very competitive · Target = good chance · Safe = easier to get. Your CUET score decides the final result.</p>
+        <div class="section-head"><h2>${all.length} colleges offer ${esc(c.name.split(' /')[0])}</h2></div>
+        <div class="search" style="margin-bottom:12px">${ico('search')}<input id="cq" placeholder="Search by college or city" aria-label="Search colleges"></div>
+        <div class="hscroll" id="cf" style="margin-bottom:14px">
+          <button class="chip on" data-f="">${t('All')} <b>${all.length}</b></button>
+          <button class="chip" data-f="cuet">Takes CUET <b>${nCuet}</b></button>
+          <button class="chip" data-f="own">Own entrance <b>${nOwn}</b></button>
+          <button class="chip" data-f="gov">Government</button>
+          <button class="chip" data-f="private">Private</button>
+        </div>
+        <div id="clist"></div>
+        <div class="pager" id="cmore"></div>
+        <p class="muted" style="font-size:.8rem;margin-top:12px">Tap ☆ to save a college to My List. Course details can change each year, so confirm on the college's official website before you apply.</p>
       </section>
-      ${more.length ? `<details class="section"><summary class="btn block">More options (${more.length})</summary><div class="list" style="margin-top:10px" id="more">${more.map(row).join('')}</div></details>` : ''}
       <section class="section"><a class="card choice" href="#/start"><span class="av big">${ico('bolt')}</span><span class="grow"><b>Not sure about ${esc(c.name.split(' /')[0])}?</b><small>Take the 2-minute quiz.</small></span>${ico('right', 'chev')}</a></section>
     </div></div>`;
   };
+  function otherSheet(x, c) {
+    const o = otherColleges().find(y => y.id === x.id);
+    modal.open(`<div class="row" style="gap:6px;margin-bottom:8px"><span class="tag">${o.gov ? 'Government' : 'Private'}</span><span class="tag">Own entrance</span></div>
+      <h2 style="margin-bottom:2px">${esc(o.name)}</h2><p class="muted">${esc(o.city)}</p>
+      <p><b>How to get in:</b> ${esc(o.entrance)} (not CUET)</p>
+      <div class="chips" style="margin-bottom:14px">${o.courses.map(courseByKey).filter(Boolean).map(k => `<a class="chip" href="#/course/${k.key}" data-act="modal-close">${esc(k.name.split(' /')[0])}</a>`).join('')}</div>
+      <div class="row"><button class="btn pri" data-act="ostar">${inDream(o.name) ? '★ On My List' : '☆ Add to My List'}</button><a class="btn" href="${esc(o.website)}" target="_blank" rel="noopener">Official website ${ico('out', 'sm')}</a></div>`, el => {
+      el.onclick = e => { if (e.target.closest('[data-act="ostar"]')) { modal.close(); inDream(o.name) ? toggleStar({ uni: o.name }) : addPicks(c, [{ ...x, tier: 'target' }]); setTimeout(render, 50); } };
+    });
+  }
   ROUTES['course:mount'] = key => {
     const c = courseByKey(key); if (!c) { bindCourseSearch(); return; }
-    const { top, more } = topPicks(c);
-    $('#view').addEventListener('click', e => {
-      if (e.target.closest('[data-act="add-all"]')) { addPicks(c, top); setTimeout(render, 50); return; }
-      const b = e.target.closest('[data-star]'); if (!b) return;
-      const [, kind, id] = b.dataset.star.split(':');
-      const p = [...top, ...more].find(x => x.kind === kind && x.id === id);
-      if (inDream(p.name)) { toggleStar({ uni: p.name }); render(); } else addPicks(c, [p]), setTimeout(render, 50);
+    const all = offeringsFor(key);
+    let f = '', lim = 40;
+    const draw = () => {
+      const term = norm($('#cq').value);
+      const list = all.filter(x => (!f || (f === 'cuet' ? x.cuet : f === 'own' ? x.group === 'own' : f === 'gov' ? x.gov : !x.gov)) && (!term || norm(x.name + ' ' + x.sub).includes(term)));
+      let html = '', last = '';
+      list.slice(0, lim).forEach(x => {
+        if (x.group !== last) { if (last) html += '</div>'; last = x.group; html += `<div class="month">${esc((GROUPS.find(g => g[0] === x.group) || [, x.group])[1])}</div><div class="list">`; }
+        html += `<div class="list-row" data-k="${x.kind}:${esc(x.id)}">
+          <${x.href ? `a href="${x.href}"` : `button type="button" data-open`} class="row-btn" style="color:inherit;text-decoration:none">
+            <span class="av">${esc(initials(x.name))}</span>
+            <span class="grow"><span class="t">${esc(x.name)}</span><span class="s">${x.cuet ? '<span class="tag red-soft">CUET</span>' : '<span class="tag">Own entrance</span>'}<span>${esc(x.sub)}</span></span></span>
+          </${x.href ? 'a' : 'button'}>
+          ${starBtn(x.kind + ':' + x.id, inDream(x.name), x.name)}
+        </div>`;
+      });
+      if (last) html += '</div>';
+      $('#clist').innerHTML = html || `<div class="empty"><b>No match</b>Try another filter or search.</div>`;
+      $('#cmore').innerHTML = list.length > lim ? `<button class="btn" data-more>Show more · ${list.length - lim} left</button>` : '';
+    };
+    $('#cq').addEventListener('input', () => { lim = 40; draw(); });
+    $('#cf').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return; f = b.dataset.f; lim = 40; $$('#cf .chip').forEach(x => x.classList.toggle('on', x === b)); draw(); });
+    $('#cmore').addEventListener('click', e => { if (e.target.closest('[data-more]')) { lim += 60; draw(); } });
+    $('#clist').addEventListener('click', e => {
+      const row = e.target.closest('[data-k]'); if (!row) return;
+      const [kind, id] = row.dataset.k.split(':');
+      const x = all.find(y => y.kind === kind && y.id === id);
+      if (e.target.closest('[data-star]')) {
+        if (inDream(x.name)) toggleStar({ uni: x.name }); else addPicks(c, [{ ...x, uniId: kind === 'uni' ? id : '', tier: 'target' }]);
+        setTimeout(draw, 50); return;
+      }
+      if (e.target.closest('[data-open]')) otherSheet(x, c);
     });
+    draw();
   };
 
   /* ---------- 2-minute course quiz ---------- */
@@ -903,7 +943,7 @@
     return `<div class="page"><div class="wrap">
       ${collegeSeg('unis')}
       ${unis().length ? '' : ntaPending()}
-      <a class="card choice" href="#/start" style="margin-bottom:14px"><span class="av">${ico('bolt')}</span><span class="grow"><b>Don't know where to start?</b><small>Tell us your course and we'll pick 3–4 colleges.</small></span>${ico('right', 'chev')}</a>
+      <a class="card choice" href="#/start" style="margin-bottom:14px"><span class="av">${ico('bolt')}</span><span class="grow"><b>Don't know where to start?</b><small>Tell us your course and see every college that offers it.</small></span>${ico('right', 'chev')}</a>
       <div class="search" style="margin-bottom:12px">${ico('search')}<input id="uq" value="${esc(q.get('q') || '')}" placeholder="${t('Search universities')}" aria-label="${t('Search universities')}"></div>
       <div class="hscroll" id="ucat" style="margin-bottom:14px">
         <button class="chip ${!cat ? 'on' : ''}" data-cat="">${t('All')}</button>
@@ -965,7 +1005,7 @@
     const promo = (C.partnerCodes || []).filter(p => norm(p.college) === norm(u.name));
     const group = (C.groups || []).find(g => norm(g.university) === norm(u.name));
     const inf = infoFor(id), name = pretty(u.name), on = inDream(name);
-    const known = courses().filter(c => c.picks.some(p => p.kind === 'uni' && p.id === id));
+    const known = courses().filter(c => (((D.offerings && D.offerings.offers) || {})[c.key] || []).some(o => o.kind === 'uni' && o.id === id));
     const similar = unis().filter(x => x.id !== id && x.category === u.category && (!inf.state || infoFor(x.id).state === inf.state)).slice(0, 4);
     const sim = similar.length ? similar : unis().filter(x => x.id !== id && x.category === u.category).slice(0, 4);
     const portal = inf.portal === 'CSAS' ? 'DU\'s CSAS portal' : 'the university\'s admission portal';
@@ -988,7 +1028,7 @@
       </div>
       <p class="muted" style="font-size:.88rem;margin-top:10px">${esc(CAT_TEXT[u.category] || '')}</p></section>
 
-      ${known.length ? `<section class="section"><div class="section-head"><h2>Popular for</h2></div><div class="chips">${known.map(c => `<a class="chip" href="#/course/${c.key}">${esc(c.name)}</a>`).join('')}</div></section>` : ''}
+      ${known.length ? `<section class="section"><div class="section-head"><h2>Courses here</h2></div><div class="chips">${known.map(c => `<a class="chip" href="#/course/${c.key}">${esc(c.name)}</a>`).join('')}</div></section>` : ''}
 
       <section class="section"><h2>How to get in</h2>
         <div class="list">
@@ -1169,7 +1209,7 @@
       </div></div>`;
   }
   const listSeg = active => `<nav class="seg" aria-label="My List"><a href="#/dream" ${active === 'board' ? 'aria-current="page"' : ''}>Board <small>${S.dream.length}</small></a><a href="#/applications" ${active === 'tracker' ? 'aria-current="page"' : ''}>Tracker</a></nav>`;
-  const emptyList = () => `<div class="card"><h2>Start your list in one step</h2><p class="muted">Type the course you want. We'll add 3–4 colleges for you: one Dream, two Target, one Safe.</p>${courseBox()}
+  const emptyList = () => `<div class="card"><h2>Start your list in one step</h2><p class="muted">Type the course you want and see every college that offers it. Tap ☆ to save the ones you like.</p>${courseBox()}
     <p style="margin:14px 0 0;font-size:.88rem">Not sure what to study? <a href="#/start"><b>Take the 2-minute quiz</b></a></p></div>`;
   ROUTES.dream = (arg, q) => {
     const list = orderedDream();
@@ -1651,7 +1691,7 @@
 `;
   }
   const KIT = [
-    ['plan', 'star', 'My CUET college plan', 'Your course, your 3–4 colleges, every form date and the documents you need. Made for you, as a PDF.'],
+    ['plan', 'star', 'My CUET college plan', 'Your course, your saved colleges, every form date and the documents you need. Made for you, as a PDF.'],
     ['checklist', 'check', 'CUET 2027 checklist', 'Every step from choosing subjects to getting your seat, with photo and signature sizes and exam-day rules.'],
     ['quiz', 'bolt', 'Which course suits me?', 'A 2-minute quiz that suggests courses that fit you.']
   ];
