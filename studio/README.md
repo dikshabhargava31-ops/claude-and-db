@@ -101,7 +101,7 @@ For your own videos with Analytics connected, first-7 and first-28-day views giv
 - The first account is the admin; other accounts are created by the admin in **Settings → Team & access** and added to workspaces by the owner.
 - API keys and OAuth tokens stay in `.env` and `data/db.json` on the server and are never sent to the browser. State-changing requests need a custom header, so other sites can't submit them.
 - All data lives in `studio/data/` (git-ignored, file mode 600). Back it up by copying that folder while the server is stopped.
-- The code lives in this public repository, but no data or keys do. Note that GitHub Pages serves this repository's files, so once this folder is on `main` the static page `studio/public/index.html` is reachable there as an empty shell; it can't reach your server or data. If you'd rather not have that, the folder can be excluded from Pages or moved to a private repository.
+- The code lives in this public repository, but no data or keys do. GitHub Pages skips this folder (`_config.yml` at the repository root excludes it), so the app is only reachable where you run or host it.
 
 ## Publish on Vercel
 
