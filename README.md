@@ -14,4 +14,4 @@ Open it in a browser; there is no build step. Data is saved in that browser's lo
 
 ## Suspense Account ad
 
-`suspense-ad/` is a Remotion project for a 15-second vertical Reels ad for the Commerce mentorship program. The rendered file is `suspense-ad/out/suspense-account-ad.mp4`. See `suspense-ad/README.md` for the storyboard and the audio/logo files to add.
+`suspense-ad/` is a Remotion project for a 15-second vertical Reels ad for the Commerce mentorship program. The rendered file is `suspense-ad/out/suspense-account-ad.mp4`. See `suspense-ad/README.md` for the storyboard and the audio/logo files to add, and `suspense-ad/NOTES.md` for the fonts used and lessons learned.
