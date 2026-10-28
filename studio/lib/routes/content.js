@@ -14,6 +14,8 @@ const KINDS = ["link", "video", "image", "document", "transcript", "note"];
 const TOPIC_TAGS = ["evergreen", "timely", "controversial", "contrarian", "educational", "career", "student-relatable"];
 const PLATFORMS = ["youtube", "youtube-short", "instagram"];
 const IMAGE_MIME = /^image\/(png|jpeg|gif|webp)$/;
+// Vercel limits a request to 4.5 MB, so uploads on the hosted app are smaller (base64 adds a third).
+const MAX_UPLOAD = (process.env.VERCEL ? 3 : 25) * 1024 * 1024;
 
 const str = (v, n = 4000) => String(v ?? "").slice(0, n);
 const strs = (v, n = 20) => (Array.isArray(v) ? v : String(v || "").split(/,|\n/)).map((s) => String(s).trim()).filter(Boolean).slice(0, n);
@@ -76,9 +78,9 @@ export default [
     const ref = { ws, kind, title: str(body.title, 300), url: str(body.url, 1000), notes: str(body.notes, 20000), text: str(body.text, 400000), categories: strs(body.categories).filter((c) => CATEGORIES.includes(c)), tags: strs(body.tags, 30).map((t) => t.toLowerCase()), createdBy: user.id, approvedExample: false };
     if (body.file?.data) {
       const buf = Buffer.from(body.file.data, "base64");
-      if (buf.length > 25 * 1024 * 1024) throw httpError(413, "Files up to 25 MB.");
+      if (buf.length > MAX_UPLOAD) throw httpError(413, `Files up to ${MAX_UPLOAD / 1024 / 1024} MB${process.env.VERCEL ? " on the hosted app" : ""}.`);
       const fileId = newId("f_");
-      store.writeFile(fileId, buf);
+      await store.writeFile(fileId, buf);
       store.insert("files", { id: fileId, ws, name: str(body.file.name, 200), mime: str(body.file.mime, 100), size: buf.length });
       ref.fileId = fileId;
       ref.fileName = body.file.name;
@@ -118,9 +120,9 @@ export default [
     return store.update("references", r.id, patch);
   }],
 
-  ["DELETE", "/api/ws/:ws/references/:id", "editor", ({ store, ws, params }) => {
+  ["DELETE", "/api/ws/:ws/references/:id", "editor", async ({ store, ws, params }) => {
     const r = getRef(store, ws, params.id);
-    if (r.fileId) { store.deleteFile(r.fileId); store.remove("files", r.fileId); }
+    if (r.fileId) { await store.deleteFile(r.fileId); store.remove("files", r.fileId); }
     store.remove("references", r.id);
     return { ok: true };
   }],
@@ -128,7 +130,7 @@ export default [
   ["POST", "/api/ws/:ws/references/:id/suggest", "editor", async ({ store, ws, params }) => {
     const r = getRef(store, ws, params.id);
     let image = null;
-    if (r.fileId && IMAGE_MIME.test(r.fileMime || "")) image = { mime: r.fileMime, data: store.readFile(r.fileId) };
+    if (r.fileId && IMAGE_MIME.test(r.fileMime || "")) image = { mime: r.fileMime, data: await store.readFile(r.fileId) };
     const s = await gen.tagReference(store, ws, r, image);
     return store.update("references", r.id, { suggestion: { ...s, at: new Date().toISOString() } });
   }],
@@ -154,11 +156,13 @@ export default [
     return store.update("references", r.id, { text: cap.text, transcriptSource: `YouTube captions (${cap.kind}, ${cap.language})` });
   }],
 
-  ["GET", "/files/:ws/:id", "viewer", ({ store, ws, params, send }) => {
+  ["GET", "/files/:ws/:id", "viewer", async ({ store, ws, params, send }) => {
     const f = store.getInWs("files", ws, params.id);
     if (!f) throw notFound("File");
     const safe = /^(image\/(png|jpeg|gif|webp)|application\/pdf|text\/plain)$/.test(f.mime) ? f.mime : "application/octet-stream";
-    send(200, store.readFile(f.id), { "content-type": safe, "content-disposition": `${safe.startsWith("image/") ? "inline" : "attachment"}; filename="${encodeURIComponent(f.name)}"`, "cache-control": "private, max-age=3600" });
+    const data = await store.readFile(f.id);
+    if (!data) throw notFound("File");
+    send(200, data, { "content-type": safe, "content-disposition": `${safe.startsWith("image/") ? "inline" : "attachment"}; filename="${encodeURIComponent(f.name)}"`, "cache-control": "private, max-age=3600" });
   }],
 
   // ---------- preferences (learned vs explicitly approved) ----------

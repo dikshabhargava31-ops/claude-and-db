@@ -11,7 +11,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { youtubeMock, claudeMock, githubMock, listen } from "./mocks.js";
+import { youtubeMock, claudeMock, githubMock, supabaseMock, listen } from "./mocks.js";
 
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
@@ -34,7 +34,7 @@ const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
 
 async function startServer(env, port) {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), "studio-e2e-"));
-  const clean = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^(ANTHROPIC_|YOUTUBE_|GOOGLE_|GITHUB_|IG_|YT_|PUBLIC_URL)/.test(k)));
+  const clean = Object.fromEntries(Object.entries(process.env).filter(([k]) => !/^(ANTHROPIC_|YOUTUBE_|GOOGLE_|GITHUB_|IG_|YT_|PUBLIC_URL|SUPABASE_|VERCEL|OWNER_EMAIL|CRON_SECRET)/.test(k)));
   const proc = spawn(process.execPath, [path.join(here, "..", "server.js")], { env: { ...clean, PORT: String(port), HOST: "127.0.0.1", DATA_DIR: dataDir, ...env }, stdio: ["ignore", "pipe", "pipe"] });
   let log = "";
   proc.stdout.on("data", (d) => (log += d));
@@ -63,16 +63,19 @@ async function signUp(page, base) {
   await page.waitForSelector("text=Create your first workspace");
 }
 
-async function passWithMocks(browser) {
+async function passWithMocks(browser, { hosted = false } = {}) {
+  const sb = hosted ? supabaseMock() : null;
+  const sbUrl = sb ? await listen(sb.server) : null;
+  const hostedEnv = hosted ? { SUPABASE_URL: sbUrl, SUPABASE_SERVICE_ROLE_KEY: "test-service-key", VERCEL: "1", OWNER_EMAIL: "owner@example.com", CRON_SECRET: "test-cron" } : {};
   const yt = youtubeMock(), claude = claudeMock(), gh = githubMock();
   const [ytUrl, claudeUrl, ghUrl] = await Promise.all([listen(yt.server), listen(claude.server), listen(gh.server)]);
-  const srv = await startServer({ YOUTUBE_API_KEY: "test-yt-key", YT_API_BASE: ytUrl, ANTHROPIC_API_KEY: "test-anthropic-key", ANTHROPIC_BASE_URL: claudeUrl, GITHUB_TOKEN: "test-gh-token", GITHUB_API_BASE: ghUrl }, 4391);
+  const srv = await startServer({ YOUTUBE_API_KEY: "test-yt-key", YT_API_BASE: ytUrl, ANTHROPIC_API_KEY: "test-anthropic-key", ANTHROPIC_BASE_URL: claudeUrl, GITHUB_TOKEN: "test-gh-token", GITHUB_API_BASE: ghUrl, ...hostedEnv }, hosted ? 4393 : 4391);
   const page = await browser.newPage();
   const errors = [];
   const answer = watchPage(page, errors);
   globalThis.currentPage = page;
   const base = srv.url;
-  results.push("Pass 1: main flow with mocked YouTube, Claude and GitHub");
+  results.push(hosted ? "Pass 3: hosted mode (Vercel settings, data in a Supabase stand-in)" : "Pass 1: main flow with mocked YouTube, Claude and GitHub");
   try {
     await step("Create owner account and the CA workspace", async () => {
       await signUp(page, base);
@@ -104,6 +107,7 @@ async function passWithMocks(browser) {
         await page.click("#addForm button");
         await page.waitForSelector(`text=${{ own: "Test Own Channel", competitor: "Test Competitor", inspiration: "Test Inspiration" }[list]}`);
       }
+      await page.waitForSelector("#view >> text=refreshed just now");
       const text = await page.textContent("#view");
       assert(text.includes("Live data"), "live label missing");
       assert(/stored videos/.test(text), "videos not stored");
@@ -241,6 +245,27 @@ async function passWithMocks(browser) {
       }
     });
 
+    if (hosted) await step("Hosted: data is in the database, a second server instance sees it, cron and owner guard work", async () => {
+      assert([...sb.rows.keys()].some((k) => k.startsWith("workspaces/")), "workspace not saved to Supabase");
+      assert(sb.files.size === 0 || [...sb.files.values()].every(Buffer.isBuffer), "files");
+      const other = await startServer({ ...hostedEnv, YOUTUBE_API_KEY: "test-yt-key", YT_API_BASE: "http://127.0.0.1:9" }, 4394);
+      try {
+        const login = await fetch(`${other.url}/api/login`, { method: "POST", headers: { "x-studio": "1", "content-type": "application/json" }, body: JSON.stringify({ email: "owner@example.com", password: "a-long-test-password" }) });
+        assert(login.status === 200, `login on second instance: ${login.status}`);
+        const cookie = login.headers.get("set-cookie").split(";")[0];
+        const ws = await (await fetch(`${other.url}/api/workspaces`, { headers: { cookie } })).json();
+        assert(ws.some((w) => w.name === "CA Mahendra Sir"), "second instance can't see the workspace");
+        const items = await (await fetch(`${other.url}/api/ws/${ws[0].id}/items`, { headers: { cookie } })).json();
+        assert(items.some((i) => ["Ready to Record", "Scheduled"].includes(i.stage)), "pipeline change not visible on second instance");
+        const denied = await fetch(`${other.url}/api/cron/research`);
+        assert(denied.status === 401, "cron without secret allowed");
+        const cron = await fetch(`${other.url}/api/cron/research`, { headers: { authorization: "Bearer test-cron" } });
+        assert(cron.status === 200, `cron failed: ${cron.status}`);
+        const setup = await fetch(`${other.url}/api/setup`, { method: "POST", headers: { "x-studio": "1", "content-type": "application/json" }, body: JSON.stringify({ email: "stranger@example.com", name: "x", password: "another-long-password" }) });
+        assert(setup.status === 403, "setup reopened");
+      } finally { other.proc.kill(); }
+    });
+
     await step("No browser errors and no secrets sent to the browser", async () => {
       assert(!errors.length, errors.join(" | "));
       const ws = await page.evaluate(async () => (await fetch("/api/workspaces")).json());
@@ -251,7 +276,7 @@ async function passWithMocks(browser) {
   } finally {
     await page.close();
     srv.proc.kill();
-    yt.server.close(); claude.server.close(); gh.server.close();
+    yt.server.close(); claude.server.close(); gh.server.close(); sb?.server.close();
     if (failures && process.env.E2E_DEBUG) console.log(srv.log());
   }
 }
@@ -393,6 +418,7 @@ const browser = await chromium.launch();
 try {
   await passWithMocks(browser);
   await passWithoutCredentials(browser);
+  await passWithMocks(browser, { hosted: true });
 } finally {
   await browser.close();
 }

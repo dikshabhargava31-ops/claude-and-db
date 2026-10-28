@@ -103,7 +103,26 @@ For your own videos with Analytics connected, first-7 and first-28-day views giv
 - All data lives in `studio/data/` (git-ignored, file mode 600). Back it up by copying that folder while the server is stopped.
 - The code lives in this public repository, but no data or keys do. Note that GitHub Pages serves this repository's files, so once this folder is on `main` the static page `studio/public/index.html` is reachable there as an empty shell; it can't reach your server or data. If you'd rather not have that, the folder can be excluded from Pages or moved to a private repository.
 
-## Hosting it privately
+## Publish on Vercel
+
+The app runs on Vercel with its data in Supabase (Vercel has no permanent disk). Your computer can keep using the same Supabase project, so both see the same data. Each push to the branch Vercel watches redeploys the app automatically.
+
+**What changes when hosted:** uploads are limited to 3 MB (Vercel's 4.5 MB request limit); scheduled research runs start once a day at about 7:30 am India time (Vercel Hobby allows one cron run a day; on Pro, change the schedule in `vercel.json`); a request can run for up to 5 minutes, enough for a research run.
+
+**Cost:** Supabase's free plan is enough to start (free projects pause after a week with no activity; the daily cron job keeps it active). Vercel's free Hobby plan is for personal, non-commercial use; for a business team, Vercel Pro is $20 per member a month.
+
+1. **Supabase:** create a project at [supabase.com](https://supabase.com/dashboard) (region: Mumbai). Open **SQL Editor → New query**, paste `supabase.sql` from this folder and click **Run**. In **Project Settings → API Keys**, copy the **Project URL** and a **secret** key (or the legacy **service_role** key). Never put this key in a browser or share it.
+2. **Copy your current data** (optional): add `SUPABASE_URL=` and `SUPABASE_SERVICE_ROLE_KEY=` to `.env` on your computer and run `npm run migrate`. Your account, workspaces, references and scripts are copied. From then on your computer also uses Supabase.
+3. **Vercel:** sign up at [vercel.com](https://vercel.com) with GitHub. **Add New → Project**, import `dikshabhargava31-ops/claude-and-db` (allow Vercel's GitHub app to see it), set **Root Directory** to `studio` and **Framework Preset** to **Other**.
+4. **Environment variables** (same screen, or Settings → Environment Variables; you can paste your whole `.env`): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `YOUTUBE_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_TOKEN` (if used), plus:
+   - `OWNER_EMAIL`: your email. Only this email can create the owner account on the hosted app (skip if you migrated your data, though it's harmless).
+   - `CRON_SECRET`: any long random text. Vercel sends it with the daily cron call so nobody else can trigger runs.
+   - `PUBLIC_URL`: the app's address, for example `https://creator-research-studio.vercel.app` (set it after the first deploy shows the address, then redeploy).
+5. **Deploy.** Then in Google Cloud → Google Auth Platform → **Clients**, open your client and add the redirect URI `https://<your-address>/oauth/google/callback`, and reconnect YouTube from the hosted app's Settings.
+
+## Hosting it elsewhere
+
+
 
 For a team, run it on an always-on machine or a private server behind HTTPS (for example Caddy or nginx as a reverse proxy, or a private network such as Tailscale), set `HOST=0.0.0.0`, `PUBLIC_URL=https://your-host`, and register that URL's `/oauth/google/callback` in Google Cloud. Scheduled research runs only happen while the server is running. Choosing and paying for a host is your decision; nothing has been deployed.
 

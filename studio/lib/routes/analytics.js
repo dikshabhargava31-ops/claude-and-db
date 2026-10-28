@@ -187,8 +187,10 @@ export default [
   }],
 
   // ---- YouTube connection (owner only) ----
-  ["GET", "/oauth/google/start/:ws", "owner", ({ ws, user, query, res }) => {
-    res.writeHead(302, { location: google.authUrl(ws, user.id, { captions: query.captions === "1" }) });
+  ["GET", "/oauth/google/start/:ws", "owner", async ({ store, ws, user, query, res }) => {
+    const location = google.authUrl(store, ws, user.id, { captions: query.captions === "1" });
+    await store.persist();
+    res.writeHead(302, { location });
     res.end();
   }],
 
@@ -196,6 +198,7 @@ export default [
     if (query.error) { res.writeHead(302, { location: `/#/settings?connect=denied` }); return res.end(); }
     try {
       const { ws } = await google.finishAuth(store, query);
+      await store.persist();
       res.writeHead(302, { location: `/#/settings?ws=${ws}&connect=ok` });
     } catch (e) {
       res.writeHead(302, { location: `/#/settings?connect=error&message=${encodeURIComponent(e.message)}` });

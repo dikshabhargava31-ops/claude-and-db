@@ -6,22 +6,27 @@ import * as google from "./google.js";
 import * as ai from "./ai.js";
 import * as gen from "./generate.js";
 import { describeScore } from "./outliers.js";
+import { waitUntil } from "@vercel/functions";
 import { refreshChannel, upsertVideo, checkOverlap, extractQuestions, addReview, rescoreChannel } from "./domain.js";
 
-const running = new Set();
-
-export function isRunning(ws) {
-  return running.has(ws);
+// A run counts as in progress while its row says so; one stuck for 15 minutes (for example a
+// server instance that was stopped) no longer blocks new runs.
+export function isRunning(store, ws) {
+  const cutoff = new Date(Date.now() - 15 * 60e3).toISOString();
+  return store.inWs("runs", ws, (r) => r.status === "running" && r.startedAt > cutoff).length > 0;
 }
 
+// Starts a run in the background. `done` resolves when it finishes; on Vercel, waitUntil keeps the
+// function alive after the response so the run can complete.
 export function startRun(store, ws, { trigger = "manual", userId = null } = {}) {
-  if (running.has(ws)) return null;
+  if (isRunning(store, ws)) return null;
   const run = store.insert("runs", { ws, trigger, startedBy: userId, status: "running", startedAt: new Date().toISOString(), steps: [], outputs: { topicIds: [], outlierVideoIds: [], reviewIds: [] } });
-  running.add(ws);
-  execute(store, ws, run.id).catch((e) => {
-    store.update("runs", run.id, { status: "failed", error: e.message, finishedAt: new Date().toISOString() });
-  }).finally(() => running.delete(ws));
-  return run;
+  const done = execute(store, ws, run.id)
+    .catch((e) => { store.update("runs", run.id, { status: "failed", error: e.message, finishedAt: new Date().toISOString() }); })
+    .then(() => store.persist())
+    .catch((e) => console.error("Saving the research run failed:", e.message));
+  waitUntil(done);
+  return { ...run, done };
 }
 
 async function execute(store, ws, runId) {
@@ -193,26 +198,32 @@ async function execute(store, ws, runId) {
 
 // ---- Scheduled runs ----
 // settings.schedule = { frequency: "off" | "daily" | "weekly", time: "07:30" (India time), weekday: 1 (Mon) }
-export function dueNow(schedule, lastRunAt, now = new Date()) {
+// `anyTime` is for once-a-day cron jobs (Vercel Hobby), which can't wait for the chosen time.
+export function dueNow(schedule, lastRunAt, now = new Date(), { anyTime = false } = {}) {
   if (!schedule || schedule.frequency === "off" || !schedule.frequency) return false;
   const ist = new Date(now.getTime() + 330 * 60e3);
   const [h, m] = String(schedule.time || "07:30").split(":").map(Number);
-  if (ist.getUTCHours() * 60 + ist.getUTCMinutes() < h * 60 + m) return false;
+  if (!anyTime && ist.getUTCHours() * 60 + ist.getUTCMinutes() < h * 60 + m) return false;
   if (schedule.frequency === "weekly" && ist.getUTCDay() !== Number(schedule.weekday ?? 1)) return false;
   const today = ist.toISOString().slice(0, 10);
   const last = lastRunAt ? new Date(new Date(lastRunAt).getTime() + 330 * 60e3).toISOString().slice(0, 10) : null;
   return last !== today;
 }
 
-export function startScheduler(store) {
-  const tick = () => {
-    for (const w of store.all("workspaces")) {
-      const s = w.settings?.schedule;
-      if (dueNow(s, w.settings?.lastScheduledRunAt)) {
-        store.update("workspaces", w.id, { settings: { ...w.settings, lastScheduledRunAt: new Date().toISOString() } });
-        startRun(store, w.id, { trigger: "scheduled" });
-      }
+// Starts every scheduled run that is due. Returns the runs started.
+export function startDueRuns(store, { anyTime = false } = {}) {
+  const started = [];
+  for (const w of store.all("workspaces")) {
+    if (dueNow(w.settings?.schedule, w.settings?.lastScheduledRunAt, new Date(), { anyTime })) {
+      store.update("workspaces", w.id, { settings: { ...w.settings, lastScheduledRunAt: new Date().toISOString() } });
+      const run = startRun(store, w.id, { trigger: "scheduled" });
+      if (run) started.push(run);
     }
-  };
-  return setInterval(tick, 60e3);
+  }
+  return started;
+}
+
+// On your own computer: check every minute. (On Vercel a cron job calls /api/cron/research instead.)
+export function startScheduler(store) {
+  return setInterval(() => store.sync().then(() => startDueRuns(store)).catch((e) => console.error(e.message)), 60e3);
 }

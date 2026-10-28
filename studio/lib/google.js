@@ -23,13 +23,14 @@ export const CAPTION_SCOPE = "https://www.googleapis.com/auth/youtube.force-ssl"
 export const oauthConfigured = () => !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.PUBLIC_URL);
 const redirectUri = () => process.env.PUBLIC_URL.replace(/\/$/, "") + "/oauth/google/callback";
 
-const pending = new Map(); // state -> {ws, userId, scopes, at}
-
-export function authUrl(ws, userId, { captions = false } = {}) {
+// Sign-in state is kept in the store, because on Vercel the start and the callback can reach
+// different server instances.
+export function authUrl(store, ws, userId, { captions = false } = {}) {
   if (!oauthConfigured()) throw httpError(503, "Google sign-in isn't set up. Add GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and PUBLIC_URL to .env.", { integration: "youtubeAnalytics" });
   const state = crypto.randomBytes(24).toString("base64url");
   const scopes = captions ? [...BASE_SCOPES, CAPTION_SCOPE] : BASE_SCOPES;
-  pending.set(state, { ws, userId, scopes, at: Date.now() });
+  for (const old of store.all("oauthStates", (s) => Date.now() - s.at > 15 * 60e3)) store.remove("oauthStates", old.id);
+  store.insert("oauthStates", { id: crypto.createHash("sha256").update(state).digest("hex"), ws, userId, scopes, at: Date.now() });
   const u = new URL(AUTH_URL);
   u.search = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID, redirect_uri: redirectUri(), response_type: "code",
@@ -50,8 +51,9 @@ async function tokenRequest(params) {
 }
 
 export async function finishAuth(store, { code, state }) {
-  const p = pending.get(state);
-  pending.delete(state);
+  const key = crypto.createHash("sha256").update(String(state || "")).digest("hex");
+  const p = store.get("oauthStates", key);
+  if (p) store.remove("oauthStates", key);
   if (!p || Date.now() - p.at > 15 * 60e3) throw httpError(400, "This Google sign-in link expired. Start the connection again from Settings.");
   const tok = await tokenRequest({ code, grant_type: "authorization_code", redirect_uri: redirectUri() });
   const id = "yt:" + p.ws;

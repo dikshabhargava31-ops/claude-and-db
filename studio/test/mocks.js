@@ -151,3 +151,40 @@ export function githubMock() {
 }
 
 export const listen = (server) => new Promise((r) => server.listen(0, "127.0.0.1", () => r(`http://127.0.0.1:${server.address().port}`)));
+
+// ---- Supabase (PostgREST table + Storage) for the hosted-mode test ----
+export function supabaseMock() {
+  const rows = new Map(); // "collection/id" -> row
+  const files = new Map();
+  let clock = Date.parse("2026-01-01T00:00:00Z");
+  const server = http.createServer(async (req, res) => {
+    const chunks = [];
+    for await (const c of req) chunks.push(c);
+    const raw = Buffer.concat(chunks);
+    const u = new URL(req.url, "http://x");
+    if (req.headers.apikey !== "test-service-key") { res.writeHead(401); return res.end("{}"); }
+    res.setHeader("content-type", "application/json");
+    if (u.pathname === "/rest/v1/studio_docs" && req.method === "GET") {
+      const gt = u.searchParams.get("updated_at")?.replace(/^gt\./, "");
+      let list = [...rows.values()].filter((r) => !gt || r.updated_at > new Date(gt).toISOString()).sort((a, b) => a.updated_at.localeCompare(b.updated_at));
+      const offset = Number(u.searchParams.get("offset") || 0), limit = Number(u.searchParams.get("limit") || 1000);
+      return res.end(JSON.stringify(list.slice(offset, offset + limit)));
+    }
+    if (u.pathname === "/rest/v1/studio_docs" && req.method === "POST") {
+      for (const r of JSON.parse(raw)) rows.set(`${r.collection}/${r.id}`, { ...r, updated_at: new Date(clock += 1).toISOString() });
+      res.writeHead(201);
+      return res.end();
+    }
+    const m = /^\/storage\/v1\/object\/(?:authenticated\/)?studio-files\/(.+)$/.exec(u.pathname);
+    if (m) {
+      if (req.method === "POST") { files.set(m[1], raw); return res.end("{}"); }
+      if (req.method === "DELETE") { files.delete(m[1]); return res.end("{}"); }
+      if (!files.has(m[1])) { res.writeHead(400); return res.end('{"error":"not found"}'); }
+      res.setHeader("content-type", "application/octet-stream");
+      return res.end(files.get(m[1]));
+    }
+    res.writeHead(404);
+    res.end("{}");
+  });
+  return { server, rows, files };
+}

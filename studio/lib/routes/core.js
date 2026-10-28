@@ -5,7 +5,7 @@ import * as yt from "../youtube.js";
 import * as google from "../google.js";
 import * as ai from "../ai.js";
 import * as ig from "../instagram.js";
-import { startRun, isRunning } from "../research.js";
+import { startRun, isRunning, startDueRuns } from "../research.js";
 import { seedDemo } from "../demo.js";
 
 export const CA_PRESET = {
@@ -48,7 +48,10 @@ export function integrationStatus(store, ws) {
   const spend = ws ? ai.aiSpend(store, ws) : null;
   const igAcc = ig.insightsAccounts();
   const lastRun = ws ? store.inWs("runs", ws).sort((a, b) => b.startedAt.localeCompare(a.startedAt))[0] : null;
+  const remote = !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
   return {
+    hosting: process.env.VERCEL ? "vercel" : "local",
+    database: { label: "Database (where everything is saved)", state: remote ? "live" : "manual", detail: remote ? `Supabase${process.env.VERCEL ? ", hosted on Vercel" : ""}. Data is shared by every copy of the app that uses this Supabase project.` : "Saved in data/db.json on this computer. Connect Supabase to host the app online (see studio/README.md → Publish on Vercel).", needs: "SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY" },
     youtubeData: { label: "YouTube Data API (public videos and channels)", state: yt.youtubeConfigured() ? "live" : "unavailable", detail: yt.youtubeConfigured() ? `${yt.quotaUsed(store).toLocaleString()} of ${yt.DAILY_QUOTA.toLocaleString()} quota units used today (Pacific day).` : "Add YOUTUBE_API_KEY to .env. Without it, import videos by link (title, channel, thumbnail only) or CSV.", needs: "YOUTUBE_API_KEY" },
     youtubeAnalytics: { label: "YouTube Analytics (my channel, authorised)", state: conn ? "live" : google.oauthConfigured() ? "not connected" : "unavailable", detail: conn ? `Connected to ${conn.channelTitle || "a channel"}${conn.scopes?.includes(google.CAPTION_SCOPE) ? " (with caption permission)" : ""}.` : google.oauthConfigured() ? "The owner can connect the channel in Settings → Connections." : "Needs a Google Cloud OAuth client: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and PUBLIC_URL.", needs: "GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, PUBLIC_URL, then Connect", channel: conn?.channelTitle || null },
     impressions: { label: "Impressions and CTR (YouTube Reporting API reach reports)", state: conn ? "live" : "unavailable", detail: conn ? "Start the daily reach reports once (Settings → Connections); YouTube adds reports from that day on. YouTube Studio CSV exports can also be imported." : "Needs the YouTube connection. Until then, import a YouTube Studio CSV export.", needs: "YouTube connection" },
@@ -66,6 +69,10 @@ export default [
 
   ["POST", "/api/setup", "public", ({ store, body, setSession }) => {
     if (store.all("users").length) throw httpError(403, "The owner account already exists. Sign in instead.");
+    // On a hosted app anyone could reach this page first, so only OWNER_EMAIL may create the owner.
+    const owner = String(process.env.OWNER_EMAIL || "").trim().toLowerCase();
+    if (process.env.VERCEL && !owner) throw httpError(403, "Set OWNER_EMAIL in Vercel's environment variables to create the owner account.");
+    if (owner && String(body.email || "").trim().toLowerCase() !== owner) throw httpError(403, "Only the email set as OWNER_EMAIL can create the owner account.");
     const user = auth.createUser(store, { ...body, admin: true });
     setSession(auth.createSession(store, user.id));
     return { user: auth.publicUser(user) };
@@ -125,7 +132,7 @@ export default [
   ["GET", "/api/ws/:ws", "viewer", ({ store, workspace, role, ws, user }) => ({
     id: workspace.id, name: workspace.name, demo: !!workspace.demo, profile: workspace.profile, settings: workspace.settings, role,
     members: workspace.members.map((m) => ({ ...auth.publicUser(store.get("users", m.userId)), role: m.role })),
-    status: integrationStatus(store, ws), running: isRunning(ws), me: auth.publicUser(user),
+    status: integrationStatus(store, ws), running: isRunning(store, ws), me: auth.publicUser(user),
   })],
 
   ["PATCH", "/api/ws/:ws", "editor", ({ store, ws, workspace, role, body }) => {
@@ -161,11 +168,21 @@ export default [
     return store.update("workspaces", ws, { members: workspace.members.filter((m) => m.userId !== params.userId) });
   }],
 
+  // Vercel cron job (vercel.json): starts scheduled research runs. Vercel sends CRON_SECRET.
+  ["GET", "/api/cron/research", "public", async ({ store, req }) => {
+    if (!process.env.CRON_SECRET || req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) throw httpError(401, "Not allowed.");
+    const runs = startDueRuns(store, { anyTime: true });
+    await store.persist();
+    await Promise.all(runs.map((r) => r.done));
+    return { started: runs.length };
+  }],
+
   // ---- research runs and the review queue ----
   ["POST", "/api/ws/:ws/runs", "editor", ({ store, ws, user }) => {
     const run = startRun(store, ws, { trigger: "manual", userId: user.id });
     if (!run) throw httpError(409, "A research run is already in progress for this workspace.");
-    return run;
+    const { done, ...row } = run;
+    return row;
   }],
 
   ["GET", "/api/ws/:ws/runs", "viewer", ({ store, ws }) => store.inWs("runs", ws).sort((a, b) => b.startedAt.localeCompare(a.startedAt)).slice(0, 20)],

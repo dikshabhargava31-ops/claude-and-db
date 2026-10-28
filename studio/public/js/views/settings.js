@@ -47,6 +47,11 @@ function profile(el, ctx) {
 // Step-by-step setup instructions shown under each connection that isn't live yet.
 const step = (n, html) => `<li>${html}</li>`;
 const GUIDES = {
+  database: `<p>Needed only to put the app online. On your computer the app saves to a local file.</p><ol>
+    ${step(1, `Create a project at <a href="https://supabase.com/dashboard" target="_blank" rel="noopener">supabase.com</a>, choosing a region near India (for example Mumbai).`)}
+    ${step(2, `Open <b>SQL Editor</b> → <b>New query</b>, paste the contents of <code>studio/supabase.sql</code>, and click <b>Run</b>.`)}
+    ${step(3, `Open <b>Project Settings → API</b>. Copy the <b>Project URL</b> and the <b>service_role</b> secret key (never share this key or put it in the browser).`)}
+    ${step(4, `Add both to <code>.env</code>:<pre>SUPABASE_URL=https://xxxx.supabase.co\nSUPABASE_SERVICE_ROLE_KEY=eyJ...</pre>Then run <code>npm run migrate</code> once to copy your current data, and restart the app.`)}</ol>`,
   youtubeData: `<ol>
     ${step(1, `In <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">Google Cloud</a>, pick your project at the top and click <b>Enable</b> on YouTube Data API v3.`)}
     ${step(2, `Open <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Credentials</a> → <b>Create credentials</b> → <b>API key</b>. Under API restrictions choose <b>YouTube Data API v3</b>, keep Application restrictions on <b>None</b>, click <b>Create</b> and copy the key.`)}
@@ -86,7 +91,7 @@ async function connections(el, ctx) {
   const yt = st.youtubeAnalytics;
   let accounts = {};
   try { accounts = (await get(`${ctx.base}/instagram/planner`)).accounts; } catch { /* shown in status */ }
-  const rows = ["youtubeData", "youtubeAnalytics", "impressions", "transcripts", "ai", "webSearch", "instagramPlanner", "instagramInsights"];
+  const rows = ["database", "youtubeData", "youtubeAnalytics", "impressions", "transcripts", "ai", "webSearch", "instagramPlanner", "instagramInsights"];
   const tone = (state) => (state === "live" ? "live" : state === "unavailable" ? "off" : "part");
   el.innerHTML = `
     <div class="card"><h2>Connection status</h2><p class="muted">Each connection shows whether it uses live data, imported data, demo data, or is unavailable. Open <b>How to connect</b> for step-by-step instructions. Keys stay in the <code>.env</code> file on your computer and are never sent to the browser.</p>
@@ -143,6 +148,7 @@ function schedule(el, ctx) {
   const s = ctx.ws.settings?.schedule || { frequency: "off", time: "07:30", weekday: 1 };
   const dis = ctx.isOwner ? "" : "disabled";
   el.innerHTML = `<form class="card" id="sf"><h2>Scheduled research runs</h2>
+    ${ctx.ws.status.hosting === "vercel" ? '<div class="notice info">On Vercel, scheduled runs start once a day at about 7:30 am India time (the Hobby plan allows one cron job run a day). The day setting for weekly runs still applies.</div>' : ""}
     <p>Runs the full research-to-shortlist workflow automatically and puts the results in the review queue. It only creates internal drafts and recommendations — it never publishes, schedules posts, changes live content or adds permissions. Runs happen while the server is running and count against the AI budget and YouTube quota.</p>
     <div class="grid g3"><label>Frequency<select name="frequency" ${dis}>${["off", "daily", "weekly"].map((f) => `<option ${s.frequency === f ? "selected" : ""}>${f}</option>`).join("")}</select></label>
     <label>Time (India)<input type="time" name="time" value="${esc(s.time)}" ${dis}></label>

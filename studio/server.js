@@ -1,10 +1,10 @@
 // Creator Research Studio — private web app server.
-// Plain Node (22.5+) with one dependency (the Anthropic SDK). Run: npm start
+// Plain Node (22.5+). Run on your computer with `npm start`; on Vercel, api/index.js exports `handler`.
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Store } from "./lib/store.js";
+import { createStore } from "./lib/store.js";
 import { sessionUser, requireRole, httpError } from "./lib/auth.js";
 import { routes } from "./lib/api.js";
 import { startScheduler } from "./lib/research.js";
@@ -20,7 +20,9 @@ const PUBLIC = path.join(here, "public");
 const COOKIE = "studio_session";
 const secureCookie = () => (process.env.PUBLIC_URL || "").startsWith("https://");
 
-export const store = new Store(DATA_DIR);
+// Supabase when SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set, otherwise a local file.
+// Vercel has no permanent disk, so there the app refuses to run without Supabase.
+export const store = process.env.VERCEL && !process.env.SUPABASE_URL ? null : createStore(DATA_DIR);
 
 function loadEnv(file) {
   if (!fs.existsSync(file)) return;
@@ -96,6 +98,7 @@ async function handle(req, res) {
   const isApi = pathname.startsWith("/api/") || pathname.startsWith("/oauth/") || pathname.startsWith("/files/");
   if (!isApi) return serveStatic(req, res, pathname);
 
+  if (!store) return send(res, 503, { error: "The database isn't set up. Add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel → Settings → Environment Variables, then redeploy." });
   const route = compiled.find((r) => r.method === req.method && r.re.test(pathname));
   if (!route) return send(res, 404, { error: "Not found." });
   const m = route.re.exec(pathname);
@@ -105,6 +108,7 @@ async function handle(req, res) {
   // another site can't add without a CORS preflight, which this server never allows.
   if (req.method !== "GET" && req.headers["x-studio"] !== "1") return send(res, 403, { error: "Missing request header." });
 
+  await store.sync();
   const token = cookies(req)[COOKIE];
   const user = sessionUser(store, token);
   const ctx = { req, res, url, params, query: Object.fromEntries(url.searchParams), user, token, store, send: (s, b, h) => send(res, s, b, h), setSession: (t) => setSessionCookie(res, t) };
@@ -119,24 +123,30 @@ async function handle(req, res) {
   }
   ctx.body = req.method === "GET" ? {} : await readBody(req);
   const out = await route.handler(ctx);
+  await store.persist();
   if (out !== undefined && !res.headersSent) send(res, 200, out);
 }
 
-export const server = http.createServer((req, res) => {
-  handle(req, res).catch((e) => {
+export async function handler(req, res) {
+  try {
+    await handle(req, res);
+  } catch (e) {
+    await store?.persist().catch(() => {});
     const status = e.status || 500;
     if (status >= 500 && !e.integration) console.error(e);
     if (!res.headersSent) send(res, status, { error: status === 500 && !e.status ? "Something went wrong on the server. Check the server log." : e.message, integration: e.integration || null, needsApproval: e.needsApproval || null });
-  });
-});
+  }
+}
+
+export const server = http.createServer(handler);
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   server.listen(PORT, HOST, () => {
     console.log(`Creator Research Studio: http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT}`);
-    if (!store.all("users").length) console.log("No accounts yet: open the app to create the owner account.");
+    store.sync().then(() => { if (!store.all("users").length) console.log("No accounts yet: open the app to create the owner account."); });
   });
   startScheduler(store);
-  const stop = () => { store.flush(); process.exit(0); };
+  const stop = async () => { store.flush?.(); await store.persist().catch(() => {}); process.exit(0); };
   process.on("SIGINT", stop);
   process.on("SIGTERM", stop);
 }
