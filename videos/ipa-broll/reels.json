@@ -1,0 +1,118 @@
+{
+  "_about": "Five B-roll reels from the IPA Instagram Content Idea Bank (B-roll table, ideas #10, #2, #5, #7, #12). Each shot: src = Drive file id from 'All Clip of IPA institute', in = seconds into the clip, dur = seconds on screen, rot = cw|ccw|none, cx = horizontal crop centre 0..1 for landscape clips. Text is Hinglish; *word* = yellow highlight.",
+  "handle": "@ipa_institute_ajmer",
+  "reels": [
+    {
+      "project": "ipa-broll-day-in-ipa",
+      "idea": "#10 Day in the life: Ek din IPA ke andar",
+      "shots": [
+        {"src": "1LM2O3HALvPNzxMurra_sejIp5M_W5IBS", "name": "C0161", "in": 4.0, "dur": 2.2, "rot": "none", "cx": 0.55,
+         "card": {"style": "hook", "chip": "7 AM → 7 PM", "lines": ["Ek din", "*IPA* ke andar"]}},
+        {"src": "1tASUpunAAHgL7wI-O1CJXDCiiOugry7o", "name": "C0145", "in": 6.0, "dur": 2.0, "rot": "none", "cx": 0.5,
+         "card": {"chip": "9:00 AM", "lines": ["Pehla lecture"]}},
+        {"src": "1HhvCIK4jlEybV7zVkh0tpRLfwJZuRCgT", "name": "C0152", "in": 6.0, "dur": 2.0, "rot": "none", "cx": 0.62,
+         "card": {"chip": "11:00 AM", "lines": ["Physics,", "seedha *smartboard* pe"]}},
+        {"src": "1SzOgFE6YAcZqwyluefS35tpuDTOy71iV", "name": "C0159", "in": 5.0, "dur": 2.0, "rot": "none", "cx": 0.6,
+         "card": {"lines": ["Doubt poochna", "yahan *allowed* hai"]}},
+        {"src": "1cKX6HcaCvRHGZ9sPYJZk6Bpc9tMFCm0I", "name": "C0162", "in": 8.0, "dur": 2.2, "rot": "none", "cx": 0.5,
+         "card": {"chip": "1:00 PM", "lines": ["Doubt session,", "*ek-ek* karke"]}},
+        {"src": "1obH5JTMJPkhM-jdzVvhDTkx9_dUWXsaQ", "name": "C0135", "in": 4.0, "dur": 2.0, "rot": "none", "cx": 0.45,
+         "card": {"chip": "3:00 PM", "lines": ["Weekly *test*"]}},
+        {"src": "1pzYukK1qBfZxvPvOGmAKO4qRlJrMfybQ", "name": "C0149", "in": 6.0, "dur": 2.0, "rot": "none", "cx": 0.5,
+         "card": {"lines": ["Galti dhoondo.", "*Sudhaaro.*"]}},
+        {"src": "12USvQXA7-ag1waA7297zJhs03ZczO88E", "name": "20260823_090351", "in": 3.0, "dur": 2.0, "rot": "none", "cx": 0.5,
+         "card": {"chip": "5:00 PM", "lines": ["Aur haan,", "thoda *cricket* bhi"]}},
+        {"src": "1Sm0a_Ms4eC3e5F1cauWVoHuSzGk_N2X4", "name": "C0038", "in": 2.0, "dur": 2.6, "rot": "none", "cx": 0.5,
+         "card": {"style": "end", "lines": ["Yeh hai *IPA.*", "Tag karo jo", "yahan padhta hai"]}}
+      ]
+    },
+    {
+      "project": "ipa-broll-exam-raat",
+      "idea": "#2 Relatable: Exam se ek raat pehle mera dimaag",
+      "shots": [
+        {"src": "1SBOoqrkj6W-3sxKlmDmNhDrQYUpXx0LF", "name": "C0002", "in": 6.0, "dur": 2.0, "rot": "cw",
+         "card": {"style": "hook", "lines": ["Exam se ek raat", "pehle *mera dimaag:*"]}},
+        {"src": "1QxTQHmODOlPNbMeZLVBxOI1RGrGX7I2I", "name": "C0150", "in": 10.0, "dur": 1.4, "rot": "none", "cx": 0.5,
+         "card": {"style": "good", "lines": ["Sab aata hai"]}},
+        {"src": "1C406nQ5KXH6ucQfWTooK9DGQr6gcgX14", "name": "C0080", "in": 6.0, "dur": 1.4, "rot": "cw",
+         "card": {"style": "bad", "lines": ["Kuch nahi aata"]}},
+        {"src": "1RHYKqLwB96F04S5RpV2BCHFSGYApg3u8", "name": "C0072", "in": 5.0, "dur": 1.4, "rot": "none", "cx": 0.5,
+         "card": {"style": "good", "lines": ["Sab aata hai"]}},
+        {"src": "1RSsBVWaHl2xqe-WqKrKHE4bUmLGhcCld", "name": "C0005", "in": 3.0, "dur": 1.6, "rot": "cw",
+         "card": {"style": "bad", "lines": ["Yeh chapter", "syllabus mein tha??"]}},
+        {"src": "1-ncxXkXfDB-0Dls0pXTuNd8JT5EN6-kI", "name": "C0151", "in": 6.0, "dur": 1.4, "rot": "none", "cx": 0.5,
+         "card": {"style": "good", "lines": ["Sab aata hai"]}},
+        {"src": "1mPtUv1YTZKnGDfa9M5zm8WW6NuAkiWG5", "name": "C0146", "in": 5.0, "dur": 1.8, "rot": "cw",
+         "card": {"style": "bad", "lines": ["Kuch.", "Nahi.", "Aata."]}},
+        {"src": "1TF0ZBozRzFhDecULh668gKoHIPbyXNm0", "name": "C0137", "in": 12.0, "dur": 2.4, "rot": "none", "cx": 0.5,
+         "card": {"chip": "Next morning", "lines": ["Jo aata tha,", "*wahi likh diya*"]}},
+        {"src": "1Uo8sDir2T8i6cxy561c0d3OpvS5YAImC", "name": "C0139", "in": 6.0, "dur": 2.6, "rot": "none", "cx": 0.5,
+         "card": {"style": "end", "lines": ["Tag karo us dost ko", "jo raat ko *panic*", "karta hai"]}}
+      ]
+    },
+    {
+      "project": "ipa-broll-topper",
+      "idea": "#5 Motivational: Topper banne ke liye talent nahi chahiye",
+      "shots": [
+        {"src": "16mRKN6TPGYVi_96JOxLkG2hKvTDacbeI", "name": "C0063", "in": 2.0, "dur": 2.4, "rot": "cw",
+         "card": {"style": "hook", "lines": ["Topper banne ke liye", "*talent* nahi chahiye"]}},
+        {"src": "1obH5JTMJPkhM-jdzVvhDTkx9_dUWXsaQ", "name": "C0135", "in": 8.0, "dur": 2.0, "rot": "none", "cx": 0.45,
+         "card": {"lines": ["Chahiye bas..."]}},
+        {"src": "1ifFxYkQUcUsHDCXBXMTPtk9UTrZ6GbxK", "name": "C0076", "in": 2.0, "dur": 2.2, "rot": "cw",
+         "card": {"lines": ["Roz *2 ghante*"]}},
+        {"src": "1Tye4y_H8ac4KonUossT1V6BUS_rCP5mG", "name": "C0146b", "in": 8.0, "dur": 2.2, "rot": "none", "cx": 0.5,
+         "card": {"lines": ["Ek time pe", "*ek chapter*"]}},
+        {"src": "10dDH2gz0nwocBYvw2YN-ozmYAToP65DH", "name": "C0138", "in": 8.0, "dur": 2.2, "rot": "none", "cx": 0.5,
+         "card": {"lines": ["Doubt aaye,", "toh *poochna*"]}},
+        {"src": "1cKX6HcaCvRHGZ9sPYJZk6Bpc9tMFCm0I", "name": "C0162", "in": 16.0, "dur": 2.2, "rot": "none", "cx": 0.5,
+         "card": {"lines": ["Aur kal", "*phir se wahi*"]}},
+        {"src": "1pzYukK1qBfZxvPvOGmAKO4qRlJrMfybQ", "name": "C0149", "in": 14.0, "dur": 2.2, "rot": "none", "cx": 0.5,
+         "card": {"style": "hook", "lines": ["Consistency", "> Talent"]}},
+        {"src": "1SzOgFE6YAcZqwyluefS35tpuDTOy71iV", "name": "C0159", "in": 12.0, "dur": 2.6, "rot": "none", "cx": 0.6,
+         "card": {"style": "end", "lines": ["Apne *study partner*", "ko bhejo"]}}
+      ]
+    },
+    {
+      "project": "ipa-broll-class10-yaadein",
+      "idea": "#7 Nostalgia: Class 10 ki yaadein jo kabhi wapas nahi aayengi",
+      "shots": [
+        {"src": "17DVGOhBNzN8DB6mQur9EmP2RDD8hr5R8", "name": "20260823_090626", "in": 4.0, "dur": 2.4, "rot": "none",
+         "card": {"style": "hook", "lines": ["Class 10 ki yaadein", "jo *kabhi wapas*", "*nahi aayengi*"]}},
+        {"src": "12USvQXA7-ag1waA7297zJhs03ZczO88E", "name": "20260823_090351", "in": 5.0, "dur": 2.0, "rot": "none",
+         "card": {"lines": ["Free period =", "*cricket match*"]}},
+        {"src": "1Bm1NtCvqV4nSoDVxC2ck84DFo86VVxAe", "name": "20260823_094014", "in": 1.0, "dur": 2.0, "rot": "none",
+         "card": {"lines": ["Ek tiffin,", "*paanch haath*"]}},
+        {"src": "1SzOgFE6YAcZqwyluefS35tpuDTOy71iV", "name": "C0159", "in": 2.0, "dur": 2.0, "rot": "none", "cx": 0.6,
+         "card": {"lines": ["Sir ka *woh ek joke*"]}},
+        {"src": "1-Bs73N9HvLLGde8bK4Vy4mOBxR1PI97i", "name": "IMG_7557", "in": 1.0, "dur": 2.0, "rot": "none",
+         "card": {"lines": ["Trip wala *din*"]}},
+        {"src": "1TLwhGobqOYI6oVN-Xh_r-_ufTEUcKqtu", "name": "IMG_8039", "in": 1.0, "dur": 2.0, "rot": "none",
+         "card": {"lines": ["Bina wajah ki *hasi*"]}},
+        {"src": "1Uo8sDir2T8i6cxy561c0d3OpvS5YAImC", "name": "C0139", "in": 2.0, "dur": 2.0, "rot": "none", "cx": 0.5,
+         "card": {"lines": ["Aur haan,", "*surprise test* bhi"]}},
+        {"src": "1t3bFUYceglelbX9j7tLXPgi6OBHr5n7e", "name": "20260823_091748", "in": 4.0, "dur": 2.8, "rot": "none",
+         "card": {"style": "end", "lines": ["Abhi *jee lo,*", "phir yaad aayega"]}}
+      ]
+    },
+    {
+      "project": "ipa-broll-100-din",
+      "idea": "#12 Count-down: Boards mein sirf 100 din bache hain",
+      "shots": [
+        {"src": "1TF0ZBozRzFhDecULh668gKoHIPbyXNm0", "name": "C0137", "in": 4.0, "dur": 2.4, "rot": "none", "cx": 0.5,
+         "card": {"style": "count", "big": "100", "lines": ["Boards mein sirf", "*100 din* bache hain"]}},
+        {"src": "1RHYKqLwB96F04S5RpV2BCHFSGYApg3u8", "name": "C0072", "in": 10.0, "dur": 2.2, "rot": "none", "cx": 0.5,
+         "card": {"lines": ["Ghabrao mat.", "Is hafte bas *3 kaam:*"]}},
+        {"src": "1QxTQHmODOlPNbMeZLVBxOI1RGrGX7I2I", "name": "C0150", "in": 24.0, "dur": 2.8, "rot": "none", "cx": 0.5,
+         "card": {"chip": "1", "lines": ["Syllabus ko", "*3 hisson* mein baanto"]}},
+        {"src": "1HhvCIK4jlEybV7zVkh0tpRLfwJZuRCgT", "name": "C0152", "in": 12.0, "dur": 2.8, "rot": "none", "cx": 0.62,
+         "card": {"chip": "2", "lines": ["Roz *1 PYQ paper*", "time lagake"]}},
+        {"src": "1ifFxYkQUcUsHDCXBXMTPtk9UTrZ6GbxK", "name": "C0076", "in": 3.5, "dur": 2.6, "rot": "cw",
+         "card": {"chip": "3", "lines": ["Galtiyon ki", "*ek alag copy*"]}},
+        {"src": "1cKX6HcaCvRHGZ9sPYJZk6Bpc9tMFCm0I", "name": "C0162", "in": 20.0, "dur": 2.2, "rot": "none", "cx": 0.5,
+         "card": {"lines": ["Agla update:", "*75 din* pe"]}},
+        {"src": "1Sm0a_Ms4eC3e5F1cauWVoHuSzGk_N2X4", "name": "C0038", "in": 4.0, "dur": 2.6, "rot": "none", "cx": 0.5,
+         "card": {"style": "end", "lines": ["*Save* karo.", "Study partner", "ko bhejo"]}}
+      ]
+    }
+  ]
+}

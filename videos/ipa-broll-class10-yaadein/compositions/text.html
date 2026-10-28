@@ -1,0 +1,97 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; }
+    /* Cards sit in the 168-1330 px band Instagram leaves clear, away from the right-hand action rail. */
+    #root .card {
+      position: absolute; left: 70px; right: 150px; top: 560px; height: 640px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 14px; text-align: center;
+    }
+    #root .line {
+      display: inline-block; background: #ffffff; color: #111111; white-space: nowrap;
+      font-weight: 800; font-size: 66px; line-height: 1.12; letter-spacing: -0.01em;
+      padding: 12px 26px 14px; border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    }
+    #root .line em { font-style: normal; background: #ffd400; border-radius: 10px; padding: 0 10px; }
+    #root .chip {
+      display: inline-block; background: #111111; color: #ffd400;
+      font-weight: 800; font-size: 40px; letter-spacing: 0.04em;
+      padding: 10px 24px; border-radius: 999px; margin-bottom: 6px;
+    }
+    #root .hook .line { font-size: 78px; }
+    #root .hook .line:first-of-type { background: #ffd400; }
+    #root .hook .line:first-of-type em { background: #ffffff; }
+    #root .good .line { background: #19c26b; color: #ffffff; font-size: 92px; }
+    #root .bad .line { background: #ff3b47; color: #ffffff; font-size: 92px; }
+    #root .count .big {
+      font-weight: 900; font-size: 300px; line-height: 0.9; color: #ffd400;
+      -webkit-text-stroke: 6px #111111; paint-order: stroke fill; letter-spacing: -0.04em;
+      text-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+    }
+    #root .end .line:last-of-type { margin-bottom: 10px; }
+    #root .handle {
+      display: inline-block; color: #ffffff; font-weight: 700; font-size: 34px;
+      background: rgba(0, 0, 0, 0.55); padding: 8px 20px; border-radius: 999px;
+    }
+  </style>
+  <div id="root" data-composition-id="text" data-width="1080" data-height="1920">
+    <div id="card1" class="clip card hook" data-start="0.00" data-duration="2.40" data-track-index="1" data-layout-allow-overlap>
+        <div id="c1-l1" class="line">Class 10 ki yaadein</div>
+        <div id="c1-l2" class="line">jo <em>kabhi wapas</em></div>
+        <div id="c1-l3" class="line"><em>nahi aayengi</em></div>
+    </div>
+    <div id="card2" class="clip card plain" data-start="2.40" data-duration="2.00" data-track-index="2" data-layout-allow-overlap>
+        <div id="c2-l1" class="line">Free period =</div>
+        <div id="c2-l2" class="line"><em>cricket match</em></div>
+    </div>
+    <div id="card3" class="clip card plain" data-start="4.40" data-duration="2.00" data-track-index="3" data-layout-allow-overlap>
+        <div id="c3-l1" class="line">Ek tiffin,</div>
+        <div id="c3-l2" class="line"><em>paanch haath</em></div>
+    </div>
+    <div id="card4" class="clip card plain" data-start="6.40" data-duration="2.00" data-track-index="4" data-layout-allow-overlap>
+        <div id="c4-l1" class="line">Sir ka <em>woh ek joke</em></div>
+    </div>
+    <div id="card5" class="clip card plain" data-start="8.40" data-duration="2.00" data-track-index="5" data-layout-allow-overlap>
+        <div id="c5-l1" class="line">Trip wala <em>din</em></div>
+    </div>
+    <div id="card6" class="clip card plain" data-start="10.40" data-duration="2.00" data-track-index="6" data-layout-allow-overlap>
+        <div id="c6-l1" class="line">Bina wajah ki <em>hasi</em></div>
+    </div>
+    <div id="card7" class="clip card plain" data-start="12.40" data-duration="2.00" data-track-index="7" data-layout-allow-overlap>
+        <div id="c7-l1" class="line">Aur haan,</div>
+        <div id="c7-l2" class="line"><em>surprise test</em> bhi</div>
+    </div>
+    <div id="card8" class="clip card end" data-start="14.40" data-duration="2.80" data-track-index="8" data-layout-allow-overlap>
+        <div id="c8-l1" class="line">Abhi <em>jee lo,</em></div>
+        <div id="c8-l2" class="line">phir yaad aayega</div>
+        <div id="c8-handle" class="handle">@ipa_institute_ajmer</div>
+    </div>
+  </div>
+  <script>
+    // Shrink any line wider than the card (860 px) so every line stays one box.
+    document.querySelectorAll("#root .card .line").forEach((el) => {
+      let size = parseFloat(getComputedStyle(el).fontSize);
+      while (el.offsetWidth > 860 && size > 40) {
+        size -= 2;
+        el.style.fontSize = size + "px";
+      }
+    });
+    const tl = gsap.timeline({ paused: true });
+    // Each card pops in on its cut; lines follow 0.07 s apart. The hook (card 1) is already on screen at frame 0.
+    tl.fromTo("#c1-l1", { scale: 1.04 }, { scale: 1, duration: 0.8, ease: "power2.out" }, 0);
+    tl.fromTo("#c2-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 2.44);
+    tl.fromTo("#c2-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 2.51);
+    tl.fromTo("#c3-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 4.44);
+    tl.fromTo("#c3-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 4.51);
+    tl.fromTo("#c4-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 6.44);
+    tl.fromTo("#c5-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 8.44);
+    tl.fromTo("#c6-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 10.44);
+    tl.fromTo("#c7-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 12.44);
+    tl.fromTo("#c7-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 12.51);
+    tl.fromTo("#c8-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 14.44);
+    tl.fromTo("#c8-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 14.51);
+    tl.fromTo("#c8-handle", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 14.58);
+    window.__timelines["text"] = tl;
+  </script>
+</template>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="hi" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>ipa-broll-topper</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0b0b0b; }
+      #root { position: relative; width: 100%; height: 100%; }
+      #root video { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+    </style>
+  </head>
+  <body>
+    <!-- #5 Motivational: Topper banne ke liye talent nahi chahiye -->
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18.00" data-width="1080" data-height="1920">
+      <video id="shot01" class="clip" src="assets/footage/shot01.mp4" muted playsinline
+        data-start="0.00" data-duration="2.40" data-track-index="0" style="z-index: 1"></video>
+      <video id="shot02" class="clip" src="assets/footage/shot02.mp4" muted playsinline
+        data-start="2.40" data-duration="2.00" data-track-index="0" style="z-index: 2"></video>
+      <video id="shot03" class="clip" src="assets/footage/shot03.mp4" muted playsinline
+        data-start="4.40" data-duration="2.20" data-track-index="0" style="z-index: 3"></video>
+      <video id="shot04" class="clip" src="assets/footage/shot04.mp4" muted playsinline
+        data-start="6.60" data-duration="2.20" data-track-index="0" style="z-index: 4"></video>
+      <video id="shot05" class="clip" src="assets/footage/shot05.mp4" muted playsinline
+        data-start="8.80" data-duration="2.20" data-track-index="0" style="z-index: 5"></video>
+      <video id="shot06" class="clip" src="assets/footage/shot06.mp4" muted playsinline
+        data-start="11.00" data-duration="2.20" data-track-index="0" style="z-index: 6"></video>
+      <video id="shot07" class="clip" src="assets/footage/shot07.mp4" muted playsinline
+        data-start="13.20" data-duration="2.20" data-track-index="0" style="z-index: 7"></video>
+      <video id="shot08" class="clip" src="assets/footage/shot08.mp4" muted playsinline
+        data-start="15.40" data-duration="2.60" data-track-index="0" style="z-index: 8"></video>
+      <div id="text" data-composition-id="text" data-composition-src="compositions/text.html"
+        data-start="0" data-duration="18.00" data-track-index="1" data-track-kind="graphics"
+        data-width="1080" data-height="1920" style="z-index: 50"></div>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>
