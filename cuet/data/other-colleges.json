@@ -1,0 +1,361 @@
+{
+ "note": "Well-known colleges outside the NTA CUET list (own entrance test or Class 12 merit), shown on course pages. Official websites only.",
+ "colleges": [
+  {
+   "id": "iits",
+   "name": "IITs (Indian Institutes of Technology)",
+   "city": "Across India",
+   "gov": true,
+   "entrance": "JEE Advanced",
+   "website": "https://jeeadv.ac.in/",
+   "courses": [
+    "btech"
+   ]
+  },
+  {
+   "id": "nits",
+   "name": "NITs and IIITs (through JoSAA)",
+   "city": "Across India",
+   "gov": true,
+   "entrance": "JEE Main",
+   "website": "https://josaa.nic.in/",
+   "courses": [
+    "btech"
+   ]
+  },
+  {
+   "id": "bits",
+   "name": "BITS Pilani (Pilani, Goa, Hyderabad)",
+   "city": "Pilani / Goa / Hyderabad",
+   "gov": false,
+   "entrance": "BITSAT",
+   "website": "https://www.bitsadmission.com/",
+   "courses": [
+    "btech",
+    "bsc-science"
+   ]
+  },
+  {
+   "id": "vit",
+   "name": "VIT (Vellore Institute of Technology)",
+   "city": "Vellore",
+   "gov": false,
+   "entrance": "VITEEE",
+   "website": "https://vit.ac.in/",
+   "courses": [
+    "btech",
+    "cs"
+   ]
+  },
+  {
+   "id": "manipal",
+   "name": "Manipal Academy of Higher Education",
+   "city": "Manipal",
+   "gov": false,
+   "entrance": "MET (Manipal Entrance Test)",
+   "website": "https://manipal.edu/",
+   "courses": [
+    "btech",
+    "bba",
+    "bcom",
+    "design",
+    "hotel",
+    "bsc-bio",
+    "journalism",
+    "cs"
+   ]
+  },
+  {
+   "id": "nirma",
+   "name": "Nirma University",
+   "city": "Ahmedabad",
+   "gov": false,
+   "entrance": "Own admission (JEE Main / merit)",
+   "website": "https://nirmauni.ac.in/",
+   "courses": [
+    "btech",
+    "bba",
+    "law"
+   ]
+  },
+  {
+   "id": "iiser",
+   "name": "IISERs (Indian Institutes of Science Education and Research)",
+   "city": "Across India",
+   "gov": true,
+   "entrance": "IISER Aptitude Test (IAT)",
+   "website": "https://www.iiseradmission.in/",
+   "courses": [
+    "bsc-science",
+    "bsc-bio"
+   ]
+  },
+  {
+   "id": "niser",
+   "name": "NISER Bhubaneswar and UM-DAE CEBS Mumbai",
+   "city": "Bhubaneswar / Mumbai",
+   "gov": true,
+   "entrance": "NEST",
+   "website": "https://www.nestexam.in/",
+   "courses": [
+    "bsc-science",
+    "bsc-bio"
+   ]
+  },
+  {
+   "id": "nlus",
+   "name": "National Law Universities (NLUs)",
+   "city": "Across India",
+   "gov": true,
+   "entrance": "CLAT",
+   "website": "https://consortiumofnlus.ac.in/",
+   "courses": [
+    "law"
+   ]
+  },
+  {
+   "id": "nid",
+   "name": "NID (National Institute of Design)",
+   "city": "Ahmedabad and other campuses",
+   "gov": true,
+   "entrance": "NID DAT",
+   "website": "https://www.nid.edu/",
+   "courses": [
+    "design"
+   ]
+  },
+  {
+   "id": "nift",
+   "name": "NIFT (National Institute of Fashion Technology)",
+   "city": "Across India",
+   "gov": true,
+   "entrance": "NIFT entrance exam",
+   "website": "https://www.nift.ac.in/",
+   "courses": [
+    "design"
+   ]
+  },
+  {
+   "id": "srishti",
+   "name": "Srishti Manipal Institute of Art, Design and Technology",
+   "city": "Bengaluru",
+   "gov": false,
+   "entrance": "Own admission process",
+   "website": "https://srishtimanipalinstitute.in/",
+   "courses": [
+    "design"
+   ]
+  },
+  {
+   "id": "mitid",
+   "name": "MIT Institute of Design",
+   "city": "Pune",
+   "gov": false,
+   "entrance": "Own design entrance",
+   "website": "https://www.mitid.edu.in/",
+   "courses": [
+    "design"
+   ]
+  },
+  {
+   "id": "ihm",
+   "name": "IHMs (Institutes of Hotel Management)",
+   "city": "Across India",
+   "gov": true,
+   "entrance": "NCHM JEE",
+   "website": "https://nchm.gov.in/",
+   "courses": [
+    "hotel"
+   ]
+  },
+  {
+   "id": "pau",
+   "name": "Punjab Agricultural University",
+   "city": "Ludhiana",
+   "gov": true,
+   "entrance": "PAU entrance / merit",
+   "website": "https://www.pau.edu/",
+   "courses": [
+    "agriculture",
+    "food"
+   ]
+  },
+  {
+   "id": "tnau",
+   "name": "Tamil Nadu Agricultural University",
+   "city": "Coimbatore",
+   "gov": true,
+   "entrance": "Merit (TNAU admissions)",
+   "website": "https://tnau.ac.in/",
+   "courses": [
+    "agriculture",
+    "food"
+   ]
+  },
+  {
+   "id": "presidency",
+   "name": "Presidency University",
+   "city": "Kolkata",
+   "gov": true,
+   "entrance": "Own entrance test",
+   "website": "https://www.presiuniv.ac.in/",
+   "courses": [
+    "economics",
+    "english",
+    "humanities",
+    "bsc-science",
+    "bsc-bio",
+    "languages"
+   ]
+  },
+  {
+   "id": "xaviers-kolkata",
+   "name": "St. Xavier's College",
+   "city": "Kolkata",
+   "gov": false,
+   "entrance": "Own admission (merit / test)",
+   "website": "https://www.sxccal.edu/",
+   "courses": [
+    "bcom",
+    "economics",
+    "english",
+    "humanities",
+    "bsc-science",
+    "bsc-bio",
+    "bba",
+    "journalism",
+    "cs"
+   ]
+  },
+  {
+   "id": "loyola-chennai",
+   "name": "Loyola College",
+   "city": "Chennai",
+   "gov": false,
+   "entrance": "Merit (own admission)",
+   "website": "https://www.loyolacollege.edu/",
+   "courses": [
+    "bcom",
+    "economics",
+    "english",
+    "humanities",
+    "bsc-science",
+    "bsc-bio",
+    "cs",
+    "journalism"
+   ]
+  },
+  {
+   "id": "mcc-chennai",
+   "name": "Madras Christian College",
+   "city": "Chennai",
+   "gov": false,
+   "entrance": "Merit (own admission)",
+   "website": "https://mcc.edu.in/",
+   "courses": [
+    "bcom",
+    "economics",
+    "english",
+    "humanities",
+    "bsc-science",
+    "bsc-bio",
+    "psychology",
+    "cs"
+   ]
+  },
+  {
+   "id": "fergusson",
+   "name": "Fergusson College",
+   "city": "Pune",
+   "gov": false,
+   "entrance": "Merit (own admission)",
+   "website": "https://www.fergusson.edu/",
+   "courses": [
+    "humanities",
+    "economics",
+    "english",
+    "psychology",
+    "bsc-science",
+    "bsc-bio"
+   ]
+  },
+  {
+   "id": "nm-college",
+   "name": "Narsee Monjee College of Commerce and Economics",
+   "city": "Mumbai",
+   "gov": false,
+   "entrance": "Merit (University of Mumbai)",
+   "website": "https://nmcollege.in/",
+   "courses": [
+    "bcom",
+    "bba",
+    "economics"
+   ]
+  },
+  {
+   "id": "jain",
+   "name": "JAIN (Deemed-to-be University)",
+   "city": "Bengaluru",
+   "gov": false,
+   "entrance": "JET / own admission",
+   "website": "https://www.jainuniversity.ac.in/",
+   "courses": [
+    "bcom",
+    "bba",
+    "cs",
+    "btech",
+    "psychology",
+    "journalism",
+    "design",
+    "law"
+   ]
+  },
+  {
+   "id": "sju",
+   "name": "St. Joseph's University",
+   "city": "Bengaluru",
+   "gov": false,
+   "entrance": "Own admission",
+   "website": "https://www.sju.edu.in/",
+   "courses": [
+    "bcom",
+    "bba",
+    "economics",
+    "english",
+    "journalism",
+    "bsc-science",
+    "cs"
+   ]
+  },
+  {
+   "id": "kristu-jayanti",
+   "name": "Kristu Jayanti College",
+   "city": "Bengaluru",
+   "gov": false,
+   "entrance": "Own admission",
+   "website": "https://www.kristujayanti.edu.in/",
+   "courses": [
+    "bcom",
+    "bba",
+    "cs",
+    "psychology",
+    "journalism",
+    "english"
+   ]
+  },
+  {
+   "id": "woxsen",
+   "name": "Woxsen University",
+   "city": "Hyderabad",
+   "gov": false,
+   "entrance": "Own admission",
+   "website": "https://woxsen.edu.in/",
+   "courses": [
+    "bba",
+    "btech",
+    "design",
+    "law"
+   ]
+  }
+ ]
+}

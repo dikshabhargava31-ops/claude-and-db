@@ -1,0 +1,5901 @@
+{
+ "note": "Course -> colleges that offer it (all NTA CUET universities plus colleges with their own forms). Course groups per university from the Everything CUET team; private universities not listed individually default to B.Com, BBA, BCA/CS and B.Tech. Students are told to confirm on the official website. kind: uni (on NTA CUET list), form (own 2027 form on the site), other (own entrance or merit).",
+ "offers": {
+  "bcom": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-assam-university-silchar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-manipur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-maulana-azad-national-urdu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-nagaland-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-pondicherry-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-rajiv-gandhi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sammakka-sarakka-central-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sikkim-university-gangtok"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tripura-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-bhattadev-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-birangana-sati-sadhani-rajyik-vishwavidyalaya-golaghat-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dibrugarh-university-dibrugarh-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-shakuntala-misra-national-rehabilitation-university-lucknow"
+   },
+   {
+    "kind": "uni",
+    "id": "state-govt-degree-college-autonomous-baramulla"
+   },
+   {
+    "kind": "uni",
+    "id": "state-guru-gobind-singh-indraprastha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-islamia-college-of-science-and-commerce-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-jagadguru-rambhadracharya-divyang-state-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-jagannath-barooah-university-jorhat"
+   },
+   {
+    "kind": "uni",
+    "id": "state-madhabdev-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-chhatrasal-bundelkhand-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-surajmal-brij-university-bharatpur"
+   },
+   {
+    "kind": "uni",
+    "id": "state-nagaon-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-north-lakhimpur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "state-sibsagar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-ladakh"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-avinashilingam-institute-for-home-science-and-higher-education-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-graphic-era-university-dehradun-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gujarat-vidyapith-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gurukula-kangri-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-lingya-s-vidyapeeth-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-maharishi-markandeshwar-deemed-to-be-university-mullana-ambala"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-malla-reddy-vishwavidyapeeth"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-manav-rachna-international-institute-of-research-and-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-nehru-gram-bharati-deemed-to-be-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-srm-institute-of-science-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-the-gandhigram-rural-institute-dtbu"
+   },
+   {
+    "kind": "uni",
+    "id": "private-abhyuday-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ajeenkya-dy-patil-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-aks-university-satna-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "private-alliance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-greater-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-universitypatna"
+   },
+   {
+    "kind": "uni",
+    "id": "private-apex-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-arka-jain-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-arunachal-university-of-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "private-asbm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-assam-down-town-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-avantika-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-babu-banarasi-das-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bhagwant-global-university-kotdwar-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bhagwant-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-birla-global-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-brainware-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-carrer-college-bhopal"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cgc-university-mohali"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chanakya-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chhatrapati-shivaji-maharaj-university-panvel"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cmr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ct-university-ludhiana"
+   },
+   {
+    "kind": "uni",
+    "id": "private-dbs-global-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-dit-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "private-future-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-g-d-goenka-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-geeta-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-gla-university-mathura"
+   },
+   {
+    "kind": "uni",
+    "id": "private-gopal-narayan-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-graphic-era-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-haridwar-university-roorkee"
+   },
+   {
+    "kind": "uni",
+    "id": "private-himalayan-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-hrit-university-ghaziabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iftm-university-moradabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iimt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-invertis-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-itm-university-raipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jagan-nath-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jaganath-university-delhi-ncr"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jaipur-national-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jecrc-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jis-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-k-r-mangalam-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-kalinga-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-madhav-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mahatma-jyoti-rao-phoole-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manav-rachna-university-faridabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mangalayatan-university-aligarh"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mangalayatan-university-jabalpur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mats-university-raipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mewar-university-chittorgarh-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mnr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mody-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-noida-international-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-om-sterling-global-university-hisar-haryana"
+   },
+   {
+    "kind": "uni",
+    "id": "private-poornima-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rabindranath-tagore-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rama-university-uttar-pradesh-kanpur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ramaiah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-renaissance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-reva-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rnb-global-university-bikaner-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sage-university-indore"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sanskriti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sant-baba-bhag-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sardar-bhagwan-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-saroj-international-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-school-of-management-sciences-sms"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-agra"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-global-technical-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-manipal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-singhania-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sir-padampat-singhania-university-udaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sister-nivedita-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-ap"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-delhi-ncr-sonepat"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sunbeam-college-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "private-suresh-gyan-vihar-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sushant-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-rama-himalayan-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-vivekanand-subharti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-techno-india-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-the-neotia-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-united-university-prayagraj"
+   },
+   {
+    "kind": "uni",
+    "id": "private-university-of-engineering-management-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "private-usha-martin-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vidya-university-meerut"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vishwa-vishwani-institute-of-systems-and-management-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vivekananda-global-university-jaipur-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-govt-college-for-women-parade-ground-jammu"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "snu"
+   },
+   {
+    "kind": "form",
+    "id": "npat"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-vishakhapatnam"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-blr"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-hyd"
+   },
+   {
+    "kind": "other",
+    "id": "manipal"
+   },
+   {
+    "kind": "other",
+    "id": "xaviers-kolkata"
+   },
+   {
+    "kind": "other",
+    "id": "loyola-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "mcc-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "nm-college"
+   },
+   {
+    "kind": "other",
+    "id": "jain"
+   },
+   {
+    "kind": "other",
+    "id": "sju"
+   },
+   {
+    "kind": "other",
+    "id": "kristu-jayanti"
+   }
+  ],
+  "economics": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-assam-university-silchar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-manipur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-nagaland-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-pondicherry-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-rajiv-gandhi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sikkim-university-gangtok"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tripura-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-delhi-technological-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dibrugarh-university-dibrugarh-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-b-r-ambedkar-university-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-b-r-ambedkar-school-of-economics-university-bengaluru"
+   },
+   {
+    "kind": "uni",
+    "id": "state-guru-gobind-singh-indraprastha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-chhatrasal-bundelkhand-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-surajmal-brij-university-bharatpur"
+   },
+   {
+    "kind": "uni",
+    "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gokhale-institute-of-politics-and-economics"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gurukula-kangri-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-alliance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-azim-prem-ji-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bml-munjal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chanakya-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "form",
+    "id": "iim-bangalore-ug"
+   },
+   {
+    "kind": "form",
+    "id": "ashoka"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "flame"
+   },
+   {
+    "kind": "form",
+    "id": "krea"
+   },
+   {
+    "kind": "form",
+    "id": "jgu"
+   },
+   {
+    "kind": "form",
+    "id": "snu"
+   },
+   {
+    "kind": "form",
+    "id": "ahduni"
+   },
+   {
+    "kind": "form",
+    "id": "npat"
+   },
+   {
+    "kind": "form",
+    "id": "sai"
+   },
+   {
+    "kind": "form",
+    "id": "xaviers-mumbai"
+   },
+   {
+    "kind": "other",
+    "id": "presidency"
+   },
+   {
+    "kind": "other",
+    "id": "xaviers-kolkata"
+   },
+   {
+    "kind": "other",
+    "id": "loyola-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "mcc-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "fergusson"
+   },
+   {
+    "kind": "other",
+    "id": "nm-college"
+   },
+   {
+    "kind": "other",
+    "id": "sju"
+   }
+  ],
+  "english": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-assam-university-silchar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-karnataka"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-tamil-nadu"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-manipur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-maulana-azad-national-urdu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-nagaland-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-pondicherry-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-rajiv-gandhi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sikkim-university-gangtok"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tezpur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-the-english-and-foreign-languages-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tripura-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dibrugarh-university-dibrugarh-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-b-r-ambedkar-university-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-gautam-buddha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-guru-gobind-singh-indraprastha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-chhatrasal-bundelkhand-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-surajmal-brij-university-bharatpur"
+   },
+   {
+    "kind": "uni",
+    "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-avinashilingam-institute-for-home-science-and-higher-education-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gurukula-kangri-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-alliance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-greater-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-universitypatna"
+   },
+   {
+    "kind": "uni",
+    "id": "private-azim-prem-ji-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cmr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-g-d-goenka-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-graphic-era-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-k-r-mangalam-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-karnavati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ramaiah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-reva-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-agra"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-manipal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-ap"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-delhi-ncr-sonepat"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-vivekanand-subharti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-govt-college-for-women-parade-ground-jammu"
+   },
+   {
+    "kind": "form",
+    "id": "ashoka"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "krea"
+   },
+   {
+    "kind": "form",
+    "id": "snu"
+   },
+   {
+    "kind": "form",
+    "id": "sai"
+   },
+   {
+    "kind": "form",
+    "id": "xaviers-mumbai"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-vishakhapatnam"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-blr"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-hyd"
+   },
+   {
+    "kind": "other",
+    "id": "presidency"
+   },
+   {
+    "kind": "other",
+    "id": "xaviers-kolkata"
+   },
+   {
+    "kind": "other",
+    "id": "loyola-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "mcc-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "fergusson"
+   },
+   {
+    "kind": "other",
+    "id": "sju"
+   },
+   {
+    "kind": "other",
+    "id": "kristu-jayanti"
+   }
+  ],
+  "psychology": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-b-r-ambedkar-university-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "state-guru-gobind-singh-indraprastha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-manav-rachna-international-institute-of-research-and-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "private-alliance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-greater-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-universitypatna"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cmr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-g-d-goenka-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-graphic-era-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-k-r-mangalam-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-karnavati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ramaiah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-reva-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rishihood-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-agra"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-manipal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-ap"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-delhi-ncr-sonepat"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-vivekanand-subharti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "form",
+    "id": "ashoka"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "flame"
+   },
+   {
+    "kind": "form",
+    "id": "krea"
+   },
+   {
+    "kind": "form",
+    "id": "jgu"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-vishakhapatnam"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-blr"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-hyd"
+   },
+   {
+    "kind": "other",
+    "id": "mcc-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "fergusson"
+   },
+   {
+    "kind": "other",
+    "id": "jain"
+   },
+   {
+    "kind": "other",
+    "id": "kristu-jayanti"
+   }
+  ],
+  "humanities": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-assam-university-silchar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-tribal-university-of-andhra-pradesh"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-andhra-pradesh"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-gujarat"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-haryana"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-himachal-pradesh"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-karnataka"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-kerala"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-odisha"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-south-bihar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-tamil-nadu"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-antarrashtriya-hindi-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-manipur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-maulana-azad-national-urdu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-nagaland-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-pondicherry-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-rajiv-gandhi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sammakka-sarakka-central-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sikkim-university-gangtok"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tezpur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tripura-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-bhattadev-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-birangana-sati-sadhani-rajyik-vishwavidyalaya-golaghat-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dibrugarh-university-dibrugarh-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-b-r-ambedkar-university-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-shakuntala-misra-national-rehabilitation-university-lucknow"
+   },
+   {
+    "kind": "uni",
+    "id": "state-govt-degree-college-autonomous-baramulla"
+   },
+   {
+    "kind": "uni",
+    "id": "state-islamia-college-of-science-and-commerce-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-jagadguru-rambhadracharya-divyang-state-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-jagannath-barooah-university-jorhat"
+   },
+   {
+    "kind": "uni",
+    "id": "state-madhabdev-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-chhatrasal-bundelkhand-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-surajmal-brij-university-bharatpur"
+   },
+   {
+    "kind": "uni",
+    "id": "state-nagaon-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-north-lakhimpur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "state-sibsagar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-ladakh"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-avinashilingam-institute-for-home-science-and-higher-education-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-chinmaya-vishwavidyapeeth"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gujarat-vidyapith-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gurukula-kangri-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-nehru-gram-bharati-deemed-to-be-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-tata-institute-of-social-sciences-tiss"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-the-gandhigram-rural-institute-dtbu"
+   },
+   {
+    "kind": "uni",
+    "id": "private-azim-prem-ji-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chanakya-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sunbeam-college-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-govt-college-for-women-parade-ground-jammu"
+   },
+   {
+    "kind": "form",
+    "id": "ashoka"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "krea"
+   },
+   {
+    "kind": "form",
+    "id": "xaviers-mumbai"
+   },
+   {
+    "kind": "other",
+    "id": "presidency"
+   },
+   {
+    "kind": "other",
+    "id": "xaviers-kolkata"
+   },
+   {
+    "kind": "other",
+    "id": "loyola-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "mcc-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "fergusson"
+   }
+  ],
+  "bba": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-rajiv-gandhi-national-aviation-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sikkim-university-gangtok"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-delhi-technological-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-shakuntala-misra-national-rehabilitation-university-lucknow"
+   },
+   {
+    "kind": "uni",
+    "id": "state-gautam-buddha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-guru-gobind-singh-indraprastha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-islamic-university-of-science-and-technology-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "state-ratan-tata-mahrashtra-state-skills-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "state-shri-mata-vaishno-devi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-graphic-era-university-dehradun-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-icfai-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-jamia-hamdard"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-lingya-s-vidyapeeth-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-maharishi-markandeshwar-deemed-to-be-university-mullana-ambala"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-malla-reddy-vishwavidyapeeth"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-manav-rachna-international-institute-of-research-and-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-shobhit-institute-of-engineering-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-srm-institute-of-science-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-vinayaka-mission-s-research-foundation"
+   },
+   {
+    "kind": "uni",
+    "id": "private-abhyuday-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ajeenkya-dy-patil-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-aks-university-satna-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "private-alliance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-greater-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-universitypatna"
+   },
+   {
+    "kind": "uni",
+    "id": "private-apex-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-arka-jain-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-arunachal-university-of-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "private-asbm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-assam-down-town-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-avantika-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-babu-banarasi-das-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bhagwant-global-university-kotdwar-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bhagwant-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-birla-global-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bml-munjal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-brainware-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-carrer-college-bhopal"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cgc-university-mohali"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chanakya-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chhatrapati-shivaji-maharaj-university-panvel"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cmr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ct-university-ludhiana"
+   },
+   {
+    "kind": "uni",
+    "id": "private-dbs-global-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-dit-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "private-future-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-g-d-goenka-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-geeta-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-gla-university-mathura"
+   },
+   {
+    "kind": "uni",
+    "id": "private-gopal-narayan-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-graphic-era-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-haridwar-university-roorkee"
+   },
+   {
+    "kind": "uni",
+    "id": "private-himalayan-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-hrit-university-ghaziabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iftm-university-moradabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iimt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-invertis-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-itm-skills-university-navi-mumbai"
+   },
+   {
+    "kind": "uni",
+    "id": "private-itm-university-raipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-itm-vocational-university-vadodara"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jagan-nath-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jaganath-university-delhi-ncr"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jaipur-national-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jecrc-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jis-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-k-r-mangalam-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-kalinga-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-karnavati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-madhav-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mahatma-jyoti-rao-phoole-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mahindra-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manav-rachna-university-faridabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mangalayatan-university-aligarh"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mangalayatan-university-jabalpur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mats-university-raipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mewar-university-chittorgarh-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mnr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mody-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-niit-university-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-noida-international-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-om-sterling-global-university-hisar-haryana"
+   },
+   {
+    "kind": "uni",
+    "id": "private-poornima-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rabindranath-tagore-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rakshpal-bahadur-management-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rama-university-uttar-pradesh-kanpur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ramaiah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-renaissance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-reva-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rishihood-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rnb-global-university-bikaner-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sage-university-indore"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sanskriti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sant-baba-bhag-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sardar-bhagwan-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-saroj-international-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-school-of-management-sciences-sms"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-agra"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-global-technical-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-manipal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-singhania-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sir-padampat-singhania-university-udaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sister-nivedita-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-ap"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-delhi-ncr-sonepat"
+   },
+   {
+    "kind": "uni",
+    "id": "private-suresh-gyan-vihar-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sushant-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-rama-himalayan-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-vivekanand-subharti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-techno-india-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-the-neotia-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-united-university-prayagraj"
+   },
+   {
+    "kind": "uni",
+    "id": "private-university-of-engineering-management-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "private-usha-martin-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vidya-university-meerut"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vishwa-vishwani-institute-of-systems-and-management-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vivekananda-global-university-jaipur-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-indian-institute-of-tourism-travel-management-university"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "flame"
+   },
+   {
+    "kind": "form",
+    "id": "jgu"
+   },
+   {
+    "kind": "form",
+    "id": "snu"
+   },
+   {
+    "kind": "form",
+    "id": "ahduni"
+   },
+   {
+    "kind": "form",
+    "id": "masters-union"
+   },
+   {
+    "kind": "form",
+    "id": "atlas"
+   },
+   {
+    "kind": "form",
+    "id": "ipmat-indore"
+   },
+   {
+    "kind": "form",
+    "id": "ipmat-rohtak"
+   },
+   {
+    "kind": "form",
+    "id": "jipmat"
+   },
+   {
+    "kind": "form",
+    "id": "set"
+   },
+   {
+    "kind": "form",
+    "id": "npat"
+   },
+   {
+    "kind": "form",
+    "id": "vijaybhoomi"
+   },
+   {
+    "kind": "form",
+    "id": "xaviers-mumbai"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-vishakhapatnam"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-blr"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-hyd"
+   },
+   {
+    "kind": "other",
+    "id": "manipal"
+   },
+   {
+    "kind": "other",
+    "id": "nirma"
+   },
+   {
+    "kind": "other",
+    "id": "xaviers-kolkata"
+   },
+   {
+    "kind": "other",
+    "id": "nm-college"
+   },
+   {
+    "kind": "other",
+    "id": "jain"
+   },
+   {
+    "kind": "other",
+    "id": "sju"
+   },
+   {
+    "kind": "other",
+    "id": "kristu-jayanti"
+   },
+   {
+    "kind": "other",
+    "id": "woxsen"
+   }
+  ],
+  "bsc-science": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-assam-university-silchar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-tribal-university-of-andhra-pradesh"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-andhra-pradesh"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-haryana"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-himachal-pradesh"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-karnataka"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-kerala"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-odisha"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-south-bihar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-tamil-nadu"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-iit-dharwad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-manipur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-maulana-azad-national-urdu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-nagaland-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-pondicherry-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-rajiv-gandhi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sikkim-university-gangtok"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tezpur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tripura-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-bhattadev-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-birangana-sati-sadhani-rajyik-vishwavidyalaya-golaghat-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dibrugarh-university-dibrugarh-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-govt-degree-college-autonomous-baramulla"
+   },
+   {
+    "kind": "uni",
+    "id": "state-islamia-college-of-science-and-commerce-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-islamic-university-of-science-and-technology-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "state-jagannath-barooah-university-jorhat"
+   },
+   {
+    "kind": "uni",
+    "id": "state-madhabdev-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-chhatrasal-bundelkhand-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-surajmal-brij-university-bharatpur"
+   },
+   {
+    "kind": "uni",
+    "id": "state-nagaon-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-north-lakhimpur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "state-sibsagar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-ladakh"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-avinashilingam-institute-for-home-science-and-higher-education-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gujarat-vidyapith-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gurukula-kangri-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-nehru-gram-bharati-deemed-to-be-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-the-gandhigram-rural-institute-dtbu"
+   },
+   {
+    "kind": "uni",
+    "id": "private-azim-prem-ji-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sunbeam-college-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-govt-college-for-women-parade-ground-jammu"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "snu"
+   },
+   {
+    "kind": "form",
+    "id": "xaviers-mumbai"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-vishakhapatnam"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-blr"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-hyd"
+   },
+   {
+    "kind": "other",
+    "id": "bits"
+   },
+   {
+    "kind": "other",
+    "id": "iiser"
+   },
+   {
+    "kind": "other",
+    "id": "niser"
+   },
+   {
+    "kind": "other",
+    "id": "presidency"
+   },
+   {
+    "kind": "other",
+    "id": "xaviers-kolkata"
+   },
+   {
+    "kind": "other",
+    "id": "loyola-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "mcc-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "fergusson"
+   },
+   {
+    "kind": "other",
+    "id": "sju"
+   }
+  ],
+  "bsc-bio": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-assam-university-silchar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-andhra-pradesh"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-tamil-nadu"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-manipur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-maulana-azad-national-urdu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-nagaland-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-pondicherry-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-rajiv-gandhi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sikkim-university-gangtok"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tezpur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tripura-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dibrugarh-university-dibrugarh-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-gautam-buddha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-chhatrasal-bundelkhand-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-surajmal-brij-university-bharatpur"
+   },
+   {
+    "kind": "uni",
+    "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-avinashilingam-institute-for-home-science-and-higher-education-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-graphic-era-university-dehradun-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gurukula-kangri-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-jamia-hamdard"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-maharishi-markandeshwar-deemed-to-be-university-mullana-ambala"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-srm-institute-of-science-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-the-gandhigram-rural-institute-dtbu"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-vinayaka-mission-s-research-foundation"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-azim-prem-ji-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ramaiah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-manipal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-vivekanand-subharti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-govt-college-for-women-parade-ground-jammu"
+   },
+   {
+    "kind": "form",
+    "id": "snu"
+   },
+   {
+    "kind": "form",
+    "id": "xaviers-mumbai"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-vishakhapatnam"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-blr"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-hyd"
+   },
+   {
+    "kind": "other",
+    "id": "manipal"
+   },
+   {
+    "kind": "other",
+    "id": "iiser"
+   },
+   {
+    "kind": "other",
+    "id": "niser"
+   },
+   {
+    "kind": "other",
+    "id": "presidency"
+   },
+   {
+    "kind": "other",
+    "id": "xaviers-kolkata"
+   },
+   {
+    "kind": "other",
+    "id": "loyola-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "mcc-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "fergusson"
+   }
+  ],
+  "cs": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-assam-university-silchar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-manipur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-nagaland-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-pondicherry-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-rajiv-gandhi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sikkim-university-gangtok"
+   },
+   {
+    "kind": "uni",
+    "id": "central-south-asian-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tezpur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tripura-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dibrugarh-university-dibrugarh-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-shakuntala-misra-national-rehabilitation-university-lucknow"
+   },
+   {
+    "kind": "uni",
+    "id": "state-gautam-buddha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-guru-gobind-singh-indraprastha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-jagadguru-rambhadracharya-divyang-state-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-chhatrasal-bundelkhand-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-surajmal-brij-university-bharatpur"
+   },
+   {
+    "kind": "uni",
+    "id": "state-ratan-tata-mahrashtra-state-skills-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-avinashilingam-institute-for-home-science-and-higher-education-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-graphic-era-university-dehradun-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gurukula-kangri-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-jamia-hamdard"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-lingya-s-vidyapeeth-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-maharishi-markandeshwar-deemed-to-be-university-mullana-ambala"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-malla-reddy-vishwavidyapeeth"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-manav-rachna-international-institute-of-research-and-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-shobhit-institute-of-engineering-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-srm-institute-of-science-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-vinayaka-mission-s-research-foundation"
+   },
+   {
+    "kind": "uni",
+    "id": "private-abhyuday-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ajeenkya-dy-patil-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-aks-university-satna-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "private-alliance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-greater-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-universitypatna"
+   },
+   {
+    "kind": "uni",
+    "id": "private-apex-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-arka-jain-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-arunachal-university-of-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "private-asbm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-assam-down-town-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-avantika-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-babu-banarasi-das-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bhagwant-global-university-kotdwar-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bhagwant-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-birla-global-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-brainware-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-carrer-college-bhopal"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cgc-university-mohali"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chhatrapati-shivaji-maharaj-university-panvel"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cmr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ct-university-ludhiana"
+   },
+   {
+    "kind": "uni",
+    "id": "private-dbs-global-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-dit-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "private-future-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-g-d-goenka-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-geeta-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-gla-university-mathura"
+   },
+   {
+    "kind": "uni",
+    "id": "private-gopal-narayan-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-graphic-era-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-haridwar-university-roorkee"
+   },
+   {
+    "kind": "uni",
+    "id": "private-himalayan-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-hrit-university-ghaziabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iftm-university-moradabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iimt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-invertis-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-itm-university-raipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-itm-vocational-university-vadodara"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jagan-nath-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jaganath-university-delhi-ncr"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jaipur-national-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jecrc-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jis-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-k-r-mangalam-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-kalinga-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-madhav-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mahatma-jyoti-rao-phoole-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manav-rachna-university-faridabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mangalayatan-university-aligarh"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mangalayatan-university-jabalpur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mats-university-raipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mewar-university-chittorgarh-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mnr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mody-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-noida-international-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-om-sterling-global-university-hisar-haryana"
+   },
+   {
+    "kind": "uni",
+    "id": "private-poornima-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rabindranath-tagore-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rama-university-uttar-pradesh-kanpur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ramaiah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-renaissance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-reva-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rnb-global-university-bikaner-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sage-university-indore"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sanskriti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sant-baba-bhag-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sardar-bhagwan-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-saroj-international-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-school-of-management-sciences-sms"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-agra"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-global-technical-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-manipal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-singhania-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sir-padampat-singhania-university-udaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sister-nivedita-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-ap"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-delhi-ncr-sonepat"
+   },
+   {
+    "kind": "uni",
+    "id": "private-suresh-gyan-vihar-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sushant-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-rama-himalayan-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-vivekanand-subharti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-techno-india-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-the-neotia-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-united-university-prayagraj"
+   },
+   {
+    "kind": "uni",
+    "id": "private-university-of-engineering-management-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "private-usha-martin-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vidya-university-meerut"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vishwa-vishwani-institute-of-systems-and-management-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vivekananda-global-university-jaipur-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-national-forensic-sciences-university-nfsu"
+   },
+   {
+    "kind": "form",
+    "id": "iim-bangalore-ug"
+   },
+   {
+    "kind": "form",
+    "id": "ashoka"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "plaksha"
+   },
+   {
+    "kind": "form",
+    "id": "snu"
+   },
+   {
+    "kind": "form",
+    "id": "ahduni"
+   },
+   {
+    "kind": "form",
+    "id": "set"
+   },
+   {
+    "kind": "form",
+    "id": "sai"
+   },
+   {
+    "kind": "form",
+    "id": "xaviers-mumbai"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-vishakhapatnam"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-blr"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-hyd"
+   },
+   {
+    "kind": "other",
+    "id": "vit"
+   },
+   {
+    "kind": "other",
+    "id": "manipal"
+   },
+   {
+    "kind": "other",
+    "id": "xaviers-kolkata"
+   },
+   {
+    "kind": "other",
+    "id": "loyola-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "mcc-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "jain"
+   },
+   {
+    "kind": "other",
+    "id": "sju"
+   },
+   {
+    "kind": "other",
+    "id": "kristu-jayanti"
+   }
+  ],
+  "btech": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tezpur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-delhi-technological-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-a-p-j-abdul-kalam-technical-university-uttar-pradesh-lucknow"
+   },
+   {
+    "kind": "uni",
+    "id": "state-gautam-buddha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-guru-gobind-singh-indraprastha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-harcourt-butler-technical-university-kanpur-up"
+   },
+   {
+    "kind": "uni",
+    "id": "state-indira-gandhi-delhi-technical-university-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "state-islamic-university-of-science-and-technology-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "state-madan-mohan-malaviya-university-of-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "state-shri-mata-vaishno-devi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-graphic-era-university-dehradun-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-icfai-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-jaypee-institute-of-information-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-kiet-krishna-institute-of-engineering-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-lingya-s-vidyapeeth-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-maharishi-markandeshwar-deemed-to-be-university-mullana-ambala"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-malla-reddy-vishwavidyapeeth"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-manav-rachna-international-institute-of-research-and-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-shobhit-institute-of-engineering-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-srm-institute-of-science-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-vinayaka-mission-s-research-foundation"
+   },
+   {
+    "kind": "uni",
+    "id": "private-abhyuday-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ajeenkya-dy-patil-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-aks-university-satna-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "private-alliance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-greater-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-universitypatna"
+   },
+   {
+    "kind": "uni",
+    "id": "private-apex-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-arka-jain-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-arunachal-university-of-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "private-asbm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-assam-down-town-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-avantika-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-babu-banarasi-das-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bhagwant-global-university-kotdwar-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bhagwant-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-birla-global-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bml-munjal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-brainware-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cgc-university-mohali"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chhatrapati-shivaji-maharaj-university-panvel"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cmr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ct-university-ludhiana"
+   },
+   {
+    "kind": "uni",
+    "id": "private-dbs-global-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-dit-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "private-future-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-g-d-goenka-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-geeta-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-gla-university-mathura"
+   },
+   {
+    "kind": "uni",
+    "id": "private-gopal-narayan-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-graphic-era-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-haridwar-university-roorkee"
+   },
+   {
+    "kind": "uni",
+    "id": "private-himalayan-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-hrit-university-ghaziabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iftm-university-moradabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iimt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-invertis-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-itm-university-raipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jagan-nath-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jaganath-university-delhi-ncr"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jaipur-national-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jecrc-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jis-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-k-r-mangalam-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-kalinga-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-madhav-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mahatma-jyoti-rao-phoole-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mahindra-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manav-rachna-university-faridabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mangalayatan-university-aligarh"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mangalayatan-university-jabalpur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mats-university-raipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mewar-university-chittorgarh-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mnr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mody-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-niit-university-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-noida-international-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-om-sterling-global-university-hisar-haryana"
+   },
+   {
+    "kind": "uni",
+    "id": "private-poornima-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rabindranath-tagore-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rama-university-uttar-pradesh-kanpur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ramaiah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-renaissance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-reva-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rnb-global-university-bikaner-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sage-university-indore"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sanskriti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sant-baba-bhag-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sardar-bhagwan-singh-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-saroj-international-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-agra"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-global-technical-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-manipal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-singhania-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sir-padampat-singhania-university-udaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sister-nivedita-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-ap"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-delhi-ncr-sonepat"
+   },
+   {
+    "kind": "uni",
+    "id": "private-suresh-gyan-vihar-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sushant-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-rama-himalayan-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-vivekanand-subharti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-techno-india-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-the-neotia-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-united-university-prayagraj"
+   },
+   {
+    "kind": "uni",
+    "id": "private-university-of-engineering-management-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "private-usha-martin-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vidya-university-meerut"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vishwa-vishwani-institute-of-systems-and-management-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-vivekananda-global-university-jaipur-rajasthan"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-rajiv-gandhi-institute-of-petroleum-technology"
+   },
+   {
+    "kind": "form",
+    "id": "plaksha"
+   },
+   {
+    "kind": "form",
+    "id": "snu"
+   },
+   {
+    "kind": "form",
+    "id": "ahduni"
+   },
+   {
+    "kind": "form",
+    "id": "atlas"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-vishakhapatnam"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-blr"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-hyd"
+   },
+   {
+    "kind": "other",
+    "id": "iits"
+   },
+   {
+    "kind": "other",
+    "id": "nits"
+   },
+   {
+    "kind": "other",
+    "id": "bits"
+   },
+   {
+    "kind": "other",
+    "id": "vit"
+   },
+   {
+    "kind": "other",
+    "id": "manipal"
+   },
+   {
+    "kind": "other",
+    "id": "nirma"
+   },
+   {
+    "kind": "other",
+    "id": "jain"
+   },
+   {
+    "kind": "other",
+    "id": "woxsen"
+   }
+  ],
+  "law": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-gautam-buddha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-guru-gobind-singh-indraprastha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-icfai-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-lingya-s-vidyapeeth-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-maharishi-markandeshwar-deemed-to-be-university-mullana-ambala"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-manav-rachna-international-institute-of-research-and-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-shobhit-institute-of-engineering-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-srm-institute-of-science-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "private-alliance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-greater-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-universitypatna"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bml-munjal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chanakya-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cmr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-g-d-goenka-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-graphic-era-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-k-r-mangalam-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-karnavati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mahindra-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ramaiah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-reva-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-agra"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-manipal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-ap"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-delhi-ncr-sonepat"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sushant-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-vivekanand-subharti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "jgu"
+   },
+   {
+    "kind": "form",
+    "id": "atlas"
+   },
+   {
+    "kind": "form",
+    "id": "slat"
+   },
+   {
+    "kind": "form",
+    "id": "sai"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-vishakhapatnam"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-blr"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gitam-hyd"
+   },
+   {
+    "kind": "other",
+    "id": "nirma"
+   },
+   {
+    "kind": "other",
+    "id": "nlus"
+   },
+   {
+    "kind": "other",
+    "id": "jain"
+   },
+   {
+    "kind": "other",
+    "id": "woxsen"
+   }
+  ],
+  "journalism": [
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-antarrashtriya-hindi-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-manipur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-maulana-azad-national-urdu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tripura-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dibrugarh-university-dibrugarh-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-guru-gobind-singh-indraprastha-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-makhanlal-chaturvedi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-graphic-era-university-dehradun-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-lingya-s-vidyapeeth-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-maharishi-markandeshwar-deemed-to-be-university-mullana-ambala"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-manav-rachna-international-institute-of-research-and-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-srm-institute-of-science-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "private-alliance-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-jharkhand"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-kolkata"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-punjab"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-greater-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-universitypatna"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-cmr-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-g-d-goenka-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-graphic-era-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jecrc-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-k-r-mangalam-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-karnavati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-mahindra-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-ramaiah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-reva-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-agra"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sikkim-manipal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-ap"
+   },
+   {
+    "kind": "uni",
+    "id": "private-srm-university-delhi-ncr-sonepat"
+   },
+   {
+    "kind": "uni",
+    "id": "private-swami-vivekanand-subharti-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "form",
+    "id": "flame"
+   },
+   {
+    "kind": "form",
+    "id": "set"
+   },
+   {
+    "kind": "form",
+    "id": "xaviers-mumbai"
+   },
+   {
+    "kind": "other",
+    "id": "manipal"
+   },
+   {
+    "kind": "other",
+    "id": "xaviers-kolkata"
+   },
+   {
+    "kind": "other",
+    "id": "loyola-chennai"
+   },
+   {
+    "kind": "other",
+    "id": "jain"
+   },
+   {
+    "kind": "other",
+    "id": "sju"
+   },
+   {
+    "kind": "other",
+    "id": "kristu-jayanti"
+   }
+  ],
+  "design": [
+   {
+    "kind": "uni",
+    "id": "state-delhi-technological-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-manav-rachna-international-institute-of-research-and-studies"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-bennet-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-jecrc-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-karnavati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "private-pearl-academy"
+   },
+   {
+    "kind": "uni",
+    "id": "private-poornima-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-r-v-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rishihood-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sushant-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-upes-dehradun"
+   },
+   {
+    "kind": "uni",
+    "id": "private-world-university-of-design"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-footwear-design-and-development-institute"
+   },
+   {
+    "kind": "form",
+    "id": "flame"
+   },
+   {
+    "kind": "form",
+    "id": "atlas"
+   },
+   {
+    "kind": "other",
+    "id": "manipal"
+   },
+   {
+    "kind": "other",
+    "id": "nid"
+   },
+   {
+    "kind": "other",
+    "id": "nift"
+   },
+   {
+    "kind": "other",
+    "id": "srishti"
+   },
+   {
+    "kind": "other",
+    "id": "mitid"
+   },
+   {
+    "kind": "other",
+    "id": "jain"
+   },
+   {
+    "kind": "other",
+    "id": "woxsen"
+   }
+  ],
+  "liberal-arts": [
+   {
+    "kind": "uni",
+    "id": "private-iilm-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-iilm-university-gurugram"
+   },
+   {
+    "kind": "uni",
+    "id": "private-rishihood-university"
+   },
+   {
+    "kind": "form",
+    "id": "ashoka"
+   },
+   {
+    "kind": "form",
+    "id": "ssla"
+   },
+   {
+    "kind": "form",
+    "id": "flame"
+   },
+   {
+    "kind": "form",
+    "id": "krea"
+   },
+   {
+    "kind": "form",
+    "id": "jgu"
+   },
+   {
+    "kind": "form",
+    "id": "ahduni"
+   },
+   {
+    "kind": "form",
+    "id": "set"
+   },
+   {
+    "kind": "form",
+    "id": "vijaybhoomi"
+   },
+   {
+    "kind": "form",
+    "id": "sai"
+   }
+  ],
+  "hotel": [
+   {
+    "kind": "uni",
+    "id": "deemed-graphic-era-university-dehradun-uttarakhand"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-maharishi-markandeshwar-deemed-to-be-university-mullana-ambala"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-srm-institute-of-science-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chitkara-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-graphic-era-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-manipal-university-jaipur"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-indian-institute-of-tourism-travel-management-university"
+   },
+   {
+    "kind": "form",
+    "id": "christ"
+   },
+   {
+    "kind": "other",
+    "id": "manipal"
+   },
+   {
+    "kind": "other",
+    "id": "ihm"
+   }
+  ],
+  "agriculture": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-nagaland-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharana-pratap-horticultural-university-karnal"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-shobhit-institute-of-engineering-and-technology"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-the-gandhigram-rural-institute-dtbu"
+   },
+   {
+    "kind": "uni",
+    "id": "private-chandigarh-university-mapping"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-sharda-university-noida"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "private-teerthanker-mahaveer-university"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-indian-council-of-agricultural-research-icar"
+   },
+   {
+    "kind": "other",
+    "id": "pau"
+   },
+   {
+    "kind": "other",
+    "id": "tnau"
+   }
+  ],
+  "languages": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-assam-university-silchar"
+   },
+   {
+    "kind": "uni",
+    "id": "central-babasaheb-bhimrao-ambedkar-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-sanskrit-university-new-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-central-university-of-gujarat"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-guru-ghasidas-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-indira-gandhi-national-tribal-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jamia-millia-islamia"
+   },
+   {
+    "kind": "uni",
+    "id": "central-jawaharlal-nehru-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-antarrashtriya-hindi-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mahatma-gandhi-central-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-manipur-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-maulana-azad-national-urdu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-mizoram-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-nagaland-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-national-sanskrit-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-north-eastern-hill-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-pondicherry-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-rajiv-gandhi-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-shri-lal-bahadur-shastri-national-sanskrit-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-sikkim-university-gangtok"
+   },
+   {
+    "kind": "uni",
+    "id": "central-the-english-and-foreign-languages-university-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-tripura-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-allahabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-hyderabad"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-baba-ghulam-shah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-barkatullah-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-cluster-university-of-srinagar"
+   },
+   {
+    "kind": "uni",
+    "id": "state-devi-ahilya-vishwavidyalaya-indore-m-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dibrugarh-university-dibrugarh-assam"
+   },
+   {
+    "kind": "uni",
+    "id": "state-dr-rammanohar-lohia-avadh-university-ayodhya-u-p"
+   },
+   {
+    "kind": "uni",
+    "id": "state-kumar-bhaskar-varma-sanskrit-and-ancient-studies-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-chhatrasal-bundelkhand-university"
+   },
+   {
+    "kind": "uni",
+    "id": "state-maharaja-surajmal-brij-university-bharatpur"
+   },
+   {
+    "kind": "uni",
+    "id": "state-samrat-vikrmaditya-vishwavidyalay-ujjain-mp"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-jammu"
+   },
+   {
+    "kind": "uni",
+    "id": "state-university-of-kashmir"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-chinmaya-vishwavidyapeeth"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-dayalbagh-educational-institute"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gujarat-vidyapith-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gurukula-kangri-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-iis-deemed-to-be-university-jaipur"
+   },
+   {
+    "kind": "other",
+    "id": "presidency"
+   }
+  ],
+  "physical-education": [
+   {
+    "kind": "uni",
+    "id": "central-aligarh-muslim-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-banaras-hindu-university"
+   },
+   {
+    "kind": "uni",
+    "id": "central-dr-harisingh-gour-vishwavidyalaya"
+   },
+   {
+    "kind": "uni",
+    "id": "central-hnb-garhwal-university-srinagar-garhwal"
+   },
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "central-visva-bharati-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-gurukula-kangri-university"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-lakshmibai-national-institute-of-physical-education"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   }
+  ],
+  "forensic": [
+   {
+    "kind": "uni",
+    "id": "state-sardar-patel-university-of-police-security-and-criminal-justice"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-galgotias-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shree-guru-gobind-singh-tricentenary-sgt-university"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-national-forensic-sciences-university-nfsu"
+   }
+  ],
+  "food": [
+   {
+    "kind": "uni",
+    "id": "central-university-of-delhi"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-avinashilingam-institute-for-home-science-and-higher-education-for-women"
+   },
+   {
+    "kind": "uni",
+    "id": "deemed-jamia-hamdard"
+   },
+   {
+    "kind": "uni",
+    "id": "private-amity-university-noida-campus"
+   },
+   {
+    "kind": "uni",
+    "id": "private-lovely-professional-university"
+   },
+   {
+    "kind": "uni",
+    "id": "private-shoolini-university-of-biotechnology-and-management-sciences"
+   },
+   {
+    "kind": "uni",
+    "id": "government-other-national-institute-of-food-technology-entrepreneurship-and-mana"
+   },
+   {
+    "kind": "other",
+    "id": "pau"
+   },
+   {
+    "kind": "other",
+    "id": "tnau"
+   }
+  ]
+ }
+}
