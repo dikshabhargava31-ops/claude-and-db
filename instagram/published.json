@@ -31,9 +31,9 @@
   },
   "failed": {
     "parthu-20261028-1600-zh3y": {
-      "attempts": 2,
+      "attempts": 3,
       "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
-      "last_try": "2026-10-28T10:42+00:00"
+      "last_try": "2026-10-28T10:53+00:00"
     }
   }
 }
