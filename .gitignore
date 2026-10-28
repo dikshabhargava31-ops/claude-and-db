@@ -2,3 +2,6 @@
 videos/*/renders/
 videos/*/raw/
 __pycache__/
+videos/*/assets/*.mp4
+videos/*/assets/*.m4a
+videos/*/.hyperframes/
