@@ -1,0 +1,1022 @@
+{
+ "note": "Course -> suggested colleges for the Dream List. Picked by the Everything CUET team by course and competition; a student's CUET score decides the final chance. tier: dream (very competitive), target (good chance), safe (easier to get).",
+ "courses": [
+  {
+   "key": "bcom",
+   "name": "B.Com",
+   "aliases": [
+    "bcom",
+    "b com",
+    "commerce",
+    "b.com hons",
+    "accounting",
+    "accounts",
+    "ca",
+    "chartered accountant"
+   ],
+   "what": "Accounts, tax, finance and business law.",
+   "fits": "Commerce students who like numbers and money.",
+   "careers": [
+    "Chartered Accountant",
+    "Banking & finance",
+    "Tax & audit"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "The most wanted B.Com seats in India"
+    },
+    {
+     "kind": "uni",
+     "id": "central-banaras-hindu-university",
+     "tier": "target",
+     "why": "Big central university, low fees"
+    },
+    {
+     "kind": "uni",
+     "id": "central-jamia-millia-islamia",
+     "tier": "target",
+     "why": "Central university in Delhi"
+    },
+    {
+     "kind": "uni",
+     "id": "state-guru-gobind-singh-indraprastha-university",
+     "tier": "target",
+     "why": "Delhi state university with many colleges"
+    },
+    {
+     "kind": "form",
+     "id": "christ",
+     "tier": "target",
+     "why": "Own entrance test; strong for commerce"
+    },
+    {
+     "kind": "uni",
+     "id": "private-sharda-university-noida",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "economics",
+   "name": "BA Economics",
+   "aliases": [
+    "economics",
+    "eco",
+    "ba economics",
+    "ba eco",
+    "econ"
+   ],
+   "what": "How money, markets and governments work.",
+   "fits": "Students good at maths who like the news and big questions.",
+   "careers": [
+    "Economist & analyst",
+    "Banking & consulting",
+    "Civil services"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "Top economics departments"
+    },
+    {
+     "kind": "form",
+     "id": "ashoka",
+     "tier": "dream",
+     "why": "Liberal-arts route; own admission"
+    },
+    {
+     "kind": "uni",
+     "id": "central-jamia-millia-islamia",
+     "tier": "target",
+     "why": "Central university in Delhi"
+    },
+    {
+     "kind": "uni",
+     "id": "state-dr-b-r-ambedkar-university-delhi",
+     "tier": "target",
+     "why": "Delhi university known for social sciences"
+    },
+    {
+     "kind": "uni",
+     "id": "state-delhi-technological-university",
+     "tier": "target",
+     "why": "BA Economics at a Delhi tech university"
+    },
+    {
+     "kind": "uni",
+     "id": "private-bennet-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "english",
+   "name": "BA English",
+   "aliases": [
+    "english",
+    "ba english",
+    "literature",
+    "english literature"
+   ],
+   "what": "Literature, writing and language.",
+   "fits": "Readers and writers.",
+   "careers": [
+    "Writing & publishing",
+    "Teaching",
+    "Media & content"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "Most sought-after English programmes"
+    },
+    {
+     "kind": "uni",
+     "id": "central-banaras-hindu-university",
+     "tier": "target",
+     "why": "Central university, low fees"
+    },
+    {
+     "kind": "uni",
+     "id": "central-the-english-and-foreign-languages-university-hyderabad",
+     "tier": "target",
+     "why": "A university just for languages"
+    },
+    {
+     "kind": "uni",
+     "id": "state-dr-b-r-ambedkar-university-delhi",
+     "tier": "target",
+     "why": "Delhi university known for humanities"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "psychology",
+   "name": "BA Psychology",
+   "aliases": [
+    "psychology",
+    "psych",
+    "ba psychology",
+    "counselling",
+    "psychologist"
+   ],
+   "what": "How people think, feel and behave.",
+   "fits": "Good listeners curious about people.",
+   "careers": [
+    "Counselling (after a Masters)",
+    "HR & people roles",
+    "Research"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "Few seats, very competitive"
+    },
+    {
+     "kind": "uni",
+     "id": "state-dr-b-r-ambedkar-university-delhi",
+     "tier": "target",
+     "why": "Delhi university known for psychology"
+    },
+    {
+     "kind": "form",
+     "id": "christ",
+     "tier": "target",
+     "why": "Popular psychology programme"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-sharda-university-noida",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "humanities",
+   "name": "BA Political Science / History / Sociology",
+   "aliases": [
+    "political science",
+    "pol science",
+    "polsci",
+    "history",
+    "sociology",
+    "ba",
+    "ba hons",
+    "ba programme",
+    "humanities",
+    "arts",
+    "upsc",
+    "ias",
+    "civil services"
+   ],
+   "what": "Society, politics and the past.",
+   "fits": "Humanities students; many civil-services aspirants start here.",
+   "careers": [
+    "Civil services",
+    "Law (after LLB)",
+    "Research, policy & journalism"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "First choice for humanities"
+    },
+    {
+     "kind": "uni",
+     "id": "central-banaras-hindu-university",
+     "tier": "target",
+     "why": "Central university, low fees"
+    },
+    {
+     "kind": "uni",
+     "id": "central-university-of-allahabad",
+     "tier": "target",
+     "why": "Old central university, low fees"
+    },
+    {
+     "kind": "uni",
+     "id": "central-jamia-millia-islamia",
+     "tier": "target",
+     "why": "Central university in Delhi"
+    },
+    {
+     "kind": "uni",
+     "id": "central-dr-harisingh-gour-vishwavidyalaya",
+     "tier": "safe",
+     "why": "Central university with many seats"
+    }
+   ]
+  },
+  {
+   "key": "bba",
+   "name": "BBA / BMS / Management",
+   "aliases": [
+    "bba",
+    "bms",
+    "management",
+    "business",
+    "mba",
+    "ipm",
+    "ipmat",
+    "business administration",
+    "marketing"
+   ],
+   "what": "Running a business: marketing, finance and people.",
+   "fits": "Students who like leading, selling or starting things.",
+   "careers": [
+    "Management jobs",
+    "MBA later",
+    "Your own business"
+   ],
+   "picks": [
+    {
+     "kind": "form",
+     "id": "ipmat-indore",
+     "tier": "dream",
+     "why": "5-year IIM programme (IPM)"
+    },
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "BMS at Delhi University colleges"
+    },
+    {
+     "kind": "form",
+     "id": "npat",
+     "tier": "target",
+     "why": "NMIMS BBA"
+    },
+    {
+     "kind": "uni",
+     "id": "state-delhi-technological-university",
+     "tier": "target",
+     "why": "BBA at a Delhi state university"
+    },
+    {
+     "kind": "uni",
+     "id": "state-guru-gobind-singh-indraprastha-university",
+     "tier": "target",
+     "why": "BBA across many Delhi colleges"
+    },
+    {
+     "kind": "uni",
+     "id": "private-bennet-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "bsc-science",
+   "name": "B.Sc Physics / Chemistry / Maths",
+   "aliases": [
+    "bsc",
+    "b.sc",
+    "physics",
+    "chemistry",
+    "maths",
+    "mathematics",
+    "pcm",
+    "science"
+   ],
+   "what": "Core science, with labs.",
+   "fits": "PCM students who enjoy solving problems.",
+   "careers": [
+    "Research (MSc, PhD)",
+    "Teaching",
+    "Data & analytics"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "Top science colleges"
+    },
+    {
+     "kind": "uni",
+     "id": "central-banaras-hindu-university",
+     "tier": "target",
+     "why": "Large science faculty, low fees"
+    },
+    {
+     "kind": "uni",
+     "id": "central-university-of-hyderabad",
+     "tier": "target",
+     "why": "5-year integrated MSc"
+    },
+    {
+     "kind": "uni",
+     "id": "central-university-of-allahabad",
+     "tier": "target",
+     "why": "Central university, low fees"
+    },
+    {
+     "kind": "uni",
+     "id": "central-dr-harisingh-gour-vishwavidyalaya",
+     "tier": "safe",
+     "why": "Central university with many seats"
+    }
+   ]
+  },
+  {
+   "key": "bsc-bio",
+   "name": "B.Sc Biology / Biotech",
+   "aliases": [
+    "biology",
+    "bio",
+    "biotech",
+    "biotechnology",
+    "zoology",
+    "botany",
+    "life sciences",
+    "pcb",
+    "microbiology"
+   ],
+   "what": "Living things: genes, cells, plants and animals.",
+   "fits": "PCB students, including those not taking NEET.",
+   "careers": [
+    "Biotech & pharma",
+    "Research",
+    "Healthcare roles"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "Top life-science colleges"
+    },
+    {
+     "kind": "uni",
+     "id": "central-banaras-hindu-university",
+     "tier": "target",
+     "why": "Large science faculty, low fees"
+    },
+    {
+     "kind": "uni",
+     "id": "central-jamia-millia-islamia",
+     "tier": "target",
+     "why": "Central university in Delhi"
+    },
+    {
+     "kind": "uni",
+     "id": "deemed-jamia-hamdard",
+     "tier": "safe",
+     "why": "Delhi university known for health sciences"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "cs",
+   "name": "Computer Science / BCA",
+   "aliases": [
+    "computer",
+    "computer science",
+    "cs",
+    "bca",
+    "it",
+    "coding",
+    "programming",
+    "software",
+    "data science",
+    "ai"
+   ],
+   "what": "Programming, software and data.",
+   "fits": "Students who like computers and logic.",
+   "careers": [
+    "Software developer",
+    "Data analyst",
+    "MCA / M.Tech later"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "B.Sc Computer Science at DU colleges"
+    },
+    {
+     "kind": "uni",
+     "id": "state-guru-gobind-singh-indraprastha-university",
+     "tier": "target",
+     "why": "BCA across many Delhi colleges"
+    },
+    {
+     "kind": "uni",
+     "id": "private-upes-dehradun",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-bennet-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-galgotias-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "btech",
+   "name": "B.Tech / Engineering",
+   "aliases": [
+    "btech",
+    "b.tech",
+    "engineering",
+    "engineer"
+   ],
+   "what": "Engineering. Most B.Tech seats use JEE Main; these also have other routes.",
+   "fits": "PCM students.",
+   "careers": [
+    "Engineer",
+    "Tech jobs",
+    "M.Tech / MBA later"
+   ],
+   "picks": [
+    {
+     "kind": "form",
+     "id": "plaksha",
+     "tier": "dream",
+     "why": "New tech university; own admission"
+    },
+    {
+     "kind": "form",
+     "id": "mahindra",
+     "tier": "target",
+     "why": "Engineering in Hyderabad"
+    },
+    {
+     "kind": "uni",
+     "id": "private-bennet-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-upes-dehradun",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "law",
+   "name": "Law (BA LLB / BBA LLB)",
+   "aliases": [
+    "law",
+    "llb",
+    "ba llb",
+    "bba llb",
+    "lawyer",
+    "legal",
+    "judge"
+   ],
+   "what": "5-year law degree. Top national law schools use CLAT; these use other routes.",
+   "fits": "Students who like debating and reading.",
+   "careers": [
+    "Lawyer",
+    "Corporate law",
+    "Judiciary"
+   ],
+   "picks": [
+    {
+     "kind": "form",
+     "id": "jgu",
+     "tier": "dream",
+     "why": "Well-known private law school"
+    },
+    {
+     "kind": "form",
+     "id": "slat",
+     "tier": "target",
+     "why": "Symbiosis law schools"
+    },
+    {
+     "kind": "uni",
+     "id": "private-upes-dehradun",
+     "tier": "safe",
+     "why": "Law school that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-sharda-university-noida",
+     "tier": "safe",
+     "why": "Law school that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Law school that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "journalism",
+   "name": "Journalism / Mass Communication",
+   "aliases": [
+    "journalism",
+    "mass communication",
+    "mass comm",
+    "media",
+    "bjmc",
+    "news",
+    "film",
+    "content"
+   ],
+   "what": "News, media, film and digital content.",
+   "fits": "Storytellers who like cameras, writing or social media.",
+   "careers": [
+    "Journalist",
+    "Content & social media",
+    "Advertising & PR"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "BA Journalism at DU colleges"
+    },
+    {
+     "kind": "uni",
+     "id": "state-guru-gobind-singh-indraprastha-university",
+     "tier": "target",
+     "why": "BJMC across many Delhi colleges"
+    },
+    {
+     "kind": "uni",
+     "id": "state-makhanlal-chaturvedi-university",
+     "tier": "target",
+     "why": "A university just for journalism"
+    },
+    {
+     "kind": "form",
+     "id": "set",
+     "tier": "target",
+     "why": "Symbiosis mass communication"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "design",
+   "name": "Design / Fashion",
+   "aliases": [
+    "design",
+    "fashion",
+    "b.des",
+    "bdes",
+    "interior",
+    "ux",
+    "animation",
+    "nift",
+    "nid"
+   ],
+   "what": "Fashion, product, communication and interior design.",
+   "fits": "Creative students who like drawing and making things.",
+   "careers": [
+    "Designer",
+    "Fashion & retail",
+    "UI/UX"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "state-delhi-technological-university",
+     "tier": "dream",
+     "why": "B.Des at a Delhi state university"
+    },
+    {
+     "kind": "uni",
+     "id": "private-pearl-academy",
+     "tier": "target",
+     "why": "Design college that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-world-university-of-design",
+     "tier": "target",
+     "why": "Design university that takes CUET"
+    },
+    {
+     "kind": "form",
+     "id": "atlas",
+     "tier": "target",
+     "why": "ISDI design school"
+    },
+    {
+     "kind": "uni",
+     "id": "private-upes-dehradun",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "liberal-arts",
+   "name": "Liberal Arts",
+   "aliases": [
+    "liberal arts",
+    "liberal",
+    "interdisciplinary",
+    "undecided",
+    "not sure"
+   ],
+   "what": "Try many subjects first, choose your major later.",
+   "fits": "Students who are not sure yet.",
+   "careers": [
+    "Almost any field",
+    "Higher studies abroad",
+    "Policy, media & business"
+   ],
+   "picks": [
+    {
+     "kind": "form",
+     "id": "ashoka",
+     "tier": "dream",
+     "why": "Best-known liberal-arts university"
+    },
+    {
+     "kind": "form",
+     "id": "flame",
+     "tier": "dream",
+     "why": "Liberal education in Pune"
+    },
+    {
+     "kind": "form",
+     "id": "krea",
+     "tier": "target",
+     "why": "Liberal arts and sciences"
+    },
+    {
+     "kind": "form",
+     "id": "ssla",
+     "tier": "target",
+     "why": "Symbiosis liberal arts"
+    },
+    {
+     "kind": "form",
+     "id": "iilm",
+     "tier": "safe",
+     "why": "Liberal arts in Delhi NCR"
+    }
+   ]
+  },
+  {
+   "key": "hotel",
+   "name": "Hotel Management / Tourism",
+   "aliases": [
+    "hotel",
+    "hotel management",
+    "tourism",
+    "travel",
+    "hospitality",
+    "bhm",
+    "aviation"
+   ],
+   "what": "Hotels, travel and hospitality.",
+   "fits": "People-friendly students who like travel.",
+   "careers": [
+    "Hotels & airlines",
+    "Travel business",
+    "Events"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "government-other-indian-institute-of-tourism-travel-management-university",
+     "tier": "target",
+     "why": "Government tourism institute"
+    },
+    {
+     "kind": "uni",
+     "id": "private-chitkara-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-lovely-professional-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "agriculture",
+   "name": "B.Sc Agriculture",
+   "aliases": [
+    "agriculture",
+    "agri",
+    "bsc agriculture",
+    "farming",
+    "horticulture"
+   ],
+   "what": "Farming science: crops, soil and food.",
+   "fits": "PCB/PCM students; good government-job route.",
+   "careers": [
+    "Agriculture officer",
+    "Agri-business",
+    "Research"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "government-other-indian-council-of-agricultural-research-icar",
+     "tier": "dream",
+     "why": "Agricultural universities across India"
+    },
+    {
+     "kind": "uni",
+     "id": "central-banaras-hindu-university",
+     "tier": "target",
+     "why": "Institute of Agricultural Sciences"
+    },
+    {
+     "kind": "uni",
+     "id": "private-lovely-professional-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-shoolini-university-of-biotechnology-and-management-sciences",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "languages",
+   "name": "Languages (Hindi, Sanskrit, foreign languages)",
+   "aliases": [
+    "hindi",
+    "sanskrit",
+    "urdu",
+    "french",
+    "german",
+    "spanish",
+    "japanese",
+    "foreign language",
+    "languages",
+    "language"
+   ],
+   "what": "Indian and foreign languages and their literature.",
+   "fits": "Students who love a language.",
+   "careers": [
+    "Translator",
+    "Teaching",
+    "Embassies & tourism"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "central-jawaharlal-nehru-university",
+     "tier": "dream",
+     "why": "Foreign-language BA programmes"
+    },
+    {
+     "kind": "uni",
+     "id": "central-university-of-delhi",
+     "tier": "dream",
+     "why": "Hindi, Sanskrit and more"
+    },
+    {
+     "kind": "uni",
+     "id": "central-the-english-and-foreign-languages-university-hyderabad",
+     "tier": "target",
+     "why": "A university just for languages"
+    },
+    {
+     "kind": "uni",
+     "id": "central-banaras-hindu-university",
+     "tier": "target",
+     "why": "Central university, low fees"
+    },
+    {
+     "kind": "uni",
+     "id": "central-central-sanskrit-university-new-delhi",
+     "tier": "safe",
+     "why": "A university just for Sanskrit"
+    }
+   ]
+  },
+  {
+   "key": "physical-education",
+   "name": "Physical Education / Sports",
+   "aliases": [
+    "physical education",
+    "sports",
+    "bped",
+    "pe",
+    "yoga",
+    "fitness"
+   ],
+   "what": "Sport, fitness and coaching.",
+   "fits": "Athletes and fitness lovers.",
+   "careers": [
+    "Coach & trainer",
+    "PE teacher",
+    "Sports management"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "deemed-lakshmibai-national-institute-of-physical-education",
+     "tier": "dream",
+     "why": "India's physical-education university"
+    },
+    {
+     "kind": "uni",
+     "id": "private-lovely-professional-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "forensic",
+   "name": "Forensic Science",
+   "aliases": [
+    "forensic",
+    "forensics",
+    "crime",
+    "criminology"
+   ],
+   "what": "Science used to solve crimes.",
+   "fits": "Science students who like investigation.",
+   "careers": [
+    "Forensic lab expert",
+    "Cyber forensics",
+    "Police & investigation"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "government-other-national-forensic-sciences-university-nfsu",
+     "tier": "dream",
+     "why": "Government forensic university"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-galgotias-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  },
+  {
+   "key": "food",
+   "name": "Food Technology",
+   "aliases": [
+    "food",
+    "food technology",
+    "food tech",
+    "nutrition",
+    "dietetics"
+   ],
+   "what": "How food is made, kept safe and sold.",
+   "fits": "Science students interested in food.",
+   "careers": [
+    "Food industry",
+    "Quality & safety",
+    "Your own food business"
+   ],
+   "picks": [
+    {
+     "kind": "uni",
+     "id": "government-other-national-institute-of-food-technology-entrepreneurship-and-mana",
+     "tier": "dream",
+     "why": "Government food-technology institute"
+    },
+    {
+     "kind": "uni",
+     "id": "private-lovely-professional-university",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    },
+    {
+     "kind": "uni",
+     "id": "private-amity-university-noida-campus",
+     "tier": "safe",
+     "why": "Private university that takes CUET"
+    }
+   ]
+  }
+ ]
+}

@@ -3,6 +3,12 @@ window.ECUET_CONFIG = {
   // WhatsApp number for orders, alerts and senior bookings, country code first, digits only (e.g. "919876543210").
   // Empty: buttons that need it say so instead of opening WhatsApp.
   whatsapp: "",
+  // Logins and leads (Supabase, free plan). Paste the Project URL and the "anon public" key from
+  // Supabase -> Project Settings -> API. Steps in cuet/supabase/README.md. Empty: a short sign-up form is used instead.
+  supabase: {
+    url: "",
+    anonKey: ""
+  },
   // Optional form endpoint (Formspree, Google Apps Script, etc.) that receives sign-ups and orders as JSON.
   formEndpoint: "",
   instagram: "https://www.instagram.com/everythingcuet/",
