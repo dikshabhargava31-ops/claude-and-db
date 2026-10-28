@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="A student talking to a college senior">
+  <rect width="480" height="360" rx="28" fill="#F6F3F1"/>
+  <g transform="translate(120 250)">
+    <circle cx="0" cy="-92" r="36" fill="#8D5B3E"/><path d="M-36 -98a36 36 0 0 1 72 0v10h-72z" fill="#2A2530"/>
+    <path d="M-62 40v-60a40 40 0 0 1 40-40h44a40 40 0 0 1 40 40v60z" fill="#FFFFFF" stroke="#2A2530" stroke-width="4"/>
+  </g>
+  <g transform="translate(360 250)">
+    <circle cx="0" cy="-92" r="36" fill="#C08A63"/><path d="M-38 -96a38 38 0 0 1 76 0v34h-14v-24h-48v24h-14z" fill="#2A2530"/>
+    <path d="M-62 40v-60a40 40 0 0 1 40-40h44a40 40 0 0 1 40 40v60z" fill="#B50316"/>
+  </g>
+  <g>
+    <path d="M168 60h120a16 16 0 0 1 16 16v44a16 16 0 0 1-16 16h-84l-22 18v-18h-14a16 16 0 0 1-16-16v-44a16 16 0 0 1 16-16z" fill="#FFFFFF" stroke="#2A2530" stroke-width="4"/>
+    <rect x="182" y="84" width="96" height="10" rx="5" fill="#2A2530"/><rect x="182" y="104" width="70" height="10" rx="5" fill="#C9C3CB"/>
+    <path d="M312 116h-0" />
+    <path d="M226 150h92a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16h-10v16l-20-16h-62a16 16 0 0 1-16-16v-32a16 16 0 0 1 16-16z" fill="#B50316"/>
+    <rect x="240" y="170" width="70" height="9" rx="4.5" fill="#FFFFFF"/><rect x="240" y="188" width="46" height="9" rx="4.5" fill="#FFFFFF" opacity=".7"/>
+  </g>
+  <path d="M420 74c2 9 8 15 17 17-9 2-15 8-17 17-2-9-8-15-17-17 9-2 15-8 17-17z" fill="#B50316"/>
+</svg>

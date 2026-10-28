@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="Choosing a course: a signpost with options">
+  <rect width="480" height="360" rx="28" fill="#F6F3F1"/>
+  <rect x="0" y="286" width="480" height="74" fill="#E9F0E6"/>
+  <rect x="232" y="70" width="16" height="220" rx="6" fill="#2A2530"/>
+  <path d="M248 88h120l26 22-26 22h-120z" fill="#B50316"/>
+  <path d="M232 146h-120l-26 22 26 22h120z" fill="#FFFFFF" stroke="#2A2530" stroke-width="4"/>
+  <path d="M248 206h104l24 20-24 20h-104z" fill="#FFFFFF" stroke="#2A2530" stroke-width="4"/>
+  <g fill="#FFFFFF"><rect x="266" y="104" width="78" height="10" rx="5"/></g>
+  <g fill="#2A2530"><rect x="122" y="162" width="88" height="10" rx="5"/><rect x="266" y="220" width="64" height="10" rx="5"/></g>
+  <path d="M110 62c2 10 9 17 19 19-10 2-17 9-19 19-2-10-9-17-19-19 10-2 17-9 19-19z" fill="#B50316"/>
+</svg>

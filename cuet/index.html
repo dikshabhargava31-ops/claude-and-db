@@ -4,46 +4,70 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Everything CUET</title>
-  <meta name="description" content="Free CUET college predictor, NTA participating universities, dream list, deadline reminders, preference builder and assisted form filling. No login needed.">
-  <meta name="theme-color" content="#1f1b4d">
+  <meta name="description" content="Find your CUET colleges, track every form and deadline, and get help applying. Free, no login.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="assets/logo.webp" type="image/webp">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2.5 9 12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v4.5c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3V11M21.5 9v5"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><path d="M3.5 4.5h2l2.2 10.5h10.6l2-7.5H7"/><circle cx="9.5" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M14 4.5h5.5V10M19.5 4.5 11 13M17 14v4.5a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1H10"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.6v.1"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5A1.5 1.5 0 0 1 19 17h-8l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 1 1 12 0v5.5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2c.8 5.2 4.8 9.2 10 10-5.2.8-9.2 4.8-10 10-.8-5.2-4.8-9.2-10-10 5.2-.8 9.2-4.8 10-10z" fill="currentColor" stroke="none"/></symbol>
+</svg>
+
 <a class="skip" href="#view">Skip to content</a>
-<header class="top">
-  <div class="wrap top-in">
-    <a class="logo" href="#/">
-      <span class="logo-mark">E</span>
-      <span class="logo-text"><b>Everything</b> CUET</span>
-    </a>
-    <nav class="nav" id="nav" aria-label="Main"></nav>
-    <div class="top-act">
-      <button class="chip" id="langBtn" type="button" aria-label="Switch language">हिंदी</button>
-      <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false">☰</button>
+<div class="app">
+  <header class="site-head" id="bar">
+    <div class="wrap head-in">
+      <a class="brand" href="#/" aria-label="Everything CUET home"><img src="assets/wordmark-red.png" alt="Everything CUET" width="720" height="325"></a>
+      <nav class="menu" id="tabs" aria-label="Main"></nav>
+      <div class="head-act">
+        <button class="pill" id="langBtn" type="button" aria-label="Switch language">हि</button>
+        <a class="icon-btn" id="cartBtn" href="#/pricing?cart=1" aria-label="Cart" hidden><svg class="i"><use href="#i-cart"/></svg><b id="cartCount">0</b></a>
+        <a class="btn sm ghost-line" id="acctBtn" href="#/login">Log in</a>
+        <a class="btn sm pri head-cta" href="#/seniors">Talk to a senior</a>
+        <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false"><svg class="i"><use href="#i-grid"/></svg></button>
+      </div>
     </div>
+  </header>
+  <div class="main">
+    <div id="barTitle" hidden></div>
+    <main id="view" tabindex="-1"></main>
   </div>
-</header>
+  <footer class="site-foot"><div class="wrap" id="railFoot"></div></footer>
+</div>
 
-<main id="view" tabindex="-1"></main>
-
-<footer class="foot">
-  <div class="wrap foot-in" id="foot"></div>
-</footer>
-
-<button class="cart-fab" id="cartFab" type="button" hidden>🛒 <span id="cartCount">0</span></button>
-<button class="bot-fab" id="botFab" type="button" aria-label="Admission assistant">💬</button>
+<button class="bot-fab" id="botFab" type="button" aria-label="Ask the admission assistant"><svg class="i"><use href="#i-chat"/></svg></button>
 <section class="bot" id="bot" hidden aria-label="Admission assistant">
-  <header><b data-t="bot.title">Admission assistant</b><button class="icon-btn" type="button" data-act="bot-close" aria-label="Close">✕</button></header>
+  <header><b data-t="bot.title">Admission assistant</b><button class="icon-btn ghost" type="button" data-act="bot-close" aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></header>
   <div class="bot-log" id="botLog"></div>
-  <form class="bot-form" id="botForm"><input id="botIn" autocomplete="off" placeholder="Ask about colleges, dates, marks…"><button class="btn pri" type="submit">→</button></form>
+  <form class="bot-form" id="botForm"><input id="botIn" autocomplete="off" placeholder="Ask about colleges, forms, dates…"><button class="btn pri" type="submit" aria-label="Send"><svg class="i"><use href="#i-right"/></svg></button></form>
 </section>
 
-<dialog class="modal" id="modal"><div id="modalBody"></div></dialog>
+<dialog class="sheet" id="modal"><div class="sheet-grip" aria-hidden="true"></div><div id="modalBody"></div></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 </body>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="Filling an application form on a laptop">
+  <rect width="480" height="360" rx="28" fill="#F6F3F1"/>
+  <rect x="96" y="70" width="288" height="190" rx="14" fill="#2A2530"/>
+  <rect x="110" y="84" width="260" height="162" rx="6" fill="#FFFFFF"/>
+  <rect x="70" y="260" width="340" height="18" rx="9" fill="#C9C3CB"/>
+  <rect x="128" y="102" width="120" height="12" rx="6" fill="#2A2530"/>
+  <g fill="#F1EEEC"><rect x="128" y="128" width="224" height="20" rx="6"/><rect x="128" y="158" width="224" height="20" rx="6"/><rect x="128" y="188" width="150" height="20" rx="6"/></g>
+  <g fill="none" stroke="#B50316" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M334 132l6 6 10-12"/><path d="M334 162l6 6 10-12"/></g>
+  <rect x="290" y="214" width="62" height="22" rx="11" fill="#B50316"/>
+  <circle cx="392" cy="90" r="30" fill="#FFFFFF" stroke="#2A2530" stroke-width="4"/>
+  <path d="M392 72v20l12 8" fill="none" stroke="#B50316" stroke-width="5" stroke-linecap="round"/>
+  <path d="M84 116c2 9 8 15 17 17-9 2-15 8-17 17-2-9-8-15-17-17 9-2 15-8 17-17z" fill="#B50316"/>
+</svg>
