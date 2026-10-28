@@ -1,9 +1,0 @@
-# GitHub Pages (Jekyll) settings for the public sites in this repository.
-# studio/ is the private Creator Research Studio app, hosted on Vercel with its own login;
-# it is excluded here so its files aren't published as a page on GitHub Pages.
-exclude:
-  - studio
-  - node_modules
-  - vendor
-  - Gemfile
-  - Gemfile.lock

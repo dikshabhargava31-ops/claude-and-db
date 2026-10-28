@@ -3,6 +3,3 @@ videos/*/renders/
 videos/*/raw/
 __pycache__/
 node_modules/
-studio/data/
-studio/.env
-studio/test-results/

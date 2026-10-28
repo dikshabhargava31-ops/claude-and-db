@@ -48,4 +48,4 @@ The cloud environment's network policy blocks `huggingface.co` (Whisper/Parakeet
 
 ## Creator Research Studio
 
-`studio/` is the private research and planning app (`studio/README.md`). Run `npm test` and `npm run test:e2e` in `studio/` after changing it. Its data (`studio/data/`) and keys (`studio/.env`) are git-ignored and must never be committed. It hands Instagram posts to the existing scheduler only after the owner approves them; don't add a second scheduler.
+The research and planning app is in the private repository `dikshabhargava31-ops/creator-research-studio`, not here. It hands Instagram posts to this repository's scheduler (`instagram/posts.csv`) only after the owner approves them; don't add a second scheduler.

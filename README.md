@@ -36,7 +36,7 @@ Claude Code makes videos here with HyperFrames (skills in `.claude/skills/`). Ea
 
 ## Creator Research Studio
 
-`studio/` is a private Node.js web app (not a GitHub Pages site) for researching, planning and scripting YouTube and Instagram content, with one workspace per brand or channel. It runs content research on your behalf (your channel, saved competitors and inspiration channels, outliers, audience questions, current developments), recommends topics with evidence, prepares hooks, outlines and scripts, and tracks each item from idea to published results. Instagram scheduling goes through the Instagram scheduler below, only after the owner approves a post. Setup, credentials, costs and limits are in `studio/README.md`; its data and keys stay on the server, in the git-ignored `studio/data/` and `studio/.env`.
+The Creator Research Studio app (research, topics, scripts and content planning) lives in its own private repository, `dikshabhargava31-ops/creator-research-studio`. It sends Instagram posts to the scheduler below only after the owner approves them.
 
 ## Instagram scheduler
 
