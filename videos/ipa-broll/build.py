@@ -45,7 +45,8 @@ def fetch():
         subprocess.run(["curl", "-sS", "--retry", "3", "-o", str(tmp), drive_url(file_id)], check=True)
         if tmp.read_bytes()[:15].startswith(b"<!DOCTYPE"):
             tmp.unlink()
-            sys.exit(f"Drive refused {file_id} (quota exceeded); try again later")
+            print("Drive refused", file_id, "(quota exceeded); run fetch again later")
+            continue
         tmp.rename(out)
         print("fetched", file_id, out.stat().st_size)
 
