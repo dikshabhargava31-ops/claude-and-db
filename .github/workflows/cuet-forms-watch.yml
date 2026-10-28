@@ -34,18 +34,23 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Check the API key
+        id: key
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           if [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo "::error::Add the ANTHROPIC_API_KEY secret (Settings -> Secrets and variables -> Actions) to run the forms watcher."
-            exit 1
+            echo "::notice::Forms watcher skipped: add the ANTHROPIC_API_KEY secret (Settings -> Secrets and variables -> Actions) to turn it on."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install the Anthropic SDK
+        if: steps.key.outputs.ok == 'true'
         run: pip install "anthropic>=1.1"
 
       - name: Check forms with Claude
+        if: steps.key.outputs.ok == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ONLY: ${{ inputs.only }}
@@ -57,6 +62,7 @@ jobs:
           python3 cuet/scripts/forms_watch.py $args
 
       - name: Open a pull request for review
+        if: steps.key.outputs.ok == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
