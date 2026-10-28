@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="A calendar with a reminder bell">
+  <rect width="480" height="360" rx="28" fill="#F6F3F1"/>
+  <rect x="110" y="70" width="230" height="220" rx="20" fill="#FFFFFF" stroke="#2A2530" stroke-width="5"/>
+  <path d="M110 90a20 20 0 0 1 20-20h190a20 20 0 0 1 20 20v30h-230z" fill="#2A2530"/>
+  <g stroke="#2A2530" stroke-width="7" stroke-linecap="round"><path d="M160 56v28"/><path d="M290 56v28"/></g>
+  <g fill="#F1EEEC">
+    <rect x="132" y="140" width="38" height="32" rx="8"/><rect x="182" y="140" width="38" height="32" rx="8"/><rect x="232" y="140" width="38" height="32" rx="8"/><rect x="282" y="140" width="38" height="32" rx="8"/>
+    <rect x="132" y="184" width="38" height="32" rx="8"/><rect x="182" y="184" width="38" height="32" rx="8"/><rect x="282" y="184" width="38" height="32" rx="8"/>
+    <rect x="132" y="228" width="38" height="32" rx="8"/><rect x="182" y="228" width="38" height="32" rx="8"/><rect x="232" y="228" width="38" height="32" rx="8"/>
+  </g>
+  <rect x="232" y="184" width="38" height="32" rx="8" fill="#B50316"/>
+  <g transform="translate(360 206)">
+    <circle r="46" fill="#FFFFFF" stroke="#2A2530" stroke-width="5"/>
+    <path d="M-18 12v-14a18 18 0 0 1 36 0v14l6 7h-48z" fill="#B50316"/>
+    <circle cy="26" r="6" fill="#2A2530"/>
+  </g>
+</svg>

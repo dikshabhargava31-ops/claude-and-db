@@ -13,6 +13,14 @@ window.ECUET_CONFIG = {
   formEndpoint: "",
   instagram: "https://www.instagram.com/everythingcuet/",
   youtube: "https://www.youtube.com/@everythingcuet",
+  // Photos for the homepage and section pictures. Put the files in cuet/assets/photos/ and name them here,
+  // e.g. campus: "assets/photos/campus.jpg". Empty slots show the built-in illustrations.
+  photos: {
+    campus: "",
+    senior: "",
+    forms: "",
+    kit: ""
+  },
   // YouTube video IDs to embed on Resources and college pages.
   youtubeVideos: [],
   // Partner-college promo codes: { code: "LPU500", college: "…", saving: "₹500 off the application fee", url: "…" }
