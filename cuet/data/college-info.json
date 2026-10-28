@@ -1,0 +1,375 @@
+{
+ "note": "City, state and official website for the most-searched universities. Filled in by the Everything CUET team; add more as needed.",
+ "colleges": {
+  "central-university-of-delhi": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.du.ac.in/",
+   "portal": "CSAS"
+  },
+  "central-jawaharlal-nehru-university": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.jnu.ac.in/"
+  },
+  "central-jamia-millia-islamia": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.jmi.ac.in/"
+  },
+  "central-south-asian-university": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.sau.int/"
+  },
+  "central-central-sanskrit-university-new-delhi": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.sanskrit.nic.in/"
+  },
+  "central-shri-lal-bahadur-shastri-national-sanskrit-university": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.slbsrsv.ac.in/"
+  },
+  "central-banaras-hindu-university": {
+   "city": "Varanasi",
+   "state": "Uttar Pradesh",
+   "website": "https://www.bhu.ac.in/"
+  },
+  "central-aligarh-muslim-university": {
+   "city": "Aligarh",
+   "state": "Uttar Pradesh",
+   "website": "https://www.amu.ac.in/"
+  },
+  "central-babasaheb-bhimrao-ambedkar-university": {
+   "city": "Lucknow",
+   "state": "Uttar Pradesh",
+   "website": "https://www.bbau.ac.in/"
+  },
+  "central-university-of-allahabad": {
+   "city": "Prayagraj",
+   "state": "Uttar Pradesh",
+   "website": "https://www.allduniv.ac.in/"
+  },
+  "central-rajiv-gandhi-national-aviation-university": {
+   "city": "Rae Bareli",
+   "state": "Uttar Pradesh",
+   "website": "https://www.rgnau.ac.in/"
+  },
+  "central-assam-university-silchar": {
+   "city": "Silchar",
+   "state": "Assam",
+   "website": "https://www.aus.ac.in/"
+  },
+  "central-tezpur-university": {
+   "city": "Tezpur",
+   "state": "Assam",
+   "website": "https://www.tezu.ernet.in/"
+  },
+  "central-central-tribal-university-of-andhra-pradesh": {
+   "city": "Vizianagaram",
+   "state": "Andhra Pradesh",
+   "website": "https://www.ctuap.ac.in/"
+  },
+  "central-central-university-of-andhra-pradesh": {
+   "city": "Anantapur",
+   "state": "Andhra Pradesh",
+   "website": "https://www.cuap.ac.in/"
+  },
+  "central-national-sanskrit-university": {
+   "city": "Tirupati",
+   "state": "Andhra Pradesh",
+   "website": "https://www.nsktu.ac.in/"
+  },
+  "central-central-university-of-gujarat": {
+   "city": "Vadodara",
+   "state": "Gujarat",
+   "website": "https://www.cug.ac.in/"
+  },
+  "central-central-university-of-haryana": {
+   "city": "Mahendergarh",
+   "state": "Haryana",
+   "website": "https://www.cuh.ac.in/"
+  },
+  "central-central-university-of-himachal-pradesh": {
+   "city": "Dharamshala",
+   "state": "Himachal Pradesh",
+   "website": "https://www.cuhimachal.ac.in/"
+  },
+  "central-central-university-of-jammu": {
+   "city": "Jammu",
+   "state": "Jammu and Kashmir",
+   "website": "https://www.cujammu.ac.in/"
+  },
+  "central-central-university-of-kashmir": {
+   "city": "Ganderbal",
+   "state": "Jammu and Kashmir",
+   "website": "https://www.cukashmir.ac.in/"
+  },
+  "central-central-university-of-jharkhand": {
+   "city": "Ranchi",
+   "state": "Jharkhand",
+   "website": "https://www.cuj.ac.in/"
+  },
+  "central-central-university-of-karnataka": {
+   "city": "Kalaburagi",
+   "state": "Karnataka",
+   "website": "https://www.cuk.ac.in/"
+  },
+  "central-iit-dharwad": {
+   "city": "Dharwad",
+   "state": "Karnataka",
+   "website": "https://www.iitdh.ac.in/"
+  },
+  "central-central-university-of-kerala": {
+   "city": "Kasaragod",
+   "state": "Kerala",
+   "website": "https://www.cukerala.ac.in/"
+  },
+  "central-central-university-of-odisha": {
+   "city": "Koraput",
+   "state": "Odisha",
+   "website": "https://www.cuo.ac.in/"
+  },
+  "central-central-university-of-punjab": {
+   "city": "Bathinda",
+   "state": "Punjab",
+   "website": "https://www.cup.edu.in/"
+  },
+  "central-central-university-of-rajasthan": {
+   "city": "Ajmer",
+   "state": "Rajasthan",
+   "website": "https://www.curaj.ac.in/"
+  },
+  "central-central-university-of-south-bihar": {
+   "city": "Gaya",
+   "state": "Bihar",
+   "website": "https://www.cusb.ac.in/"
+  },
+  "central-mahatma-gandhi-central-university": {
+   "city": "Motihari",
+   "state": "Bihar",
+   "website": "https://www.mgcub.ac.in/"
+  },
+  "central-central-university-of-tamil-nadu": {
+   "city": "Thiruvarur",
+   "state": "Tamil Nadu",
+   "website": "https://www.cutn.ac.in/"
+  },
+  "central-dr-harisingh-gour-vishwavidyalaya": {
+   "city": "Sagar",
+   "state": "Madhya Pradesh",
+   "website": "https://www.dhsgsu.edu.in/"
+  },
+  "central-indira-gandhi-national-tribal-university": {
+   "city": "Amarkantak",
+   "state": "Madhya Pradesh",
+   "website": "https://www.igntu.ac.in/"
+  },
+  "central-guru-ghasidas-vishwavidyalaya": {
+   "city": "Bilaspur",
+   "state": "Chhattisgarh",
+   "website": "https://www.ggu.ac.in/"
+  },
+  "central-hnb-garhwal-university-srinagar-garhwal": {
+   "city": "Srinagar (Garhwal)",
+   "state": "Uttarakhand",
+   "website": "https://www.hnbgu.ac.in/"
+  },
+  "central-mahatma-gandhi-antarrashtriya-hindi-vishwavidyalaya": {
+   "city": "Wardha",
+   "state": "Maharashtra",
+   "website": "https://www.hindivishwa.org/"
+  },
+  "central-manipur-university": {
+   "city": "Imphal",
+   "state": "Manipur",
+   "website": "https://www.manipuruniv.ac.in/"
+  },
+  "central-maulana-azad-national-urdu-university": {
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "website": "https://www.manuu.edu.in/"
+  },
+  "central-the-english-and-foreign-languages-university-hyderabad": {
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "website": "https://www.efluniversity.ac.in/"
+  },
+  "central-university-of-hyderabad": {
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "website": "https://www.uohyd.ac.in/"
+  },
+  "central-sammakka-sarakka-central-tribal-university": {
+   "city": "Mulugu",
+   "state": "Telangana"
+  },
+  "central-mizoram-university": {
+   "city": "Aizawl",
+   "state": "Mizoram",
+   "website": "https://www.mzu.edu.in/"
+  },
+  "central-nagaland-university": {
+   "city": "Lumami",
+   "state": "Nagaland",
+   "website": "https://www.nagalanduniversity.ac.in/"
+  },
+  "central-north-eastern-hill-university": {
+   "city": "Shillong",
+   "state": "Meghalaya",
+   "website": "https://www.nehu.ac.in/"
+  },
+  "central-pondicherry-university": {
+   "city": "Puducherry",
+   "state": "Puducherry",
+   "website": "https://www.pondiuni.edu.in/"
+  },
+  "central-rajiv-gandhi-university": {
+   "city": "Itanagar",
+   "state": "Arunachal Pradesh",
+   "website": "https://www.rgu.ac.in/"
+  },
+  "central-sikkim-university-gangtok": {
+   "city": "Gangtok",
+   "state": "Sikkim",
+   "website": "https://www.cus.ac.in/"
+  },
+  "central-tripura-university": {
+   "city": "Agartala",
+   "state": "Tripura",
+   "website": "https://www.tripurauniv.ac.in/"
+  },
+  "central-visva-bharati-university": {
+   "city": "Santiniketan",
+   "state": "West Bengal",
+   "website": "https://www.visvabharati.ac.in/"
+  },
+  "state-delhi-technological-university": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.dtu.ac.in/"
+  },
+  "state-guru-gobind-singh-indraprastha-university": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.ipu.ac.in/"
+  },
+  "state-dr-b-r-ambedkar-university-delhi": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.aud.ac.in/"
+  },
+  "state-indira-gandhi-delhi-technical-university-for-women": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.igdtuw.ac.in/"
+  },
+  "state-makhanlal-chaturvedi-university": {
+   "city": "Bhopal",
+   "state": "Madhya Pradesh",
+   "website": "https://www.mcu.ac.in/"
+  },
+  "deemed-jamia-hamdard": {
+   "city": "New Delhi",
+   "state": "Delhi",
+   "website": "https://www.jamiahamdard.edu/"
+  },
+  "deemed-tata-institute-of-social-sciences-tiss": {
+   "city": "Mumbai",
+   "state": "Maharashtra",
+   "website": "https://www.tiss.edu/"
+  },
+  "deemed-lakshmibai-national-institute-of-physical-education": {
+   "city": "Gwalior",
+   "state": "Madhya Pradesh",
+   "website": "https://www.lnipe.edu.in/"
+  },
+  "deemed-gokhale-institute-of-politics-and-economics": {
+   "city": "Pune",
+   "state": "Maharashtra",
+   "website": "https://www.gipe.ac.in/"
+  },
+  "deemed-dayalbagh-educational-institute": {
+   "city": "Agra",
+   "state": "Uttar Pradesh",
+   "website": "https://www.dei.ac.in/"
+  },
+  "government-other-national-forensic-sciences-university-nfsu": {
+   "city": "Gandhinagar",
+   "state": "Gujarat",
+   "website": "https://www.nfsu.ac.in/"
+  },
+  "government-other-national-institute-of-food-technology-entrepreneurship-and-mana": {
+   "city": "Sonipat",
+   "state": "Haryana",
+   "website": "https://www.niftem.ac.in/"
+  },
+  "government-other-indian-council-of-agricultural-research-icar": {
+   "city": "Agricultural universities across India",
+   "state": "India",
+   "website": "https://www.icar.org.in/"
+  },
+  "government-other-indian-institute-of-tourism-travel-management-university": {
+   "city": "Gwalior",
+   "state": "Madhya Pradesh",
+   "website": "https://www.iittm.ac.in/"
+  },
+  "private-amity-university-noida-campus": {
+   "city": "Noida",
+   "state": "Uttar Pradesh",
+   "website": "https://www.amity.edu/"
+  },
+  "private-sharda-university-noida": {
+   "city": "Greater Noida",
+   "state": "Uttar Pradesh",
+   "website": "https://www.sharda.ac.in/"
+  },
+  "private-bennet-university": {
+   "city": "Greater Noida",
+   "state": "Uttar Pradesh",
+   "website": "https://www.bennett.edu.in/"
+  },
+  "private-galgotias-university": {
+   "city": "Greater Noida",
+   "state": "Uttar Pradesh",
+   "website": "https://www.galgotiasuniversity.edu.in/"
+  },
+  "private-upes-dehradun": {
+   "city": "Dehradun",
+   "state": "Uttarakhand",
+   "website": "https://www.upes.ac.in/"
+  },
+  "private-lovely-professional-university": {
+   "city": "Phagwara",
+   "state": "Punjab",
+   "website": "https://www.lpu.in/"
+  },
+  "private-chitkara-university": {
+   "city": "Rajpura",
+   "state": "Punjab",
+   "website": "https://www.chitkara.edu.in/"
+  },
+  "private-world-university-of-design": {
+   "city": "Sonipat",
+   "state": "Haryana",
+   "website": "https://www.wud.ac.in/"
+  },
+  "private-shoolini-university-of-biotechnology-and-management-sciences": {
+   "city": "Solan",
+   "state": "Himachal Pradesh",
+   "website": "https://www.shooliniuniversity.com/"
+  },
+  "private-mahindra-university": {
+   "city": "Hyderabad",
+   "state": "Telangana",
+   "website": "https://www.mahindrauniversity.edu.in/"
+  },
+  "private-pearl-academy": {
+   "city": "Several campuses",
+   "state": "India",
+   "website": "https://www.pearlacademy.com/"
+  }
+ }
+}
