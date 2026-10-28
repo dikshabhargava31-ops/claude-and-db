@@ -2,6 +2,7 @@
   <style>
     #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; }
     /* Cards sit in the 168-1330 px band Instagram leaves clear, away from the right-hand action rail. */
+    #root .slot { position: absolute; inset: 0; }
     #root .card {
       position: absolute; left: 70px; right: 150px; top: 560px; height: 640px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -41,39 +42,53 @@
     }
   </style>
   <div id="root" data-composition-id="text" data-width="1080" data-height="1920">
-    <div id="card1" class="clip card count" data-start="0.00" data-duration="2.40" data-track-index="1" data-layout-allow-overlap>
+    <div id="card1" class="clip slot" data-start="0.00" data-duration="2.40" data-track-index="1">
+      <div id="card1-in" class="card count" data-layout-allow-overlap>
         <div id="c1-big" class="big">100</div>
         <div id="c1-l1" class="line">Boards mein sirf</div>
         <div id="c1-l2" class="line"><em>100 din</em> bache hain</div>
+      </div>
     </div>
-    <div id="card2" class="clip card plain" data-start="2.40" data-duration="2.20" data-track-index="2" data-layout-allow-overlap>
+    <div id="card2" class="clip slot" data-start="2.40" data-duration="2.20" data-track-index="2">
+      <div id="card2-in" class="card plain" data-layout-allow-overlap>
         <div id="c2-l1" class="line">Ghabrao mat.</div>
         <div id="c2-l2" class="line">Is hafte bas <em>3 kaam:</em></div>
+      </div>
     </div>
-    <div id="card3" class="clip card plain" data-start="4.60" data-duration="2.80" data-track-index="3" data-layout-allow-overlap>
+    <div id="card3" class="clip slot" data-start="4.60" data-duration="2.80" data-track-index="3">
+      <div id="card3-in" class="card plain" data-layout-allow-overlap>
         <div id="c3-chip" class="chip num">1</div>
         <div id="c3-l1" class="line">Syllabus ko</div>
         <div id="c3-l2" class="line"><em>3 hisson</em> mein baanto</div>
+      </div>
     </div>
-    <div id="card4" class="clip card plain" data-start="7.40" data-duration="2.80" data-track-index="4" data-layout-allow-overlap>
+    <div id="card4" class="clip slot" data-start="7.40" data-duration="2.80" data-track-index="4">
+      <div id="card4-in" class="card plain" data-layout-allow-overlap>
         <div id="c4-chip" class="chip num">2</div>
         <div id="c4-l1" class="line">Roz <em>1 PYQ paper</em></div>
         <div id="c4-l2" class="line">time lagake</div>
+      </div>
     </div>
-    <div id="card5" class="clip card plain" data-start="10.20" data-duration="2.60" data-track-index="5" data-layout-allow-overlap>
+    <div id="card5" class="clip slot" data-start="10.20" data-duration="2.60" data-track-index="5">
+      <div id="card5-in" class="card plain" data-layout-allow-overlap>
         <div id="c5-chip" class="chip num">3</div>
         <div id="c5-l1" class="line">Galtiyon ki</div>
         <div id="c5-l2" class="line"><em>ek alag copy</em></div>
+      </div>
     </div>
-    <div id="card6" class="clip card plain" data-start="12.80" data-duration="2.20" data-track-index="6" data-layout-allow-overlap>
+    <div id="card6" class="clip slot" data-start="12.80" data-duration="2.20" data-track-index="6">
+      <div id="card6-in" class="card plain" data-layout-allow-overlap>
         <div id="c6-l1" class="line">Agla update:</div>
         <div id="c6-l2" class="line"><em>75 din</em> pe</div>
+      </div>
     </div>
-    <div id="card7" class="clip card end" data-start="15.00" data-duration="2.60" data-track-index="7" data-layout-allow-overlap>
+    <div id="card7" class="clip slot" data-start="15.00" data-duration="2.60" data-track-index="7">
+      <div id="card7-in" class="card end" data-layout-allow-overlap>
         <div id="c7-l1" class="line"><em>Save</em> karo.</div>
         <div id="c7-l2" class="line">Study partner</div>
         <div id="c7-l3" class="line">ko bhejo</div>
         <div id="c7-handle" class="handle">@ipa_institute_ajmer</div>
+      </div>
     </div>
   </div>
   <script>
@@ -87,20 +102,40 @@
     });
     const tl = gsap.timeline({ paused: true });
     // Each card pops in on its cut; lines follow 0.07 s apart. The hook (card 1) is already on screen at frame 0.
+    tl.set("#card1-in", { opacity: 1, visibility: "visible" }, 0.00);
+    tl.set("#card1-in", { opacity: 0, visibility: "hidden" }, 2.40);
     tl.fromTo("#c1-big", { scale: 1.04 }, { scale: 1, duration: 0.8, ease: "power2.out" }, 0);
+    tl.set("#card2-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card2-in", { opacity: 1, visibility: "visible" }, 2.40);
+    tl.set("#card2-in", { opacity: 0, visibility: "hidden" }, 4.60);
     tl.fromTo("#c2-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 2.44);
     tl.fromTo("#c2-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 2.51);
+    tl.set("#card3-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card3-in", { opacity: 1, visibility: "visible" }, 4.60);
+    tl.set("#card3-in", { opacity: 0, visibility: "hidden" }, 7.40);
     tl.fromTo("#c3-chip", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 4.64);
     tl.fromTo("#c3-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 4.71);
     tl.fromTo("#c3-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 4.78);
+    tl.set("#card4-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card4-in", { opacity: 1, visibility: "visible" }, 7.40);
+    tl.set("#card4-in", { opacity: 0, visibility: "hidden" }, 10.20);
     tl.fromTo("#c4-chip", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 7.44);
     tl.fromTo("#c4-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 7.51);
     tl.fromTo("#c4-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 7.58);
+    tl.set("#card5-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card5-in", { opacity: 1, visibility: "visible" }, 10.20);
+    tl.set("#card5-in", { opacity: 0, visibility: "hidden" }, 12.80);
     tl.fromTo("#c5-chip", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 10.24);
     tl.fromTo("#c5-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 10.31);
     tl.fromTo("#c5-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 10.38);
+    tl.set("#card6-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card6-in", { opacity: 1, visibility: "visible" }, 12.80);
+    tl.set("#card6-in", { opacity: 0, visibility: "hidden" }, 15.00);
     tl.fromTo("#c6-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 12.84);
     tl.fromTo("#c6-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 12.91);
+    tl.set("#card7-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card7-in", { opacity: 1, visibility: "visible" }, 15.00);
+    tl.set("#card7-in", { opacity: 0, visibility: "hidden" }, 17.60);
     tl.fromTo("#c7-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 15.04);
     tl.fromTo("#c7-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 15.11);
     tl.fromTo("#c7-l3", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 15.18);

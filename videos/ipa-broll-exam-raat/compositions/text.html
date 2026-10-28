@@ -2,6 +2,7 @@
   <style>
     #root { position: absolute; inset: 0; font-family: "Montserrat", sans-serif; }
     /* Cards sit in the 168-1330 px band Instagram leaves clear, away from the right-hand action rail. */
+    #root .slot { position: absolute; inset: 0; }
     #root .card {
       position: absolute; left: 70px; right: 150px; top: 560px; height: 640px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -41,41 +42,59 @@
     }
   </style>
   <div id="root" data-composition-id="text" data-width="1080" data-height="1920">
-    <div id="card1" class="clip card hook" data-start="0.00" data-duration="2.00" data-track-index="1" data-layout-allow-overlap>
+    <div id="card1" class="clip slot" data-start="0.00" data-duration="2.00" data-track-index="1">
+      <div id="card1-in" class="card hook" data-layout-allow-overlap>
         <div id="c1-l1" class="line">Exam se ek raat</div>
         <div id="c1-l2" class="line">pehle <em>mera dimaag:</em></div>
+      </div>
     </div>
-    <div id="card2" class="clip card good" data-start="2.00" data-duration="1.40" data-track-index="2" data-layout-allow-overlap>
+    <div id="card2" class="clip slot" data-start="2.00" data-duration="1.40" data-track-index="2">
+      <div id="card2-in" class="card good" data-layout-allow-overlap>
         <div id="c2-l1" class="line">Sab aata hai</div>
+      </div>
     </div>
-    <div id="card3" class="clip card bad" data-start="3.40" data-duration="1.40" data-track-index="3" data-layout-allow-overlap>
+    <div id="card3" class="clip slot" data-start="3.40" data-duration="1.40" data-track-index="3">
+      <div id="card3-in" class="card bad" data-layout-allow-overlap>
         <div id="c3-l1" class="line">Kuch nahi aata</div>
+      </div>
     </div>
-    <div id="card4" class="clip card good" data-start="4.80" data-duration="1.40" data-track-index="4" data-layout-allow-overlap>
+    <div id="card4" class="clip slot" data-start="4.80" data-duration="1.40" data-track-index="4">
+      <div id="card4-in" class="card good" data-layout-allow-overlap>
         <div id="c4-l1" class="line">Sab aata hai</div>
+      </div>
     </div>
-    <div id="card5" class="clip card bad" data-start="6.20" data-duration="1.60" data-track-index="5" data-layout-allow-overlap>
+    <div id="card5" class="clip slot" data-start="6.20" data-duration="1.60" data-track-index="5">
+      <div id="card5-in" class="card bad" data-layout-allow-overlap>
         <div id="c5-l1" class="line">Yeh chapter</div>
         <div id="c5-l2" class="line">syllabus mein tha??</div>
+      </div>
     </div>
-    <div id="card6" class="clip card good" data-start="7.80" data-duration="1.40" data-track-index="6" data-layout-allow-overlap>
+    <div id="card6" class="clip slot" data-start="7.80" data-duration="1.40" data-track-index="6">
+      <div id="card6-in" class="card good" data-layout-allow-overlap>
         <div id="c6-l1" class="line">Sab aata hai</div>
+      </div>
     </div>
-    <div id="card7" class="clip card bad" data-start="9.20" data-duration="1.80" data-track-index="7" data-layout-allow-overlap>
+    <div id="card7" class="clip slot" data-start="9.20" data-duration="1.80" data-track-index="7">
+      <div id="card7-in" class="card bad" data-layout-allow-overlap>
         <div id="c7-l1" class="line">Kuch.</div>
         <div id="c7-l2" class="line">Nahi.</div>
         <div id="c7-l3" class="line">Aata.</div>
+      </div>
     </div>
-    <div id="card8" class="clip card plain" data-start="11.00" data-duration="2.40" data-track-index="8" data-layout-allow-overlap>
+    <div id="card8" class="clip slot" data-start="11.00" data-duration="2.40" data-track-index="8">
+      <div id="card8-in" class="card plain" data-layout-allow-overlap>
         <div id="c8-chip" class="chip">Next morning</div>
         <div id="c8-l1" class="line">Jo aata tha,</div>
         <div id="c8-l2" class="line"><em>wahi likh diya</em></div>
+      </div>
     </div>
-    <div id="card9" class="clip card end" data-start="13.40" data-duration="2.60" data-track-index="9" data-layout-allow-overlap>
+    <div id="card9" class="clip slot" data-start="13.40" data-duration="2.60" data-track-index="9">
+      <div id="card9-in" class="card end" data-layout-allow-overlap>
         <div id="c9-l1" class="line">Tag karo us dost ko</div>
         <div id="c9-l2" class="line">jo raat ko <em>panic</em></div>
         <div id="c9-l3" class="line">karta hai</div>
         <div id="c9-handle" class="handle">@ipa_institute_ajmer</div>
+      </div>
     </div>
   </div>
   <script>
@@ -89,19 +108,45 @@
     });
     const tl = gsap.timeline({ paused: true });
     // Each card pops in on its cut; lines follow 0.07 s apart. The hook (card 1) is already on screen at frame 0.
+    tl.set("#card1-in", { opacity: 1, visibility: "visible" }, 0.00);
+    tl.set("#card1-in", { opacity: 0, visibility: "hidden" }, 2.00);
     tl.fromTo("#c1-l1", { scale: 1.04 }, { scale: 1, duration: 0.8, ease: "power2.out" }, 0);
+    tl.set("#card2-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card2-in", { opacity: 1, visibility: "visible" }, 2.00);
+    tl.set("#card2-in", { opacity: 0, visibility: "hidden" }, 3.40);
     tl.fromTo("#c2-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 2.04);
+    tl.set("#card3-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card3-in", { opacity: 1, visibility: "visible" }, 3.40);
+    tl.set("#card3-in", { opacity: 0, visibility: "hidden" }, 4.80);
     tl.fromTo("#c3-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 3.44);
+    tl.set("#card4-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card4-in", { opacity: 1, visibility: "visible" }, 4.80);
+    tl.set("#card4-in", { opacity: 0, visibility: "hidden" }, 6.20);
     tl.fromTo("#c4-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 4.84);
+    tl.set("#card5-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card5-in", { opacity: 1, visibility: "visible" }, 6.20);
+    tl.set("#card5-in", { opacity: 0, visibility: "hidden" }, 7.80);
     tl.fromTo("#c5-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 6.24);
     tl.fromTo("#c5-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 6.31);
+    tl.set("#card6-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card6-in", { opacity: 1, visibility: "visible" }, 7.80);
+    tl.set("#card6-in", { opacity: 0, visibility: "hidden" }, 9.20);
     tl.fromTo("#c6-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 7.84);
+    tl.set("#card7-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card7-in", { opacity: 1, visibility: "visible" }, 9.20);
+    tl.set("#card7-in", { opacity: 0, visibility: "hidden" }, 11.00);
     tl.fromTo("#c7-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 9.24);
     tl.fromTo("#c7-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 9.31);
     tl.fromTo("#c7-l3", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 9.38);
+    tl.set("#card8-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card8-in", { opacity: 1, visibility: "visible" }, 11.00);
+    tl.set("#card8-in", { opacity: 0, visibility: "hidden" }, 13.40);
     tl.fromTo("#c8-chip", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 11.04);
     tl.fromTo("#c8-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 11.11);
     tl.fromTo("#c8-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 11.18);
+    tl.set("#card9-in", { opacity: 0, visibility: "hidden" }, 0);
+    tl.set("#card9-in", { opacity: 1, visibility: "visible" }, 13.40);
+    tl.set("#card9-in", { opacity: 0, visibility: "hidden" }, 16.00);
     tl.fromTo("#c9-l1", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 13.44);
     tl.fromTo("#c9-l2", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 13.51);
     tl.fromTo("#c9-l3", { opacity: 0, y: 26, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(1.6)" }, 13.58);

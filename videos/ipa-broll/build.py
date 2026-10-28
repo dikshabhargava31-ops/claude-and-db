@@ -151,6 +151,7 @@ TEXT_TEMPLATE = """<template>
   <style>
     #root {{ position: absolute; inset: 0; font-family: "Montserrat", sans-serif; }}
     /* Cards sit in the 168-1330 px band Instagram leaves clear, away from the right-hand action rail. */
+    #root .slot {{ position: absolute; inset: 0; }}
     #root .card {{
       position: absolute; left: 70px; right: 150px; top: 560px; height: 640px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -235,9 +236,15 @@ def build_html(name=None):
                 inner.append(f'<div id="c{i}-handle" class="handle">{html.escape(CONFIG["handle"])}</div>')
             body = "\n        ".join(inner)
             cards.append(
-                f'    <div id="card{i}" class="clip card {style}" data-start="{t:.2f}" data-duration="{d:.2f}"'
-                f' data-track-index="{i}" data-layout-allow-overlap>\n        {body}\n    </div>')
+                f'    <div id="card{i}" class="clip slot" data-start="{t:.2f}" data-duration="{d:.2f}"'
+                f' data-track-index="{i}">\n      <div id="card{i}-in" class="card {style}" data-layout-allow-overlap>\n'
+                f'        {body}\n      </div>\n    </div>')
             ids = [s.split('"')[1] for s in inner]
+            # Hard show/hide on the card's own window so no card lingers into the next shot.
+            if i > 1:
+                tweens.append(f'    tl.set("#card{i}-in", {{ opacity: 0, visibility: "hidden" }}, 0);')
+            tweens.append(f'    tl.set("#card{i}-in", {{ opacity: 1, visibility: "visible" }}, {t:.2f});')
+            tweens.append(f'    tl.set("#card{i}-in", {{ opacity: 0, visibility: "hidden" }}, {t + d:.2f});')
             if i == 1:
                 # Frame 0 is the thumbnail: the hook is fully visible, with a slow settle only.
                 tweens.append(f'    tl.fromTo("#{ids[0]}", {{ scale: 1.04 }}, {{ scale: 1, duration: 0.8, ease: "power2.out" }}, 0);')
