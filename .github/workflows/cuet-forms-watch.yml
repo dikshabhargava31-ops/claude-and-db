@@ -1,0 +1,79 @@
+name: CUET forms watcher
+
+# Twice a week Claude checks every college form on Everything CUET against the college's official
+# admission pages and looks for new UG forms, then opens a pull request with the changes.
+# Nothing reaches the live site until someone reviews and merges that pull request.
+# Needs the repository secret ANTHROPIC_API_KEY (Settings -> Secrets and variables -> Actions).
+on:
+  schedule:
+    - cron: "23 2 * * 1,4"   # Monday and Thursday, 07:53 India time
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Form ids to check, space separated (empty: all)"
+        type: string
+        default: ""
+      discover:
+        description: "Also look for new forms"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: cuet-forms-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the API key
+        id: key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::notice::Forms watcher skipped: add the ANTHROPIC_API_KEY secret (Settings -> Secrets and variables -> Actions) to turn it on."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install the Anthropic SDK
+        if: steps.key.outputs.ok == 'true'
+        run: pip install "anthropic>=1.1"
+
+      - name: Check forms with Claude
+        if: steps.key.outputs.ok == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ONLY: ${{ inputs.only }}
+          DISCOVER: ${{ inputs.discover }}
+        run: |
+          args=""
+          [ -n "$ONLY" ] && args="--only $ONLY"
+          [ "$DISCOVER" = "false" ] && args="$args --no-discover"
+          python3 cuet/scripts/forms_watch.py $args
+
+      - name: Open a pull request for review
+        if: steps.key.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git diff --quiet -I '"checked"' cuet/data/forms.json && { echo "No changes to forms."; exit 0; }
+          branch="forms-watch/$(date +%Y-%m-%d-%H%M)"
+          git config user.name "cuet-forms-watch"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add cuet/data/forms.json
+          git commit -m "Everything CUET: forms update $(date +%Y-%m-%d)"
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" \
+            --title "Forms update $(date +%d %b %Y)" \
+            --body-file cuet/data/forms-watch.md

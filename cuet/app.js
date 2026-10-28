@@ -364,10 +364,31 @@
     return { route: parts[0] || '', arg: parts.slice(1).join('/'), q: new URLSearchParams(qs || '') };
   }
   const ROUTES = {};
+  /* Website menu: every main feature visible, Talk to a senior always one tap away. */
+  const MENU = [['start', 'Find your course'], ['colleges', 'Colleges'], ['forms', 'Application forms'], ['calendar', 'Reminders'], ['resources', 'Free kit'], ['seniors', 'Talk to a senior'], ['dream', 'My List']];
+  const MENU_OF = { college: 'colleges', course: 'dream', applications: 'dream', kit: 'resources', parent: 'dream' };
   function renderTabs(route) {
-    const tab = route in TAB_OF ? TAB_OF[route] : TABS.some(x => x[0] === route) ? route : 'more';
-    $('#tabs').innerHTML = TABS.map(([r, l, i]) => `<a href="#/${r}" ${r === tab ? 'aria-current="page"' : ''}>${ico(i)}<span>${t(l)}</span>${r === 'dream' && S.dream.length ? `<span class="badge">${S.dream.length}</span>` : ''}</a>`).join('');
+    const cur = MENU_OF[route] || route;
+    $('#tabs').innerHTML = MENU.map(([r, l]) => `<a href="#/${r}" class="${r === 'seniors' ? 'm-senior' : ''}" ${r === cur ? 'aria-current="page"' : ''}>${t(l)}${r === 'dream' && S.dream.length ? ` <span class="badge">${S.dream.length}</span>` : ''}</a>`).join('');
   }
+  /* A title band at the top of inner pages, so every page says what it is for. */
+  const BANNERS = {
+    colleges: ['Colleges', 'Every university that takes CUET, plus colleges with their own forms.', 'campus'],
+    forms: ['Application forms 2027', 'Colleges with their own forms, with dates and help filling them.', 'forms'],
+    dream: ['My List', 'Your saved colleges, sorted into Dream, Target and Safe.', 'course'],
+    applications: ['My List', 'Track each application and the documents you need.', 'course'],
+    calendar: ['Reminders', 'Application form and CUET dates. Tap 🔔 and we\'ll remind you.', 'calendar'],
+    more: ['More', 'Tools, guides and your account.', 'course'],
+    tools: ['CUET tools', 'Calculators and guides.', 'kit'],
+    predictor: ['Score predictor', 'Use this once your CUET scores are out.', 'course'],
+    pricing: ['Help with forms', 'Our team fills your forms, checks them twice and submits before the deadline.', 'forms'],
+    community: ['Community', 'College groups and the allotment-day tracker.', 'senior'],
+    account: ['My account', '', 'course'], admin: ['Leads', '', 'kit'], login: ['Log in', 'Save your colleges and get reminders. Free.', 'course']
+  };
+  const picture = (slot, alt) => {
+    const ph = (C.photos || {})[slot];
+    return ph ? `<img class="pic photo" src="${esc(ph)}" alt="${esc(alt)}" loading="lazy">` : `<img class="pic" src="assets/illus/${slot}.svg" alt="${esc(alt)}" loading="lazy">`;
+  };
   function render() {
     let { route, arg, q } = parseHash();
     if (!ROUTES[route]) route = '';
@@ -378,14 +399,16 @@
     $('#langBtn').textContent = S.lang === 'hi' ? 'EN' : 'हि';
     const acct = $('#acctBtn'), inAs = loggedIn() && profileDone();
     acct.href = inAs ? '#/account' : '#/login';
-    acct.textContent = inAs ? (S.profile.name || '?')[0].toUpperCase() : 'Log in';
+    acct.textContent = inAs ? 'Hi, ' + (S.profile.name || '').split(' ')[0] : 'Log in';
     acct.classList.toggle('me', inAs);
     acct.setAttribute('aria-label', inAs ? 'Your account' : 'Log in');
     $('[data-t="bot.title"]').textContent = t('Admission assistant');
     // A fresh element each time, so a page's listeners never pile up on re-render.
     const old = $('#view'), view = old.cloneNode(false);
     old.replaceWith(view);
-    view.innerHTML = ROUTES[route](arg, q) || '';
+    const band = BANNERS[route];
+    view.innerHTML = (band ? `<section class="page-band"><div class="wrap band-in"><div><h1>${esc(t(band[0]))}</h1>${band[1] ? `<p>${esc(band[1])}</p>` : ''}</div><img src="assets/illus/${band[2]}.svg" alt="" aria-hidden="true"></div></section>` : '') + (ROUTES[route](arg, q) || '');
+    $('#tabs').classList.remove('open'); $('#menuBtn').setAttribute('aria-expanded', 'false');
     const mount = ROUTES[route + ':mount'];
     mount && mount(arg, q);
     document.title = (route ? title + ' · ' : '') + 'Everything CUET';
@@ -393,6 +416,7 @@
   }
   window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
   window.addEventListener('scroll', () => $('#bar').classList.toggle('scrolled', window.scrollY > 4), { passive: true });
+  $('#menuBtn').addEventListener('click', () => { const m = $('#tabs'); m.classList.toggle('open'); $('#menuBtn').setAttribute('aria-expanded', m.classList.contains('open')); });
 
   /* ---------- shared bits ---------- */
   function upcomingEvents(onlyMine) {
@@ -595,38 +619,97 @@
       <div class="stat"><b>${v('Exam cities')}</b><span>exam cities</span></div></div></section>`;
   }
   ROUTES[''] = () => {
-    const closing = forms().filter(f => formStatus(f) === 'open').map(f => ({ f, nd: nextDeadline(f) })).filter(x => x.nd).sort((a, b) => a.nd.when - b.nd.when).slice(0, 3);
+    const closing = forms().filter(f => formStatus(f) === 'open').map(f => ({ f, nd: nextDeadline(f) })).filter(x => x.nd).sort((a, b) => a.nd.when - b.nd.when).slice(0, 4);
     const name = (S.profile.name || '').split(' ')[0];
     const quizTop = S.quiz && S.quiz.result ? S.quiz.result.map(courseByKey).filter(Boolean) : [];
-    return `<div class="page"><div class="wrap">
-      <section class="hello">
+    const FEATURES = [
+      ['start', 'course', 'Find your course', 'Not sure what to study? A 2-minute quiz suggests courses that fit you.'],
+      ['colleges', 'campus', 'Every CUET college', `All ${unis().length || 244} universities that take CUET, with fees, location and how to get in.`],
+      ['forms', 'forms', 'Application forms', `${forms().length} colleges with their own 2027 forms, sorted by deadline.`],
+      ['calendar', 'calendar', 'Form reminders', 'We remind you 7 days, 2 days and on the day each form closes.'],
+      ['seniors', 'senior', 'Talk to a senior', 'Ask students from the college you want about courses, hostels and life.'],
+      ['resources', 'kit', 'Free CUET kit', 'Your personal college plan and the CUET 2027 checklist, as PDFs.']
+    ];
+    return `
+    <section class="hero"><div class="wrap hero-in">
+      <div class="hero-copy">
         <div class="eyebrow">✦ Free for every CUET student</div>
-        <h1>${name ? `Hi ${esc(name)}! ` : ''}What do you want to study?</h1>
-        <p>Tell us your course and we'll pick your colleges and remind you of every form.</p>
-        ${courseBox()}
-      </section>
-      <a class="card choice section" href="#/start">
-        <span class="av big">${ico('bolt')}</span>
-        <span class="grow"><b>Not sure yet? Take the 2-minute quiz</b><small>5 quick taps. We'll suggest courses that fit you.</small></span>
-        ${ico('right', 'chev')}
-      </a>
-      ${quizTop.length ? `<section class="section"><div class="section-head"><h2>Your quiz picks</h2><a href="#/start">Retake</a></div><div class="list">${quizTop.map(c => `<a class="list-row" href="#/course/${c.key}"><span class="av">${ico('cap')}</span><span class="grow"><span class="t">${esc(c.name)}</span><span class="s">${esc(c.what)}</span></span>${ico('right', 'chev')}</a>`).join('')}</div></section>` : ''}
-      <section class="section">
-        <h2>How it works</h2>
-        <div class="steps3">
-          <div><span class="num">1</span><b>Pick a course</b><small>Type it, or take the quiz.</small></div>
-          <div><span class="num">2</span><b>Get your colleges</b><small>We pick Dream, Target and Safe options.</small></div>
-          <div><span class="num">3</span><b>Never miss a form</b><small>We remind you before each one closes.</small></div>
-        </div>
-      </section>
-      ${closing.length ? `<section class="section"><div class="section-head"><h2>Forms closing soon</h2><a href="#/forms">All forms</a></div>
-        <div class="list">${closing.map(({ f, nd }) => `<a class="list-row" href="#/forms?open=${esc(f.id)}"><span class="av">${esc(initials(f.name))}</span><span class="grow"><span class="t">${esc(f.name)}</span><span class="s">${esc(nd.label)} · ${fmtDate(nd.when)}</span></span><span class="days">${daysLeft(nd.when)}</span></a>`).join('')}</div></section>` : ''}
-      <section class="section"><a class="card choice" href="#/resources">
-        <span class="av big">${ico('star')}</span>
-        <span class="grow"><b>Free CUET kit</b><small>Your personal college plan + CUET 2027 checklist, as PDFs.</small></span>${ico('right', 'chev')}
-      </a></section>
-      <section class="section"><div class="cta-band"><div><h3>Stuck? Talk to us.</h3><p>Our team and college seniors help you decide.</p></div><a class="btn pri" href="#/seniors">Connect with us</a></div></section>
-    </div></div>`;
+        <h1>${name ? `Hi ${esc(name)}, let's` : "Let's"} find your college.</h1>
+        <p class="lead">Tell us what you want to study. We'll pick your colleges, remind you of every form and help you apply.</p>
+        ${courseBox('What do you want to study? e.g. B.Com, Psychology')}
+        <div class="row hero-btns"><a class="btn pri" href="#/start">Not sure? Take the 2-min quiz</a><a class="btn" href="#/seniors">Talk to a senior</a></div>
+      </div>
+      <div class="hero-art">${picture('campus', 'Students on a university campus')}</div>
+    </div></section>
+
+    <section class="strip"><div class="wrap strip-in">
+      <div><b>${unis().length || 244}</b><span>CUET universities</span></div>
+      <div><b>${forms().length}</b><span>application forms</span></div>
+      <div><b>${courses().length}</b><span>courses mapped</span></div>
+      <div><b>₹0</b><span>to use</span></div>
+    </div></section>
+
+    ${quizTop.length ? `<section class="block"><div class="wrap"><div class="section-head"><h2>Your quiz picks</h2><a href="#/start">Retake</a></div><div class="grid g3">${quizTop.map(c => `<a class="card choice" href="#/course/${c.key}"><span class="grow"><b>${esc(c.name)}</b><small>${esc(c.what)}</small></span>${ico('right', 'chev')}</a>`).join('')}</div></div></section>` : ''}
+
+    <section class="block"><div class="wrap">
+      <div class="block-head"><div class="eyebrow">✦ What we do</div><h2>Everything you need after Class 12, in one place</h2></div>
+      <div class="features">${FEATURES.map(([r, img, h, d]) => `<a class="feature" href="#/${r}"><img src="assets/illus/${img}.svg" alt="" aria-hidden="true"><div><h3>${h}</h3><p>${d}</p><span class="more">${r === 'seniors' ? 'Connect with us' : 'Open'} ${ico('right', 'sm')}</span></div></a>`).join('')}</div>
+    </div></section>
+
+    <section class="block alt"><div class="wrap">
+      <div class="block-head"><div class="eyebrow">✦ How it works</div><h2>Three steps. No confusion.</h2></div>
+      <div class="steps3">
+        <div><span class="num">1</span><b>Pick a course</b><small>Type it, or take the quiz if you're not sure.</small></div>
+        <div><span class="num">2</span><b>Get your colleges</b><small>We pick Dream, Target and Safe options for you.</small></div>
+        <div><span class="num">3</span><b>Apply on time</b><small>We remind you, and can fill the forms for you.</small></div>
+      </div>
+    </div></section>
+
+    <section class="block"><div class="wrap split">
+      <div class="split-art">${picture('senior', 'A student talking to a college senior')}</div>
+      <div>
+        <div class="eyebrow">✦ Talk to a senior</div>
+        <h2>Ask someone who's already there</h2>
+        <p class="lead">Hostel, campus life, which course to choose, which college to put first: ask students from the college you want. Our admission team helps too.</p>
+        <ul class="ticks"><li>Students from DU, BHU, JMI, private universities and more</li><li>Talk in Hindi or English</li><li>Your parents can join too</li></ul>
+        <a class="btn pri" href="#/seniors" style="margin-top:16px">Connect with us</a>
+      </div>
+    </div></section>
+
+    ${closing.length ? `<section class="block alt"><div class="wrap">
+      <div class="section-head"><h2>Forms closing soon</h2><a href="#/forms">All application forms</a></div>
+      <div class="grid g2">${closing.map(({ f, nd }) => `<a class="card fcard2" href="#/forms?open=${esc(f.id)}"><span class="av">${esc(initials(f.name))}</span><span class="grow"><b>${esc(f.name)}</b><small>${esc(nd.label)} · ${fmtDate(nd.when)}</small></span><span class="days">${daysLeft(nd.when)}</span></a>`).join('')}</div>
+    </div></section>` : ''}
+
+    <section class="block"><div class="wrap split rev">
+      <div>
+        <div class="eyebrow">✦ Help with forms</div>
+        <h2>We'll fill your forms for you</h2>
+        <p class="lead">CUET, DU CSAS and private-university forms filled with you, checked twice and submitted before the deadline.</p>
+        <div class="row"><a class="btn pri" href="#/pricing">See how it works</a><a class="btn" href="#/forms">Browse forms</a></div>
+      </div>
+      <div class="split-art">${picture('forms', 'Filling an application form on a laptop')}</div>
+    </div></section>
+
+    <section class="block alt"><div class="wrap split">
+      <div class="split-art">${picture('kit', 'Free CUET college plan')}</div>
+      <div>
+        <div class="eyebrow">✦ Free download</div>
+        <h2>Get your free CUET kit</h2>
+        <p class="lead">Your personal college plan and the CUET 2027 checklist, ready to print or share with your parents.</p>
+        <a class="btn pri" href="#/resources">Get the free kit</a>
+      </div>
+    </div></section>
+
+    <section class="block"><div class="wrap">
+      <div class="block-head"><h2>Questions students ask</h2></div>
+      <div class="faq">${[
+        ['Is Everything CUET free?', 'Yes. Finding courses and colleges, reminders and the CUET kit are free. You pay only if you want our team to fill your forms.'],
+        ['I don\'t know what to study. Can you help?', 'Yes. Take the 2-minute quiz, or talk to a senior or our team. We\'ll suggest courses and colleges that fit you.'],
+        ['Do I need to log in?', 'Only to save colleges, get reminders or download the kit, so we can send them to you.'],
+        ['Are you part of NTA?', 'No. Everything CUET is an independent student service. Always check dates on official websites.']]
+        .map(([q, a]) => `<details class="card"><summary><b>${q}</b>${ico('plus', 'chev')}</summary><p>${a}</p></details>`).join('')}</div>
+    </div></section>`;
   };
   ROUTES[':mount'] = () => bindCourseSearch();
 
@@ -1857,7 +1940,13 @@
   ROUTES['more:mount'] = () => $('#view').addEventListener('click', e => { if (e.target.closest('[data-act="lang"]')) { S.lang = S.lang === 'hi' ? 'en' : 'hi'; save(); render(); } });
 
   function renderFoot() {
-    $('#railFoot').innerHTML = `<p>Free for every CUET student</p><p><a href="${esc(C.instagram)}" target="_blank" rel="noopener">Instagram</a> · <a href="${esc(C.youtube)}" target="_blank" rel="noopener">YouTube</a></p>`;
+    $('#railFoot').innerHTML = `<div class="foot-grid">
+      <div><img class="foot-logo" src="assets/wordmark-red.png" alt="Everything CUET" width="720" height="325"><p>Free help for every CUET student: find your course, pick your colleges and never miss a form.</p>
+        <p><a href="${esc(C.instagram)}" target="_blank" rel="noopener">Instagram</a> · <a href="${esc(C.youtube)}" target="_blank" rel="noopener">YouTube</a></p></div>
+      <div><b>Start here</b><a href="#/start">Find your course</a><a href="#/colleges">All colleges</a><a href="#/forms">Application forms</a><a href="#/calendar">Reminders</a></div>
+      <div><b>Get help</b><a href="#/seniors">Talk to a senior</a><a href="#/pricing">Help filling forms</a><a href="#/resources">Free CUET kit</a><a href="#/community">Community</a></div>
+      <div><b>Tools</b><a href="#/tools/marks">Marks calculator</a><a href="#/tools/fees">CUET fee calculator</a><a href="#/predictor">Score predictor</a><a href="#/more">More</a></div>
+    </div><p class="foot-fine">Everything CUET is independent and not part of the National Testing Agency or any university. Always check dates on official websites.</p>`;
   }
 
   /* ---------- assistant ---------- */
