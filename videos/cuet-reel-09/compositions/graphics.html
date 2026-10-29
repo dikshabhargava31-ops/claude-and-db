@@ -1,0 +1,98 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    #g-progress { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: rgba(255,255,255,0.12); }
+    #g-progress-fill { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: var(--accent, #FFC93C); transform-origin: 0 50%; }
+    #g-top { position: absolute; left: 60px; right: 60px; top: 190px; }
+    #g-chip { display: inline-flex; align-items: center; gap: 18px; padding: 14px 28px 14px 16px; border-radius: 60px;
+      background: rgba(10,15,44,0.72); border: 2px solid rgba(255,201,60,0.6); }
+    #g-chip-num { font-family: "League Gothic"; font-size: 64px; line-height: 1; color: #0A0F2C; background: var(--accent, #FFC93C);
+      border-radius: 40px; padding: 4px 20px 0; }
+    #g-chip-txt { font-family: Montserrat; font-weight: 800; font-size: 34px; letter-spacing: 0.14em; color: #fff; }
+    #g-dots { display: flex; gap: 10px; margin-top: 22px; margin-left: 8px; }
+    .dot { width: 30px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.22); }
+    .dot-on { background: rgba(255,201,60,0.55); }
+    .dot-now { background: var(--accent, #FFC93C); width: 56px; }
+    #g-title { position: absolute; left: 60px; right: 60px; top: 362px; font-family: Montserrat; font-weight: 900;
+      font-size: 78px; line-height: 1.04; color: #fff; text-transform: uppercase; }
+    .tt-w { display: inline-block; margin-right: 20px; }
+    .tt-acc { color: var(--accent, #FFC93C); }
+    .card { position: absolute; top: 556px; left: 90px; width: 900px; }
+    .card-in { display: flex; align-items: center; gap: 22px; padding: 24px 28px; border-radius: 30px;
+      background: rgba(255,255,255,0.96); box-shadow: 0 24px 60px rgba(0,0,0,0.45); }
+    .card-icon { flex: 0 0 auto; width: 84px; height: 84px; border-radius: 24px; display: flex; align-items: center; justify-content: center; }
+    .card-icon svg { width: 52px; height: 52px; }
+    .card-accent .card-icon { background: var(--accent, #FFC93C); color: #0A0F2C; }
+    .card-good .card-icon { background: #22C55E; color: #fff; }
+    .card-bad .card-icon { background: #EF4444; color: #fff; }
+    .card-blue .card-icon { background: #3D7BFF; color: #fff; }
+    .card-main { font-family: Montserrat; font-weight: 900; font-size: 46px; line-height: 1.05; color: #0A0F2C; }
+    .card-sub { font-family: Poppins; font-weight: 600; font-size: 30px; line-height: 1.15; color: #4B5563; margin-top: 6px; }
+  </style>
+  <div id="root" data-composition-id="graphics" data-width="1080" data-height="1920">
+    <div id="g-progress" data-layout-ignore><div id="g-progress-fill"></div></div>
+    <div id="g-top" class="clip" data-start="1.250" data-duration="22.61" data-track-index="0">
+      <div id="g-top-in">
+        <div id="g-chip"><span id="g-chip-num">RECAP</span><span id="g-chip-txt">CUET FORM SE PEHLE</span></div>
+        <div id="g-dots"><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on dot-now"></span><span class="dot"></span></div>
+      </div>
+    </div>
+    <div id="g-title" class="clip" data-start="1.400" data-duration="22.46" data-track-index="1">
+      <div id="g-title-in"><span class="tt-w">Form</span><span class="tt-w">se</span><span class="tt-w">pehle:</span><span class="tt-w tt-acc">5</span><span class="tt-w">rules</span></div>
+    </div>
+    <div id="card-0" class="clip card card-left card-bad" data-start="5.38" data-duration="2.21" data-track-index="2">
+      <div id="card-0-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12" /><path d="M18 6L6 18" /></svg></div>
+        <div class="card-txt"><div class="card-main">1. Crowd ki list copy mat karo</div></div>
+      </div>
+    </div>
+    <div id="card-1" class="clip card card-right card-blue" data-start="7.64" data-duration="3.2" data-track-index="3">
+      <div id="card-1-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="4" /><circle cx="12" cy="12" r="0.8" /></svg></div>
+        <div class="card-txt"><div class="card-main">2. Asli score pe planning</div><div class="card-sub">best case pe nahi</div></div>
+      </div>
+    </div>
+    <div id="card-2" class="clip card card-left card-accent" data-start="11.34" data-duration="3.2" data-track-index="2">
+      <div id="card-2-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7h11" /><path d="M9 12h11" /><path d="M9 17h11" /><path d="M4 7h.5" /><path d="M4 12h.5" /><path d="M4 17h.5" /></svg></div>
+        <div class="card-txt"><div class="card-main">3. Dream, target, safe list</div><div class="card-sub">ready rakho</div></div>
+      </div>
+    </div>
+    <div id="card-3" class="clip card card-right card-blue" data-start="14.98" data-duration="3.2" data-track-index="3">
+      <div id="card-3-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19V9" /><path d="M12 19V5" /><path d="M19 19v-7" /></svg></div>
+        <div class="card-txt"><div class="card-main">4. Data pe bharosa</div><div class="card-sub">reels pe nahi</div></div>
+      </div>
+    </div>
+    <div id="card-4" class="clip card card-left card-good" data-start="18.24" data-duration="3.2" data-track-index="2">
+      <div id="card-4-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7" /></svg></div>
+        <div class="card-txt"><div class="card-main">5. Form ko list se match karo</div><div class="card-sub">subject mapping</div></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#g-progress-fill", { scaleX: 0 }, { scaleX: 1, duration: 26.41, ease: "none" }, 0);
+    // the opener's badge lands here as the chip (carry across)
+    tl.fromTo("#g-top-in", { y: 160, scale: 1.5, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.55, ease: "expo.out" }, 1.250);
+    tl.fromTo("#g-title-in .tt-w", { opacity: 0, y: 40, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "power4.out" }, 1.400);
+    tl.to("#g-title-in, #g-top-in", { opacity: 0, y: -40, filter: "blur(8px)", duration: 0.3, ease: "power3.in" }, 23.56);
+    tl.fromTo("#card-0-in", { x: -1000, rotation: -6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 5.38);
+    tl.fromTo("#card-0-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 5.53);
+    tl.to("#card-0-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 7.35);
+    tl.fromTo("#card-1-in", { x: 1000, rotation: 6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 7.64);
+    tl.fromTo("#card-1-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 7.79);
+    tl.to("#card-1-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 10.6);
+    tl.fromTo("#card-2-in", { x: -1000, rotation: -6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 11.34);
+    tl.fromTo("#card-2-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 11.49);
+    tl.to("#card-2-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 14.3);
+    tl.fromTo("#card-3-in", { x: 1000, rotation: 6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 14.98);
+    tl.fromTo("#card-3-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 15.13);
+    tl.to("#card-3-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 17.94);
+    tl.fromTo("#card-4-in", { x: -1000, rotation: -6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 18.24);
+    tl.fromTo("#card-4-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 18.39);
+    tl.to("#card-4-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 21.2);
+    window.__timelines["graphics"] = tl;
+  </script>
+</template>

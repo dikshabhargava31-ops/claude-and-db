@@ -1,0 +1,848 @@
+{
+ "series": "CUET 2027  ·  COLLEGE LIST",
+ "words": "words_rom.json",
+ "reels": [
+  {
+   "n": 1,
+   "badge": "MUST KNOW",
+   "bignum": "!",
+   "chip": "COLLEGE LIST",
+   "headline": [
+    "List",
+    "mein",
+    "naam",
+    "nahi?",
+    "*Seat*",
+    "nahi"
+   ],
+   "title": [
+    "College",
+    "*list*",
+    "=",
+    "aapki",
+    "*seat*"
+   ],
+   "tease": "Sabse important baat",
+   "segments": [
+    [
+     210.69,
+     215.53
+    ],
+    [
+     22.913,
+     30.65
+    ],
+    [
+     262.24,
+     265.59
+    ]
+   ],
+   "hi": [
+    "important",
+    "galti",
+    "seat",
+    "naam",
+    "mehnat"
+   ],
+   "fix": {
+    "262.3": "Aur",
+    "26.1": "counselling"
+   },
+   "cards": [
+    {
+     "t": 211.06,
+     "text": "College list",
+     "icon": "list",
+     "tone": "accent",
+     "sub": "sabse important, sabse ignored"
+    },
+    {
+     "t": 26.1,
+     "text": "Counselling preference",
+     "icon": "target",
+     "tone": "blue",
+     "sub": "result ke baad asli test"
+    },
+    {
+     "t": 28.63,
+     "text": "1 galti = mehnat pe paani",
+     "icon": "alert",
+     "tone": "bad"
+    },
+    {
+     "t": 263.04,
+     "text": "Naam nahi = Seat nahi",
+     "icon": "cross",
+     "tone": "bad"
+    }
+   ],
+   "punches": [
+    {
+     "t": 28.49,
+     "until": 30.4
+    }
+   ]
+  },
+  {
+   "n": 2,
+   "badge": "TIP 6",
+   "chip": "COLLEGE + COURSE",
+   "headline": [
+    "Cut-off",
+    "*course*",
+    "ka",
+    "hota",
+    "hai"
+   ],
+   "title": [
+    "College",
+    "nahi,",
+    "*College",
+    "*+",
+    "*Course"
+   ],
+   "tease": "Cut-off college ka nahi, course ka",
+   "segments": [
+    [
+     32.275,
+     55.201
+    ]
+   ],
+   "hi": [
+    "course",
+    "cut-off",
+    "958.71",
+    "919.87",
+    "39"
+   ],
+   "fix": {
+    "37.96": "cut-off",
+    "38.1": "",
+    "47.58": "cut-off",
+    "47.77": "",
+    "50.93": "cut-off",
+    "51.12": "",
+    "44.8": "BA",
+    "45.0": "Honours",
+    "49.46": "B.Com",
+    "49.66": "",
+    "49.95": "Honours",
+    "36.16": "zyadatar",
+    "36.51": "",
+    "35.05": "Chhatha"
+   },
+   "cards": [
+    {
+     "t": 34.15,
+     "text": "College + Course",
+     "icon": "college",
+     "tone": "accent",
+     "sub": "dono ka pair chuno"
+    },
+    {
+     "t": 38.24,
+     "text": "Cut-off course ka hota hai",
+     "icon": "alert",
+     "tone": "bad",
+     "sub": "college ka nahi"
+    },
+    {
+     "t": 45.59,
+     "text": "BA (H) Political Science",
+     "icon": "chart",
+     "tone": "blue",
+     "sub": "Hindu College: 958.71"
+    },
+    {
+     "t": 49.46,
+     "text": "B.Com (H)",
+     "icon": "chart",
+     "tone": "blue",
+     "sub": "Hindu College: 919.87"
+    },
+    {
+     "t": 53.57,
+     "text": "~39 marks ka farak",
+     "icon": "star",
+     "tone": "accent",
+     "sub": "same college!"
+    }
+   ],
+   "punches": [
+    {
+     "t": 38.24,
+     "until": 40.0
+    },
+    {
+     "t": 53.57,
+     "until": 55.0
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "badge": "TIP 6",
+   "chip": "PEHLE COURSE",
+   "headline": [
+    "Pehle",
+    "*course*",
+    "phir",
+    "college"
+   ],
+   "title": [
+    "Pehle",
+    "*course,*",
+    "phir",
+    "college"
+   ],
+   "tease": "Pehle course, phir college",
+   "segments": [
+    [
+     58.018,
+     68.32
+    ]
+   ],
+   "hi": [
+    "pair",
+    "course",
+    "pehle",
+    "teen"
+   ],
+   "fix": {
+    "58.08": "Har",
+    "67.37": "lambe"
+   },
+   "cards": [
+    {
+     "t": 58.78,
+     "text": "Har entry = ek pair",
+     "icon": "list",
+     "tone": "accent",
+     "sub": "College + Course"
+    },
+    {
+     "t": 61.24,
+     "text": "Pehle course, phir college",
+     "icon": "check",
+     "tone": "good",
+     "sub": "isi order mein"
+    },
+    {
+     "t": 63.92,
+     "text": "Famous college, galat course?",
+     "icon": "alert",
+     "tone": "bad",
+     "sub": "3 saal bahut lambe lagenge"
+    }
+   ],
+   "punches": [
+    {
+     "t": 66.66,
+     "until": 67.7
+    }
+   ]
+  },
+  {
+   "n": 4,
+   "badge": "TIP 7",
+   "chip": "DU KE BAHAR",
+   "headline": [
+    "DU",
+    "ke",
+    "*bahar*",
+    "bhi",
+    "duniya",
+    "hai"
+   ],
+   "title": [
+    "DU",
+    "ke",
+    "*bahar*",
+    "bhi",
+    "duniya"
+   ],
+   "tease": "DU ke bahar bhi duniya hai",
+   "segments": [
+    [
+     69.04,
+     92.03
+    ]
+   ],
+   "hi": [
+    "du",
+    "jnu",
+    "jamia",
+    "bhu",
+    "amu",
+    "nirf",
+    "central"
+   ],
+   "fix": {
+    "71.66": "Saatva"
+   },
+   "cards": [
+    {
+     "t": 75.9,
+     "text": "NIRF 2025",
+     "icon": "chart",
+     "tone": "blue",
+     "sub": "University Ranking"
+    },
+    {
+     "t": 78.46,
+     "text": "#2  JNU",
+     "icon": "star",
+     "tone": "accent",
+     "sub": "NIRF 2025"
+    },
+    {
+     "t": 79.9,
+     "text": "#4  Jamia Millia Islamia",
+     "icon": "star",
+     "tone": "accent",
+     "sub": "NIRF 2025"
+    },
+    {
+     "t": 82.7,
+     "text": "#5  Delhi University",
+     "icon": "star",
+     "tone": "accent",
+     "sub": "NIRF 2025"
+    },
+    {
+     "t": 85.18,
+     "text": "#6  BHU",
+     "icon": "star",
+     "tone": "accent",
+     "sub": "NIRF 2025"
+    },
+    {
+     "t": 86.54,
+     "text": "#10  AMU",
+     "icon": "star",
+     "tone": "accent",
+     "sub": "NIRF 2025"
+    },
+    {
+     "t": 88.22,
+     "text": "Sab Central Universities",
+     "icon": "college",
+     "tone": "good",
+     "sub": "CUET se UG admission"
+    }
+   ],
+   "punches": [
+    {
+     "t": 73.9,
+     "until": 75.6
+    }
+   ]
+  },
+  {
+   "n": 5,
+   "badge": "TIP 8",
+   "chip": "SAFE TIER",
+   "headline": [
+    "Safe",
+    "ka",
+    "matlab",
+    "*kharab*",
+    "nahi"
+   ],
+   "title": [
+    "Safe",
+    "=",
+    "*kharab*",
+    "nahi"
+   ],
+   "tease": "Safe ka matlab kharab nahi",
+   "segments": [
+    [
+     92.0,
+     121.48
+    ],
+    [
+     124.972,
+     131.07
+    ]
+   ],
+   "hi": [
+    "safe",
+    "backup",
+    "saal",
+    "cuet",
+    "b.tech"
+   ],
+   "fix": {
+    "98.16": "Aathva",
+    "125.03": "Ek",
+    "129.0": "CUET",
+    "128.38": "B.Tech"
+   },
+   "cards": [
+    {
+     "t": 100.06,
+     "text": "Safe tier = sirf backup?",
+     "icon": "alert",
+     "tone": "bad",
+     "sub": "halke mein mat lo"
+    },
+    {
+     "t": 108.06,
+     "text": "Yahi tier saal bachata hai",
+     "icon": "star",
+     "tone": "good"
+    },
+    {
+     "t": 112.78,
+     "text": "Central University of Rajasthan",
+     "icon": "college",
+     "tone": "blue",
+     "sub": "Bandarsindri, Ajmer"
+    },
+    {
+     "t": 115.77,
+     "text": "Fully funded",
+     "icon": "check",
+     "tone": "good",
+     "sub": "Central University"
+    },
+    {
+     "t": 119.22,
+     "text": "UG admission: CUET score",
+     "icon": "check",
+     "tone": "accent"
+    },
+    {
+     "t": 125.28,
+     "text": "CU Raj B.Tech: CUET UG se nahi",
+     "icon": "alert",
+     "tone": "bad"
+    }
+   ],
+   "punches": [
+    {
+     "t": 108.06,
+     "until": 111.4
+    }
+   ]
+  },
+  {
+   "n": 6,
+   "badge": "TIP 8",
+   "chip": "48 CENTRAL UNIS",
+   "headline": [
+    "*48*",
+    "central",
+    "universities"
+   ],
+   "title": [
+    "*48*",
+    "Central",
+    "Universities"
+   ],
+   "tease": "48 central universities",
+   "segments": [
+    [
+     131.04,
+     142.04
+    ]
+   ],
+   "hi": [
+    "48",
+    "state",
+    "safe",
+    "private",
+    "fees",
+    "placement"
+   ],
+   "fix": {
+    "131.1": "NTA",
+    "138.36": "ka"
+   },
+   "cards": [
+    {
+     "t": 131.97,
+     "text": "48 Central Universities",
+     "icon": "college",
+     "tone": "blue",
+     "sub": "NTA ki list mein"
+    },
+    {
+     "t": 133.66,
+     "text": "Apne state wali",
+     "icon": "target",
+     "tone": "good",
+     "sub": "safe tier mein zaroor rakho"
+    },
+    {
+     "t": 136.88,
+     "text": "Private universities bhi",
+     "icon": "check",
+     "tone": "accent",
+     "sub": "CUET score leti hain"
+    },
+    {
+     "t": 139.37,
+     "text": "Fees + placement",
+     "icon": "alert",
+     "tone": "bad",
+     "sub": "khud check karo"
+    }
+   ],
+   "punches": [
+    {
+     "t": 133.66,
+     "until": 135.5
+    }
+   ]
+  },
+  {
+   "n": 7,
+   "badge": "TIP 9",
+   "chip": "ALAG REGISTRATION",
+   "headline": [
+    "Har",
+    "university",
+    "ka",
+    "*alag*",
+    "darwaza"
+   ],
+   "title": [
+    "Har",
+    "university",
+    "ka",
+    "*alag*",
+    "darwaza"
+   ],
+   "tease": "Har university ka alag darwaza",
+   "segments": [
+    [
+     143.14,
+     174.52
+    ]
+   ],
+   "hi": [
+    "alag",
+    "seat",
+    "registration",
+    "csas",
+    "date",
+    "miss"
+   ],
+   "fix": {
+    "143.2": "Tip",
+    "143.69": "9,",
+    "145.98": "Nauvan",
+    "150.85": "1",
+    "151.82": "2",
+    "160.05": "",
+    "160.1": ""
+   },
+   "cards": [
+    {
+     "t": 147.51,
+     "text": "Ye galti seat le jaati hai",
+     "icon": "alert",
+     "tone": "bad"
+    },
+    {
+     "t": 149.46,
+     "text": "Step 1: CUET do",
+     "icon": "check",
+     "tone": "accent"
+    },
+    {
+     "t": 151.19,
+     "text": "Step 2: har portal pe registration",
+     "icon": "list",
+     "tone": "blue",
+     "sub": "alag se"
+    },
+    {
+     "t": 156.26,
+     "text": "DU: CSAS portal",
+     "icon": "college",
+     "tone": "blue"
+    },
+    {
+     "t": 158.14,
+     "text": "CU Raj: apna portal",
+     "icon": "college",
+     "tone": "blue"
+    },
+    {
+     "t": 164.33,
+     "text": "Registration miss?",
+     "icon": "cross",
+     "tone": "bad",
+     "sub": "list mein aaoge hi nahi"
+    },
+    {
+     "t": 170.9,
+     "text": "Har university ki registration date",
+     "icon": "clock",
+     "tone": "accent",
+     "sub": "list ke saath dekho"
+    }
+   ],
+   "punches": [
+    {
+     "t": 164.33,
+     "until": 166.4
+    }
+   ]
+  },
+  {
+   "n": 8,
+   "badge": "TIP 10",
+   "chip": "LIST 2 BAAR",
+   "headline": [
+    "List",
+    "*do*",
+    "baar",
+    "banti",
+    "hai"
+   ],
+   "title": [
+    "List",
+    "*do*",
+    "baar",
+    "banao"
+   ],
+   "tease": "List ek baar nahi, do baar",
+   "segments": [
+    [
+     174.49,
+     206.67
+    ]
+   ],
+   "hi": [
+    "do",
+    "checkpoint",
+    "points",
+    "result",
+    "tiers",
+    "update"
+   ],
+   "fix": {
+    "174.55": "Tip",
+    "189.82": "doosra"
+   },
+   "cards": [
+    {
+     "t": 175.72,
+     "text": "List x 2",
+     "icon": "list",
+     "tone": "accent",
+     "sub": "ek baar nahi, do baar"
+    },
+    {
+     "t": 183.44,
+     "text": "2 checkpoints",
+     "icon": "target",
+     "tone": "blue"
+    },
+    {
+     "t": 184.45,
+     "text": "Checkpoint 1: CUET form se pehle",
+     "icon": "check",
+     "tone": "blue",
+     "sub": "subjects + universities"
+    },
+    {
+     "t": 189.82,
+     "text": "Checkpoint 2: result ke baad",
+     "icon": "check",
+     "tone": "good",
+     "sub": "counselling preferences"
+    },
+    {
+     "t": 195.56,
+     "text": "Tiers dobara banao",
+     "icon": "star",
+     "tone": "accent",
+     "sub": "asli score ke saath"
+    },
+    {
+     "t": 201.81,
+     "text": "Har mahine update",
+     "icon": "clock",
+     "tone": "blue",
+     "sub": "mock average ke saath"
+    }
+   ],
+   "punches": [
+    {
+     "t": 195.56,
+     "until": 197.6
+    }
+   ]
+  },
+  {
+   "n": 9,
+   "badge": "RECAP",
+   "bignum": "1-5",
+   "chip": "CUET FORM SE PEHLE",
+   "headline": [
+    "*5*",
+    "rules",
+    "CUET",
+    "form",
+    "se",
+    "pehle"
+   ],
+   "title": [
+    "Form",
+    "se",
+    "pehle:",
+    "*5*",
+    "rules"
+   ],
+   "tease": "CUET form se pehle 5 rules",
+   "segments": [
+    [
+     217.3,
+     239.71
+    ]
+   ],
+   "hi": [
+    "copy",
+    "asli",
+    "dream",
+    "target",
+    "safe",
+    "data",
+    "match"
+   ],
+   "fix": {
+    "217.36": "List",
+    "221.91": "ki"
+   },
+   "cards": [
+    {
+     "t": 221.18,
+     "text": "1. Crowd ki list copy mat karo",
+     "icon": "cross",
+     "tone": "bad"
+    },
+    {
+     "t": 223.44,
+     "text": "2. Asli score pe planning",
+     "icon": "target",
+     "tone": "blue",
+     "sub": "best case pe nahi"
+    },
+    {
+     "t": 227.14,
+     "text": "3. Dream, target, safe list",
+     "icon": "list",
+     "tone": "accent",
+     "sub": "ready rakho"
+    },
+    {
+     "t": 230.78,
+     "text": "4. Data pe bharosa",
+     "icon": "chart",
+     "tone": "blue",
+     "sub": "reels pe nahi"
+    },
+    {
+     "t": 234.04,
+     "text": "5. Form ko list se match karo",
+     "icon": "check",
+     "tone": "good",
+     "sub": "subject mapping"
+    }
+   ],
+   "punches": [
+    {
+     "t": 230.78,
+     "until": 232.6
+    }
+   ]
+  },
+  {
+   "n": 10,
+   "badge": "RECAP",
+   "bignum": "6-10",
+   "chip": "RESULT KE BAAD",
+   "headline": [
+    "*5*",
+    "rules",
+    "result",
+    "ke",
+    "baad"
+   ],
+   "title": [
+    "Result",
+    "ke",
+    "baad:",
+    "*5*",
+    "rules"
+   ],
+   "tease": "Result ke baad 5 rules",
+   "segments": [
+    [
+     240.15,
+     262.27
+    ]
+   ],
+   "hi": [
+    "course",
+    "du",
+    "safe",
+    "registration",
+    "list",
+    "aaj"
+   ],
+   "fix": {
+    "240.21": "Result"
+   },
+   "cards": [
+    {
+     "t": 242.04,
+     "text": "6. College + course plan karo",
+     "icon": "college",
+     "tone": "accent"
+    },
+    {
+     "t": 246.12,
+     "text": "7. DU ke bahar bhi duniya",
+     "icon": "star",
+     "tone": "blue"
+    },
+    {
+     "t": 248.72,
+     "text": "8. Safe = kharab nahi",
+     "icon": "check",
+     "tone": "good"
+    },
+    {
+     "t": 251.36,
+     "text": "9. Har university ka alag portal",
+     "icon": "list",
+     "tone": "blue"
+    },
+    {
+     "t": 255.1,
+     "text": "10. List do baar banao",
+     "icon": "clock",
+     "tone": "accent"
+    },
+    {
+     "t": 257.86,
+     "text": "Aaj se list mein lagao",
+     "icon": "target",
+     "tone": "good"
+    }
+   ],
+   "punches": [
+    {
+     "t": 257.86,
+     "until": 259.6
+    }
+   ]
+  }
+ ]
+}

@@ -31,9 +31,20 @@ R = {
     "किसी": "kisi", "सीट": "seat", "लेके": "leke", "जा": "ja", "देना": "dena", "स्टेप": "step", "बन": "one",
     "टू": "two", "अपना": "apna", "पोर्टल": "portal", "ड्यू": "DU", "राज": "Raj", "दूसरी": "doosri",
     "अपनी": "apni", "वेबसाइट": "website", "होती": "hoti",
+    "आपने": "aapne", "किया": "kiya", "इस": "is", "आओगे": "aaoge", "चाहे": "chahe", "कितना": "kitna", "अच्छा": "achha",
+    "क्यों": "kyun", "साथ": "saath", "उसकी": "uski", "बार": "baar", "दो": "do", "बनती": "banti", "मेरा": "mera",
+    "दसवा": "dasvan", "आखरी": "aakhri", "बना": "bana", "भूलने": "bhoolne", "चीज": "cheez", "चीज़": "cheez",
+    "पहला": "pehla", "अभी": "abhi", "जब": "jab", "दूसर": "doosra", "भड़ते": "bharte", "आते": "aate",
+    "बनाओ": "banao", "दोबारा": "dobara", "शायद": "shayad", "गया": "gaya", "उल्टा": "ulta", "दोनों": "dono",
+    "बीच": "beech", "महीने": "mahine", "रहो": "raho", "थे": "the", "मेरे": "mere", "मैंने": "maine", "शुरू": "shuru",
+    "कहा": "kaha", "सबसे": "sabse", "जिस": "jis", "कम": "kam", "देते": "dete", "लिस्ट": "list", "बनाने": "banane",
+    "बताये": "bataye", "मत": "mat", "हिसाब": "hisaab", "सारा": "saara", "वर्थ": "paas", "भरूसा": "bharosa",
+    "यूज़": "use", "करने": "karne", "हमारी": "hamari", "इन": "in", "कोई": "koi", "आज": "aaj", "लगा": "laga",
+    "सकते": "sakte", "याद": "yaad", "रखना": "rakhna", "नाम": "naam", "चांस": "chance", "क्योंकि": "kyunki",
 }
 FIX = {"CUT": "CUET", "Jammu-Millia-Islamia": "Jamia", "be": "BA", "BTEC": "B.Tech", "बांदर": "Bandarsindri",
-       "सीन्ग्री": "", "everything": "Everything"}
+       "सीन्ग्री": "", "everything": "Everything", "CVT": "CUET", "tears": "tiers", "rails": "reels",
+       "code": "case", "crowd": "crowd", "वड़ावट": "", "ह": ""}
 
 words = json.load(open(sys.argv[1]))
 out, missing = [], set()

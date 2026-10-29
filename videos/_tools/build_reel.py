@@ -1,11 +1,11 @@
-"""Build one CUET-tip reel (a HyperFrames project) from tips.json.
+"""Build one CUET reel (a HyperFrames project) from reels.json.
 
-usage: python3 build_reel.py <tips.json> <tip number> <keyed.webm> <source.mp4> <out dir>
+usage: python3 build_reel.py <reels.json> <reel number> <keyed.webm> <source.mp4> <out dir>
 
 Every reel shares the same opener, layout, caption style and end card so the
 ten shorts read as one series; only the copy, callouts and timing change.
-Times in tips.json are seconds in the source video; the reel's clock is
-INTRO + (source time - segment start).
+A reel is one or more source segments joined with jump cuts. Times in
+reels.json are seconds in the source video; rt() maps them onto the reel's clock.
 """
 import html
 import json
@@ -15,22 +15,39 @@ import subprocess
 import sys
 
 INTRO = 1.5  # series opener before the presenter speaks
-OUTRO = 2.2  # end card after the last word
+OUTRO = 2.5  # end card after the last word
 PRE, POST = 0.55, 0.45  # presenter footage kept around the speech, for the rise-in and the exit
 W, H = 1080, 1920
 SFX_DIR = os.path.join(os.path.dirname(__file__), "..", "..", ".claude", "skills", "media-use", "audio", "assets", "sfx")
 
 cfg_path, num, keyed, source, out = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]
 cfg = json.load(open(cfg_path))
-total_tips = len(cfg["tips"])
-tip = next(t for t in cfg["tips"] if t["n"] == num)
-a, b = tip["start"], tip["end"]
-body = round(b - a, 3)
+reels = cfg["reels"]
+total_tips = len(reels)
+tip = next(t for t in reels if t["n"] == num)
+nxt_reel = next((t for t in reels if t["n"] == num + 1), None)
+segs = [tuple(x) for x in tip["segments"]]
+body = round(sum(b - a for a, b in segs), 3)
 D = round(INTRO + body + OUTRO, 3)
+a, b = segs[0][0], segs[-1][1]
+
+# reel time of each segment's start
+seg_at, acc = [], INTRO
+for s0, s1 in segs:
+    seg_at.append(acc)
+    acc += s1 - s0
+cuts = [round(t, 3) for t in seg_at[1:]]  # jump cuts on the reel clock
 
 
 def rt(src_t):
-    return round(INTRO + src_t - a, 3)
+    for (s0, s1), at in zip(segs, seg_at):
+        if s0 - 0.05 <= src_t <= s1 + 0.05:
+            return round(at + min(max(src_t, s0), s1) - s0, 3)
+    raise ValueError("time %.2f is outside the reel's segments" % src_t)
+
+
+def inside(src_t):
+    return any(s0 - 0.02 <= src_t < s1 for s0, s1 in segs)
 
 
 def esc(s):
@@ -46,19 +63,31 @@ shutil.copy(os.path.join(os.path.dirname(__file__), "vendor", "gsap.min.js"), os
 # ---------- media ----------
 pres = os.path.join(out, "assets", "presenter.webm")
 voice = os.path.join(out, "assets", "voice.m4a")
+vsegs = [list(x) for x in segs]
+vsegs[0][0] = max(0, vsegs[0][0] - PRE)
+vsegs[-1][1] += POST
 if not os.path.exists(pres):
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-c:v", "libvpx-vp9", "-ss", str(max(0, a - PRE)), "-to", str(b + POST), "-i", keyed,
-                    "-vf", "fps=30", "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-crf", "26", "-b:v", "0",
+    # one seeked input per segment, so the concat never buffers minutes of frames
+    ins = []
+    for s0, s1 in vsegs:
+        ins += ["-c:v", "libvpx-vp9", "-ss", "%.3f" % s0, "-t", "%.3f" % (s1 - s0), "-i", keyed]
+    f = "".join("[%d:v]setpts=PTS-STARTPTS[v%d];" % (i, i) for i in range(len(vsegs)))
+    f += "".join("[v%d]" % i for i in range(len(vsegs))) + "concat=n=%d:v=1:a=0,fps=30[v]" % len(vsegs)
+    subprocess.run(["ffmpeg", "-v", "error", "-y"] + ins + [
+                    "-filter_complex", f,
+                    "-map", "[v]", "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-crf", "26", "-b:v", "0",
                     "-row-mt", "1", "-cpu-used", "4", "-g", "30", "-auto-alt-ref", "0", "-an", pres], check=True)
 if not os.path.exists(voice):
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(a), "-to", str(b), "-i", source, "-vn",
-                    "-af", "loudnorm=I=-14:TP=-1.5:LRA=9,afade=t=in:d=0.04,afade=t=out:st=%.3f:d=0.12" % (body - 0.12),
-                    "-c:a", "aac", "-b:a", "192k", voice], check=True)
+    f = "".join("[0:a]atrim=%.3f:%.3f,asetpts=PTS-STARTPTS,afade=t=in:d=0.02,afade=t=out:st=%.3f:d=0.03[a%d];"
+                % (s0, s1, s1 - s0 - 0.03, i) for i, (s0, s1) in enumerate(segs))
+    f += "".join("[a%d]" % i for i in range(len(segs))) + "concat=n=%d:v=0:a=1,loudnorm=I=-14:TP=-1.5:LRA=9[a]" % len(segs)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", source, "-vn", "-filter_complex", f, "-map", "[a]",
+                    "-ar", "48000", "-c:a", "aac", "-b:a", "192k", voice], check=True)
 for s in ["impact-bass-1.mp3", "whoosh-cinematic.mp3", "whoosh-short.mp3", "pop.mp3", "chime.mp3"]:
     shutil.copy(os.path.join(SFX_DIR, s), os.path.join(out, "assets", "sfx", s))
 
-nn = "%02d" % num
-nxt = "%02d" % (num + 1) if num < total_tips else None
+badge = tip["badge"]  # "TIP 6", "RECAP"…
+bignum = tip.get("bignum", badge.split()[-1])
 
 # ---------- index.html ----------
 pops = []
@@ -80,7 +109,7 @@ index = f"""<!doctype html>
       html, body {{ margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }}
       #root {{ position: relative; width: 100%; height: 100%; background: var(--ground); overflow: hidden; }}
       #presenter-stage {{ position: absolute; inset: 0; z-index: 3; }}
-      #presenter-rig {{ position: absolute; left: -132px; top: 624px; width: 1320px; height: 1296px; transform-origin: 50% 100%; }}
+      #presenter-rig {{ position: absolute; left: -132px; top: 664px; width: 1320px; height: 1296px; transform-origin: 50% 100%; }}
       #presenter {{ position: absolute; left: 0; top: 0; width: 1320px; height: 1296px; object-fit: contain; }}
     </style>
   </head>
@@ -122,10 +151,14 @@ index = f"""<!doctype html>
 
 for p in tip.get("punches", []):
     t0 = rt(p["t"])
-    t1 = rt(p.get("until", p["t"] + 1.6))
+    t1 = min(rt(p.get("until", p["t"] + 1.6)), INTRO + body - 0.6)  # settle before the exit move
     s = p.get("scale", 1.12)
     index += f'      tl.to("#presenter-rig", {{ scale: {s}, duration: 0.28, ease: "power3.out" }}, {t0});\n'
     index += f'      tl.to("#presenter-rig", {{ scale: 1, duration: 0.45, ease: "power2.inOut" }}, {t1});\n'
+# jump cuts: alternate the framing so a cut reads as a punch-in, not a glitch
+for k, c in enumerate(cuts):
+    s_ = 1.1 if k % 2 == 0 else 1.0
+    index += f'      tl.set("#presenter-rig", {{ scale: {s_} }}, {c});\n'
 index += f"""      tl.to("#presenter-rig", {{ y: 160, scale: 0.9, opacity: 0, duration: 0.45, ease: "power3.in" }}, {round(INTRO + body - 0.1, 3)});
       window.__timelines["main"] = tl;
     </script>
@@ -156,7 +189,7 @@ bg = f"""<template>
     <div id="bg-glow-a" data-layout-ignore></div>
     <div id="bg-glow-b" data-layout-ignore></div>
     <div id="bg-grid" data-layout-ignore></div>
-    <div id="bg-num" data-layout-ignore>{nn}</div>
+    <div id="bg-num" data-layout-ignore>{esc(bignum)}</div>
     <div id="bg-vignette"></div>
   </div>
   <script>
@@ -186,9 +219,8 @@ intro = f"""<template>
     #intro-kicker {{ position: absolute; left: 0; right: 0; top: 380px; text-align: center;
       font-family: Montserrat; font-weight: 800; font-size: 44px; letter-spacing: 0.32em; color: #fff; opacity: 0.85; }}
     #intro-badge {{ position: absolute; left: 0; right: 0; top: 470px; text-align: center; }}
-    #intro-tip {{ display: inline-block; font-family: "League Gothic"; font-size: 420px; line-height: 0.9; color: var(--accent, #FFC93C);
+    #intro-tip {{ display: inline-block; font-family: "League Gothic"; font-size: {min(420, int(900 / (0.43 * len(badge))))}px; line-height: 0.9; color: var(--accent, #FFC93C);
       letter-spacing: 0.01em; }}
-    #intro-of {{ display: inline-block; font-family: Montserrat; font-weight: 800; font-size: 64px; color: #fff; opacity: 0.6; margin-left: 12px; }}
     #intro-head {{ position: absolute; left: 80px; right: 80px; top: 930px; text-align: center;
       font-family: Montserrat; font-weight: 900; font-size: 92px; line-height: 1.08; color: #fff; text-transform: uppercase; }}
     .intro-w {{ display: inline-block; margin: 0 12px; }}
@@ -198,7 +230,7 @@ intro = f"""<template>
     <div id="intro-plate"></div>
     <div id="intro-streaks" data-layout-ignore></div>
     <div id="intro-kicker">{esc(cfg["series"])}</div>
-    <div id="intro-badge"><span id="intro-tip">TIP {nn}</span><span id="intro-of">/{total_tips:02d}</span></div>
+    <div id="intro-badge"><span id="intro-tip">{esc(badge)}</span></div>
     <div id="intro-head">{"".join(hl_html)}</div>
   </div>
   <script>
@@ -206,7 +238,7 @@ intro = f"""<template>
     // frame 0 is already the thumbnail: number and hook line on screen, then it all moves
     tl.fromTo("#intro-tip", {{ scale: 1.18 }}, {{ scale: 1, duration: 0.5, ease: "expo.out" }}, 0);
     tl.fromTo("#intro-streaks", {{ x: -160 }}, {{ x: 120, duration: {INTRO + 0.4:.2f}, ease: "none" }}, 0);
-    tl.fromTo(".intro-w", {{ opacity: 0.25, filter: "blur(4px)" }}, {{ opacity: 1, filter: "blur(0px)", duration: 0.14, stagger: 0.07, ease: "power2.out" }}, 0.02);
+    tl.fromTo(".intro-w", {{ y: 26 }}, {{ y: 0, duration: 0.45, stagger: 0.06, ease: "expo.out" }}, 0);
     // exit: the plate lifts away like a shutter while the presenter rises under it
     tl.to("#intro-head", {{ y: -60, opacity: 0, filter: "blur(10px)", duration: 0.3, ease: "power3.in" }}, {INTRO - 0.5:.3f});
     tl.to("#intro-badge, #intro-kicker", {{ y: -380, scale: 0.5, opacity: 0, duration: 0.42, ease: "power3.in" }}, {INTRO - 0.48:.3f});
@@ -232,7 +264,10 @@ ICONS = {
 cards_html, cards_js = [], []
 for i, c in enumerate(tip["cards"]):
     t0 = rt(c["t"])
-    t1 = min(rt(c.get("until", c["t"] + 3.2)), INTRO + body - 0.2)
+    t1 = rt(c["until"]) if "until" in c else t0 + 3.2
+    if i + 1 < len(tip["cards"]):
+        t1 = min(t1, rt(tip["cards"][i + 1]["t"]) - 0.05)  # one card at a time
+    t1 = min(t1, INTRO + body - 0.2)
     side = c.get("side", "left" if i % 2 == 0 else "right")
     tone = c.get("tone", "accent")
     icon = ICONS.get(c.get("icon", "check"), ICONS["check"])
@@ -243,10 +278,10 @@ for i, c in enumerate(tip["cards"]):
         <div class="card-txt"><div class="card-main">{esc(c["text"])}</div>{sub}</div>
       </div>
     </div>""")
-    dx = -620 if side == "left" else 620
+    dx = -1000 if side == "left" else 1000
     cards_js.append(f'    tl.fromTo("#card-{i}-in", {{ x: {dx}, rotation: {-6 if side == "left" else 6}, opacity: 0 }}, {{ x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }}, {t0});')
     cards_js.append(f'    tl.fromTo("#card-{i}-in .card-icon", {{ scale: 0.3 }}, {{ scale: 1, duration: 0.4, ease: "back.out(2.2)" }}, {round(t0 + 0.15, 3)});')
-    cards_js.append(f'    tl.to("#card-{i}-in", {{ x: {dx // 2}, opacity: 0, filter: "blur(8px)", duration: 0.28, ease: "power3.in" }}, {round(t1 - 0.3, 3)});')
+    cards_js.append(f'    tl.to("#card-{i}-in", {{ y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }}, {round(t1 - 0.24, 3)});')
 
 title_words = tip["title"]
 tw_html = "".join(f'<span class="tt-w{" tt-acc" if w.startswith("*") else ""}">{esc(w.strip("*"))}</span>' for w in title_words)
@@ -271,9 +306,7 @@ graphics = f"""<template>
       font-size: 78px; line-height: 1.04; color: #fff; text-transform: uppercase; }}
     .tt-w {{ display: inline-block; margin-right: 20px; }}
     .tt-acc {{ color: var(--accent, #FFC93C); }}
-    .card {{ position: absolute; top: 560px; width: 560px; }}
-    .card-left {{ left: 44px; }}
-    .card-right {{ right: 44px; }}
+    .card {{ position: absolute; top: 556px; left: 90px; width: 900px; }}
     .card-in {{ display: flex; align-items: center; gap: 22px; padding: 24px 28px; border-radius: 30px;
       background: rgba(255,255,255,0.96); box-shadow: 0 24px 60px rgba(0,0,0,0.45); }}
     .card-icon {{ flex: 0 0 auto; width: 84px; height: 84px; border-radius: 24px; display: flex; align-items: center; justify-content: center; }}
@@ -282,14 +315,14 @@ graphics = f"""<template>
     .card-good .card-icon {{ background: #22C55E; color: #fff; }}
     .card-bad .card-icon {{ background: #EF4444; color: #fff; }}
     .card-blue .card-icon {{ background: #3D7BFF; color: #fff; }}
-    .card-main {{ font-family: Montserrat; font-weight: 900; font-size: 44px; line-height: 1.05; color: #0A0F2C; }}
+    .card-main {{ font-family: Montserrat; font-weight: 900; font-size: 46px; line-height: 1.05; color: #0A0F2C; }}
     .card-sub {{ font-family: Poppins; font-weight: 600; font-size: 30px; line-height: 1.15; color: #4B5563; margin-top: 6px; }}
   </style>
   <div id="root" data-composition-id="graphics" data-width="1080" data-height="1920">
     <div id="g-progress" data-layout-ignore><div id="g-progress-fill"></div></div>
     <div id="g-top" class="clip" data-start="{INTRO - 0.25:.3f}" data-duration="{round(body + 0.2, 3)}" data-track-index="0">
       <div id="g-top-in">
-        <div id="g-chip"><span id="g-chip-num">TIP {nn}</span><span id="g-chip-txt">{esc(cfg["chip"])}</span></div>
+        <div id="g-chip"><span id="g-chip-num">{esc(badge)}</span><span id="g-chip-txt">{esc(tip["chip"])}</span></div>
         <div id="g-dots">{dots}</div>
       </div>
     </div>
@@ -312,7 +345,18 @@ graphics = f"""<template>
 """
 
 # ---------- captions ----------
-words = tip["words"]  # [{text, start, end, hi?}] source times, romanised
+# romanised words inside the reel's segments; per-reel fixes keyed by source start time
+all_words = json.load(open(os.path.join(os.path.dirname(os.path.abspath(cfg_path)), cfg["words"])))
+fix = {float(k): v for k, v in tip.get("fix", {}).items()}
+hi_set = {h.lower() for h in tip.get("hi", [])}
+words = []
+for w in all_words:
+    if not inside(w["start"]):
+        continue
+    t = fix.get(round(w["start"], 2), w["text"])
+    if not t:
+        continue
+    words.append({"text": t, "start": w["start"], "end": w["end"], "hi": t.strip(".,?!").lower() in hi_set})
 groups, cur = [], []
 for w in words:
     if cur and (len(cur) >= 3 or w["start"] - cur[-1]["end"] >= 0.25 or cur[-1]["text"][-1:] in ".?!,"):
@@ -327,14 +371,19 @@ for gi, g in enumerate(groups):
     nxt_start = rt(groups[gi + 1][0]["start"]) - 0.05 if gi + 1 < len(groups) else rt(g[-1]["end"]) + 0.4
     g1 = min(max(rt(g[-1]["end"]) + 0.1, g0 + 0.3), nxt_start, INTRO + body)
     spans = "".join(f'<span id="cw-{gi}-{k}" class="cw{" cw-hi" if w.get("hi") else ""}">{esc(w["text"].strip(".,?!"))}</span>' for k, w in enumerate(g))
-    cap_html.append(f'    <div id="cg-{gi}" class="cg" data-gs="{g0:.3f}">{spans}</div>')
-    cap_js.append(f'    tl.fromTo("#cg-{gi}", {{ opacity: 0, scale: 0.8, y: 20 }}, {{ opacity: 1, scale: 1, y: 0, duration: 0.16, ease: "back.out(2)" }}, {g0:.3f});')
+    chars = sum(len(w["text"].strip(".,?!")) for w in g) + 2 * len(g)
+    fs = min(74, int(1000 / (0.78 * chars)))  # one line, never wrapped
+    cap_html.append(f'    <div id="cg-{gi}" class="cg" style="font-size:{fs}px">{spans}</div>')
+    d_in = min(0.16, (g1 - g0) / 2.5)
+    cap_js.append(f'    tl.fromTo("#cg-{gi}", {{ opacity: 0, scale: 0.8, y: 20 }}, {{ opacity: 1, scale: 1, y: 0, duration: {d_in:.3f}, ease: "back.out(2)" }}, {g0:.3f});')
     for k, w in enumerate(g):
         ws = rt(w["start"])
-        cap_js.append(f'    tl.fromTo("#cw-{gi}-{k}", {{ color: "#ffffff", backgroundColor: "rgba(255,201,60,0)" }}, {{ color: "#0A0F2C", backgroundColor: "rgba(255,201,60,1)", duration: 0.08 }}, {max(ws, g0):.3f});')
+        # the spoken word flips to the accent pill; it hands back when the next word starts
+        cap_js.append(f'    tl.set("#cw-{gi}-{k}", {{ color: "#0A0F2C", backgroundColor: "#FFC93C" }}, {max(ws, g0):.3f});')
         if k < len(g) - 1:
-            cap_js.append(f'    tl.to("#cw-{gi}-{k}", {{ color: "{"#FFC93C" if w.get("hi") else "#ffffff"}", backgroundColor: "rgba(255,201,60,0)", duration: 0.08 }}, {rt(g[k + 1]["start"]):.3f});')
-    cap_js.append(f'    tl.to("#cg-{gi}", {{ opacity: 0, duration: 0.1, ease: "power2.in" }}, {g1 - 0.1:.3f});')
+            cap_js.append(f'    tl.set("#cw-{gi}-{k}", {{ color: "{"#FFC93C" if w.get("hi") else "#ffffff"}", backgroundColor: "rgba(10,15,44,0.88)" }}, {max(rt(g[k + 1]["start"]), g0 + 0.01):.3f});')
+    d_out = min(0.1, (g1 - g0) / 3)
+    cap_js.append(f'    tl.to("#cg-{gi}", {{ opacity: 0, duration: {d_out:.3f}, ease: "power2.in" }}, {max(g1 - d_out, g0 + d_in):.3f});')
     cap_js.append(f'    tl.set("#cg-{gi}", {{ opacity: 0, visibility: "hidden" }}, {g1:.3f});')
 
 captions = f"""<template>
@@ -342,8 +391,8 @@ captions = f"""<template>
     #root {{ position: absolute; inset: 0; overflow: visible; pointer-events: none; }}
     .cg {{ position: absolute; left: 0; width: 1080px; top: 1244px; text-align: center; opacity: 0; overflow: visible;
       font-family: Montserrat; font-weight: 900; font-size: 74px; line-height: 1.1; text-transform: uppercase; }}
-    .cw {{ display: inline-block; margin: 0 6px; padding: 2px 16px 4px; border-radius: 16px; color: #fff;
-      text-shadow: 0 4px 0 rgba(0,0,0,0.35), 0 0 24px rgba(0,0,0,0.5); }}
+    .cw {{ display: inline-block; margin: 0 5px; padding: 4px 16px 6px; border-radius: 16px; color: #fff;
+      background-color: rgba(10,15,44,0.88); box-shadow: 0 10px 30px rgba(0,0,0,0.35); }}
   </style>
   <div id="root" data-composition-id="captions" data-width="1080" data-height="1920" data-layout-allow-overlap>
 {chr(10).join(cap_html)}
@@ -357,10 +406,10 @@ captions = f"""<template>
 """
 
 # ---------- outro (end card that hands over to the next reel) ----------
-if nxt:
-    o_kicker, o_main, o_sub = "NEXT", f"TIP {nxt}", tip.get("next_tease", "Follow karo, agla tip miss mat karna")
+if nxt_reel:
+    o_kicker, o_main, o_sub = "NEXT REEL", nxt_reel["badge"], nxt_reel["tease"]
 else:
-    o_kicker, o_main, o_sub = "ALL 10 TIPS", "SAVE KARO", "Follow karo aur dosto ko share karo"
+    o_kicker, o_main, o_sub = "SAARE 10 TIPS", "SAVE KARO", "Follow karo aur doston ko share karo"
 O0 = 0.3
 outro = f"""<template>
   <style>

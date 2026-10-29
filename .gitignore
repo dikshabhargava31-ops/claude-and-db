@@ -3,3 +3,11 @@ videos/*/renders/
 videos/*/raw/
 __pycache__/
 node_modules/
+# per-reel media and tool state (rebuilt by videos/_tools/build_reel.py)
+videos/*/assets/*.webm
+videos/*/assets/*.m4a
+videos/*/assets/sfx/
+videos/*/assets/vendor/
+videos/*/.hyperframes/
+videos/*/renders.log
+videos/*/.transcode-cache/

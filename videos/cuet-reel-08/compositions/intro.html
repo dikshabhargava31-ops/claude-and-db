@@ -1,0 +1,36 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #intro-plate { position: absolute; inset: 0; background: linear-gradient(160deg, #101a4d 0%, #0A0F2C 55%, #1b1240 100%); }
+    #intro-streaks { position: absolute; inset: -200px; opacity: 0.55;
+      background: repeating-linear-gradient(115deg, rgba(255,201,60,0) 0 90px, rgba(255,201,60,0.16) 90px 96px); }
+    #intro-kicker { position: absolute; left: 0; right: 0; top: 380px; text-align: center;
+      font-family: Montserrat; font-weight: 800; font-size: 44px; letter-spacing: 0.32em; color: #fff; opacity: 0.85; }
+    #intro-badge { position: absolute; left: 0; right: 0; top: 470px; text-align: center; }
+    #intro-tip { display: inline-block; font-family: "League Gothic"; font-size: 348px; line-height: 0.9; color: var(--accent, #FFC93C);
+      letter-spacing: 0.01em; }
+    #intro-head { position: absolute; left: 80px; right: 80px; top: 930px; text-align: center;
+      font-family: Montserrat; font-weight: 900; font-size: 92px; line-height: 1.08; color: #fff; text-transform: uppercase; }
+    .intro-w { display: inline-block; margin: 0 12px; }
+    .intro-acc { color: var(--accent, #FFC93C); }
+  </style>
+  <div id="root" data-composition-id="intro" data-width="1080" data-height="1920">
+    <div id="intro-plate"></div>
+    <div id="intro-streaks" data-layout-ignore></div>
+    <div id="intro-kicker">CUET 2027  ·  COLLEGE LIST</div>
+    <div id="intro-badge"><span id="intro-tip">TIP 10</span></div>
+    <div id="intro-head"><span class="intro-w" id="intro-w0">List</span><span class="intro-w intro-acc" id="intro-w1">do</span><span class="intro-w" id="intro-w2">baar</span><span class="intro-w" id="intro-w3">banti</span><span class="intro-w" id="intro-w4">hai</span></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // frame 0 is already the thumbnail: number and hook line on screen, then it all moves
+    tl.fromTo("#intro-tip", { scale: 1.18 }, { scale: 1, duration: 0.5, ease: "expo.out" }, 0);
+    tl.fromTo("#intro-streaks", { x: -160 }, { x: 120, duration: 1.90, ease: "none" }, 0);
+    tl.fromTo(".intro-w", { y: 26 }, { y: 0, duration: 0.45, stagger: 0.06, ease: "expo.out" }, 0);
+    // exit: the plate lifts away like a shutter while the presenter rises under it
+    tl.to("#intro-head", { y: -60, opacity: 0, filter: "blur(10px)", duration: 0.3, ease: "power3.in" }, 1.000);
+    tl.to("#intro-badge, #intro-kicker", { y: -380, scale: 0.5, opacity: 0, duration: 0.42, ease: "power3.in" }, 1.020);
+    tl.fromTo(["#intro-plate", "#intro-streaks"], { clipPath: "inset(0% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 100% 0%)", duration: 0.5, ease: "power3.inOut" }, 1.050);
+    window.__timelines["intro"] = tl;
+  </script>
+</template>

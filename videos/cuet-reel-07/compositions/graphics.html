@@ -1,0 +1,116 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    #g-progress { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: rgba(255,255,255,0.12); }
+    #g-progress-fill { position: absolute; left: 0; top: 0; height: 12px; width: 1080px; background: var(--accent, #FFC93C); transform-origin: 0 50%; }
+    #g-top { position: absolute; left: 60px; right: 60px; top: 190px; }
+    #g-chip { display: inline-flex; align-items: center; gap: 18px; padding: 14px 28px 14px 16px; border-radius: 60px;
+      background: rgba(10,15,44,0.72); border: 2px solid rgba(255,201,60,0.6); }
+    #g-chip-num { font-family: "League Gothic"; font-size: 64px; line-height: 1; color: #0A0F2C; background: var(--accent, #FFC93C);
+      border-radius: 40px; padding: 4px 20px 0; }
+    #g-chip-txt { font-family: Montserrat; font-weight: 800; font-size: 34px; letter-spacing: 0.14em; color: #fff; }
+    #g-dots { display: flex; gap: 10px; margin-top: 22px; margin-left: 8px; }
+    .dot { width: 30px; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.22); }
+    .dot-on { background: rgba(255,201,60,0.55); }
+    .dot-now { background: var(--accent, #FFC93C); width: 56px; }
+    #g-title { position: absolute; left: 60px; right: 60px; top: 362px; font-family: Montserrat; font-weight: 900;
+      font-size: 78px; line-height: 1.04; color: #fff; text-transform: uppercase; }
+    .tt-w { display: inline-block; margin-right: 20px; }
+    .tt-acc { color: var(--accent, #FFC93C); }
+    .card { position: absolute; top: 556px; left: 90px; width: 900px; }
+    .card-in { display: flex; align-items: center; gap: 22px; padding: 24px 28px; border-radius: 30px;
+      background: rgba(255,255,255,0.96); box-shadow: 0 24px 60px rgba(0,0,0,0.45); }
+    .card-icon { flex: 0 0 auto; width: 84px; height: 84px; border-radius: 24px; display: flex; align-items: center; justify-content: center; }
+    .card-icon svg { width: 52px; height: 52px; }
+    .card-accent .card-icon { background: var(--accent, #FFC93C); color: #0A0F2C; }
+    .card-good .card-icon { background: #22C55E; color: #fff; }
+    .card-bad .card-icon { background: #EF4444; color: #fff; }
+    .card-blue .card-icon { background: #3D7BFF; color: #fff; }
+    .card-main { font-family: Montserrat; font-weight: 900; font-size: 46px; line-height: 1.05; color: #0A0F2C; }
+    .card-sub { font-family: Poppins; font-weight: 600; font-size: 30px; line-height: 1.15; color: #4B5563; margin-top: 6px; }
+  </style>
+  <div id="root" data-composition-id="graphics" data-width="1080" data-height="1920">
+    <div id="g-progress" data-layout-ignore><div id="g-progress-fill"></div></div>
+    <div id="g-top" class="clip" data-start="1.250" data-duration="31.58" data-track-index="0">
+      <div id="g-top-in">
+        <div id="g-chip"><span id="g-chip-num">TIP 9</span><span id="g-chip-txt">ALAG REGISTRATION</span></div>
+        <div id="g-dots"><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on"></span><span class="dot dot-on dot-now"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      </div>
+    </div>
+    <div id="g-title" class="clip" data-start="1.400" data-duration="31.43" data-track-index="1">
+      <div id="g-title-in"><span class="tt-w">Har</span><span class="tt-w">university</span><span class="tt-w">ka</span><span class="tt-w tt-acc">alag</span><span class="tt-w">darwaza</span></div>
+    </div>
+    <div id="card-0" class="clip card card-left card-bad" data-start="5.87" data-duration="1.9" data-track-index="2">
+      <div id="card-0-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z" /><path d="M12 10v4" /><path d="M12 17v.5" /></svg></div>
+        <div class="card-txt"><div class="card-main">Ye galti seat le jaati hai</div></div>
+      </div>
+    </div>
+    <div id="card-1" class="clip card card-right card-accent" data-start="7.82" data-duration="1.68" data-track-index="3">
+      <div id="card-1-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7" /></svg></div>
+        <div class="card-txt"><div class="card-main">Step 1: CUET do</div></div>
+      </div>
+    </div>
+    <div id="card-2" class="clip card card-left card-blue" data-start="9.55" data-duration="3.2" data-track-index="2">
+      <div id="card-2-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7h11" /><path d="M9 12h11" /><path d="M9 17h11" /><path d="M4 7h.5" /><path d="M4 12h.5" /><path d="M4 17h.5" /></svg></div>
+        <div class="card-txt"><div class="card-main">Step 2: har portal pe registration</div><div class="card-sub">alag se</div></div>
+      </div>
+    </div>
+    <div id="card-3" class="clip card card-right card-blue" data-start="14.62" data-duration="1.83" data-track-index="3">
+      <div id="card-3-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-5 9 5-9 5z" /><path d="M7 11.5V16c3 2 7 2 10 0v-4.5" /></svg></div>
+        <div class="card-txt"><div class="card-main">DU: CSAS portal</div></div>
+      </div>
+    </div>
+    <div id="card-4" class="clip card card-left card-blue" data-start="16.5" data-duration="3.2" data-track-index="2">
+      <div id="card-4-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-5 9 5-9 5z" /><path d="M7 11.5V16c3 2 7 2 10 0v-4.5" /></svg></div>
+        <div class="card-txt"><div class="card-main">CU Raj: apna portal</div></div>
+      </div>
+    </div>
+    <div id="card-5" class="clip card card-right card-bad" data-start="22.69" data-duration="3.2" data-track-index="3">
+      <div id="card-5-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12" /><path d="M18 6L6 18" /></svg></div>
+        <div class="card-txt"><div class="card-main">Registration miss?</div><div class="card-sub">list mein aaoge hi nahi</div></div>
+      </div>
+    </div>
+    <div id="card-6" class="clip card card-left card-accent" data-start="29.26" data-duration="3.2" data-track-index="2">
+      <div id="card-6-in" class="card-in">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" /></svg></div>
+        <div class="card-txt"><div class="card-main">Har university ki registration date</div><div class="card-sub">list ke saath dekho</div></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#g-progress-fill", { scaleX: 0 }, { scaleX: 1, duration: 35.38, ease: "none" }, 0);
+    // the opener's badge lands here as the chip (carry across)
+    tl.fromTo("#g-top-in", { y: 160, scale: 1.5, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.55, ease: "expo.out" }, 1.250);
+    tl.fromTo("#g-title-in .tt-w", { opacity: 0, y: 40, filter: "blur(6px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "power4.out" }, 1.400);
+    tl.to("#g-title-in, #g-top-in", { opacity: 0, y: -40, filter: "blur(8px)", duration: 0.3, ease: "power3.in" }, 32.53);
+    tl.fromTo("#card-0-in", { x: -1000, rotation: -6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 5.87);
+    tl.fromTo("#card-0-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 6.02);
+    tl.to("#card-0-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 7.53);
+    tl.fromTo("#card-1-in", { x: 1000, rotation: 6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 7.82);
+    tl.fromTo("#card-1-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 7.97);
+    tl.to("#card-1-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 9.26);
+    tl.fromTo("#card-2-in", { x: -1000, rotation: -6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 9.55);
+    tl.fromTo("#card-2-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 9.7);
+    tl.to("#card-2-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 12.51);
+    tl.fromTo("#card-3-in", { x: 1000, rotation: 6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 14.62);
+    tl.fromTo("#card-3-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 14.77);
+    tl.to("#card-3-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 16.21);
+    tl.fromTo("#card-4-in", { x: -1000, rotation: -6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 16.5);
+    tl.fromTo("#card-4-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 16.65);
+    tl.to("#card-4-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 19.46);
+    tl.fromTo("#card-5-in", { x: 1000, rotation: 6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 22.69);
+    tl.fromTo("#card-5-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 22.84);
+    tl.to("#card-5-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 25.65);
+    tl.fromTo("#card-6-in", { x: -1000, rotation: -6, opacity: 0 }, { x: 0, rotation: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 29.26);
+    tl.fromTo("#card-6-in .card-icon", { scale: 0.3 }, { scale: 1, duration: 0.4, ease: "back.out(2.2)" }, 29.41);
+    tl.to("#card-6-in", { y: -40, scale: 0.92, opacity: 0, filter: "blur(8px)", duration: 0.22, ease: "power3.in" }, 32.22);
+    window.__timelines["graphics"] = tl;
+  </script>
+</template>

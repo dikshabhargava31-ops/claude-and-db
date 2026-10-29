@@ -1,0 +1,34 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    #o-plate { position: absolute; inset: 0; background: linear-gradient(200deg, #1b1240 0%, #0A0F2C 50%, #101a4d 100%); }
+    #o-streaks { position: absolute; inset: -200px; opacity: 0.5;
+      background: repeating-linear-gradient(65deg, rgba(61,123,255,0) 0 90px, rgba(61,123,255,0.18) 90px 96px); }
+    #o-box { position: absolute; left: 80px; right: 80px; top: 520px; text-align: center; }
+    #o-kicker { font-family: Montserrat; font-weight: 800; font-size: 48px; letter-spacing: 0.3em; color: #fff; opacity: 0.8; }
+    #o-main { font-family: "League Gothic"; font-size: 300px; line-height: 0.95; color: var(--accent, #FFC93C); margin-top: 10px; }
+    #o-sub { font-family: Montserrat; font-weight: 800; font-size: 50px; line-height: 1.15; color: #fff; margin-top: 30px; }
+    #o-follow { display: inline-block; margin-top: 56px; padding: 26px 56px; border-radius: 60px; background: var(--accent, #FFC93C);
+      font-family: Montserrat; font-weight: 900; font-size: 46px; letter-spacing: 0.08em; color: #0A0F2C; }
+  </style>
+  <div id="root" data-composition-id="outro" data-width="1080" data-height="1920">
+    <div id="o-plate"></div>
+    <div id="o-streaks" data-layout-ignore></div>
+    <div id="o-box">
+      <div id="o-kicker">NEXT REEL</div>
+      <div id="o-main">TIP 7</div>
+      <div id="o-sub">DU ke bahar bhi duniya hai</div>
+      <div id="o-follow">FOLLOW +</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo(["#o-plate", "#o-streaks"], { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power3.inOut" }, 0);
+    tl.fromTo("#o-streaks", { x: 0 }, { x: 200, duration: 2.80, ease: "none" }, 0);
+    tl.fromTo("#o-kicker", { opacity: 0, y: 30 }, { opacity: 0.8, y: 0, duration: 0.5, ease: "expo.out" }, 0.4);
+    tl.fromTo("#o-main", { scale: 1.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "expo.out" }, 0.5);
+    tl.fromTo("#o-sub", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.75);
+    tl.fromTo("#o-follow", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)" }, 0.95);
+    window.__timelines["outro"] = tl;
+  </script>
+</template>
