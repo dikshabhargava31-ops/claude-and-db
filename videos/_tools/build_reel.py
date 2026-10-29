@@ -39,6 +39,9 @@ def esc(s):
 
 os.makedirs(os.path.join(out, "assets", "sfx"), exist_ok=True)
 os.makedirs(os.path.join(out, "compositions"), exist_ok=True)
+os.makedirs(os.path.join(out, "assets", "vendor"), exist_ok=True)
+# GSAP ships with the project: renders never fetch
+shutil.copy(os.path.join(os.path.dirname(__file__), "vendor", "gsap.min.js"), os.path.join(out, "assets", "vendor", "gsap.min.js"))
 
 # ---------- media ----------
 pres = os.path.join(out, "assets", "presenter.webm")
@@ -70,7 +73,7 @@ index = f"""<!doctype html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/vendor/gsap.min.js"></script>
     <style>
       :root {{ --accent: #FFC93C; --ground: #0A0F2C; --ink: #ffffff; }}
       * {{ margin: 0; padding: 0; box-sizing: border-box; }}
@@ -108,7 +111,7 @@ index = f"""<!doctype html>
       <audio id="sfx-impact" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="0" data-duration="1.4" data-track-index="7" data-volume="0.5"></audio>
       <audio id="sfx-whoosh-in" class="clip" src="assets/sfx/whoosh-cinematic.mp3" data-start="{INTRO - 0.6:.3f}" data-duration="1.2" data-track-index="8" data-volume="0.4"></audio>
 {pops}
-      <audio id="sfx-whoosh-out" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="{round(INTRO + body - 0.15, 3)}" data-duration="0.8" data-track-index="10" data-volume="0.45"></audio>
+      <audio id="sfx-whoosh-out" class="clip" src="assets/sfx/whoosh-short.mp3" data-start="{round(INTRO + body - 0.15, 3)}" data-duration="0.57" data-track-index="10" data-volume="0.45"></audio>
       <audio id="sfx-chime" class="clip" src="assets/sfx/chime.mp3" data-start="{round(INTRO + body + 0.35, 3)}" data-duration="1.4" data-track-index="11" data-volume="0.3"></audio>
     </div>
     <script>
@@ -150,9 +153,9 @@ bg = f"""<template>
       background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 100%); }}
   </style>
   <div id="root" data-composition-id="bg" data-width="1080" data-height="1920">
-    <div id="bg-glow-a"></div>
-    <div id="bg-glow-b"></div>
-    <div id="bg-grid"></div>
+    <div id="bg-glow-a" data-layout-ignore></div>
+    <div id="bg-glow-b" data-layout-ignore></div>
+    <div id="bg-grid" data-layout-ignore></div>
     <div id="bg-num" data-layout-ignore>{nn}</div>
     <div id="bg-vignette"></div>
   </div>
@@ -337,7 +340,7 @@ for gi, g in enumerate(groups):
 captions = f"""<template>
   <style>
     #root {{ position: absolute; inset: 0; overflow: visible; pointer-events: none; }}
-    .cg {{ position: absolute; left: 0; width: 1080px; top: 1196px; text-align: center; opacity: 0; overflow: visible;
+    .cg {{ position: absolute; left: 0; width: 1080px; top: 1244px; text-align: center; opacity: 0; overflow: visible;
       font-family: Montserrat; font-weight: 900; font-size: 74px; line-height: 1.1; text-transform: uppercase; }}
     .cw {{ display: inline-block; margin: 0 6px; padding: 2px 16px 4px; border-radius: 16px; color: #fff;
       text-shadow: 0 4px 0 rgba(0,0,0,0.35), 0 0 24px rgba(0,0,0,0.5); }}
@@ -386,7 +389,7 @@ outro = f"""<template>
     const tl = gsap.timeline({{ paused: true }});
     tl.fromTo(["#o-plate", "#o-streaks"], {{ clipPath: "inset(100% 0% 0% 0%)" }}, {{ clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power3.inOut" }}, 0);
     tl.fromTo("#o-streaks", {{ x: 0 }}, {{ x: 200, duration: {OUTRO + O0:.2f}, ease: "none" }}, 0);
-    tl.fromTo("#o-kicker", {{ opacity: 0, letterSpacing: "0.6em" }}, {{ opacity: 0.8, letterSpacing: "0.3em", duration: 0.5, ease: "expo.out" }}, {O0 + 0.1});
+    tl.fromTo("#o-kicker", {{ opacity: 0, y: 30 }}, {{ opacity: 0.8, y: 0, duration: 0.5, ease: "expo.out" }}, {O0 + 0.1});
     tl.fromTo("#o-main", {{ scale: 1.4, opacity: 0 }}, {{ scale: 1, opacity: 1, duration: 0.5, ease: "expo.out" }}, {O0 + 0.2});
     tl.fromTo("#o-sub", {{ opacity: 0, filter: "blur(8px)" }}, {{ opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }}, {O0 + 0.45});
     tl.fromTo("#o-follow", {{ scale: 0.4, opacity: 0 }}, {{ scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)" }}, {O0 + 0.65});
