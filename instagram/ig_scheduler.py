@@ -43,6 +43,7 @@ MAX_ATTEMPTS = 3
 RETRY_GAP = timedelta(minutes=10)
 WATCH_POLL = timedelta(minutes=2)
 REPORTED_SKIPS = set()
+PARTS_SUFFIX = ".parts.json"
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v"}
 TYPES = {"post", "carousel", "reel", "story"}
 COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment"]
@@ -125,8 +126,30 @@ def parse_time(value, tz_name):
     return dt
 
 
+def is_parts(url):
+    """A video over GitHub's 100 MB file limit is stored as pieces listed in a .parts.json file."""
+    return urllib.parse.urlparse(url).path.lower().endswith(PARTS_SUFFIX)
+
+
 def is_video(url):
-    return Path(urllib.parse.urlparse(url).path).suffix.lower() in VIDEO_EXTENSIONS
+    return is_parts(url) or Path(urllib.parse.urlparse(url).path).suffix.lower() in VIDEO_EXTENSIONS
+
+
+def fetch_parts(url):
+    """Download the pieces a .parts.json lists and join them into the original video."""
+    try:
+        with urllib.request.urlopen(url, timeout=60) as resp:
+            manifest = json.load(resp)
+        chunks = []
+        for part in manifest["parts"]:
+            with urllib.request.urlopen(urllib.parse.urljoin(url, part), timeout=300) as resp:
+                chunks.append(resp.read())
+    except (urllib.error.URLError, ValueError, KeyError) as e:
+        raise PostError(f"couldn't download the video pieces: {getattr(e, 'reason', e)}") from None
+    data = b"".join(chunks)
+    if len(data) != manifest.get("size", len(data)):
+        raise PostError(f"the video pieces add up to {len(data)} bytes, not {manifest['size']}")
+    return data
 
 
 def load_posts(tz_name):
@@ -198,6 +221,40 @@ def save_state(state):
 
 # ---------- Graph API ----------
 
+class TempRelease:
+    """Puts a file in the temporary 'instagram-upload' release of the repository this runs in (the
+    workflow's GITHUB_TOKEN can write releases) and deletes it again on exit."""
+    TAG = "instagram-upload"
+
+    def __init__(self, data, source_path):
+        self.data = data
+        stem = Path(source_path).name[: -len(PARTS_SUFFIX)]
+        self.name = f"{stem}-{int(time.time())}.mp4"
+        self.repo = os.environ.get("GITHUB_REPOSITORY", "")
+
+    def gh(self, *cmd, check=True):
+        result = subprocess.run(["gh", *cmd, "--repo", self.repo], capture_output=True, text=True)
+        if check and result.returncode:
+            raise PostError(f"temporary upload: {result.stderr.strip() or result.stdout.strip()}")
+        return result
+
+    def __enter__(self):
+        if not self.repo or not os.environ.get("GH_TOKEN"):
+            raise PostError("videos over 95 MB can only be posted from the GitHub workflow")
+        if self.gh("release", "view", self.TAG, check=False).returncode:
+            self.gh("release", "create", self.TAG, "--prerelease", "--title", "Instagram uploads (temporary)",
+                    "--notes", "Videos over GitHub's 100 MB file limit wait here while Instagram downloads them. "
+                               "The scheduler deletes each one afterwards.")
+        self.path = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / self.name
+        self.path.write_bytes(self.data)
+        self.gh("release", "upload", self.TAG, str(self.path), "--clobber")
+        return f"https://github.com/{self.repo}/releases/download/{self.TAG}/{self.name}"
+
+    def __exit__(self, *exc):
+        self.gh("release", "delete-asset", self.TAG, self.name, "--yes", check=False)
+        self.path.unlink(missing_ok=True)
+
+
 class Graph:
     def __init__(self, account):
         self.user_id = account["user_id"]
@@ -229,6 +286,17 @@ class Graph:
     def container(self, **params):
         return self.call("POST", f"{self.user_id}/media", **params)["id"]
 
+    def video_container(self, url, media_type, **params):
+        """A container for a video link. Instagram only downloads videos from a link, and a .parts.json
+        video is too big for one GitHub file, so it is joined and put in a temporary release download
+        (up to 2 GB) until Instagram has fetched it."""
+        if not is_parts(url):
+            return self.container(media_type=media_type, video_url=url, **params)
+        with TempRelease(fetch_parts(url), urllib.parse.urlparse(url).path) as big_url:
+            container = self.container(media_type=media_type, video_url=big_url, **params)
+            self.wait_until_ready(container)
+        return container
+
     def wait_until_ready(self, container_id, timeout=600):
         # Videos are processed by Instagram before they can be published; images are usually instant.
         deadline = time.time() + timeout
@@ -243,11 +311,10 @@ class Graph:
                 raise PostError("Instagram took more than 10 minutes to process the media")
             time.sleep(10)
 
-    def media_params(self, url, **extra):
+    def media_container(self, url, video_type="VIDEO", **params):
         if is_video(url):
-            return {"video_url": url, "media_type": extra.pop("video_type", "VIDEO"), **extra}
-        extra.pop("video_type", None)
-        return {"image_url": url, **extra}
+            return self.video_container(url, video_type, **params)
+        return self.container(image_url=url, **params)
 
 
 def publish(graph, post):
@@ -258,15 +325,16 @@ def publish(graph, post):
     if kind == "post":
         creation = graph.container(image_url=media[0], caption=caption)
     elif kind == "reel":
-        creation = graph.container(media_type="REELS", video_url=media[0], caption=caption, share_to_feed="true")
+        creation = graph.video_container(media[0], "REELS", caption=caption, share_to_feed="true")
     elif kind == "story":
-        params = graph.media_params(media[0], video_type="STORIES")
-        params.setdefault("media_type", "STORIES")
-        creation = graph.container(**params)
+        if is_video(media[0]):
+            creation = graph.video_container(media[0], "STORIES")
+        else:
+            creation = graph.container(image_url=media[0], media_type="STORIES")
     else:
         children = []
         for url in media:
-            child = graph.container(**graph.media_params(url, is_carousel_item="true"))
+            child = graph.media_container(url, is_carousel_item="true")
             graph.wait_until_ready(child)
             children.append(child)
         creation = graph.container(media_type="CAROUSEL", children=",".join(children), caption=caption)
@@ -470,7 +538,7 @@ def cmd_probe(args):
     url = args.url
     try:
         if is_video(url):
-            container = graph.container(media_type="REELS", video_url=url)
+            container = graph.video_container(url, "REELS")
         else:
             container = graph.container(image_url=url)
         graph.wait_until_ready(container)

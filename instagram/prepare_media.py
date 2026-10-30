@@ -23,7 +23,10 @@ from zoneinfo import ZoneInfo
 RAW = "https://raw.githubusercontent.com/dikshabhargava31-ops/instagram-media/main/"
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v"}
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-MAX_BYTES = 95 * 1024 * 1024
+MB = 1024 * 1024
+FILE_LIMIT = 95 * MB   # GitHub refuses files over 100 MB
+PART_SIZE = 45 * MB
+REEL_LIMIT = 300 * MB  # Instagram's limit for reels
 
 
 def probe(path):
@@ -35,10 +38,26 @@ def probe(path):
     return stream["width"], stream["height"], float(data.get("format", {}).get("duration") or 0)
 
 
+def split_into_parts(src, dest):
+    """Write src as numbered pieces beside dest plus a .parts.json listing them; the scheduler joins
+    them at posting time. Returns the .parts.json path."""
+    parts = []
+    with open(src, "rb") as f:
+        while chunk := f.read(PART_SIZE):
+            part = dest.with_name(f"{dest.name}.part{len(parts):03d}")
+            part.write_bytes(chunk)
+            parts.append(part.name)
+    manifest = dest.with_name(dest.stem + ".parts.json")
+    manifest.write_text(json.dumps({"name": dest.name, "size": src.stat().st_size, "parts": parts}))
+    return manifest
+
+
 def problems_for(kind, is_video, width, height, duration, size):
     found = []
-    if size > MAX_BYTES:
-        found.append(f"{size / 1048576:.0f} MB is over the 95 MB upload limit")
+    if size > REEL_LIMIT:
+        found.append(f"{size / MB:.0f} MB is over Instagram's 300 MB limit")
+    elif size > FILE_LIMIT and kind != "reel":
+        found.append(f"{size / MB:.0f} MB is over 95 MB; only reels can be bigger (up to 300 MB)")
     if not is_video and kind in ("post", "carousel") and not 0.79 <= width / height <= 1.92:
         found.append(f"{width}x{height} is outside the feed's 4:5 to 1.91:1 range (use story for 9:16)")
     if is_video and kind == "reel" and not 3 <= duration <= 900:
@@ -85,10 +104,13 @@ def main():
             continue
         if is_video:
             dest = folder / f"{base}-{n}{'.mov' if ext == '.mov' else '.mp4'}"
-            shutil.copyfile(src, dest)
+            if src.stat().st_size > FILE_LIMIT:
+                dest = split_into_parts(src, dest)
+            else:
+                shutil.copyfile(src, dest)
             subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(min(1, duration / 2)), "-i", str(src),
                             "-frames:v", "1", "-vf", "scale='min(540,iw)':-2", "-q:v", "4",
-                            str(dest.with_suffix(".poster.jpg"))], check=True)
+                            str(folder / f"{base}-{n}.poster.jpg")], check=True)
         else:
             dest = folder / f"{base}-{n}.jpg"
             # Flatten transparency onto white, cap the width at 1440 px and save as JPEG.
