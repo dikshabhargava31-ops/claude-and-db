@@ -43,7 +43,8 @@ def rig(s, cx, cy):
 
 
 FULL = rig(1.0, 540, 860)
-SPLIT = rig(0.62, 540, 1440)
+SPLIT = rig(0.62, 540, 1462)
+CAP_SPLIT_DY = -96  # in split view the word sits above the face card, never on his head
 
 
 def punch(state, k=1.14, pivot_y=CAP_Y - 90):
@@ -160,9 +161,20 @@ for d in ["assets/fonts", "assets/vendor", "assets/sfx", "compositions"]:
 pres, voice = os.path.join(out, "assets", "presenter.webm"), os.path.join(out, "assets", "voice.m4a")
 seg_key = os.path.join(out, "assets", ".segment")
 if not (os.path.exists(seg_key) and open(seg_key).read() == f"{a} {b}"):
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-c:v", "libvpx-vp9", "-ss", f"{a:.3f}", "-t", f"{body + TAIL:.3f}", "-i", keyed,
-                    "-vf", "fps=30", "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-crf", "26", "-b:v", "0", "-row-mt", "1",
-                    "-cpu-used", "4", "-g", "30", "-auto-alt-ref", "0", "-an", pres], check=True)
+    # key straight from the 1080p source at the rig's final size: light denoise, Lanczos upscale and a
+    # gentle sharpen before the key, then a high-quality encode, so the face stays crisp on a phone
+    dec = subprocess.Popen(["ffmpeg", "-v", "error", "-ss", f"{a:.3f}", "-t", f"{body + TAIL:.3f}", "-i", source,
+                            "-vf", "crop=1100:1080:280:0,hqdn3d=1.2:1.2:4:4,scale=1320:1296:flags=lanczos,"
+                                   "unsharp=5:5:0.7:5:5:0,fps=30",
+                            "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], stdout=subprocess.PIPE)
+    key = subprocess.Popen(["python3", "-I", os.path.join(HERE, "greenkey.py"), "1320", "1296", "48", "92"],
+                           stdin=dec.stdout, stdout=subprocess.PIPE)
+    dec.stdout.close()
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", "1320x1296", "-r", "30", "-i", "-",
+                    "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-crf", "18", "-b:v", "0", "-row-mt", "1",
+                    "-cpu-used", "2", "-g", "30", "-auto-alt-ref", "0", "-an", pres], stdin=key.stdout, check=True)
+    key.stdout.close()
+    assert dec.wait() == 0 and key.wait() == 0
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{a:.3f}", "-t", f"{body + 0.3:.3f}", "-i", source, "-vn",
                     "-af", f"afade=t=in:d=0.03,afade=t=out:st={body:.3f}:d=0.3,loudnorm=I=-14:TP=-1.5:LRA=9",
                     "-ar", "48000", "-c:a", "aac", "-b:a", "192k", voice], check=True)
@@ -307,7 +319,7 @@ slides = f"""<template>
     #root {{ position: absolute; inset: 0; overflow: hidden; pointer-events: none; }}
     {SHARED_CSS}
     .panel {{ position: absolute; left: 0; top: 0; width: 1080px; height: {CARD[0] - 40}px; }}
-    .panel-in {{ position: absolute; left: 70px; right: 70px; top: 190px; bottom: 30px; display: flex; flex-direction: column;
+    .panel-in {{ position: absolute; left: 70px; right: 70px; top: 190px; bottom: 120px; display: flex; flex-direction: column;
       align-items: center; justify-content: center; text-align: center; gap: 26px; }}
     .dots {{ position: absolute; inset: 0;
       background-image: radial-gradient(rgba(255,255,255,0.10) 2px, transparent 2.5px); background-size: 30px 30px;
@@ -364,6 +376,18 @@ for w in all_words:
         t += "."
     words.append((t, w["start"]))
 cap_html, cap_js = [], []
+# the caption band follows the layout: on the seam in full view, lifted above the card in split view,
+# moving with the same 0.42 s ease as the face so the two never cross
+for i, bt in enumerate(R["beats"]):
+    dy = CAP_SPLIT_DY if bt["mode"] == "split" else 0
+    if i == 0:
+        cap_js.append(f'    tl.set("#cap-band", {{ y: {dy} }}, 0);')
+    else:
+        # duck the word while the face travels between layouts, bring it back once he has landed
+        t = T(bt["t"])
+        cap_js.append(f'    tl.to("#cap-band", {{ opacity: 0, duration: 0.07, ease: "power1.in" }}, {t - 0.24:.3f});')
+        cap_js.append(f'    tl.set("#cap-band", {{ y: {dy} }}, {t - 0.16:.3f});')
+        cap_js.append(f'    tl.to("#cap-band", {{ opacity: 1, duration: 0.08, ease: "power1.out" }}, {t + 0.2:.3f});')
 for i, (t, s) in enumerate(words):
     t0 = T(s)
     t1 = T(words[i + 1][1]) if i + 1 < len(words) else min(T(s) + 0.6, INTRO + body)
@@ -373,12 +397,15 @@ for i, (t, s) in enumerate(words):
 captions = f"""<template>
   <style>
     #root {{ position: absolute; inset: 0; overflow: visible; pointer-events: none; }}
+    #cap-band {{ position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }}
     .w {{ position: absolute; left: 0; width: 1080px; top: {CAP_Y - 40}px; text-align: center; opacity: 0;
       font-family: Inter; font-weight: 800; font-size: 64px; line-height: 80px; letter-spacing: -0.01em; color: #fff;
       -webkit-text-stroke: 12px #0E0E0E; paint-order: stroke fill; text-shadow: 0 6px 24px rgba(0,0,0,0.6); }}
   </style>
   <div id="root" data-composition-id="captions" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div id="cap-band">
 {chr(10).join(cap_html)}
+    </div>
   </div>
   <script>
     const tl = gsap.timeline({{ paused: true }});
@@ -456,4 +483,9 @@ for name, content in [("index.html", index), ("compositions/slides.html", slides
                       ("compositions/cta.html", cta), ("compositions/fx.html", fx)]:
     with open(os.path.join(out, name), "w") as f:
         f.write(content)
+# presenter grade (lifted blacks down, cleaner whites, pink shirt cast and green edge fringe neutralised),
+# persisted through HyperFrames' own media-treatment so the shader owns it, not CSS filters
+subprocess.run(["npx", "hyperframes", "media-treatment", "--project", out, "--selector", "#presenter",
+                "--grading", os.path.join(HERE, "presenter-grade.json"), "--apply", "--json"],
+               check=True, stdout=subprocess.DEVNULL)
 print(json.dumps({"out": out, "duration": D, "words": len(words)}))

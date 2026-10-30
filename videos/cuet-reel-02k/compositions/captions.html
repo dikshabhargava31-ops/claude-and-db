@@ -1,11 +1,13 @@
 <template>
   <style>
     #root { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+    #cap-band { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
     .w { position: absolute; left: 0; width: 1080px; top: 1170px; text-align: center; opacity: 0;
       font-family: Inter; font-weight: 800; font-size: 64px; line-height: 80px; letter-spacing: -0.01em; color: #fff;
       -webkit-text-stroke: 12px #0E0E0E; paint-order: stroke fill; text-shadow: 0 6px 24px rgba(0,0,0,0.6); }
   </style>
   <div id="root" data-composition-id="captions" data-width="1080" data-height="1920" data-layout-allow-overlap>
+    <div id="cap-band">
     <div id="w0" class="w">college</div>
     <div id="w1" class="w">nahi</div>
     <div id="w2" class="w">aapko</div>
@@ -76,9 +78,26 @@
     <div id="w67" class="w">marks</div>
     <div id="w68" class="w">ka</div>
     <div id="w69" class="w">farak.</div>
+    </div>
   </div>
   <script>
     const tl = gsap.timeline({ paused: true });
+    tl.set("#cap-band", { y: 0 }, 0);
+    tl.to("#cap-band", { opacity: 0, duration: 0.07, ease: "power1.in" }, 2.360);
+    tl.set("#cap-band", { y: -96 }, 2.440);
+    tl.to("#cap-band", { opacity: 1, duration: 0.08, ease: "power1.out" }, 2.800);
+    tl.to("#cap-band", { opacity: 0, duration: 0.07, ease: "power1.in" }, 5.060);
+    tl.set("#cap-band", { y: -96 }, 5.140);
+    tl.to("#cap-band", { opacity: 1, duration: 0.08, ease: "power1.out" }, 5.500);
+    tl.to("#cap-band", { opacity: 0, duration: 0.07, ease: "power1.in" }, 7.540);
+    tl.set("#cap-band", { y: 0 }, 7.620);
+    tl.to("#cap-band", { opacity: 1, duration: 0.08, ease: "power1.out" }, 7.980);
+    tl.to("#cap-band", { opacity: 0, duration: 0.07, ease: "power1.in" }, 10.820);
+    tl.set("#cap-band", { y: -96 }, 10.900);
+    tl.to("#cap-band", { opacity: 1, duration: 0.08, ease: "power1.out" }, 11.260);
+    tl.to("#cap-band", { opacity: 0, duration: 0.07, ease: "power1.in" }, 19.800);
+    tl.set("#cap-band", { y: 0 }, 19.880);
+    tl.to("#cap-band", { opacity: 1, duration: 0.08, ease: "power1.out" }, 20.240);
     tl.fromTo("#w0", { opacity: 1, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.08, ease: "power2.out", immediateRender: false }, 0.000);
     tl.set("#w0", { opacity: 0 }, 0.373);
     tl.fromTo("#w1", { opacity: 1, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.08, ease: "power2.out", immediateRender: false }, 0.373);
