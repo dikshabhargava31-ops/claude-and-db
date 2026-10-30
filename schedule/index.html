@@ -336,7 +336,7 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
           <label class="drop" id="cDrop">
             <svg class="i" style="width:26px;height:26px"><use href="#i-upload"/></svg>
             <span><b>Drop photos or videos here</b> or click to choose</span>
-            <span style="font-size:12px">JPG, PNG or MP4 · PNGs are turned into JPGs for you</span>
+            <span style="font-size:12px">JPG, PNG or MP4 · reels up to 300 MB · PNGs are turned into JPGs for you</span>
             <input type="file" id="cFile" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime" multiple hidden>
           </label>
           <div class="mgrid" id="cMedia"></div>
@@ -388,8 +388,11 @@ const API = "https://api.github.com/";
 const RAW = `https://raw.githubusercontent.com/${GH.owner}/${GH.media}/main/`;
 const AUTH_KEY = "ig-planner-token", BOARD_AUTH_KEY = "ipa-priority-board-user", PREF_KEY = "ig-planner-prefs";
 const COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment"];
-const IST = 330 * 60e3, LATE_LIMIT_MS = 12 * 3600e3, MAX_ATTEMPTS = 3, MAX_BYTES = 95 * 1024 * 1024;
-const VIDEO_RE = /\.(mp4|mov|m4v)$/i, NOT_JPEG_RE = /\.(png|webp|gif|heic|avif|bmp)$/i;
+const IST = 330 * 60e3, LATE_LIMIT_MS = 12 * 3600e3, MAX_ATTEMPTS = 3, MB = 1024 * 1024;
+// GitHub takes files up to 100 MB, so bigger videos are uploaded in pieces listed in a .parts.json
+// file; the scheduler joins them at posting time. Instagram allows 300 MB for reels, about 100 for the rest.
+const FILE_LIMIT = 95 * MB, PART_SIZE = 45 * MB, REEL_LIMIT = 300 * MB;
+const VIDEO_RE = /\.(mp4|mov|m4v|parts\.json)$/i, NOT_JPEG_RE = /\.(png|webp|gif|heic|avif|bmp)$/i;
 const TYPE_LABEL = {post: "Photo", carousel: "Carousel", reel: "Reel", story: "Story"};
 const TYPE_ICON = {post: "photo", carousel: "carousel", reel: "reel", story: "story"};
 const TYPE_HINT = {
@@ -452,6 +455,20 @@ const blobToBase64 = blob => new Promise((res, rej) => {
 });
 
 // Uploads one file to the media repository, reporting progress; returns its public link.
+// Files over GitHub's limit go up as numbered pieces plus a .parts.json listing them.
+async function uploadVideoOrPhoto(blob, path, onProgress) {
+  if (blob.size <= FILE_LIMIT) return uploadMedia(blob, path, onProgress);
+  const name = path.split("/").pop(), parts = [];
+  const count = Math.ceil(blob.size / PART_SIZE);
+  for (let i = 0; i < count; i++) {
+    const part = `${name}.part${String(i).padStart(3, "0")}`;
+    await uploadMedia(blob.slice(i * PART_SIZE, (i + 1) * PART_SIZE), path.replace(name, part), p => onProgress((i + p) / count));
+    parts.push(part);
+  }
+  const manifest = new Blob([JSON.stringify({name, size: blob.size, parts})], {type: "application/json"});
+  return uploadMedia(manifest, path.replace(VIDEO_RE, ".parts.json"), () => {});
+}
+
 async function uploadMedia(blob, path, onProgress) {
   const content = await blobToBase64(blob);
   return new Promise((resolve, reject) => {
@@ -762,6 +779,7 @@ function mediaIssues() {
       const r = m.w / m.h;
       if (r < 0.79 || r > 1.92) out.push({err: true, text: `${label}This photo is ${m.w}×${m.h}. Feed photos must be between 4:5 (portrait) and 1.91:1 (landscape); use Story for tall 9:16 images.`});
     }
+    if (m.isVideo && m.size > FILE_LIMIT && t !== "reel") out.push({err: true, text: `${label}This video is ${fmtSize(m.size)}. Only reels can be over 95 MB (up to 300 MB); export it smaller or post it as a reel.`});
     if (m.isVideo && m.dur) {
       if (t === "reel" && (m.dur < 3 || m.dur > 900)) out.push({err: true, text: `${label}Reels must be 3 seconds to 15 minutes (this is ${Math.round(m.dur)} s).`});
       if (t === "story" && m.dur > 60) out.push({err: true, text: `${label}Stories can be at most 60 seconds (this is ${Math.round(m.dur)} s).`});
@@ -840,8 +858,8 @@ async function addFiles(files) {
         }
       }
       const bytes = item.blob ? item.blob.size : file.size;
-      if (bytes > MAX_BYTES) item.error = `${file.name} is ${(bytes / 1048576).toFixed(0)} MB; the limit here is 95 MB. Export it smaller.`;
-      if (!isVideo && bytes > 8 * 1048576) item.error = "Instagram photos can be at most 8 MB.";
+      if (isVideo && bytes > REEL_LIMIT) item.error = `${file.name} is ${fmtSize(bytes)}; Instagram's limit is 300 MB. Export it smaller.`;
+      if (!isVideo && bytes > 8 * MB) item.error = "Instagram photos can be at most 8 MB.";
     } catch (_) {
       item.error = `Couldn't read ${file.name}.`;
     }
@@ -909,7 +927,7 @@ async function saveComposer() {
       const m = uploads[i], ext = m.isVideo ? (/\.mov$/i.test(m.name) || m.file.type === "video/quicktime" ? "mov" : "mp4") : "jpg";
       const path = `media/${t.date.slice(0, 7)}/${base.replace(/[^\w-]/g, "")}-${C.media.indexOf(m) + 1}-${Date.now().toString(36)}.${ext}`;
       status.textContent = `Uploading ${i + 1} of ${uploads.length}…`; bar.hidden = false; fill.style.width = "0%";
-      m.url = await uploadMedia(m.blob || m.file, path, p => fill.style.width = `${Math.round(p * 100)}%`);
+      m.url = await uploadVideoOrPhoto(m.blob || m.file, path, p => fill.style.width = `${Math.round(p * 100)}%`);
       if (m.isVideo && m.posterBlob) {
         try { await uploadMedia(m.posterBlob, path.replace(VIDEO_RE, ".poster.jpg"), () => {}); } catch (_) {}
       }

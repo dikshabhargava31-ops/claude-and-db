@@ -73,7 +73,8 @@ You can also add rows to `posts.csv` by hand, on github.com or in Excel or Googl
 Instagram downloads each file from its link, so the link has to open the file itself, not a preview page. The planner and `prepare_media.py` handle this by putting files in `instagram-media`. If you add a link by hand, note that Google Drive and Dropbox share links don't work.
 
 - **Images:** JPEG only. Use a 4:5 ratio (1080×1350) for the feed and 9:16 (1080×1920) for Stories.
-- **Reels:** MP4 or MOV, 9:16, 3 seconds to 15 minutes. Videos rendered in `videos/<name>/renders/` are already the right size.
+- **Reels:** MP4 or MOV, 9:16, 3 seconds to 15 minutes, up to 300 MB. Videos rendered in `videos/<name>/renders/` are already the right size.
+- **Videos over 95 MB:** GitHub refuses files over 100 MB, so the planner (and `prepare_media.py`) uploads a bigger reel as 45 MB pieces plus a `.parts.json` file that lists them. At posting time the scheduler joins the pieces and puts the video in this repository's temporary `instagram-upload` release, Instagram downloads it from there, and the scheduler deletes it. Stories and carousel videos stay at 95 MB, close to Instagram's own limit of about 100 MB.
 - **Daily limit:** each account can publish a limited number of posts per day through the API (100 at the time of writing). The *verify* run shows the current limit.
 
 ## Check and run
