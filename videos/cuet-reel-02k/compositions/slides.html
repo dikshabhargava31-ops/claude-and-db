@@ -1,0 +1,112 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; src: url("assets/fonts/InstrumentSerif-Italic.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+    
+    .pill { display: inline-block; padding: 14px 30px; border-radius: 60px; background: #1c1c1c; border: 2px solid rgba(255,255,255,0.16);
+      font-family: Inter; font-weight: 600; font-size: 30px; letter-spacing: 0.14em; color: #fff; }
+    .pill-step { background: rgba(227,22,27,0.08); border-color: #E3161B; color: #fff; }
+    .serif { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; text-transform: none; letter-spacing: -0.01em; }
+    .hero { color: #E3161B; text-shadow: 0 0 28px rgba(227,22,27,0.75), 0 0 70px rgba(227,22,27,0.45); }
+    .red { color: #E3161B; }
+
+    .panel { position: absolute; left: 0; top: 0; width: 1080px; height: 1170px; }
+    .panel-in { position: absolute; left: 70px; right: 70px; top: 190px; bottom: 30px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; gap: 26px; }
+    .dots { position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.10) 2px, transparent 2.5px); background-size: 30px 30px;
+      -webkit-mask-image: linear-gradient(#000 40%, transparent 100%); mask-image: linear-gradient(#000 40%, transparent 100%); }
+    .h1 { font-family: Inter; font-weight: 900; font-size: 92px; line-height: 0.98; letter-spacing: -0.02em; color: #fff; text-transform: uppercase; }
+    .h1.big { font-size: 80px; white-space: nowrap; }
+    .h1.red { color: #E3161B; }
+    .h1 .serif { font-size: 1.32em; line-height: 0.8; }
+    .body { font-family: Inter; font-weight: 500; font-size: 42px; line-height: 1.3; color: rgba(255,255,255,0.86); max-width: 860px; }
+    .bars { width: 940px; margin-top: 36px; display: flex; flex-direction: column; gap: 34px; }
+    .bar-row { display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; column-gap: 24px; row-gap: 12px; text-align: left; }
+    .bar-label { grid-column: 1 / 3; font-family: Inter; font-weight: 700; font-size: 30px; letter-spacing: 0.06em; color: rgba(255,255,255,0.8); }
+    .bar-track { height: 46px; border-radius: 12px; background: rgba(255,255,255,0.08); overflow: hidden; }
+    .bar-fill { height: 100%; width: 100%; border-radius: 12px; background: #3DFF8A; transform-origin: 0 50%; box-shadow: 0 0 24px rgba(61,255,138,0.5); }
+    .bar-num { font-family: Inter; font-weight: 900; font-size: 56px; line-height: 46px; color: #3DFF8A; min-width: 230px; text-align: right;
+      font-variant-numeric: tabular-nums; }
+    .bar-axis { display: flex; justify-content: space-between; width: 690px; font-family: Inter; font-weight: 600; font-size: 28px; color: rgba(255,255,255,0.5); }
+    .overlay { position: absolute; left: 0; top: 0; width: 1080px; height: 700px; }
+    .overlay-in { position: absolute; left: 60px; right: 60px; top: 230px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+    .sans-small { font-family: Inter; font-weight: 900; font-size: 50px; letter-spacing: -0.01em; color: #fff; text-transform: uppercase; }
+    .hero-xl { font-size: 230px; line-height: 0.95; }
+  </style>
+  <div id="root" data-composition-id="slides" data-width="1080" data-height="1920">
+    <div id="s-title" class="clip panel" data-start="4.475" data-duration="2.850" data-track-index="1">
+      <div class="dots" data-layout-ignore></div>
+      <div id="s-title-in" class="panel-in">
+        <div class="pill pill-step">TIP 6</div>
+        <div class="h1">COLLEGE NAHI,</div>
+        <div class="h1">COLLEGE + <span class="serif hero">Course</span></div>
+        <div class="body">Ye <span class="red">simple tip</span> zyadatar log<br>ignore karte hain</div>
+      </div>
+    </div>
+    <div id="s-premise" class="clip panel" data-start="7.175" data-duration="2.630" data-track-index="0">
+      <div class="dots" data-layout-ignore></div>
+      <div id="s-premise-in" class="panel-in">
+        <div class="pill">CUT-OFF KA SACH</div>
+        <div class="h1 big">CUT-OFF COLLEGE</div>
+        <div class="h1 big">KA NAHI HOTA.</div>
+        <div class="h1 big red reveal" id="s-premise-red">COURSE KA HOTA HAI.</div>
+      </div>
+    </div>
+    <div id="o-example" class="clip overlay" data-start="11.155" data-duration="1.930" data-track-index="2">
+      <div id="o-example-in" class="overlay-in"><div class="pill">EXAMPLE · HINDU COLLEGE</div>
+      </div>
+    </div>
+    <div id="s-data" class="clip panel" data-start="12.935" data-duration="9.130" data-track-index="0">
+      <div class="dots" data-layout-ignore></div>
+      <div id="s-data-in" class="panel-in">
+        <div class="pill">HINDU COLLEGE · 2026 ROUND 1</div>
+        <div class="h1">EK COLLEGE, <span class="serif hero">alag</span> CUT-OFF</div>
+        <div class="bars">
+          <div class="bar-row" id="row-a">
+            <div class="bar-label">BA (H) POLITICAL SCIENCE</div>
+            <div class="bar-track"><div class="bar-fill" id="bar-a"></div></div>
+            <div class="bar-num" id="num-a">0.00</div>
+          </div>
+          <div class="bar-row" id="row-b">
+            <div class="bar-label">B.COM (H)</div>
+            <div class="bar-track"><div class="bar-fill" id="bar-b"></div></div>
+            <div class="bar-num" id="num-b">0.00</div>
+          </div>
+          <div class="bar-axis"><span>0</span><span>1000</span></div>
+        </div>
+      </div>
+    </div>
+    <div id="o-hero" class="clip overlay" data-start="23.045" data-duration="1.731" data-track-index="2">
+      <div id="o-hero-in" class="overlay-in"><div class="sans-small">EK HI COLLEGE, LAGBHAG</div>
+        <div class="serif hero hero-xl">39 marks</div>
+        <div class="sans-small">KA FARAK.</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    const numA = { v: 0 }, numB = { v: 0 };
+    const elA = document.querySelector("#num-a"), elB = document.querySelector("#num-b");
+    tl.fromTo("#s-title-in > *:not(.reveal)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "expo.out" }, 4.525);
+    tl.to("#s-title-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 7.125);
+    tl.fromTo("#s-premise-in > *:not(.reveal)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "expo.out" }, 7.225);
+    tl.to("#s-premise-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 9.605);
+    tl.fromTo("#o-example-in > *", { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "expo.out" }, 11.205);
+    tl.to("#o-example-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 12.885);
+    tl.fromTo("#s-data-in > *:not(.reveal)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "expo.out" }, 12.985);
+    tl.to("#s-data-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 21.865);
+    tl.fromTo("#o-hero-in > *", { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "expo.out" }, 23.095);
+    tl.to("#o-hero-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 24.576);
+
+    tl.fromTo("#s-premise-red", { opacity: 0, y: 30, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, 8.795);
+    tl.fromTo("#row-a", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 14.325);
+    tl.fromTo("#bar-a", { scaleX: 0 }, { scaleX: 0.9587, duration: 1.4, ease: "power3.out" }, 16.725);
+    tl.fromTo(numA, { v: 0 }, { v: 958.71, duration: 1.4, ease: "power3.out", onUpdate: () => { elA.textContent = numA.v.toFixed(2); } }, 16.725);
+    tl.fromTo("#row-b", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 18.985);
+    tl.fromTo("#bar-b", { scaleX: 0 }, { scaleX: 0.9199, duration: 1.4, ease: "power3.out" }, 20.125);
+    tl.fromTo(numB, { v: 0 }, { v: 919.87, duration: 1.4, ease: "power3.out", onUpdate: () => { elB.textContent = numB.v.toFixed(2); } }, 20.125);
+    window.__timelines["slides"] = tl;
+  </script>
+</template>

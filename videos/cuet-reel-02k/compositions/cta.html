@@ -1,0 +1,35 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; src: url("assets/fonts/InstrumentSerif-Italic.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    
+    .pill { display: inline-block; padding: 14px 30px; border-radius: 60px; background: #1c1c1c; border: 2px solid rgba(255,255,255,0.16);
+      font-family: Inter; font-weight: 600; font-size: 30px; letter-spacing: 0.14em; color: #fff; }
+    .pill-step { background: rgba(227,22,27,0.08); border-color: #E3161B; color: #fff; }
+    .serif { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; text-transform: none; letter-spacing: -0.01em; }
+    .hero { color: #E3161B; text-shadow: 0 0 28px rgba(227,22,27,0.75), 0 0 70px rgba(227,22,27,0.45); }
+    .red { color: #E3161B; }
+
+    #cta-plate { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, #2a0b0c 0%, #121212 50%, #0B0B0B 100%); }
+    #cta-box { position: absolute; left: 60px; right: 60px; top: 600px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    #cta-top { font-family: Inter; font-weight: 900; font-size: 96px; letter-spacing: -0.02em; color: #fff; }
+    #cta-hero { font-size: 290px; line-height: 0.9; }
+    #cta-line { font-family: Inter; font-weight: 500; font-size: 40px; color: rgba(255,255,255,0.85); margin-top: 24px; }
+  </style>
+  <div id="root" data-composition-id="cta" data-width="1080" data-height="1920">
+    <div id="cta-plate"></div>
+    <div id="cta-box">
+      <div id="cta-top">COMMENT</div>
+      <div id="cta-hero" class="serif hero">MENTOR</div>
+      <div id="cta-line">CUET college list mentorship ke liye</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#cta-plate", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.inOut" }, 0);
+    tl.fromTo("#cta-top", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 0.3);
+    tl.fromTo("#cta-hero", { opacity: 0, scale: 1.3, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 0.42);
+    tl.fromTo("#cta-line", { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, 0.8);
+    window.__timelines["cta"] = tl;
+  </script>
+</template>

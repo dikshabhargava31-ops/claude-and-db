@@ -1,0 +1,38 @@
+<template>
+  <style>
+    @font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; src: url("assets/fonts/InstrumentSerif-Italic.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; }
+    
+    .pill { display: inline-block; padding: 14px 30px; border-radius: 60px; background: #1c1c1c; border: 2px solid rgba(255,255,255,0.16);
+      font-family: Inter; font-weight: 600; font-size: 30px; letter-spacing: 0.14em; color: #fff; }
+    .pill-step { background: rgba(227,22,27,0.08); border-color: #E3161B; color: #fff; }
+    .serif { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; text-transform: none; letter-spacing: -0.01em; }
+    .hero { color: #E3161B; text-shadow: 0 0 28px rgba(227,22,27,0.75), 0 0 70px rgba(227,22,27,0.45); }
+    .red { color: #E3161B; }
+
+    #hook-plate { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 46%, #2a0b0c 0%, #121212 48%, #0B0B0B 100%); }
+    #hook-box { position: absolute; left: 60px; right: 60px; top: 520px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    #hook-top, #hook-bottom { font-family: Inter; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: -0.02em; }
+    #hook-top { font-size: 120px; line-height: 1; margin-top: 46px; }
+    #hook-hero { font-size: 330px; line-height: 0.86; margin: 4px 0 16px; }
+    #hook-bottom { font-size: 58px; line-height: 1.06; max-width: 900px; }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1080" data-height="1920">
+    <div id="hook-plate"></div>
+    <div id="hook-box">
+      <div id="hook-pill" class="pill pill-step">CUET 2027 · TIP 6</div>
+      <div id="hook-top">CUT-OFF</div>
+      <div id="hook-hero" class="serif hero">Course</div>
+      <div id="hook-bottom">KA HOTA HAI,<br>COLLEGE KA NAHI</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // readable at frame 0; the hero word settles, then everything blur-swaps into the face
+    tl.fromTo("#hook-hero", { scale: 1.12 }, { scale: 1, duration: 0.6, ease: "expo.out" }, 0);
+    tl.fromTo("#hook-top, #hook-bottom", { y: 18 }, { y: 0, duration: 0.5, ease: "expo.out" }, 0);
+    tl.to("#hook-box", { opacity: 0, scale: 0.94, filter: "blur(12px)", duration: 0.24, ease: "power2.in" }, 1.500);
+    tl.to("#hook-plate", { opacity: 0, duration: 0.35, ease: "power2.inOut" }, 1.600);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>
