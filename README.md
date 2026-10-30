@@ -16,6 +16,8 @@ A single static page: `index.html`, plus `assets/`. There is no build step. It's
 - **Wellbeing:** habits, journal and a focus timer.
 - **Systems:** a PARA overview and an archive. Search with `/` (or Ctrl+K), and quick capture with `N`.
 
+Cover art lives in `daily/illustrations.js`: original inline-SVG drawings (life areas, notebooks, the three method cards and a dashboard banner). Life areas and notebooks can pick any of them in their edit form. The accent colour is burnt orange (`--accent` in `style.css`).
+
 Data is saved in the browser's local storage. Use **Settings & backup** to export or import it. Data from the earlier planner versions carries over.
 
 ## IPA Priority Board
