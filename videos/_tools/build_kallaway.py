@@ -1,9 +1,10 @@
 """Build a CUET reel in the Kallaway style (see the style guide the team shared).
 
-usage: python3 build_kallaway.py <reel key> <words_rom.json> <media dir> <out dir>
+usage: python3 build_kallaway.py <reel key> <words_rom.json> <keyed.webm> <source.mp4> <out dir>
 
-<media dir> is an already-built cuet-reel-NN project: its presenter.webm and
-voice.m4a (same segment, same pre-roll) are reused.
+The reel opens on the presenter mid-sentence with the hook above his head
+(no title card), and ends by holding his face through the pause after the
+last word before the CTA frame settles over it.
 
 The look: near-black grain background with a vignette, white heavy all-caps
 Inter, one red italic Instrument Serif hero word per frame with a glow, red-
@@ -15,12 +16,14 @@ import html
 import json
 import os
 import shutil
+import subprocess
 import sys
 
 W, H = 1080, 1920
-INTRO = 1.8  # hook card before the presenter speaks
-CTA = 2.8  # "Comment MENTOR" end frame
-PRE = 0.55  # pre-roll baked into presenter.webm by build_reel.py
+INTRO = 0.0  # no title card: frame 0 is the face with the hook over it
+HOLD = 0.35  # face held after the last word before the CTA starts
+CTA = 3.0  # "Comment MENTOR" end frame
+TAIL = 1.2  # footage kept after the last word, under the CTA's fade
 RED, GREEN = "#E3161B", "#3DFF8A"
 LEFT, TOP = -132, 664  # presenter rig box: 1320 x 1296, rig-local face centre below
 FACE_X, FACE_Y = 672, 276
@@ -58,35 +61,35 @@ def js(o):
 # ---------------------------------------------------------------- reel specs
 REELS = {
     "tip6-cutoff": {
-        "segment": [32.275, 55.201],
-        "hook": {"pill": "CUET 2027 · TIP 6", "top": "CUT-OFF", "hero": "Course", "bottom": "KA HOTA HAI,|COLLEGE KA NAHI"},
+        "segment": [32.45, 55.40],  # first word to the end of "farak." (silence 55.36-55.76)
         "fix": {"36.16": "zyadatar", "36.51": "", "37.75": "", "37.96": "cut-off", "38.1": "",
                 "44.8": "ba", "45.0": "honours", "47.58": "cut-off", "47.77": "",
-                "49.46": "b.com", "49.66": "", "49.95": "honours", "50.93": "cut-off", "51.12": ""},
+                "49.46": "b.com", "49.66": "", "49.95": "honours", "50.93": "cut-off", "51.12": "",
+                "55.23": ""},  # "toh" opens the next sentence (spoken after 55.76)
         "stops": [34.91, 37.55, 40.09, 48.96, 52.30, 54.84],  # sentence ends get a full stop
         "beats": [
-            {"t": 32.275, "mode": "full"},
+            {"t": 32.45, "mode": "full", "overlay": "o-hook"},
             {"t": 35.05, "mode": "split", "slide": "s-title"},
             {"t": 37.75, "mode": "split", "slide": "s-premise"},
             {"t": 40.23, "mode": "full", "overlay": "o-example"},
             {"t": 43.51, "mode": "split", "slide": "s-data"},
             {"t": 52.49, "mode": "full", "overlay": "o-hero"},
         ],
-        "punches": [{"t": 34.15, "until": 35.0}, {"t": 41.68, "until": 43.3}, {"t": 53.96, "until": 55.1}],
+        "punches": [{"t": 34.15, "until": 35.0}, {"t": 53.96, "until": 54.7}],
         "slides": {
             "s-title": """
         <div class="pill pill-step">TIP 6</div>
-        <div class="h1">COLLEGE NAHI,</div>
+        <div class="h1">NOT JUST COLLEGE,</div>
         <div class="h1">COLLEGE + <span class="serif hero">Course</span></div>
-        <div class="body">Ye <span class="red">simple tip</span> zyadatar log<br>ignore karte hain</div>""",
+        <div class="body">A <span class="red">simple tip</span> that most<br>students ignore</div>""",
             "s-premise": """
-        <div class="pill">CUT-OFF KA SACH</div>
-        <div class="h1 big">CUT-OFF COLLEGE</div>
-        <div class="h1 big">KA NAHI HOTA.</div>
-        <div class="h1 big red reveal" id="s-premise-red">COURSE KA HOTA HAI.</div>""",
+        <div class="pill">THE CUT-OFF TRUTH</div>
+        <div class="h1 big">CUT-OFF ISN'T</div>
+        <div class="h1 big">PER COLLEGE.</div>
+        <div class="h1 big red reveal" id="s-premise-red">IT'S PER COURSE.</div>""",
             "s-data": """
         <div class="pill">HINDU COLLEGE · 2026 ROUND 1</div>
-        <div class="h1">EK COLLEGE, <span class="serif hero">alag</span> CUT-OFF</div>
+        <div class="h1">SAME COLLEGE, <span class="serif hero">different</span> CUT-OFFS</div>
         <div class="bars">
           <div class="bar-row" id="row-a">
             <div class="bar-label">BA (H) POLITICAL SCIENCE</div>
@@ -103,7 +106,9 @@ REELS = {
         },
         # slide-local animation, times in source seconds; {T(x)} is replaced with reel time
         "slide_js": """
+    tl.fromTo("#bld [pathLength]", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, stagger: 0.04, ease: "power2.out" }, {T(41.5)});
     tl.fromTo("#s-premise-red", { opacity: 0, y: 30, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, {T(39.27)});
+    tl.set("#row-a, #row-b", { opacity: 0 }, {T(43.4)});
     tl.fromTo("#row-a", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, {T(44.8)});
     tl.fromTo("#bar-a", { scaleX: 0 }, { scaleX: 0.9587, duration: 1.4, ease: "power3.out" }, {T(47.2)});
     tl.fromTo(numA, { v: 0 }, { v: 958.71, duration: 1.4, ease: "power3.out", onUpdate: () => { elA.textContent = numA.v.toFixed(2); } }, {T(47.2)});
@@ -114,21 +119,36 @@ REELS = {
     const numA = { v: 0 }, numB = { v: 0 };
     const elA = document.querySelector("#num-a"), elB = document.querySelector("#num-b");""",
         "overlays": {
-            "o-example": {"at": 41.68, "html": '<div class="pill">EXAMPLE · HINDU COLLEGE</div>'},
-            "o-hero": {"at": 53.57, "html": """<div class="sans-small">EK HI COLLEGE, LAGBHAG</div>
+            "o-hook": {"at": 32.45, "static": True, "html": """<div class="pill pill-step">CUET 2027 · TIP 6</div>
+        <div class="sans-small">CUT-OFF DEPENDS ON THE</div>
+        <div class="serif hero hero-l">Course</div>
+        <div class="sans-small">NOT THE COLLEGE</div>"""},
+            "o-example": {"at": 41.4, "html": """<svg id="bld" class="bld" viewBox="0 0 400 230" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+          <path pathLength="1" d="M40 78 L200 18 L360 78 Z" />
+          <path pathLength="1" d="M168 62 a32 32 0 0 1 64 0" stroke="#E3161B" />
+          <rect pathLength="1" x="40" y="78" width="320" height="18" />
+          <line pathLength="1" x1="70" y1="96" x2="70" y2="186" /><line pathLength="1" x1="122" y1="96" x2="122" y2="186" />
+          <line pathLength="1" x1="174" y1="96" x2="174" y2="186" /><line pathLength="1" x1="226" y1="96" x2="226" y2="186" />
+          <line pathLength="1" x1="278" y1="96" x2="278" y2="186" /><line pathLength="1" x1="330" y1="96" x2="330" y2="186" />
+          <path pathLength="1" d="M185 186 V146 a15 15 0 0 1 30 0 V186" stroke="#E3161B" />
+          <rect pathLength="1" x="28" y="186" width="344" height="14" /><rect pathLength="1" x="12" y="200" width="376" height="16" />
+        </svg>
+        <div class="sans-mid bld-name">HINDU COLLEGE</div>
+        <div class="bld-sub">UNIVERSITY OF DELHI</div>"""},
+            "o-hero": {"at": 53.57, "html": """<div class="sans-small">SAME COLLEGE, NEARLY</div>
         <div class="serif hero hero-xl">39 marks</div>
-        <div class="sans-small">KA FARAK.</div>"""},
+        <div class="sans-small">APART.</div>"""},
         },
-        "cta": {"top": "COMMENT", "hero": "MENTOR", "line": "CUET college list mentorship ke liye"},
+        "cta": {"top": "COMMENT", "hero": "MENTOR", "line": "for 1:1 help with your CUET college list"},
     },
 }
 
 # ---------------------------------------------------------------- build
-key, words_path, media_dir, out = sys.argv[1:5]
+key, words_path, keyed, source, out = sys.argv[1:6]
 R = REELS[key]
 a, b = R["segment"]
 body = round(b - a, 3)
-D = round(INTRO + body + CTA, 3)
+D = round(INTRO + body + HOLD + CTA, 3)
 
 
 def T(src):
@@ -137,17 +157,21 @@ def T(src):
 
 for d in ["assets/fonts", "assets/vendor", "assets/sfx", "compositions"]:
     os.makedirs(os.path.join(out, d), exist_ok=True)
-for f in ["presenter.webm", "voice.m4a"]:
-    shutil.copy(os.path.join(media_dir, "assets", f), os.path.join(out, "assets", f))
-for f in ["impact-bass-1.mp3", "whoosh-short.mp3", "pop.mp3", "click-soft.mp3"]:
+pres, voice = os.path.join(out, "assets", "presenter.webm"), os.path.join(out, "assets", "voice.m4a")
+seg_key = os.path.join(out, "assets", ".segment")
+if not (os.path.exists(seg_key) and open(seg_key).read() == f"{a} {b}"):
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-c:v", "libvpx-vp9", "-ss", f"{a:.3f}", "-t", f"{body + TAIL:.3f}", "-i", keyed,
+                    "-vf", "fps=30", "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-crf", "26", "-b:v", "0", "-row-mt", "1",
+                    "-cpu-used", "4", "-g", "30", "-auto-alt-ref", "0", "-an", pres], check=True)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", f"{a:.3f}", "-t", f"{body + 0.3:.3f}", "-i", source, "-vn",
+                    "-af", f"afade=t=in:d=0.03,afade=t=out:st={body:.3f}:d=0.3,loudnorm=I=-14:TP=-1.5:LRA=9",
+                    "-ar", "48000", "-c:a", "aac", "-b:a", "192k", voice], check=True)
+    open(seg_key, "w").write(f"{a} {b}")
+for f in ["impact-bass-1.mp3", "whoosh-short.mp3", "whoosh-cinematic.mp3", "pop.mp3", "click-soft.mp3"]:
     shutil.copy(os.path.join(HERE, "..", "..", ".claude", "skills", "media-use", "audio", "assets", "sfx", f), os.path.join(out, "assets", "sfx", f))
 shutil.copy(os.path.join(HERE, "vendor", "gsap.min.js"), os.path.join(out, "assets", "vendor", "gsap.min.js"))
 shutil.copy(os.path.join(HERE, "fonts", "InstrumentSerif-Italic.woff2"), os.path.join(out, "assets", "fonts", "InstrumentSerif-Italic.woff2"))
 shutil.copy(os.path.join(HERE, "grain.png"), os.path.join(out, "assets", "grain.png"))
-for f in ["hyperframes.json", "package.json"]:
-    src = os.path.join(media_dir, f)
-    if os.path.exists(src) and not os.path.exists(os.path.join(out, f)):
-        shutil.copy(src, os.path.join(out, f))
 
 FONT_FACE = """@font-face { font-family: "Instrument Serif"; font-style: italic; font-weight: 400; src: url("assets/fonts/InstrumentSerif-Italic.woff2") format("woff2"); }"""
 SHARED_CSS = f"""
@@ -178,8 +202,9 @@ for i, bt in enumerate(R["beats"]):
         if bt["t"] <= p["t"] < (R["beats"][i + 1]["t"] if i + 1 < len(R["beats"]) else b):
             layout_js.append(f'    tl.to("#rig", {{ ...{js(punch(st))}, duration: 0.25, ease: "power3.out" }}, {T(p["t"]):.3f});')
             layout_js.append(f'    tl.to("#rig", {{ ...{js(st)}, duration: 0.4, ease: "power2.inOut" }}, {min(T(p["until"]), T(R["beats"][i + 1]["t"]) - 0.5 if i + 1 < len(R["beats"]) else T(p["until"])):.3f});')
-# presenter leaves under the CTA
-layout_js.append(f'    tl.to("#stage", {{ opacity: 0, duration: 0.35, ease: "power2.in" }}, {INTRO + body - 0.1:.3f});')
+# hold the face through the pause, then a slow push while the CTA settles over it
+END = INTRO + body
+layout_js.append(f'    tl.to("#rig", {{ ...{js(rig(1.08, 540, 860))}, duration: {HOLD + 1.0:.2f}, ease: "power2.inOut" }}, {END - 0.2:.3f});')
 
 whooshes = [T(bt["t"]) - 0.25 for bt in R["beats"][1:]]
 sfx = "\n".join(
@@ -215,7 +240,7 @@ index = f"""<!doctype html>
         <div id="face-card" data-layout-ignore></div>
         <div id="mask">
           <div id="rig">
-            <video id="presenter" class="clip" src="assets/presenter.webm" data-start="{INTRO - PRE:.3f}" data-media-start="0" data-duration="{round(body + PRE + 0.45, 3)}" data-track-index="1" muted playsinline></video>
+            <video id="presenter" class="clip" src="assets/presenter.webm" data-start="{INTRO:.3f}" data-media-start="0" data-duration="{round(body + TAIL, 3)}" data-track-index="1" muted playsinline></video>
           </div>
         </div>
       </div>
@@ -223,17 +248,15 @@ index = f"""<!doctype html>
         data-start="0" data-duration="{D}" data-track-index="2" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:3"></div>
       <div id="captions" class="clip" data-composition-id="captions" data-composition-src="compositions/captions.html"
         data-start="0" data-duration="{D}" data-track-index="3" data-track-kind="captions" data-width="1080" data-height="1920" style="z-index:4"></div>
-      <div id="hook" class="clip" data-composition-id="hook" data-composition-src="compositions/hook.html"
-        data-start="0" data-duration="{INTRO + 0.35:.3f}" data-track-index="4" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:5"></div>
       <div id="cta" class="clip" data-composition-id="cta" data-composition-src="compositions/cta.html"
-        data-start="{INTRO + body - 0.25:.3f}" data-duration="{CTA + 0.25:.3f}" data-track-index="5" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:6"></div>
+        data-start="{INTRO + body + HOLD:.3f}" data-duration="{CTA:.3f}" data-track-index="5" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:6"></div>
       <div id="fx" class="clip" data-composition-id="fx" data-composition-src="compositions/fx.html"
         data-start="0" data-duration="{D}" data-track-index="6" data-track-kind="graphics" data-width="1080" data-height="1920" style="z-index:7"></div>
 
-      <audio id="voice" class="clip" src="assets/voice.m4a" data-start="{INTRO}" data-duration="{body}" data-track-index="7" data-volume="1"></audio>
-      <audio id="sfx-hit" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="0" data-duration="1.4" data-track-index="10" data-volume="0.35"></audio>
+      <audio id="voice" class="clip" src="assets/voice.m4a" data-start="{INTRO}" data-duration="{round(body + 0.3, 3)}" data-track-index="7" data-volume="1"></audio>
+      <audio id="sfx-cta-in" class="clip" src="assets/sfx/whoosh-cinematic.mp3" data-start="{INTRO + body + HOLD - 0.35:.3f}" data-duration="1.2" data-track-index="12" data-volume="0.3"></audio>
 {sfx}
-      <audio id="sfx-cta" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="{INTRO + body + 0.2:.3f}" data-duration="1.4" data-track-index="11" data-volume="0.3"></audio>
+      <audio id="sfx-cta" class="clip" src="assets/sfx/impact-bass-1.mp3" data-start="{INTRO + body + HOLD + 0.45:.3f}" data-duration="1.4" data-track-index="11" data-volume="0.38"></audio>
     </div>
     <script>
       const tl = gsap.timeline({{ paused: true }});
@@ -262,12 +285,16 @@ for i, bt in enumerate(beats):
     if "overlay" in bt:
         oid = bt["overlay"]
         o = R["overlays"][oid]
-        o0 = T(o["at"]) - 0.05
+        o0 = max(T(o["at"]) - 0.05, 0)
         panels.append(f"""    <div id="{oid}" class="clip overlay" data-start="{o0:.3f}" data-duration="{t1 - o0:.3f}" data-track-index="2">
       <div id="{oid}-in" class="overlay-in">{o["html"]}
       </div>
     </div>""")
-        pjs.append(f'    tl.fromTo("#{oid}-in > *", {{ opacity: 0, scale: 1.25, filter: "blur(10px)" }}, {{ opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "expo.out" }}, {o0 + 0.05:.3f});')
+        if o.get("static"):
+            # on screen from frame 0 (the thumbnail): only the hero word settles
+            pjs.append(f'    tl.fromTo("#{oid}-in .hero", {{ scale: 1.1 }}, {{ scale: 1, duration: 0.6, ease: "expo.out" }}, {max(o0, 0):.3f});')
+        else:
+            pjs.append(f'    tl.fromTo("#{oid}-in > *", {{ opacity: 0, scale: 1.25, filter: "blur(10px)" }}, {{ opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "expo.out" }}, {o0 + 0.05:.3f});')
         pjs.append(f'    tl.to("#{oid}-in", {{ opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }}, {t1 - 0.2:.3f});')
 
 slide_js = R.get("slide_js", "")
@@ -299,9 +326,14 @@ slides = f"""<template>
       font-variant-numeric: tabular-nums; }}
     .bar-axis {{ display: flex; justify-content: space-between; width: 690px; font-family: Inter; font-weight: 600; font-size: 28px; color: rgba(255,255,255,0.5); }}
     .overlay {{ position: absolute; left: 0; top: 0; width: 1080px; height: 700px; }}
-    .overlay-in {{ position: absolute; left: 60px; right: 60px; top: 230px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }}
-    .sans-small {{ font-family: Inter; font-weight: 900; font-size: 50px; letter-spacing: -0.01em; color: #fff; text-transform: uppercase; }}
-    .hero-xl {{ font-size: 230px; line-height: 0.95; }}
+    .overlay-in {{ position: absolute; left: 60px; right: 60px; top: 196px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }}
+    .sans-small {{ font-family: Inter; font-weight: 900; font-size: 44px; letter-spacing: -0.01em; color: #fff; text-transform: uppercase; }}
+    .hero-xl {{ font-size: 190px; line-height: 0.95; }}
+    .hero-l {{ font-size: 170px; line-height: 0.86; margin: -6px 0 4px; }}
+    .bld {{ width: 270px; height: 156px; margin: 0 0 4px; filter: drop-shadow(0 0 14px rgba(227,22,27,0.55)); }}
+    .bld-name {{ font-size: 64px; margin-top: 6px; }}
+    .bld-sub {{ font-family: Inter; font-weight: 600; font-size: 28px; letter-spacing: 0.24em; color: rgba(255,255,255,0.6); }}
+    .sans-mid {{ font-family: Inter; font-weight: 900; font-size: 80px; line-height: 1; letter-spacing: -0.02em; color: #fff; margin-top: 14px; }}
   </style>
   <div id="root" data-composition-id="slides" data-width="1080" data-height="1920">
 {chr(10).join(panels)}
@@ -322,7 +354,7 @@ fix = {float(k): v for k, v in R.get("fix", {}).items()}
 stops = {round(x, 2) for x in R.get("stops", [])}
 words = []
 for w in all_words:
-    if not (a - 0.02 <= w["start"] < b):
+    if not (a - 0.15 <= w["start"] < b):  # whisper starts the first word a little early
         continue
     t = fix.get(round(w["start"], 2), w["text"])
     if not t:
@@ -356,41 +388,6 @@ captions = f"""<template>
 </template>
 """
 
-# ---- hook card (frame 0 = thumbnail)
-hk = R["hook"]
-hook = f"""<template>
-  <style>
-    {FONT_FACE}
-    #root {{ position: absolute; inset: 0; overflow: hidden; }}
-    {SHARED_CSS}
-    #hook-plate {{ position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 46%, #2a0b0c 0%, #121212 48%, #0B0B0B 100%); }}
-    #hook-box {{ position: absolute; left: 60px; right: 60px; top: 520px; display: flex; flex-direction: column; align-items: center; text-align: center; }}
-    #hook-top, #hook-bottom {{ font-family: Inter; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: -0.02em; }}
-    #hook-top {{ font-size: 120px; line-height: 1; margin-top: 46px; }}
-    #hook-hero {{ font-size: 330px; line-height: 0.86; margin: 4px 0 16px; }}
-    #hook-bottom {{ font-size: 58px; line-height: 1.06; max-width: 900px; }}
-  </style>
-  <div id="root" data-composition-id="hook" data-width="1080" data-height="1920">
-    <div id="hook-plate"></div>
-    <div id="hook-box">
-      <div id="hook-pill" class="pill pill-step">{esc(hk["pill"])}</div>
-      <div id="hook-top">{esc(hk["top"])}</div>
-      <div id="hook-hero" class="serif hero">{esc(hk["hero"])}</div>
-      <div id="hook-bottom">{"<br>".join(esc(x) for x in hk["bottom"].split("|"))}</div>
-    </div>
-  </div>
-  <script>
-    const tl = gsap.timeline({{ paused: true }});
-    // readable at frame 0; the hero word settles, then everything blur-swaps into the face
-    tl.fromTo("#hook-hero", {{ scale: 1.12 }}, {{ scale: 1, duration: 0.6, ease: "expo.out" }}, 0);
-    tl.fromTo("#hook-top, #hook-bottom", {{ y: 18 }}, {{ y: 0, duration: 0.5, ease: "expo.out" }}, 0);
-    tl.to("#hook-box", {{ opacity: 0, scale: 0.94, filter: "blur(12px)", duration: 0.24, ease: "power2.in" }}, {INTRO - 0.3:.3f});
-    tl.to("#hook-plate", {{ opacity: 0, duration: 0.35, ease: "power2.inOut" }}, {INTRO - 0.2:.3f});
-    window.__timelines["hook"] = tl;
-  </script>
-</template>
-"""
-
 # ---- CTA
 c = R["cta"]
 cta = f"""<template>
@@ -398,7 +395,7 @@ cta = f"""<template>
     {FONT_FACE}
     #root {{ position: absolute; inset: 0; overflow: hidden; }}
     {SHARED_CSS}
-    #cta-plate {{ position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, #2a0b0c 0%, #121212 50%, #0B0B0B 100%); }}
+    #cta-plate {{ position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, rgba(42,11,12,0.94) 0%, rgba(18,18,18,0.9) 50%, rgba(11,11,11,0.96) 100%); }}
     #cta-box {{ position: absolute; left: 60px; right: 60px; top: 600px; display: flex; flex-direction: column; align-items: center; text-align: center; }}
     #cta-top {{ font-family: Inter; font-weight: 900; font-size: 96px; letter-spacing: -0.02em; color: #fff; }}
     #cta-hero {{ font-size: 290px; line-height: 0.9; }}
@@ -414,10 +411,11 @@ cta = f"""<template>
   </div>
   <script>
     const tl = gsap.timeline({{ paused: true }});
-    tl.fromTo("#cta-plate", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3, ease: "power2.inOut" }}, 0);
-    tl.fromTo("#cta-top", {{ opacity: 0, y: 24 }}, {{ opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }}, 0.3);
-    tl.fromTo("#cta-hero", {{ opacity: 0, scale: 1.3, filter: "blur(12px)" }}, {{ opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }}, 0.42);
-    tl.fromTo("#cta-line", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.3, ease: "power2.out" }}, 0.8);
+    // the face dims behind the plate rather than cutting away
+    tl.fromTo("#cta-plate", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.6, ease: "power2.inOut" }}, 0);
+    tl.fromTo("#cta-top", {{ opacity: 0, y: 24 }}, {{ opacity: 1, y: 0, duration: 0.45, ease: "expo.out" }}, 0.3);
+    tl.fromTo("#cta-hero", {{ opacity: 0, scale: 1.3, filter: "blur(12px)" }}, {{ opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }}, 0.45);
+    tl.fromTo("#cta-line", {{ opacity: 0 }}, {{ opacity: 1, duration: 0.35, ease: "power2.out" }}, 0.85);
     window.__timelines["cta"] = tl;
   </script>
 </template>
@@ -455,7 +453,7 @@ fx = f"""<template>
 """
 
 for name, content in [("index.html", index), ("compositions/slides.html", slides), ("compositions/captions.html", captions),
-                      ("compositions/hook.html", hook), ("compositions/cta.html", cta), ("compositions/fx.html", fx)]:
+                      ("compositions/cta.html", cta), ("compositions/fx.html", fx)]:
     with open(os.path.join(out, name), "w") as f:
         f.write(content)
 print(json.dumps({"out": out, "duration": D, "words": len(words)}))

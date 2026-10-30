@@ -30,38 +30,61 @@
       font-variant-numeric: tabular-nums; }
     .bar-axis { display: flex; justify-content: space-between; width: 690px; font-family: Inter; font-weight: 600; font-size: 28px; color: rgba(255,255,255,0.5); }
     .overlay { position: absolute; left: 0; top: 0; width: 1080px; height: 700px; }
-    .overlay-in { position: absolute; left: 60px; right: 60px; top: 230px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
-    .sans-small { font-family: Inter; font-weight: 900; font-size: 50px; letter-spacing: -0.01em; color: #fff; text-transform: uppercase; }
-    .hero-xl { font-size: 230px; line-height: 0.95; }
+    .overlay-in { position: absolute; left: 60px; right: 60px; top: 196px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+    .sans-small { font-family: Inter; font-weight: 900; font-size: 44px; letter-spacing: -0.01em; color: #fff; text-transform: uppercase; }
+    .hero-xl { font-size: 190px; line-height: 0.95; }
+    .hero-l { font-size: 170px; line-height: 0.86; margin: -6px 0 4px; }
+    .bld { width: 270px; height: 156px; margin: 0 0 4px; filter: drop-shadow(0 0 14px rgba(227,22,27,0.55)); }
+    .bld-name { font-size: 64px; margin-top: 6px; }
+    .bld-sub { font-family: Inter; font-weight: 600; font-size: 28px; letter-spacing: 0.24em; color: rgba(255,255,255,0.6); }
+    .sans-mid { font-family: Inter; font-weight: 900; font-size: 80px; line-height: 1; letter-spacing: -0.02em; color: #fff; margin-top: 14px; }
   </style>
   <div id="root" data-composition-id="slides" data-width="1080" data-height="1920">
-    <div id="s-title" class="clip panel" data-start="4.475" data-duration="2.850" data-track-index="1">
+    <div id="o-hook" class="clip overlay" data-start="0.000" data-duration="2.650" data-track-index="2">
+      <div id="o-hook-in" class="overlay-in"><div class="pill pill-step">CUET 2027 · TIP 6</div>
+        <div class="sans-small">CUT-OFF DEPENDS ON THE</div>
+        <div class="serif hero hero-l">Course</div>
+        <div class="sans-small">NOT THE COLLEGE</div>
+      </div>
+    </div>
+    <div id="s-title" class="clip panel" data-start="2.500" data-duration="2.850" data-track-index="1">
       <div class="dots" data-layout-ignore></div>
       <div id="s-title-in" class="panel-in">
         <div class="pill pill-step">TIP 6</div>
-        <div class="h1">COLLEGE NAHI,</div>
+        <div class="h1">NOT JUST COLLEGE,</div>
         <div class="h1">COLLEGE + <span class="serif hero">Course</span></div>
-        <div class="body">Ye <span class="red">simple tip</span> zyadatar log<br>ignore karte hain</div>
+        <div class="body">A <span class="red">simple tip</span> that most<br>students ignore</div>
       </div>
     </div>
-    <div id="s-premise" class="clip panel" data-start="7.175" data-duration="2.630" data-track-index="0">
+    <div id="s-premise" class="clip panel" data-start="5.200" data-duration="2.630" data-track-index="0">
       <div class="dots" data-layout-ignore></div>
       <div id="s-premise-in" class="panel-in">
-        <div class="pill">CUT-OFF KA SACH</div>
-        <div class="h1 big">CUT-OFF COLLEGE</div>
-        <div class="h1 big">KA NAHI HOTA.</div>
-        <div class="h1 big red reveal" id="s-premise-red">COURSE KA HOTA HAI.</div>
+        <div class="pill">THE CUT-OFF TRUTH</div>
+        <div class="h1 big">CUT-OFF ISN'T</div>
+        <div class="h1 big">PER COLLEGE.</div>
+        <div class="h1 big red reveal" id="s-premise-red">IT'S PER COURSE.</div>
       </div>
     </div>
-    <div id="o-example" class="clip overlay" data-start="11.155" data-duration="1.930" data-track-index="2">
-      <div id="o-example-in" class="overlay-in"><div class="pill">EXAMPLE · HINDU COLLEGE</div>
+    <div id="o-example" class="clip overlay" data-start="8.900" data-duration="2.210" data-track-index="2">
+      <div id="o-example-in" class="overlay-in"><svg id="bld" class="bld" viewBox="0 0 400 230" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+          <path pathLength="1" d="M40 78 L200 18 L360 78 Z" />
+          <path pathLength="1" d="M168 62 a32 32 0 0 1 64 0" stroke="#E3161B" />
+          <rect pathLength="1" x="40" y="78" width="320" height="18" />
+          <line pathLength="1" x1="70" y1="96" x2="70" y2="186" /><line pathLength="1" x1="122" y1="96" x2="122" y2="186" />
+          <line pathLength="1" x1="174" y1="96" x2="174" y2="186" /><line pathLength="1" x1="226" y1="96" x2="226" y2="186" />
+          <line pathLength="1" x1="278" y1="96" x2="278" y2="186" /><line pathLength="1" x1="330" y1="96" x2="330" y2="186" />
+          <path pathLength="1" d="M185 186 V146 a15 15 0 0 1 30 0 V186" stroke="#E3161B" />
+          <rect pathLength="1" x="28" y="186" width="344" height="14" /><rect pathLength="1" x="12" y="200" width="376" height="16" />
+        </svg>
+        <div class="sans-mid bld-name">HINDU COLLEGE</div>
+        <div class="bld-sub">UNIVERSITY OF DELHI</div>
       </div>
     </div>
-    <div id="s-data" class="clip panel" data-start="12.935" data-duration="9.130" data-track-index="0">
+    <div id="s-data" class="clip panel" data-start="10.960" data-duration="9.130" data-track-index="0">
       <div class="dots" data-layout-ignore></div>
       <div id="s-data-in" class="panel-in">
         <div class="pill">HINDU COLLEGE · 2026 ROUND 1</div>
-        <div class="h1">EK COLLEGE, <span class="serif hero">alag</span> CUT-OFF</div>
+        <div class="h1">SAME COLLEGE, <span class="serif hero">different</span> CUT-OFFS</div>
         <div class="bars">
           <div class="bar-row" id="row-a">
             <div class="bar-label">BA (H) POLITICAL SCIENCE</div>
@@ -77,10 +100,10 @@
         </div>
       </div>
     </div>
-    <div id="o-hero" class="clip overlay" data-start="23.045" data-duration="1.731" data-track-index="2">
-      <div id="o-hero-in" class="overlay-in"><div class="sans-small">EK HI COLLEGE, LAGBHAG</div>
+    <div id="o-hero" class="clip overlay" data-start="21.070" data-duration="1.930" data-track-index="2">
+      <div id="o-hero-in" class="overlay-in"><div class="sans-small">SAME COLLEGE, NEARLY</div>
         <div class="serif hero hero-xl">39 marks</div>
-        <div class="sans-small">KA FARAK.</div>
+        <div class="sans-small">APART.</div>
       </div>
     </div>
   </div>
@@ -89,24 +112,28 @@
 
     const numA = { v: 0 }, numB = { v: 0 };
     const elA = document.querySelector("#num-a"), elB = document.querySelector("#num-b");
-    tl.fromTo("#s-title-in > *:not(.reveal)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "expo.out" }, 4.525);
-    tl.to("#s-title-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 7.125);
-    tl.fromTo("#s-premise-in > *:not(.reveal)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "expo.out" }, 7.225);
-    tl.to("#s-premise-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 9.605);
-    tl.fromTo("#o-example-in > *", { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "expo.out" }, 11.205);
-    tl.to("#o-example-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 12.885);
-    tl.fromTo("#s-data-in > *:not(.reveal)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "expo.out" }, 12.985);
-    tl.to("#s-data-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 21.865);
-    tl.fromTo("#o-hero-in > *", { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "expo.out" }, 23.095);
-    tl.to("#o-hero-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 24.576);
+    tl.fromTo("#o-hook-in .hero", { scale: 1.1 }, { scale: 1, duration: 0.6, ease: "expo.out" }, 0.000);
+    tl.to("#o-hook-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 2.450);
+    tl.fromTo("#s-title-in > *:not(.reveal)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "expo.out" }, 2.550);
+    tl.to("#s-title-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 5.150);
+    tl.fromTo("#s-premise-in > *:not(.reveal)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "expo.out" }, 5.250);
+    tl.to("#s-premise-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 7.630);
+    tl.fromTo("#o-example-in > *", { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "expo.out" }, 8.950);
+    tl.to("#o-example-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 10.910);
+    tl.fromTo("#s-data-in > *:not(.reveal)", { opacity: 0, y: 26, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.32, stagger: 0.07, ease: "expo.out" }, 11.010);
+    tl.to("#s-data-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 19.890);
+    tl.fromTo("#o-hero-in > *", { opacity: 0, scale: 1.25, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, stagger: 0.08, ease: "expo.out" }, 21.120);
+    tl.to("#o-hero-in", { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 22.800);
 
-    tl.fromTo("#s-premise-red", { opacity: 0, y: 30, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, 8.795);
-    tl.fromTo("#row-a", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 14.325);
-    tl.fromTo("#bar-a", { scaleX: 0 }, { scaleX: 0.9587, duration: 1.4, ease: "power3.out" }, 16.725);
-    tl.fromTo(numA, { v: 0 }, { v: 958.71, duration: 1.4, ease: "power3.out", onUpdate: () => { elA.textContent = numA.v.toFixed(2); } }, 16.725);
-    tl.fromTo("#row-b", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 18.985);
-    tl.fromTo("#bar-b", { scaleX: 0 }, { scaleX: 0.9199, duration: 1.4, ease: "power3.out" }, 20.125);
-    tl.fromTo(numB, { v: 0 }, { v: 919.87, duration: 1.4, ease: "power3.out", onUpdate: () => { elB.textContent = numB.v.toFixed(2); } }, 20.125);
+    tl.fromTo("#bld [pathLength]", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, stagger: 0.04, ease: "power2.out" }, 9.050);
+    tl.fromTo("#s-premise-red", { opacity: 0, y: 30, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.3, ease: "expo.out" }, 6.820);
+    tl.set("#row-a, #row-b", { opacity: 0 }, 10.950);
+    tl.fromTo("#row-a", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 12.350);
+    tl.fromTo("#bar-a", { scaleX: 0 }, { scaleX: 0.9587, duration: 1.4, ease: "power3.out" }, 14.750);
+    tl.fromTo(numA, { v: 0 }, { v: 958.71, duration: 1.4, ease: "power3.out", onUpdate: () => { elA.textContent = numA.v.toFixed(2); } }, 14.750);
+    tl.fromTo("#row-b", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, 17.010);
+    tl.fromTo("#bar-b", { scaleX: 0 }, { scaleX: 0.9199, duration: 1.4, ease: "power3.out" }, 18.150);
+    tl.fromTo(numB, { v: 0 }, { v: 919.87, duration: 1.4, ease: "power3.out", onUpdate: () => { elB.textContent = numB.v.toFixed(2); } }, 18.150);
     window.__timelines["slides"] = tl;
   </script>
 </template>
