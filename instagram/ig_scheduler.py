@@ -43,6 +43,7 @@ MAX_ATTEMPTS = 3
 RETRY_GAP = timedelta(minutes=10)
 WATCH_POLL = timedelta(minutes=2)
 REPORTED_SKIPS = set()
+PARTS_SUFFIX = ".parts.json"
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v"}
 TYPES = {"post", "carousel", "reel", "story"}
 COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment"]
@@ -125,8 +126,30 @@ def parse_time(value, tz_name):
     return dt
 
 
+def is_parts(url):
+    """A video over GitHub's 100 MB file limit is stored as pieces listed in a .parts.json file."""
+    return urllib.parse.urlparse(url).path.lower().endswith(PARTS_SUFFIX)
+
+
 def is_video(url):
-    return Path(urllib.parse.urlparse(url).path).suffix.lower() in VIDEO_EXTENSIONS
+    return is_parts(url) or Path(urllib.parse.urlparse(url).path).suffix.lower() in VIDEO_EXTENSIONS
+
+
+def fetch_parts(url):
+    """Download the pieces a .parts.json lists and join them into the original video."""
+    try:
+        with urllib.request.urlopen(url, timeout=60) as resp:
+            manifest = json.load(resp)
+        chunks = []
+        for part in manifest["parts"]:
+            with urllib.request.urlopen(urllib.parse.urljoin(url, part), timeout=300) as resp:
+                chunks.append(resp.read())
+    except (urllib.error.URLError, ValueError, KeyError) as e:
+        raise PostError(f"couldn't download the video pieces: {getattr(e, 'reason', e)}") from None
+    data = b"".join(chunks)
+    if len(data) != manifest.get("size", len(data)):
+        raise PostError(f"the video pieces add up to {len(data)} bytes, not {manifest['size']}")
+    return data
 
 
 def load_posts(tz_name):
@@ -229,6 +252,31 @@ class Graph:
     def container(self, **params):
         return self.call("POST", f"{self.user_id}/media", **params)["id"]
 
+    def video_container(self, url, media_type, **params):
+        """A container for a video link; a .parts.json video is joined and uploaded to Instagram directly."""
+        if not is_parts(url):
+            return self.container(media_type=media_type, video_url=url, **params)
+        data = fetch_parts(url)
+        created = self.call("POST", f"{self.user_id}/media", media_type=media_type, upload_type="resumable", **params)
+        upload_url = created.get("uri") or f"https://rupload.facebook.com/ig-api-upload/{GRAPH_VERSION}/{created['id']}"
+        req = urllib.request.Request(upload_url, data=data, method="POST", headers={
+            "Authorization": f"OAuth {self.token}", "offset": "0", "file_size": str(len(data))})
+        try:
+            with urllib.request.urlopen(req, timeout=900) as resp:
+                result = json.load(resp)
+        except urllib.error.HTTPError as e:
+            try:
+                body = json.load(e)
+                message = (body.get("debug_info") or body.get("error") or {}).get("message") or str(body)
+            except ValueError:
+                message = str(e)
+            raise PostError(f"video upload: {message}") from None
+        except urllib.error.URLError as e:
+            raise PostError(f"video upload: network error: {e.reason}") from None
+        if not result.get("success", True):
+            raise PostError(f"video upload: {result}")
+        return created["id"]
+
     def wait_until_ready(self, container_id, timeout=600):
         # Videos are processed by Instagram before they can be published; images are usually instant.
         deadline = time.time() + timeout
@@ -243,11 +291,10 @@ class Graph:
                 raise PostError("Instagram took more than 10 minutes to process the media")
             time.sleep(10)
 
-    def media_params(self, url, **extra):
+    def media_container(self, url, video_type="VIDEO", **params):
         if is_video(url):
-            return {"video_url": url, "media_type": extra.pop("video_type", "VIDEO"), **extra}
-        extra.pop("video_type", None)
-        return {"image_url": url, **extra}
+            return self.video_container(url, video_type, **params)
+        return self.container(image_url=url, **params)
 
 
 def publish(graph, post):
@@ -258,15 +305,16 @@ def publish(graph, post):
     if kind == "post":
         creation = graph.container(image_url=media[0], caption=caption)
     elif kind == "reel":
-        creation = graph.container(media_type="REELS", video_url=media[0], caption=caption, share_to_feed="true")
+        creation = graph.video_container(media[0], "REELS", caption=caption, share_to_feed="true")
     elif kind == "story":
-        params = graph.media_params(media[0], video_type="STORIES")
-        params.setdefault("media_type", "STORIES")
-        creation = graph.container(**params)
+        if is_video(media[0]):
+            creation = graph.video_container(media[0], "STORIES")
+        else:
+            creation = graph.container(image_url=media[0], media_type="STORIES")
     else:
         children = []
         for url in media:
-            child = graph.container(**graph.media_params(url, is_carousel_item="true"))
+            child = graph.media_container(url, is_carousel_item="true")
             graph.wait_until_ready(child)
             children.append(child)
         creation = graph.container(media_type="CAROUSEL", children=",".join(children), caption=caption)
@@ -470,7 +518,7 @@ def cmd_probe(args):
     url = args.url
     try:
         if is_video(url):
-            container = graph.container(media_type="REELS", video_url=url)
+            container = graph.video_container(url, "REELS")
         else:
             container = graph.container(image_url=url)
         graph.wait_until_ready(container)
