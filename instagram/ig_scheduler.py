@@ -221,6 +221,40 @@ def save_state(state):
 
 # ---------- Graph API ----------
 
+class TempRelease:
+    """Puts a file in the temporary 'instagram-upload' release of the repository this runs in (the
+    workflow's GITHUB_TOKEN can write releases) and deletes it again on exit."""
+    TAG = "instagram-upload"
+
+    def __init__(self, data, source_path):
+        self.data = data
+        stem = Path(source_path).name[: -len(PARTS_SUFFIX)]
+        self.name = f"{stem}-{int(time.time())}.mp4"
+        self.repo = os.environ.get("GITHUB_REPOSITORY", "")
+
+    def gh(self, *cmd, check=True):
+        result = subprocess.run(["gh", *cmd, "--repo", self.repo], capture_output=True, text=True)
+        if check and result.returncode:
+            raise PostError(f"temporary upload: {result.stderr.strip() or result.stdout.strip()}")
+        return result
+
+    def __enter__(self):
+        if not self.repo or not os.environ.get("GH_TOKEN"):
+            raise PostError("videos over 95 MB can only be posted from the GitHub workflow")
+        if self.gh("release", "view", self.TAG, check=False).returncode:
+            self.gh("release", "create", self.TAG, "--prerelease", "--title", "Instagram uploads (temporary)",
+                    "--notes", "Videos over GitHub's 100 MB file limit wait here while Instagram downloads them. "
+                               "The scheduler deletes each one afterwards.")
+        self.path = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / self.name
+        self.path.write_bytes(self.data)
+        self.gh("release", "upload", self.TAG, str(self.path), "--clobber")
+        return f"https://github.com/{self.repo}/releases/download/{self.TAG}/{self.name}"
+
+    def __exit__(self, *exc):
+        self.gh("release", "delete-asset", self.TAG, self.name, "--yes", check=False)
+        self.path.unlink(missing_ok=True)
+
+
 class Graph:
     def __init__(self, account):
         self.user_id = account["user_id"]
@@ -253,29 +287,15 @@ class Graph:
         return self.call("POST", f"{self.user_id}/media", **params)["id"]
 
     def video_container(self, url, media_type, **params):
-        """A container for a video link; a .parts.json video is joined and uploaded to Instagram directly."""
+        """A container for a video link. Instagram only downloads videos from a link, and a .parts.json
+        video is too big for one GitHub file, so it is joined and put in a temporary release download
+        (up to 2 GB) until Instagram has fetched it."""
         if not is_parts(url):
             return self.container(media_type=media_type, video_url=url, **params)
-        data = fetch_parts(url)
-        created = self.call("POST", f"{self.user_id}/media", media_type=media_type, upload_type="resumable", **params)
-        upload_url = created.get("uri") or f"https://rupload.facebook.com/ig-api-upload/{GRAPH_VERSION}/{created['id']}"
-        req = urllib.request.Request(upload_url, data=data, method="POST", headers={
-            "Authorization": f"OAuth {self.token}", "offset": "0", "file_size": str(len(data))})
-        try:
-            with urllib.request.urlopen(req, timeout=900) as resp:
-                result = json.load(resp)
-        except urllib.error.HTTPError as e:
-            try:
-                body = json.load(e)
-                message = (body.get("debug_info") or body.get("error") or {}).get("message") or str(body)
-            except ValueError:
-                message = str(e)
-            raise PostError(f"video upload: {message}") from None
-        except urllib.error.URLError as e:
-            raise PostError(f"video upload: network error: {e.reason}") from None
-        if not result.get("success", True):
-            raise PostError(f"video upload: {result}")
-        return created["id"]
+        with TempRelease(fetch_parts(url), urllib.parse.urlparse(url).path) as big_url:
+            container = self.container(media_type=media_type, video_url=big_url, **params)
+            self.wait_until_ready(container)
+        return container
 
     def wait_until_ready(self, container_id, timeout=600):
         # Videos are processed by Instagram before they can be published; images are usually instant.

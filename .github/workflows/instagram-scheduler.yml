@@ -48,6 +48,7 @@ jobs:
           IG_ACCOUNT_8: ${{ secrets.IG_ACCOUNT_8 }}
           IG_ACCOUNT_9: ${{ secrets.IG_ACCOUNT_9 }}
           IG_ACCOUNT_10: ${{ secrets.IG_ACCOUNT_10 }}
+          GH_TOKEN: ${{ github.token }}
           MODE: ${{ inputs.mode || 'publish' }}
           PROBE_URL: ${{ inputs.probe_url }}
         run: |
