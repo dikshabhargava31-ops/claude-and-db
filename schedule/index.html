@@ -389,9 +389,10 @@ const RAW = `https://raw.githubusercontent.com/${GH.owner}/${GH.media}/main/`;
 const AUTH_KEY = "ig-planner-token", BOARD_AUTH_KEY = "ipa-priority-board-user", PREF_KEY = "ig-planner-prefs";
 const COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment"];
 const IST = 330 * 60e3, LATE_LIMIT_MS = 12 * 3600e3, MAX_ATTEMPTS = 3, MB = 1024 * 1024;
-// GitHub takes files up to 100 MB, so bigger videos are uploaded in pieces listed in a .parts.json
-// file; the scheduler joins them at posting time. Instagram allows 300 MB for reels, about 100 for the rest.
-const FILE_LIMIT = 95 * MB, PART_SIZE = 45 * MB, REEL_LIMIT = 300 * MB;
+// Videos over 20 MB are uploaded in 20 MB pieces listed in a .parts.json file, which the scheduler
+// joins at posting time: GitHub refuses files over 100 MB, and its secret-scanning check times out on
+// big single files ("Timed out validating the rule"). Instagram allows 300 MB for reels, 100 for the rest.
+const FILE_LIMIT = 20 * MB, PART_SIZE = 20 * MB, REEL_LIMIT = 300 * MB, VIDEO_LIMIT = 100 * MB;
 const VIDEO_RE = /\.(mp4|mov|m4v|parts\.json)$/i, NOT_JPEG_RE = /\.(png|webp|gif|heic|avif|bmp)$/i;
 const TYPE_LABEL = {post: "Photo", carousel: "Carousel", reel: "Reel", story: "Story"};
 const TYPE_ICON = {post: "photo", carousel: "carousel", reel: "reel", story: "story"};
@@ -469,8 +470,19 @@ async function uploadVideoOrPhoto(blob, path, onProgress) {
   return uploadMedia(manifest, path.replace(VIDEO_RE, ".parts.json"), () => {});
 }
 
+// GitHub sometimes times out checking an upload; those are retried twice before giving up.
 async function uploadMedia(blob, path, onProgress) {
   const content = await blobToBase64(blob);
+  for (let attempt = 1; ; attempt++) {
+    try { return await putMedia(content, path, onProgress); }
+    catch (e) {
+      if (!e.retry || attempt === 3) throw e;
+      await new Promise(r => setTimeout(r, attempt * 4000));
+    }
+  }
+}
+
+function putMedia(content, path, onProgress) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("PUT", API + repoPath(GH.media, `/contents/${path}`));
@@ -480,9 +492,13 @@ async function uploadMedia(blob, path, onProgress) {
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) return resolve(RAW + path);
       let m = ""; try { m = JSON.parse(xhr.responseText).message; } catch (_) {}
-      reject(new Error(xhr.status === 404 ? `Can't reach the ${GH.media} repository with this token.` : (m || `Upload failed (${xhr.status})`)));
+      // an earlier try that timed out on our side may have saved the file after all
+      if (xhr.status === 422 && /sha/.test(m)) return resolve(RAW + path);
+      const err = new Error(xhr.status === 404 ? `Can't reach the ${GH.media} repository with this token.` : (m || `Upload failed (${xhr.status})`));
+      err.retry = xhr.status >= 500 || /timed out|rule|try again/i.test(m);
+      reject(err);
     };
-    xhr.onerror = () => reject(new Error("Upload failed. Check your connection."));
+    xhr.onerror = () => reject(Object.assign(new Error("Upload failed. Check your connection."), {retry: true}));
     xhr.send(JSON.stringify({message: `Upload ${path}`, content, branch: "main"}));
   });
 }
@@ -779,7 +795,7 @@ function mediaIssues() {
       const r = m.w / m.h;
       if (r < 0.79 || r > 1.92) out.push({err: true, text: `${label}This photo is ${m.w}×${m.h}. Feed photos must be between 4:5 (portrait) and 1.91:1 (landscape); use Story for tall 9:16 images.`});
     }
-    if (m.isVideo && m.size > FILE_LIMIT && t !== "reel") out.push({err: true, text: `${label}This video is ${fmtSize(m.size)}. Only reels can be over 95 MB (up to 300 MB); export it smaller or post it as a reel.`});
+    if (m.isVideo && m.size > VIDEO_LIMIT && t !== "reel") out.push({err: true, text: `${label}This video is ${fmtSize(m.size)}. Only reels can be over 100 MB (up to 300 MB); export it smaller or post it as a reel.`});
     if (m.isVideo && m.dur) {
       if (t === "reel" && (m.dur < 3 || m.dur > 900)) out.push({err: true, text: `${label}Reels must be 3 seconds to 15 minutes (this is ${Math.round(m.dur)} s).`});
       if (t === "story" && m.dur > 60) out.push({err: true, text: `${label}Stories can be at most 60 seconds (this is ${Math.round(m.dur)} s).`});

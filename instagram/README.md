@@ -74,7 +74,7 @@ Instagram downloads each file from its link, so the link has to open the file it
 
 - **Images:** JPEG only. Use a 4:5 ratio (1080×1350) for the feed and 9:16 (1080×1920) for Stories.
 - **Reels:** MP4 or MOV, 9:16, 3 seconds to 15 minutes, up to 300 MB. Videos rendered in `videos/<name>/renders/` are already the right size.
-- **Videos over 95 MB:** GitHub refuses files over 100 MB, so the planner (and `prepare_media.py`) uploads a bigger reel as 45 MB pieces plus a `.parts.json` file that lists them. At posting time the scheduler joins the pieces and puts the video in this repository's temporary `instagram-upload` release, Instagram downloads it from there, and the scheduler deletes it. Stories and carousel videos stay at 95 MB, close to Instagram's own limit of about 100 MB.
+- **Big videos:** the planner uploads any video over 20 MB as 20 MB pieces plus a `.parts.json` file that lists them, retrying a piece if GitHub times out checking it. GitHub refuses files over 100 MB, and its secret-scanning check can time out on big single files ("Repository rule violations found: Timed out validating the rule"). `prepare_media.py` pushes with git and splits only files over 95 MB. At posting time the scheduler joins the pieces and puts the video in this repository's temporary `instagram-upload` release, Instagram downloads it from there, and the scheduler deletes it. Reels can be up to 300 MB; stories and carousel videos up to 100 MB.
 - **Daily limit:** each account can publish a limited number of posts per day through the API (100 at the time of writing). The *verify* run shows the current limit.
 
 ## Check and run
