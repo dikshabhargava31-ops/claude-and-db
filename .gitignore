@@ -3,3 +3,4 @@ videos/*/renders/
 videos/*/raw/
 __pycache__/
 node_modules/
+__pycache__/
