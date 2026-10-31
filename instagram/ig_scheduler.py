@@ -226,11 +226,15 @@ def save_state(state):
 
 class TempRelease:
     """Puts a file in the temporary 'instagram-upload' release of the repository this runs in (the
-    workflow's GITHUB_TOKEN can write releases) and deletes it again on exit."""
+    workflow's GITHUB_TOKEN can write releases). With keep=True it stays for KEEP so Instagram can
+    come back to it: deleting it as soon as the video was ready, before publishing, left reels with
+    garbled, then silent audio in their first seconds. clean_up() removes it later."""
     TAG = "instagram-upload"
+    KEEP = timedelta(days=2)
 
-    def __init__(self, data, source_path):
+    def __init__(self, data, source_path, keep=True):
         self.data = data
+        self.keep = keep
         stem = Path(source_path).name[: -len(PARTS_SUFFIX)]
         self.name = f"{stem}-{int(time.time())}.mp4"
         self.repo = os.environ.get("GITHUB_REPOSITORY", "")
@@ -247,15 +251,31 @@ class TempRelease:
         if self.gh("release", "view", self.TAG, check=False).returncode:
             self.gh("release", "create", self.TAG, "--prerelease", "--title", "Instagram uploads (temporary)",
                     "--notes", "Videos over GitHub's 100 MB file limit wait here while Instagram downloads them. "
-                               "The scheduler deletes each one afterwards.")
+                               "The scheduler deletes each one two days later.")
         self.path = Path(os.environ.get("RUNNER_TEMP", "/tmp")) / self.name
         self.path.write_bytes(self.data)
         self.gh("release", "upload", self.TAG, str(self.path), "--clobber")
         return f"https://github.com/{self.repo}/releases/download/{self.TAG}/{self.name}"
 
     def __exit__(self, *exc):
-        self.gh("release", "delete-asset", self.TAG, self.name, "--yes", check=False)
+        if not self.keep:
+            self.gh("release", "delete-asset", self.TAG, self.name, "--yes", check=False)
         self.path.unlink(missing_ok=True)
+
+    @classmethod
+    def clean_up(cls):
+        """Delete temporary videos older than KEEP."""
+        repo = os.environ.get("GITHUB_REPOSITORY", "")
+        if not repo or not os.environ.get("GH_TOKEN"):
+            return
+        listing = subprocess.run(["gh", "api", f"repos/{repo}/releases/tags/{cls.TAG}", "--jq",
+                                  '.assets[] | [.name, .created_at] | @tsv'], capture_output=True, text=True)
+        cutoff = datetime.now(timezone.utc) - cls.KEEP
+        for line in listing.stdout.splitlines():
+            name, created = line.split("\t")
+            if datetime.fromisoformat(created.replace("Z", "+00:00")) < cutoff:
+                subprocess.run(["gh", "release", "delete-asset", cls.TAG, name, "--yes", "--repo", repo],
+                               capture_output=True)
 
 
 class Graph:
@@ -572,6 +592,7 @@ def cmd_run(args):
     if args.sync:
         git_sync()
         posts, _ = load_posts(args.timezone)
+        TempRelease.clean_up()
     while True:
         state = load_state()
         failures += publish_due(accounts, posts, state, args)
@@ -649,7 +670,7 @@ def cmd_media_url(args):
         # Instagram's CDN links only work from some networks, so offer a copy as a release download.
         with urllib.request.urlopen(media["media_url"], timeout=300) as resp:
             data = resp.read()
-        release = TempRelease(data, f"instagram-{args.media_id}{PARTS_SUFFIX}")
+        release = TempRelease(data, f"instagram-{args.media_id}{PARTS_SUFFIX}", keep=False)
         with release as link:
             print(f"COPY     {link} (deleted in {args.share_minutes} min)")
             sys.stdout.flush()
