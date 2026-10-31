@@ -8,10 +8,10 @@ on:
       mode:
         description: "publish: post what is due. dry-run: only show it. verify: test the accounts. probe: test a media link. verify and probe post nothing."
         type: choice
-        options: [publish, dry-run, verify, probe]
+        options: [publish, dry-run, verify, probe, media-url]
         default: publish
       probe_url:
-        description: "For probe: the media link to test"
+        description: "For probe: the media link to test. For media-url: the account short name and media id"
         type: string
         default: ""
 
@@ -55,6 +55,7 @@ jobs:
           case "$MODE" in
             verify) python3 instagram/ig_scheduler.py verify ;;
             probe) python3 instagram/ig_scheduler.py probe "$PROBE_URL" ;;
+            media-url) python3 instagram/ig_scheduler.py media-url $PROBE_URL ;;
             dry-run) python3 instagram/ig_scheduler.py run --dry-run ;;
             *) python3 instagram/ig_scheduler.py run --watch-hours 5.5 --sync ;;
           esac

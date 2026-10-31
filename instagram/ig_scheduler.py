@@ -633,6 +633,22 @@ def cmd_probe(args):
     return 0
 
 
+def cmd_media_url(args):
+    """Print the link to the video Instagram serves for a published post, to compare with the original."""
+    accounts = load_accounts(args.accounts)
+    if args.account not in accounts:
+        raise SystemExit(f"No account named '{args.account}'.")
+    graph = Graph(accounts[args.account])
+    try:
+        media = graph.call("GET", args.media_id, fields="media_url,permalink,media_type")
+    except PostError as e:
+        print(f"ERROR    {e}")
+        return 1
+    print(f"MEDIA    {media.get('permalink', '')} {media.get('media_type', '')}")
+    print(f"URL      {media.get('media_url', '')}")
+    return 0
+
+
 def cmd_refresh_tokens(args):
     accounts = load_accounts(args.accounts)
     if not accounts:
@@ -679,6 +695,9 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check")
     sub.add_parser("verify")
+    media_url = sub.add_parser("media-url", help="print the video link Instagram serves for a published post")
+    media_url.add_argument("account")
+    media_url.add_argument("media_id")
     sub.add_parser("sync", help="pull the latest schedule and push published.json (used by the workflow)")
     probe = sub.add_parser("probe")
     probe.add_argument("url")
@@ -693,7 +712,7 @@ def main():
     refresh = sub.add_parser("refresh-tokens")
     refresh.add_argument("--out-dir", required=True, help="folder to write one file per renewed secret to")
     args = parser.parse_args()
-    handler = {"check": cmd_check, "verify": cmd_verify, "sync": cmd_sync, "probe": cmd_probe, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
+    handler = {"check": cmd_check, "verify": cmd_verify, "sync": cmd_sync, "media-url": cmd_media_url, "probe": cmd_probe, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
     sys.exit(handler(args))
 
 
