@@ -394,6 +394,7 @@ const IST = 330 * 60e3, LATE_LIMIT_MS = 12 * 3600e3, MAX_ATTEMPTS = 3, MB = 1024
 // big single files ("Timed out validating the rule"). Instagram allows 300 MB for reels, 100 for the rest.
 const FILE_LIMIT = 20 * MB, PART_SIZE = 20 * MB, REEL_LIMIT = 300 * MB, VIDEO_LIMIT = 100 * MB;
 const VIDEO_RE = /\.(mp4|mov|m4v|parts\.json)$/i, NOT_JPEG_RE = /\.(png|webp|gif|heic|avif|bmp)$/i;
+const EXPORT_GUIDE = "https://github.com/dikshabhargava31-ops/claude-and-db/blob/main/instagram/EXPORT-GUIDE.md";
 const TYPE_LABEL = {post: "Photo", carousel: "Carousel", reel: "Reel", story: "Story"};
 const TYPE_ICON = {post: "photo", carousel: "carousel", reel: "reel", story: "story"};
 const TYPE_HINT = {
@@ -802,6 +803,7 @@ function mediaIssues() {
       if (t === "carousel" && m.dur > 60) out.push({err: true, text: `${label}Carousel videos can be at most 60 seconds.`});
       if (t === "reel" && m.w && m.h && Math.abs(m.w / m.h - 9 / 16) > 0.05) out.push({err: false, text: `${label}Reels look best at 9:16 (this is ${m.w}×${m.h}).`});
     }
+    if (m.audioGlitches) out.push({err: false, text: `${label}This video's sound has timing glitches at ${m.audioGlitches} points, usually from cutting or joining clips without re-encoding the audio. Instagram would garble and mute it near the start, so the scheduler repairs it before posting. To fix it at the source, follow the`, link: EXPORT_GUIDE});
     if (m.file && m.converted) out.push({err: false, text: `${label}${m.file.name} will be uploaded as a JPG.`});
   });
   if (!C.accounts.size) out.push({err: true, text: "Pick at least one account."});
@@ -827,7 +829,7 @@ function drawComposer() {
     </div>`).join("");
   const issues = mediaIssues();
   $("cIssues").innerHTML = issues.filter(x => x.text !== "Add a photo or video." && x.text !== "Pick at least one account.")
-    .map(x => `<div class="issue${x.err ? "" : " warn"}">${esc(x.text)}</div>`).join("");
+    .map(x => `<div class="issue${x.err ? "" : " warn"}">${esc(x.text)}${x.link ? ` <a href="${esc(x.link)}" target="_blank" rel="noopener" style="color:inherit;font-weight:600">export guide</a>.` : ""}</div>`).join("");
   const n = C.caption.length, tags = (C.caption.match(/#[\w]+/g) || []).length;
   $("cCapCount").textContent = `${n.toLocaleString("en-IN")} / 2,200 · ${tags} / 30 #`;
   $("cCapCount").classList.toggle("over", n > 2200 || tags > 30);
@@ -864,6 +866,7 @@ async function addFiles(files) {
         const meta = await videoMeta(item.src);
         Object.assign(item, meta);
         item.posterBlob = meta.posterBlob; item.poster = meta.posterBlob ? URL.createObjectURL(meta.posterBlob) : "";
+        item.audioGlitches = await audioTimingGlitches(file).catch(() => 0);
       } else if (!item.error) {
         const img = await loadImage(item.src);
         item.w = img.naturalWidth; item.h = img.naturalHeight;
@@ -893,6 +896,47 @@ function toJpeg(img) {
   ctx.drawImage(img, 0, 0, cv.width, cv.height);
   return new Promise(res => cv.toBlob(res, "image/jpeg", 0.92));
 }
+// Reads the audio track's sample-timing table (stts) from an MP4/MOV. A clean export has one long run
+// of equal-length audio frames; cutting or joining clips without re-encoding the audio leaves runs of
+// tiny frames, which Instagram follows literally. Returns how many such glitches there are.
+async function audioTimingGlitches(file) {
+  const read = async (start, len) => new DataView(await file.slice(start, start + len).arrayBuffer());
+  const type = (v, o) => String.fromCharCode(v.getUint8(o), v.getUint8(o + 1), v.getUint8(o + 2), v.getUint8(o + 3));
+  let pos = 0, moov = null;
+  while (pos + 8 <= file.size) {   // top-level boxes: find moov wherever it is
+    const h = await read(pos, 16);
+    let size = h.getUint32(0), hdr = 8;
+    if (size === 1) { size = Number(h.getBigUint64(8)); hdr = 16; } else if (size === 0) size = file.size - pos;
+    if (size < 8) return 0;
+    if (type(h, 4) === "moov") { moov = await read(pos + hdr, Math.min(size - hdr, 50 * MB)); break; }
+    pos += size;
+  }
+  if (!moov) return 0;
+  const children = (v, start, end) => {
+    const out = [];
+    for (let p = start; p + 8 <= end;) {
+      const size = v.getUint32(p);
+      if (size < 8) break;
+      out.push({type: type(v, p + 4), start: p + 8, end: Math.min(p + size, end)});
+      p += size;
+    }
+    return out;
+  };
+  const child = (v, box, path) => path.reduce((b, t) => b && children(v, b.start, b.end).find(c => c.type === t), box);
+  for (const trak of children(moov, 0, moov.byteLength).filter(b => b.type === "trak")) {
+    const hdlr = child(moov, trak, ["mdia", "hdlr"]);
+    if (!hdlr || type(moov, hdlr.start + 8) !== "soun") continue;
+    const stts = child(moov, trak, ["mdia", "minf", "stbl", "stts"]);
+    if (!stts) return 0;
+    const n = moov.getUint32(stts.start + 4), runs = [];
+    for (let i = 0; i < n; i++) runs.push([moov.getUint32(stts.start + 8 + i * 8), moov.getUint32(stts.start + 12 + i * 8)]);
+    const usual = runs.reduce((a, b) => (b[0] > a[0] ? b : a), [0, 0])[1];
+    // the last frame is normally shorter, so it doesn't count
+    return runs.slice(0, -1).filter(([, delta]) => delta < usual / 4 || delta > usual * 2).length;
+  }
+  return 0;
+}
+
 function videoMeta(src) {
   return new Promise(res => {
     const v = document.createElement("video");

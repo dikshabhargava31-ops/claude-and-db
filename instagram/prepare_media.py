@@ -7,6 +7,7 @@ Photos become JPEGs (Instagram accepts nothing else) at most 1440 px wide; video
 .poster.jpg beside them for the planner's thumbnails. Each file is checked against Instagram's
 limits for the post type, then written to media/YYYY-MM/ in the repository. The script prints
 the public links to put in posts.csv; commit and push the media repository before scheduling.
+Videos whose audio timestamps are broken (EXPORT-GUIDE.md) are repaired on the way.
 Needs ffmpeg and ffprobe.
 """
 
@@ -19,6 +20,9 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from ig_scheduler import audio_timestamps_broken, repair_audio  # noqa: E402
 
 RAW = "https://raw.githubusercontent.com/dikshabhargava31-ops/instagram-media/main/"
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v"}
@@ -104,6 +108,13 @@ def main():
             continue
         if is_video:
             dest = folder / f"{base}-{n}{'.mov' if ext == '.mov' else '.mp4'}"
+            original = src
+            repaired = repair_audio(src.read_bytes()) if audio_timestamps_broken(src) else None
+            if repaired:
+                # see EXPORT-GUIDE.md: these timing faults garble the sound on Instagram
+                src = Path(folder / f"{base}-{n}.repaired.mp4")
+                src.write_bytes(repaired)
+                dest = dest.with_suffix(".mp4")
             if src.stat().st_size > FILE_LIMIT:
                 dest = split_into_parts(src, dest)
             else:
@@ -111,14 +122,17 @@ def main():
             subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", str(min(1, duration / 2)), "-i", str(src),
                             "-frames:v", "1", "-vf", "scale='min(540,iw)':-2", "-q:v", "4",
                             str(folder / f"{base}-{n}.poster.jpg")], check=True)
+            if repaired:
+                src.unlink()   # the repaired copy has been copied or split into dest
         else:
+            original = src
             dest = folder / f"{base}-{n}.jpg"
             # Flatten transparency onto white, cap the width at 1440 px and save as JPEG.
             subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-f", "lavfi", "-i",
                             f"color=white:s={width}x{height}", "-filter_complex",
                             "[1][0]overlay=format=auto,scale='min(1440,iw)':-2,format=yuvj420p",
                             "-frames:v", "1", "-q:v", "2", str(dest)], check=True)
-        print(f"READY    {src} -> {dest.relative_to(args.repo)}")
+        print(f"READY    {original} -> {dest.relative_to(args.repo)}")
         links.append(RAW + dest.relative_to(args.repo).as_posix())
 
     if failed:

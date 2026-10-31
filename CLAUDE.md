@@ -32,6 +32,10 @@ Read `.claude/skills/hyperframes/references/types/vertical.md` before any short-
 | Podcast clips / repurposing long videos | `auto-editor` + `scenedetect` to find the moments, then the vertical recipe |
 | Stem-separated remixes, dialogue cleanup | `demucs` (needs `--full`, run on the person's own computer) |
 
+## Before handing over any video
+
+Run `python3 instagram/ig_scheduler.py check-video <file>` on every finished render, and re-export or use `--fix` if it reports FAULT. Cutting or joining clips while copying the audio (for example `ffmpeg -c copy` or a lossless trim) leaves audio timestamps that Instagram turns into garbled, then silent sound; `instagram/EXPORT-GUIDE.md` has the export settings.
+
 ## Scheduling to Instagram
 
 Finished posts and reels can be scheduled on the person's Instagram accounts (`instagram/README.md`; account short names are in `instagram/accounts.json`). When they ask to schedule something:
