@@ -4,6 +4,7 @@
 Commands:
   check            validate posts.csv and list what is queued
   verify           log in to each account and show its posting quota (posts nothing)
+  check-video      check finished videos for audio timing faults (--fix writes repaired copies)
   probe            have Instagram fetch and process a media link without publishing it
   run [--dry-run]  publish every post that is due and not yet published
                    (--watch-hours keeps it running to publish upcoming posts on time)
@@ -727,6 +728,28 @@ def cmd_media_url(args):
     return 0
 
 
+def cmd_check_video(args):
+    """Check finished videos' audio timing (see instagram/EXPORT-GUIDE.md); with --fix, write repaired copies."""
+    bad = 0
+    for path in args.files:
+        if not audio_timestamps_broken(path):
+            print(f"OK       {path}")
+            continue
+        bad += 1
+        if not args.fix:
+            print(f"FAULT    {path}: the audio's timestamps bunch up or jump; Instagram would garble and mute "
+                  f"that stretch. Re-export it (instagram/EXPORT-GUIDE.md) or run again with --fix.")
+            continue
+        repaired = repair_audio(Path(path).read_bytes())
+        out = Path(path).with_name(Path(path).stem + "-fixed.mp4")
+        if repaired:
+            out.write_bytes(repaired)
+            print(f"FIXED    {path} -> {out}")
+        else:
+            print(f"ERROR    {path}: couldn't repair it")
+    return 1 if bad and not args.fix else 0
+
+
 def cmd_refresh_tokens(args):
     accounts = load_accounts(args.accounts)
     if not accounts:
@@ -773,6 +796,9 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check")
     sub.add_parser("verify")
+    check_video = sub.add_parser("check-video", help="check finished videos for audio timing faults")
+    check_video.add_argument("files", nargs="+")
+    check_video.add_argument("--fix", action="store_true", help="write a repaired <name>-fixed.mp4 beside each faulty one")
     media_url = sub.add_parser("media-url", help="print the video link Instagram serves for a published post")
     media_url.add_argument("account")
     media_url.add_argument("media_id")
@@ -792,7 +818,7 @@ def main():
     refresh = sub.add_parser("refresh-tokens")
     refresh.add_argument("--out-dir", required=True, help="folder to write one file per renewed secret to")
     args = parser.parse_args()
-    handler = {"check": cmd_check, "verify": cmd_verify, "sync": cmd_sync, "media-url": cmd_media_url, "probe": cmd_probe, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
+    handler = {"check": cmd_check, "verify": cmd_verify, "sync": cmd_sync, "check-video": cmd_check_video, "media-url": cmd_media_url, "probe": cmd_probe, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
     sys.exit(handler(args))
 
 
