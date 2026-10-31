@@ -61,9 +61,4 @@ jobs:
 
       - name: Save what was published
         if: always()
-        run: |
-          git diff --quiet instagram/published.json && exit 0
-          git add instagram/published.json
-          git commit -m "Instagram: record published posts"
-          for i in 1 2 3; do git pull --rebase && git push && exit 0; sleep 5; done
-          exit 1
+        run: python3 instagram/ig_scheduler.py sync
