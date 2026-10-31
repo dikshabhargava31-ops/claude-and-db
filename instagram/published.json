@@ -55,6 +55,13 @@
       "published_at": "2026-10-31T15:48+00:00",
       "media_id": "18100678967427938",
       "permalink": "https://www.instagram.com/reel/DfKg54_Ctve/"
+    },
+    "parthu-20261031-2129-xlok": {
+      "account": "parthu",
+      "type": "reel",
+      "published_at": "2026-10-31T16:01+00:00",
+      "media_id": "18014376530978239",
+      "permalink": "https://www.instagram.com/reel/DfKiV5FH5ty/"
     }
   },
   "failed": {
@@ -64,10 +71,5 @@
       "last_try": "2026-10-28T10:53+00:00"
     }
   },
-  "claims": {
-    "parthu-20261031-2129-xlok": {
-      "run": "41217515462",
-      "at": "2026-10-31T16:00:19+00:00"
-    }
-  }
+  "claims": {}
 }
