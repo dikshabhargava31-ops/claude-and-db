@@ -645,7 +645,15 @@ def cmd_media_url(args):
         print(f"ERROR    {e}")
         return 1
     print(f"MEDIA    {media.get('permalink', '')} {media.get('media_type', '')}")
-    print(f"URL      {media.get('media_url', '')}")
+    if args.share_minutes and media.get("media_url"):
+        # Instagram's CDN links only work from some networks, so offer a copy as a release download.
+        with urllib.request.urlopen(media["media_url"], timeout=300) as resp:
+            data = resp.read()
+        release = TempRelease(data, f"instagram-{args.media_id}{PARTS_SUFFIX}")
+        with release as link:
+            print(f"COPY     {link} (deleted in {args.share_minutes} min)")
+            sys.stdout.flush()
+            time.sleep(args.share_minutes * 60)
     return 0
 
 
@@ -698,6 +706,8 @@ def main():
     media_url = sub.add_parser("media-url", help="print the video link Instagram serves for a published post")
     media_url.add_argument("account")
     media_url.add_argument("media_id")
+    media_url.add_argument("--share-minutes", type=float, default=10,
+                           help="also offer Instagram's copy as a release download for this long")
     sub.add_parser("sync", help="pull the latest schedule and push published.json (used by the workflow)")
     probe = sub.add_parser("probe")
     probe.add_argument("url")
