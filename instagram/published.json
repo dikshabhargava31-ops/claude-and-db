@@ -56,5 +56,11 @@
       "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
       "last_try": "2026-10-28T10:53+00:00"
     }
+  },
+  "claims": {
+    "ipa-20261031-2117-lbh0": {
+      "run": "41216528727",
+      "at": "2026-10-31T15:47:39+00:00"
+    }
   }
 }
