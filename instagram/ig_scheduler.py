@@ -43,6 +43,8 @@ MAX_ATTEMPTS = 3
 RETRY_GAP = timedelta(minutes=10)
 WATCH_POLL = timedelta(minutes=2)
 REPORTED_SKIPS = set()
+RUN_ID = os.environ.get("GITHUB_RUN_ID") or f"local-{os.getpid()}"
+CLAIM_TTL = timedelta(minutes=30)   # a claim older than this (a run that crashed) can be taken over
 PARTS_SUFFIX = ".parts.json"
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v"}
 TYPES = {"post", "carousel", "reel", "story"}
@@ -212,6 +214,7 @@ def load_state():
         state = {}
     state.setdefault("published", {})
     state.setdefault("failed", {})
+    state.setdefault("claims", {})
     return state
 
 
@@ -408,8 +411,22 @@ def publish_due(accounts, posts, state, args):
         if args.dry_run:
             print(f"WOULD    {label}")
             continue
+        if args.sync:
+            # Never trust a checkout taken earlier: another run may have published this meanwhile.
+            state = git_sync()
+            if post_id in state["published"]:
+                continue
+            if not claim(post_id):
+                print(f"SKIP     {label}: another run is publishing it")
+                continue
+            state = load_state()
+        graph = Graph(accounts[post["account"]])
         try:
-            result = publish(Graph(accounts[post["account"]]), post)
+            result = find_on_instagram(graph, post)
+            if result:
+                print(f"FOUND    {label} is already on Instagram; recording it instead of posting again")
+            else:
+                result = publish(graph, post)
         except PostError as e:
             fail = {"attempts": fail["attempts"] + 1, "error": str(e),
                     "last_try": datetime.now(timezone.utc).isoformat(timespec="minutes")}
@@ -426,7 +443,8 @@ def publish_due(accounts, posts, state, args):
             **result,
         }
         save_state(state)  # saved after every post so a crash never posts twice
-        print(f"POSTED   {label} {result.get('permalink', result['media_id'])}")
+        verb = "RECORDED" if result.get("found_existing") else "POSTED  "
+        print(f"{verb} {label} {result.get('permalink', result['media_id'])}")
         if "comment_error" in result:
             print(f"WARNING  first comment failed: {result['comment_error']}")
     return failures
@@ -455,22 +473,85 @@ def next_due(posts, state):
     return min(times, default=None)
 
 
+def find_on_instagram(graph, post):
+    """The account's own recent post with this caption, if one went up in the last day. Guards
+    against posting twice when a publish succeeded but its record was lost."""
+    caption = post["caption"].strip()
+    if not caption or post["type"] == "story":
+        return None
+    try:
+        recent = graph.call("GET", f"{graph.user_id}/media", fields="caption,timestamp,permalink", limit="10")
+    except PostError:
+        return None
+    since = datetime.now(timezone.utc) - timedelta(days=1)
+    for media in recent.get("data", []):
+        try:
+            posted = datetime.strptime(media.get("timestamp", ""), "%Y-%m-%dT%H:%M:%S%z")
+        except ValueError:
+            continue
+        if posted >= since and (media.get("caption") or "").strip() == caption:
+            return {"media_id": media["id"], "permalink": media.get("permalink", ""), "found_existing": True}
+    return None
+
+
 def git(*cmd):
     return subprocess.run(["git", *cmd], cwd=HERE, capture_output=True, text=True)
 
 
+def merge_states(remote, local):
+    """Combine two copies of published.json. The remote copy wins where both have an entry, so the
+    first run to push a claim keeps it."""
+    published = {**local["published"], **remote["published"]}
+    failed = {}
+    for key in set(local["failed"]) | set(remote["failed"]):
+        if key in published:
+            continue
+        a, b = local["failed"].get(key), remote["failed"].get(key)
+        failed[key] = max((x for x in (a, b) if x), key=lambda f: f.get("attempts", 0))
+    cutoff = datetime.now(timezone.utc) - timedelta(days=2)
+    claims = {k: v for k, v in {**local["claims"], **remote["claims"]}.items()
+              if k not in published and datetime.fromisoformat(v["at"]) > cutoff}
+    return {"published": published, "failed": failed, "claims": claims}
+
+
 def git_sync():
-    """Commit published.json if it changed, then pull the latest schedule and push."""
-    if git("diff", "--quiet", "--", STATE_FILE.name).returncode:
-        git("add", STATE_FILE.name)
-        git("commit", "-qm", "Instagram: record published posts")
-    for _ in range(3):
-        if git("pull", "-q", "--rebase").returncode == 0:
-            ahead = git("rev-list", "--count", "@{u}..HEAD").stdout.strip()
-            if ahead == "0" or git("push", "-q").returncode == 0:
-                return
-        time.sleep(5)
+    """Bring the checkout up to date with GitHub (the planner adds posts; other runs record theirs),
+    keep this run's published.json entries, and push them. Returns the merged state."""
+    local = load_state()
+    for _ in range(5):
+        if git("fetch", "-q", "origin", "main").returncode == 0:
+            git("reset", "-q", "--hard", "FETCH_HEAD")
+            remote = load_state()
+            merged = merge_states(remote, local)
+            if merged == remote:
+                return merged
+            save_state(merged)
+            git("add", STATE_FILE.name)
+            git("commit", "-qm", "Instagram: record published posts")
+            if git("push", "-q", "origin", "HEAD:main").returncode == 0:
+                return merged
+        time.sleep(3)
     print("WARNING  couldn't sync with GitHub; will try again")
+    save_state(local)
+    return local
+
+
+def claim(post_id):
+    """Mark a post as being published by this run and push the mark. Only one run can win: a run
+    whose push loses the race sees the other run's claim after merging. Returns True if it's ours."""
+    state = load_state()
+    other = state["claims"].get(post_id)
+    now = datetime.now(timezone.utc)
+    if other and other["run"] != RUN_ID and now - datetime.fromisoformat(other["at"]) < CLAIM_TTL:
+        return False
+    state["claims"][post_id] = {"run": RUN_ID, "at": now.isoformat(timespec="seconds")}
+    save_state(state)
+    return git_sync()["claims"].get(post_id, {}).get("run") == RUN_ID
+
+
+def cmd_sync(args):
+    git_sync()
+    return 0
 
 
 def cmd_run(args):
@@ -488,6 +569,9 @@ def cmd_run(args):
     # post is coming and publishes it on time, re-reading the schedule for new posts as it waits.
     deadline = datetime.now(timezone.utc) + timedelta(hours=args.watch_hours)
     failures = 0
+    if args.sync:
+        git_sync()
+        posts, _ = load_posts(args.timezone)
     while True:
         state = load_state()
         failures += publish_due(accounts, posts, state, args)
@@ -595,6 +679,7 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check")
     sub.add_parser("verify")
+    sub.add_parser("sync", help="pull the latest schedule and push published.json (used by the workflow)")
     probe = sub.add_parser("probe")
     probe.add_argument("url")
     probe.add_argument("--account", help="account to test with (default: the first one)")
@@ -608,7 +693,7 @@ def main():
     refresh = sub.add_parser("refresh-tokens")
     refresh.add_argument("--out-dir", required=True, help="folder to write one file per renewed secret to")
     args = parser.parse_args()
-    handler = {"check": cmd_check, "verify": cmd_verify, "probe": cmd_probe, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
+    handler = {"check": cmd_check, "verify": cmd_verify, "sync": cmd_sync, "probe": cmd_probe, "run": cmd_run, "refresh-tokens": cmd_refresh_tokens}[args.command]
     sys.exit(handler(args))
 
 
