@@ -76,6 +76,13 @@
       "published_at": "2026-10-31T18:27+00:00",
       "media_id": "17903879709606027",
       "permalink": "https://www.instagram.com/reel/DfKzDXpFaSf/"
+    },
+    "cuet-20261101-0017-jexv": {
+      "account": "cuet",
+      "type": "reel",
+      "published_at": "2026-10-31T18:49+00:00",
+      "media_id": "17965326462208391",
+      "permalink": "https://www.instagram.com/reel/DfK1osJCBwR/"
     }
   },
   "failed": {
@@ -85,10 +92,5 @@
       "last_try": "2026-10-28T10:53+00:00"
     }
   },
-  "claims": {
-    "cuet-20261101-0017-jexv": {
-      "run": "41231200899",
-      "at": "2026-10-31T18:48:45+00:00"
-    }
-  }
+  "claims": {}
 }
