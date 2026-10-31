@@ -23,8 +23,10 @@ import csv
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.parse
@@ -137,6 +139,50 @@ def is_video(url):
     return is_parts(url) or Path(urllib.parse.urlparse(url).path).suffix.lower() in VIDEO_EXTENSIONS
 
 
+def download(url):
+    """The video at url, or None if it can't be downloaded (the link is then passed on unchanged)."""
+    try:
+        with urllib.request.urlopen(url, timeout=300) as resp:
+            return resp.read()
+    except (urllib.error.URLError, ValueError):
+        return None
+
+
+def audio_timestamps_broken(path):
+    """True if the audio's timestamps bunch up or jump. Some exports label a run of audio frames
+    with nearly the same time and then skip ahead; players play the frames in order and sound fine,
+    but Instagram follows the timestamps and turns that stretch into garble, then silence."""
+    out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries",
+                          "packet=pts_time", "-of", "csv=p=0", str(path)], capture_output=True, text=True).stdout
+    times = [float(t) for t in out.split() if t.replace(".", "", 1).replace("-", "", 1).isdigit()]
+    steps = [b - a for a, b in zip(times, times[1:])]
+    if len(steps) < 10:
+        return False
+    usual = sorted(steps)[len(steps) // 2]
+    return any(step < usual / 4 or step > usual * 2 for step in steps)
+
+
+def repair_audio(data):
+    """A copy of the video with the audio's timestamps rebuilt in playing order, or None if the
+    audio is fine (or ffmpeg isn't available). The video stream is copied unchanged."""
+    if not shutil.which("ffmpeg") or not shutil.which("ffprobe"):
+        print("WARNING  ffmpeg isn't installed, so audio timestamps weren't checked")
+        return None
+    with tempfile.TemporaryDirectory() as tmp:
+        src, dst = Path(tmp) / "in.mp4", Path(tmp) / "out.mp4"
+        src.write_bytes(data)
+        if not audio_timestamps_broken(src):
+            return None
+        result = subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-map", "0:v:0", "-map", "0:a:0",
+                                 "-c:v", "copy", "-af", "asetpts=N/SR/TB", "-c:a", "aac", "-b:a", "192k",
+                                 "-movflags", "+faststart", str(dst)], capture_output=True, text=True)
+        if result.returncode or audio_timestamps_broken(dst):
+            print(f"WARNING  couldn't repair the audio timestamps: {result.stderr.strip()[:200]}")
+            return None
+        print("REPAIRED audio timestamps that would have garbled the sound on Instagram")
+        return dst.read_bytes()
+
+
 def fetch_parts(url):
     """Download the pieces a .parts.json lists and join them into the original video."""
     try:
@@ -235,7 +281,8 @@ class TempRelease:
     def __init__(self, data, source_path, keep=True):
         self.data = data
         self.keep = keep
-        stem = Path(source_path).name[: -len(PARTS_SUFFIX)]
+        name = Path(urllib.parse.urlparse(source_path).path).name
+        stem = name[: -len(PARTS_SUFFIX)] if name.endswith(PARTS_SUFFIX) else Path(name).stem
         self.name = f"{stem}-{int(time.time())}.mp4"
         self.repo = os.environ.get("GITHUB_REPOSITORY", "")
 
@@ -313,9 +360,11 @@ class Graph:
         """A container for a video link. Instagram only downloads videos from a link, and a .parts.json
         video is too big for one GitHub file, so it is joined and put in a temporary release download
         (up to 2 GB) until Instagram has fetched it."""
-        if not is_parts(url):
+        data = fetch_parts(url) if is_parts(url) else download(url)
+        repaired = repair_audio(data) if data else None
+        if not is_parts(url) and not repaired:
             return self.container(media_type=media_type, video_url=url, **params)
-        with TempRelease(fetch_parts(url), urllib.parse.urlparse(url).path) as big_url:
+        with TempRelease(repaired or data, url) as big_url:
             container = self.container(media_type=media_type, video_url=big_url, **params)
             self.wait_until_ready(container)
         return container
