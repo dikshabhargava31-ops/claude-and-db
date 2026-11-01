@@ -111,6 +111,13 @@
       "published_at": "2026-11-01T15:30+00:00",
       "media_id": "18080585129400144",
       "permalink": "https://www.instagram.com/reel/DfNDqzZFM1E/"
+    },
+    "theopsroom-20261101-2319-fez0": {
+      "account": "theopsroom",
+      "type": "reel",
+      "published_at": "2026-11-01T17:50+00:00",
+      "media_id": "18129586646313052",
+      "permalink": "https://www.instagram.com/reel/DfNTr0bivny/"
     }
   },
   "failed": {
@@ -120,10 +127,5 @@
       "last_try": "2026-10-28T10:53+00:00"
     }
   },
-  "claims": {
-    "theopsroom-20261101-2319-fez0": {
-      "run": "41333426810",
-      "at": "2026-11-01T17:49:52+00:00"
-    }
-  }
+  "claims": {}
 }
