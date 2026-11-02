@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # a run whose watch is over starts the next one
 
 # One publishing run at a time; a test run (verify, probe, dry-run) never waits behind it.
 concurrency:
