@@ -10,6 +10,10 @@ on:
         type: choice
         options: [publish, dry-run, verify, probe, media-url]
         default: publish
+      watch_hours:
+        description: "For publish: how long a run keeps watching for upcoming posts"
+        type: string
+        default: "5.5"
       probe_url:
         description: "For probe: the media link to test. For media-url: the account short name and media id"
         type: string
@@ -55,13 +59,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           MODE: ${{ inputs.mode || 'publish' }}
           PROBE_URL: ${{ inputs.probe_url }}
+          WATCH_HOURS: ${{ inputs.watch_hours || '5.5' }}
         run: |
           case "$MODE" in
             verify) python3 instagram/ig_scheduler.py verify ;;
             probe) python3 instagram/ig_scheduler.py probe "$PROBE_URL" ;;
             media-url) python3 instagram/ig_scheduler.py media-url $PROBE_URL ;;
             dry-run) python3 instagram/ig_scheduler.py run --dry-run ;;
-            *) python3 instagram/ig_scheduler.py run --watch-hours 5.5 --sync ;;
+            *) python3 instagram/ig_scheduler.py run --watch-hours "$WATCH_HOURS" --sync ;;
           esac
 
       - name: Save what was published
