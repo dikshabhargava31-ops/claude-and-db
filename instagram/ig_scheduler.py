@@ -47,6 +47,7 @@ RETRY_GAP = timedelta(minutes=10)
 WATCH_POLL = timedelta(minutes=2)
 REPORTED_SKIPS = set()
 RUN_ID = os.environ.get("GITHUB_RUN_ID") or f"local-{os.getpid()}"
+CHAIN_HORIZON = timedelta(hours=24)  # keep a run watching whenever a post is due within this
 CLAIM_TTL = timedelta(minutes=30)   # a claim older than this (a run that crashed) can be taken over
 PARTS_SUFFIX = ".parts.json"
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v"}
@@ -652,15 +653,34 @@ def cmd_run(args):
             break
         upcoming = next_due(posts, load_state())
         now = datetime.now(timezone.utc)
-        if upcoming is None or upcoming > deadline:
-            print("DONE     nothing else due before this run ends" if upcoming else "DONE     nothing else scheduled")
+        if upcoming is None or upcoming > now + CHAIN_HORIZON:
+            print("DONE     nothing scheduled in the next day" if upcoming else "DONE     nothing else scheduled")
             break
-        wait = max(5, min(WATCH_POLL.total_seconds(), (upcoming - now).total_seconds()))
-        print(f"WAITING  next post at {upcoming.astimezone(ZoneInfo(args.timezone)):%d %b %H:%M}; "
-              f"checking again in {wait / 60:.0f} min" if wait >= 60 else f"checking again in {wait:.0f} s")
+        if upcoming > deadline and now >= deadline:
+            # GitHub has gone more than 7 hours without starting a scheduled run, so a run whose watch
+            # is over hands over to a fresh one instead of leaving the next post to the cron.
+            chain_next_run(args)
+            break
+        wait = max(5, min(WATCH_POLL.total_seconds(), (min(upcoming, deadline) - now).total_seconds()))
+        again = f"{wait / 60:.0f} min" if wait >= 60 else f"{wait:.0f} s"
+        print(f"WAITING  next post at {upcoming.astimezone(ZoneInfo(args.timezone)):%d %b %H:%M}; checking again in {again}")
         time.sleep(wait)
         posts, _ = load_posts(args.timezone)
     return 1 if failures else 0
+
+
+def chain_next_run(args):
+    """Start the next publishing run (a workflow_dispatch made with GITHUB_TOKEN does start runs)."""
+    repo = os.environ.get("GITHUB_REPOSITORY", "")
+    if not args.sync or not repo or not os.environ.get("GH_TOKEN"):
+        print("DONE     this run's watch is over")
+        return
+    result = subprocess.run(["gh", "workflow", "run", "instagram-scheduler.yml", "--repo", repo, "--ref", "main",
+                             "-f", "mode=publish"], capture_output=True, text=True)
+    if result.returncode:
+        print(f"WARNING  couldn't start the next run, so the scheduled one will have to: {result.stderr.strip()}")
+    else:
+        print("HANDOVER this run's watch is over; started the next run to keep watching")
 
 
 def cmd_verify(args):
