@@ -47,7 +47,7 @@
 
   /* ---------- data ---------- */
   const D = { universities: null, cutoffs: null, events: null, allotments: null, rules: null, official: null, forms: null, courses: null, info: null, offerings: null, other: null };
-  const FILES = { universities: 'universities.json', cutoffs: 'cutoffs.json', events: 'events.json', allotments: 'allotments.json', rules: 'subject-rules.json', official: 'official.json', forms: 'forms.json', courses: 'courses.json', info: 'college-info.json', offerings: 'course-offerings.json', other: 'other-colleges.json' };
+  const FILES = { universities: 'universities.json', cutoffs: 'cutoffs.json', events: 'events.json', allotments: 'allotments.json', rules: 'subject-rules.json', official: 'official.json', forms: 'forms.json', courses: 'courses.json', info: 'college-info.json', offerings: 'course-offerings.json', other: 'other-colleges.json', guides: 'guides.json' };
   async function loadData() {
     await Promise.all(Object.entries(FILES).map(async ([k, f]) => {
       try { const r = await fetch('data/' + f, { cache: 'no-cache' }); D[k] = r.ok ? await r.json() : null; } catch { D[k] = null; }
@@ -147,7 +147,7 @@
     if (sb && user) {
       const { error } = await sb.from('requests').insert({ kind, payload });
       sent = !error;
-    }
+    } else sent = await saveSignup(kind, payload);
     if (C.formEndpoint) {
       try {
         const r = await fetch(C.formEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ kind, ...payload, at: new Date().toISOString() }) });
@@ -165,10 +165,23 @@
      (Google or a 6-digit email code through Supabase), then for name, phone and interests: that row is the lead.
      Without Supabase settings in config.js the same steps fall back to a short unverified form. */
   const SBC = C.supabase || {};
-  let sb = null, user = null, pending = null, isAdmin = false;
+  // db saves leads and requests; sb is the same client, used for logins only when login is "auth".
+  let db = null, sb = null, user = null, pending = null, isAdmin = false;
   try {
-    if (SBC.url && SBC.anonKey && window.supabase) sb = window.supabase.createClient(SBC.url, SBC.anonKey, { auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: true } });
-  } catch (err) { console.warn('Supabase did not start', err); sb = null; }
+    if (SBC.url && SBC.anonKey && window.supabase) db = window.supabase.createClient(SBC.url, SBC.anonKey, { auth: { flowType: 'pkce', persistSession: true, detectSessionInUrl: true } });
+    if (SBC.login === 'auth') sb = db;
+  } catch (err) { console.warn('Supabase did not start', err); db = sb = null; }
+  async function saveSignup(kind, payload) {
+    if (!db) return false;
+    const p = S.profile;
+    const { error } = await db.from('signups').insert({
+      kind, name: p.name || null, phone: p.phone || null, email: p.email || null, course: payload.course || p.interest || null,
+      payload: { ...payload, profile: { class12_year: p.class12_year, category: p.category, state: p.state, interest: p.interest, whatsapp_ok: p.whatsapp_ok !== false }, myList: S.dream.map(d => d.uni) },
+      page: location.hash.slice(0, 300)
+    });
+    if (error) console.warn('signup not saved', error);
+    return !error;
+  }
   const loggedIn = () => (sb ? !!user : !!S.profile.phone);
   const profileDone = () => !!(S.profile.name && /\d{10}/.test(String(S.profile.phone).replace(/\D/g, '')));
   const YEARS = ['2026', '2027', '2028'];
@@ -336,7 +349,7 @@
   const ico = (n, cls = '') => `<svg class="i ${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
   const TABS = [['', 'Home', 'home'], ['colleges', 'Colleges', 'cap'], ['dream', 'My List', 'star'], ['calendar', 'Reminders', 'cal'], ['more', 'More', 'grid']];
   const TAB_OF = { college: 'colleges', forms: 'colleges', applications: 'dream', parent: 'dream', login: 'more', account: 'more', admin: 'more', course: 'dream', start: '', kit: 'more', resources: 'more' };
-  const TITLES = { '': 'Home', colleges: 'Colleges', forms: 'Colleges', college: 'College', dream: 'My List', applications: 'My List', calendar: 'Reminders', more: 'More', predictor: 'Score predictor', tools: 'Tools', resources: 'Free CUET kit', seniors: 'Connect with a senior', course: 'Colleges for your course', start: 'Find your course', kit: 'Free CUET kit', community: 'Community', pricing: 'Plans', parent: 'Parent view', login: 'Log in', account: 'Account', admin: 'Leads' };
+  const TITLES = { '': 'Home', colleges: 'Colleges', forms: 'Colleges', college: 'College', dream: 'My List', applications: 'My List', calendar: 'Reminders', more: 'More', predictor: 'Score predictor', tools: 'Tools', resources: 'Free CUET kit', seniors: 'Talk to a senior', guides: 'Guides', course: 'Colleges for your course', start: 'Find your course', kit: 'Free CUET kit', community: 'Community', pricing: 'Plans', parent: 'Parent view', login: 'Log in', account: 'Account', admin: 'Leads' };
   const NAV = Object.entries(TITLES).map(([r, l]) => [r, l]);
   function parseHash() {
     const h = location.hash.replace(/^#\/?/, '');
@@ -362,6 +375,8 @@
     more: ['More', 'Tools, guides and your account.', 'course'],
     tools: ['CUET tools', 'Calculators and guides.', 'kit'],
     predictor: ['Score predictor', 'Use this once your CUET scores are out.', 'course'],
+    guides: ['Guides', 'Short reads on CUET, colleges and forms.', 'kit'],
+    seniors: ['Talk to a senior', 'A free call with a student from the college you want, or our team.', 'senior'],
     pricing: ['Help with forms', 'Our team fills your forms, checks them twice and submits before the deadline.', 'forms'],
     community: ['Community', 'College groups and the allotment-day tracker.', 'senior'],
     account: ['My account', '', 'course'], admin: ['Leads', '', 'kit'], login: ['Log in', 'Save your colleges and get reminders. Free.', 'course']
@@ -510,7 +525,7 @@
     if (!S.courses) S.courses = [];
     if (!S.courses.includes(c.key)) S.courses.push(c.key);
     save(); renderTabs(parseHash().route);
-    toast(n ? `★ Added ${n} colleges for ${c.name}` : 'Already on your list');
+    toast(n ? `★ Added to My List` : 'Already on your list');
   }
   const POPULAR = ['bcom', 'economics', 'psychology', 'bba', 'cs', 'english', 'law', 'journalism'];
   function courseBox(placeholder) {
@@ -668,7 +683,7 @@
       <a class="back" href="#/start">${ico('left', 'sm')} Change course</a>
       <h1 class="course-h">${esc(c.name)}</h1>
       <p class="muted course-what">${esc(c.what)}</p>
-      <details class="about"><summary>About this course</summary><p><b>Good for:</b> ${esc(c.fits)}</p><p><b>Careers:</b> ${c.careers.map(esc).join(', ')}</p></details>
+      <details class="about"><summary>About this course</summary><p><b>Good for:</b> ${esc(c.fits)}</p><p><b>Careers:</b> ${c.careers.map(esc).join(', ')}</p>${c.subjects ? `<p><b>CUET subjects usually needed:</b> ${esc(c.subjects)} <a href="#/tools/subjects?course=${c.key}">Check yours</a></p>` : ''}</details>
       <h2 class="count-h">${all.length} colleges offer ${esc(short)}</h2>
       <div class="hscroll" id="cf">${groups.map(([g, l, n], i) => `<button class="chip ${i ? '' : 'on'}" data-f="${esc(g)}">${esc(GROUP_SHORT[g] || l)} <b>${n}</b></button>`).join('')}</div>
       <p class="muted group-note" id="cnote"></p>
@@ -789,6 +804,7 @@
   };
 
   /* Colleges: NTA participating universities, and colleges with their own forms */
+  const coursesAt = id => courses().filter(c => (((D.offerings && D.offerings.offers) || {})[c.key] || []).some(o => o.kind === 'uni' && o.id === id));
   const initials = n => pretty(n).replace(/\b(of|and|the|for|in|university|universities)\b/gi, ' ').split(/[^A-Za-z]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '✦';
   const starBtn = (key, on, label) => `<button class="star-btn ${on ? 'on' : ''}" type="button" data-star="${esc(key)}" aria-pressed="${on}" aria-label="${on ? 'Remove ' : 'Add '}${esc(label)} ${on ? 'from' : 'to'} My List">${ico('star')}</button>`;
   function ntaPending() {
@@ -805,14 +821,26 @@
       <p style="margin-bottom:6px"><b>How to get in:</b> ${esc(f.entrance)}</p>
       ${f.note ? `<p class="muted" style="font-size:.88rem">${esc(f.note)}</p>` : ''}
       ${f.deadlines.length > 1 ? `<details style="margin-bottom:12px"><summary class="muted" style="font-weight:700;font-size:.85rem">All dates (${f.deadlines.length})</summary><div class="list" style="margin-top:8px">${f.deadlines.map(d => `<div class="list-row" style="min-height:52px"><span class="grow"><span class="t">${esc(d.label)}</span></span><small>${fmtDate(evDate(d))}</small></div>`).join('')}</div></details>` : ''}
+      ${s !== 'closed' ? `<details class="about" style="margin-bottom:12px"><summary>How to apply</summary><ol class="steps-ol">
+        <li>Open the official form from the link below and register with your own email and phone.</li>
+        <li>Fill your details exactly as on your Class 10 and 12 marksheets.</li>
+        <li>Upload a recent photo, your signature and your marksheets (or Class 12 admit card if results aren't out).</li>
+        <li>Pay the fee online and save the payment receipt.</li>
+        <li>Download the filled form as a PDF. Check your email for the next step (test, interview or result).</li>
+      </ol><p class="muted" style="font-size:.84rem">Most common mistakes: a name that doesn't match the marksheet, a blurry photo, and leaving payment for the last day.</p></details>` : ''}
       <div class="list" style="margin-bottom:14px">${f.links.map(([l, u]) => `<a class="list-row" href="${esc(u)}" target="_blank" rel="noopener" style="min-height:52px"><span class="grow"><span class="t">${esc(l)}</span></span>${ico('out', 'sm chev')}</a>`).join('')}</div>
       <div class="row">
         <button class="btn pri" data-act="fstar">${inDream(f.name) ? '★ On My List' : '☆ Add to My List'}</button>
+        ${nd ? `<button class="btn" data-act="fremind">${S.remind && S.remind['form:' + f.id] ? '🔔 Reminder on' : '🔔 Remind me'}</button>` : ''}
         ${s !== 'closed' ? `<button class="btn sun" data-act="fassist">We'll fill it · ${inr(P.assistedForm)}</button>` : ''}
       </div>`, el => {
       el.onclick = e => {
         if (e.target.closest('[data-act="fstar"]') && !inDream(f.name) && !(loggedIn() && profileDone())) { requireLogin('Log in to save your list', () => toggleStar({ uni: f.name, portal: f.links[0][1], deadline: nd ? toLocalInput(nd.when) : '', col: 'dream' })); return; }
         if (e.target.closest('[data-act="fstar"]')) { toggleStar({ uni: f.name, portal: f.links[0][1], deadline: nd ? toLocalInput(nd.when) : '', col: 'dream' }); modal.close(); render(); }
+        if (e.target.closest('[data-act="fremind"]')) {
+          const on = () => { S.remind = S.remind || {}; S.remind['form:' + f.id] = 1; save(); saveSignup('reminder', { form: f.name, date: toLocalInput(nd.when).slice(0, 10) }); toast('🔔 We\'ll remind you before ' + f.name + ' closes'); };
+          modal.close(); requireLogin('Get a reminder before this form closes', on); return;
+        }
         if (e.target.closest('[data-act="fassist"]')) { addCart({ type: 'form', label: `${f.name} application form`, price: P.assistedForm }); modal.close(); }
       };
       tick();
@@ -933,7 +961,7 @@
     const promo = (C.partnerCodes || []).filter(p => norm(p.college) === norm(u.name));
     const group = (C.groups || []).find(g => norm(g.university) === norm(u.name));
     const inf = infoFor(id), name = pretty(u.name), on = inDream(name);
-    const known = courses().filter(c => (((D.offerings && D.offerings.offers) || {})[c.key] || []).some(o => o.kind === 'uni' && o.id === id));
+    const known = coursesAt(id);
     const similar = unis().filter(x => x.id !== id && x.category === u.category && (!inf.state || infoFor(x.id).state === inf.state)).slice(0, 4);
     const sim = similar.length ? similar : unis().filter(x => x.id !== id && x.category === u.category).slice(0, 4);
     const portal = inf.portal === 'CSAS' ? 'DU\'s CSAS portal' : 'the university\'s admission portal';
@@ -1145,6 +1173,7 @@
     const show = q.get('col') || (COLS.find(([k]) => list.some(d => d.col === k)) || COLS[0])[0];
     return `<div class="page"><div class="wrap">
       ${listSeg('board')}
+      <div class="kit-band no-print" style="margin-bottom:14px"><span><b>Share with your parents</b><small>They see your colleges, deadlines and progress.</small></span><button class="btn pri sm" data-act="parent">Share</button></div>
       <details class="card no-print" style="margin-bottom:14px"><summary style="display:flex;gap:10px;align-items:center"><span class="av">${ico('plus')}</span><b style="flex:1">Add colleges by course</b>${ico('right', 'chev')}</summary><div style="margin-top:12px">${courseBox()}</div></details>
       <nav class="seg col-tabs no-print">${COLS.map(([k, l]) => `<a href="#/dream?col=${k}" ${k === show ? 'aria-current="page"' : ''}>${t(l)} <small>${list.filter(d => d.col === k).length}</small></a>`).join('')}</nav>
       <div class="board no-print" data-show="${show}">${COLS.map(([k, l]) => {
@@ -1348,7 +1377,7 @@
   function toggleRemind(e) {
     if (!(loggedIn() && profileDone())) { requireLogin('Log in to get reminders', () => toggleRemind(e)); return; }
     S.remind = S.remind || {};
-    if (S.remind[e.id]) { delete S.remind[e.id]; toast('Reminder off'); } else { S.remind[e.id] = 1; toast('🔔 We\'ll remind you 7 days, 2 days and on the day'); }
+    if (S.remind[e.id]) { delete S.remind[e.id]; toast('Reminder off'); } else { S.remind[e.id] = 1; toast('🔔 We\'ll remind you 7 days, 2 days and on the day'); saveSignup('reminder', { title: e.title, date: e.when ? e.when.toISOString().slice(0, 10) : '' }); }
     save(); if (parseHash().route === 'calendar') render();
   }
   function addEventSheet() {
@@ -1445,7 +1474,6 @@
     const tab = arg || 'marks';
     const tabs = [['marks', t('Marks calculator')], ['fees', 'Application fee'], ['subjects', t('Subject combination checker')], ['compare', 'Compare universities'], ['equivalent', t('Same course at other universities')], ['normalisation', 'Score & percentile guide']];
     return `<div class="page"><div class="wrap">
-      <div class="page-head"><h1>CUET tools</h1></div>
       <div class="chips no-print" style="margin-bottom:20px">${tabs.map(([k, l]) => `<a class="chip ${k === tab ? 'on' : ''}" href="#/tools/${k}">${l}</a>`).join('')}</div>
       <div id="toolBody">${(TOOLS[tab] || TOOLS.marks)()}</div>
     </div></div>`;
@@ -1464,25 +1492,29 @@
         <p class="muted" style="font-size:.82rem">This is your raw score. NTA publishes normalised scores, which can differ from it when a subject runs in several shifts.</p></div>
     </div>`;
   };
+  const STREAMS = [['pcm', 'Science (PCM)'], ['pcb', 'Science (PCB)'], ['commerce', 'Commerce'], ['arts', 'Arts / Humanities']];
+  const STREAM_NOTE = { 'bsc-science': 'Science with Maths (PCM)', btech: 'Science with Maths (PCM)', 'bsc-bio': 'Science with Biology (PCB)', agriculture: 'Science (PCM or PCB)', forensic: 'Science (PCM or PCB)', food: 'Science (PCM or PCB)', cs: 'Maths in Class 12' };
   TOOLS.subjects = () => {
-    const rules = (D.rules && D.rules.rules) || [];
-    if (!rules.length) return `<div class="notice info"><b>Program rules are being added from each university's admission bulletin.</b> Until then, check the "eligibility" or "programme-specific requirements" table in the university's bulletin. The predictor already flags a course as <b>Not eligible</b> when its official rule is loaded.</div>`;
-    return `<div class="side-layout"><div class="card"><label>Course<input id="rq" placeholder="e.g. Economics" list="rlist"></label><datalist id="rlist">${[...new Set(rules.map(r => r.program))].map(p => `<option value="${esc(p)}">`).join('')}</datalist>
-      <p class="muted" style="font-size:.85rem;margin-top:10px">Your subjects: ${Object.keys(S.scores).map(esc).join(', ') || 'none yet — add them in the predictor'}</p></div><div id="rout"></div></div>`;
+    const q = parseHash().q;
+    return `<div class="wrap narrow" style="padding:0">
+      <div class="card"><h3 style="margin-top:0">Which CUET subjects should I take?</h3>
+        <div class="form-grid"><label>Your Class 12 stream<select id="sjStream">${STREAMS.map(([k, l]) => `<option value="${k}" ${(S.quiz && S.quiz.answers && S.quiz.answers.stream) === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+        <label>Course you want<select id="sjCourse">${courses().map(c => `<option value="${c.key}" ${q.get('course') === c.key ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></label></div></div>
+      <div id="sjOut" style="margin-top:14px"></div></div>`;
   };
   TOOLS.compare = () => {
     const sel = S.compare.map(uniById).filter(Boolean);
-    if (!sel.length) return `<div class="empty"><b>Pick up to 3 universities</b>Tick "${t('Compare')}" on the <a href="#/colleges">${t('Colleges')}</a> page.</div>`;
+    if (!sel.length) return `<div class="empty"><b>Pick up to 3 universities</b>Open a university and tap "Compare". <a href="#/colleges">Go to colleges</a></div>`;
     const rowsFor = u => cutRows().filter(r => norm(r.university) === norm(u.name) && (r.category || 'UR') === S.profile.category);
     const line = (label, f) => `<tr><th style="position:static">${label}</th>${sel.map(u => `<td>${f(u)}</td>`).join('')}</tr>`;
     return `<div class="table-wrap"><table>
       <tr><th style="position:static"></th>${sel.map(u => `<td><b>${esc(pretty(u.name))}</b><br><button class="btn sm" data-uncmp="${esc(u.id)}">${t('Remove')}</button></td>`).join('')}</tr>
-      ${line('Type', u => esc(u.category))}${line('State', u => esc(u.state || '—'))}
-      ${line('Website', u => u.website ? `<a href="${esc(u.website)}" target="_blank" rel="noopener">Open ↗</a>` : '—')}
-      ${line(`Courses with cutoffs (${esc(S.profile.category)})`, u => new Set(rowsFor(u).map(r => r.program)).size || '—')}
-      ${line('Closing score range', u => { const c = rowsFor(u).map(r => +r.cutoff); return c.length ? `${Math.min(...c)} – ${Math.max(...c)}` : '—'; })}
-      ${line('On your Dream List', u => (inDream(u.name) ? '★ Yes' : 'No'))}
-      ${line('Student group', u => ((C.groups || []).some(g => norm(g.university) === norm(u.name)) ? 'Yes' : '—'))}
+      ${line('Type', u => esc(u.category))}${line('City', u => esc(infoFor(u.id).city || u.state || '—'))}
+      ${line('Fees', u => (GOV.has(u.category) ? 'Low (government)' : 'Higher (private)'))}
+      ${line('How to get in', () => 'CUET score, then the university\'s own portal')}
+      ${line('Courses we list', u => coursesAt(u.id).map(c => esc(c.name.split(' (')[0].split(' /')[0])).join(', ') || '—')}
+      ${cutRows().length ? line('Closing score range', u => { const c = rowsFor(u).map(r => +r.cutoff); return c.length ? `${Math.min(...c)} – ${Math.max(...c)}` : '—'; }) : ''}
+      ${line('On My List', u => (inDream(pretty(u.name)) ? '★ Yes' : 'No'))}
     </table></div>`;
   };
   TOOLS.equivalent = () => {
@@ -1550,6 +1582,18 @@
         $('#feeOut').textContent = inr(r[1] + Math.max(0, n - 3) * r[2]);
       };
       $('#feeCat').addEventListener('change', calc); $('#feeN').addEventListener('change', calc); calc();
+    }
+    if (tab === 'subjects' && $('#sjCourse')) {
+      const draw = () => {
+        const c = courseByKey($('#sjCourse').value), st = $('#sjStream').value;
+        const ok = !SCIENCE_ONLY[c.key] || SCIENCE_ONLY[c.key].includes(st);
+        $('#sjOut').innerHTML = `<div class="card">
+          <span class="tag ${ok ? 'safe' : 'red'}">${ok ? '✓ Your stream works for this course' : '✗ Usually needs ' + esc(STREAM_NOTE[c.key] || 'a different stream')}</span>
+          <h3 style="margin:12px 0 6px">For ${esc(c.name)}, take:</h3><p style="margin:0">${esc(c.subjects || '')}</p>
+          <p class="muted" style="font-size:.84rem;margin:12px 0 0">Each university sets its own rule, so check the admission rules of the universities on your list. You can take up to 5 CUET subjects, so cover your first and second choice courses.</p>
+          <div class="row" style="margin-top:14px"><a class="btn pri" href="#/course/${c.key}">See colleges for this</a><a class="btn" href="#/seniors">Ask our team</a></div></div>`;
+      };
+      $('#sjCourse').addEventListener('change', draw); $('#sjStream').addEventListener('change', draw); draw();
     }
     if (tab === 'subjects' && $('#rq')) {
       const rules = D.rules.rules;
@@ -1678,25 +1722,37 @@
 
   /* Seniors */
   ROUTES.seniors = (arg, q) => {
-    const ms = C.mentors || [];
-    return `<div class="page"><div class="wrap" style="max-width:720px">
-      <section class="hello"><div class="eyebrow">✦ Seniors & counsellors</div><h1>Talk to someone who's been there</h1><p style="margin:0">Students from the college you want, and our admission team. Tell us what you need and we'll connect you.</p></section>
-      <form class="card section" id="srForm">
+    const ms = C.mentors || [], rv = C.reviews || [];
+    return `<div class="page"><div class="wrap narrow">
+      ${q.get('booked') && S.booked ? `<div class="card done-card"><h2 style="margin-top:0">✓ Call booked</h2><p>We'll call ${esc((S.profile.name || '').split(' ')[0])} on ${esc(S.profile.phone)} (${esc(String(S.booked).toLowerCase())}). Keep your questions ready.</p><div class="row"><a class="btn" href="#/forms">See open forms</a><a class="btn ghost" href="#/seniors">Book another</a></div></div>` : `<form class="card" id="srForm">
+        <h2 style="margin-top:0">Book a free call</h2>
+        <p class="muted" style="margin-top:-4px">Tell us what you need. We'll call you back with a senior from that college, or someone from our team.</p>
         <label>Which college or course?<input name="college" required value="${esc(q.get('college') || '')}" list="uniList2" placeholder="e.g. University of Delhi, BBA"></label>
         <datalist id="uniList2">${unis().slice(0, 2000).map(u => `<option value="${esc(pretty(u.name))}">`).join('')}</datalist>
         <label style="margin-top:12px">What do you want to know?<textarea name="ask" rows="3" placeholder="Hostel, campus life, which course to choose…"></textarea></label>
-        <button class="btn pri block" style="margin-top:14px;min-height:52px">Connect with us</button>
-      </form>
+        <div class="form-grid" style="margin-top:12px">
+          <label>Best time to call<select name="when"><option>Morning (9–12)</option><option>Afternoon (12–5)</option><option selected>Evening (5–9)</option><option>Weekend</option></select></label>
+          <label>Language<select name="language"><option>Hindi</option><option>English</option><option>Either</option></select></label>
+        </div>
+        <label class="check" style="margin-top:10px"><input type="checkbox" name="parent">A parent will join the call</label>
+        <button class="btn pri block" style="margin-top:14px;min-height:52px">Book my call</button>
+        ${C.whatsapp ? `<a class="btn block" style="margin-top:10px" href="https://wa.me/${esc(C.whatsapp)}?text=${encodeURIComponent('Hi Everything CUET, I have a question about admissions.')}" target="_blank" rel="noopener">Or chat with us on WhatsApp</a>` : ''}
+      </form>`}
+      ${rv.length ? `<section class="section"><h2>What students say</h2><div class="stack">${rv.map(r => `<figure class="card review"><blockquote>“${esc(r.text)}”</blockquote><figcaption><b>${esc(r.name)}</b>${r.college ? ` · ${esc(r.college)}` : ''}</figcaption></figure>`).join('')}</div></section>` : ''}
       ${ms.length ? `<div class="grid g2 section">${ms.map(m => `<div class="card"><div class="row between"><h3 style="margin:0">${esc(m.name)}</h3>${m.verified ? '<span class="tag red-soft">✓ Verified</span>' : ''}</div><p class="muted" style="margin:4px 0">${esc(m.course)} · ${esc(m.college)} · ${esc(m.year || '')}</p><small>${esc(m.languages || '')}</small></div>`).join('')}</div>` : ''}
       <a class="card choice section" href="#" data-act="mentor"><span class="av big">${ico('cap')}</span><span class="grow"><b>Studying at a CUET university?</b><small>Help juniors as an Everything CUET senior.</small></span>${ico('right', 'chev')}</a>
     </div></div>`;
   };
   ROUTES['seniors:mount'] = () => {
-    $('#srForm').addEventListener('submit', async e => {
+    if ($('#srForm')) $('#srForm').addEventListener('submit', async e => {
       e.preventDefault();
-      if (!(loggedIn() && profileDone())) { requireLogin('Log in to book a senior'); return; }
       const f = Object.fromEntries(new FormData(e.target));
-      await submit('connect', f, `Hi Everything CUET, I'd like to talk to a senior.\nCollege / course: ${f.college}\nQuestion: ${f.ask}\nName: ${S.profile.name}\nPhone: ${S.profile.phone}`);
+      const send = async () => {
+        const ok = await submit('senior-call', { ...f, parent: !!f.parent, course: f.college }, `Hi Everything CUET, I'd like to talk to a senior.\nCollege / course: ${f.college}\nQuestion: ${f.ask}\nBest time: ${f.when} · ${f.language}\nName: ${S.profile.name}\nPhone: ${S.profile.phone}`);
+        if (ok) { S.booked = f.when; save(); location.hash = '#/seniors?booked=1'; }
+      };
+      if (!(loggedIn() && profileDone())) { requireLogin('Where should we call you?', send); return; }
+      await send();
     });
     $('#view').addEventListener('click', e => {
       if (!e.target.closest('[data-act="mentor"]')) return;
@@ -1712,6 +1768,23 @@
         });
       });
     });
+  };
+
+  /* Guides: short reads written from Everything CUET's own data */
+  const guides = () => (D.guides && D.guides.guides) || [];
+  ROUTES.guides = slug => {
+    const g = guides().find(x => x.slug === slug);
+    if (!g) return `<div class="page"><div class="wrap narrow"><div class="list">${guides().map(x => `<a class="list-row" href="#/guides/${x.slug}"><span class="grow"><span class="t">${esc(x.title)}</span><span class="s">${esc(x.summary)} · ${x.minutes} min read</span></span>${ico('right', 'chev')}</a>`).join('')}</div></div></div>`;
+    const part = ([k, v]) => k === 'h' ? `<h2>${esc(v)}</h2>` : k === 'ul' ? `<ul>${v.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : `<p>${esc(v)}</p>`;
+    const next = guides().filter(x => x.slug !== slug).slice(0, 3);
+    return `<div class="page"><div class="wrap narrow"><article class="guide">
+      <a class="back" href="#/guides">${ico('left', 'sm')} All guides</a>
+      <h1>${esc(g.title)}</h1><p class="muted">${g.minutes} min read</p>
+      ${g.body.map(part).join('')}
+      <div class="kit-band" style="margin-top:26px"><span><b>Still confused?</b><small>Talk to a senior or our team. It's free.</small></span><a class="btn pri sm" href="#/seniors">Book a call</a></div>
+    </article>
+    <h3 style="margin-top:30px">Read next</h3><div class="list">${next.map(x => `<a class="list-row" href="#/guides/${x.slug}"><span class="grow"><span class="t">${esc(x.title)}</span></span>${ico('right', 'chev')}</a>`).join('')}</div>
+    </div></div>`;
   };
 
   /* Community: groups + allotment-day tracker */
@@ -1910,7 +1983,7 @@
   function renderFoot() {
     $('#railFoot').innerHTML = `<div class="foot-simple">
       <img class="foot-logo" src="assets/wordmark-red.png" alt="Everything CUET" width="720" height="325">
-      <nav class="foot-links"><a href="#/start">Find your course</a><a href="#/colleges">Colleges</a><a href="#/forms">Application forms</a><a href="#/calendar">Reminders</a><a href="#/resources">Free CUET kit</a><a href="#/seniors">Talk to a senior</a><a href="#/more">More tools</a><a href="${esc(C.instagram)}" target="_blank" rel="noopener">Instagram</a><a href="${esc(C.youtube)}" target="_blank" rel="noopener">YouTube</a></nav>
+      <nav class="foot-links"><a href="#/start">Find your course</a><a href="#/colleges">Colleges</a><a href="#/forms">Application forms</a><a href="#/calendar">Reminders</a><a href="#/resources">Free CUET kit</a><a href="#/guides">Guides</a><a href="#/tools/subjects">Subject checker</a><a href="#/tools/compare">Compare colleges</a><a href="#/predictor">Score check</a><a href="#/seniors">Talk to a senior</a><a href="#/more">More tools</a><a href="${esc(C.instagram)}" target="_blank" rel="noopener">Instagram</a><a href="${esc(C.youtube)}" target="_blank" rel="noopener">YouTube</a></nav>
     </div><p class="foot-fine">Everything CUET is independent and not part of the National Testing Agency or any university. Always check dates on official websites.</p>`;
   }
 
