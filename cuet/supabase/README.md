@@ -1,13 +1,17 @@
-# Everything CUET: logins and leads (Supabase)
+# Everything CUET: leads (Supabase)
 
-Students log in with Google or a 6-digit email code, then add their name, mobile, Class 12 year, category, state and interest. Each student is one row in the `leads` table, with their saved list. Orders, senior-call bookings, alert sign-ups, group requests and allotment reports go to the `requests` table. Admins see everything at **More → Account → Leads** on the site (`#/admin`), with CSV downloads.
+**Live now.** The site is connected to the Supabase project **everything-cuet** (Mumbai, `kvfgjsnhbyduntbsxqxs`), set in `cuet/config.js` with `login: "form"`.
 
-Until the steps below are done, the site falls back to a short sign-up form (name, mobile, email). It saves sign-ups in the student's browser and sends them to WhatsApp or `formEndpoint` if those are set in `config.js`.
+Every time a student signs up, books a senior call, turns on a reminder or asks for help, the site adds a row to the **`signups`** table. Each row holds the kind (`lead`, `senior-call`, `reminder`, `alerts`, `form`, ...), name, phone, email, course, the page they were on and the details in `payload`. Visitors can only add rows; nobody can read them through the API.
 
-## Setup (about 20 minutes, free)
+**See your leads:** Supabase → **Table Editor → signups**. Sort by `created_at`, filter by `kind`, or choose **Export to CSV**.
 
-1. **Create the project.** Go to [supabase.com](https://supabase.com), sign up, choose **New project**, and pick the region **Mumbai (ap-south-1)**.
-2. **Create the tables.** Open **SQL Editor → New query** and paste in [`schema.sql`](schema.sql). On the last line, replace `your-email@example.com` with the email you will log in with, then choose **Run**.
+The `leads`, `requests` and `admins` tables are ready for proper logins (Google and 6-digit email codes). To switch those on, finish steps 3 to 5 below, then set `login: "auth"` in `config.js`. Until then the short sign-up form is used, so students never wait for an email.
+
+## Turning on Google and email-code logins (optional)
+
+1. **Create the project.** Done: `everything-cuet` in Mumbai.
+2. **Create the tables.** Done: [`schema.sql`](schema.sql) has been run, with dikshabhargava31@gmail.com as admin.
 3. **Turn on email codes.**
    1. Go to **Authentication → Sign In / Providers → Email** and make sure it is on.
    2. Go to **Authentication → Emails → Magic Link** and replace the body with:
@@ -21,10 +25,7 @@ Until the steps below are done, the site falls back to a short sign-up form (nam
    2. Under **Authorized redirect URIs**, add `https://<your-project-ref>.supabase.co/auth/v1/callback`.
    3. Copy the client ID and secret into Supabase under **Authentication → Sign In / Providers → Google**.
    4. On Google's **OAuth consent screen**, set the app name to *Everything CUET* and add your logo.
-6. **Connect the site.**
-   1. Go to **Project Settings → API** and copy the **Project URL** and the **anon public** key.
-   2. Paste them into `cuet/config.js` under `supabase`.
-   3. The anon key is meant to be public. The row-level security in `schema.sql` lets each student read only their own row, and lets only the emails in `admins` read every lead.
+6. **Switch the site over.** Set `login: "auth"` in `cuet/config.js`. The URL and anon key are already there. The anon key is meant to be public: row-level security lets each student read only their own row, and only the emails in `admins` read every lead.
 
 ## Leads
 

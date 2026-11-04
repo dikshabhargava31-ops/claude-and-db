@@ -3,11 +3,13 @@ window.ECUET_CONFIG = {
   // WhatsApp number for orders, alerts and senior bookings, country code first, digits only (e.g. "919876543210").
   // Empty: buttons that need it say so instead of opening WhatsApp.
   whatsapp: "",
-  // Logins and leads (Supabase, free plan). Paste the Project URL and the "anon public" key from
-  // Supabase -> Project Settings -> API. Steps in cuet/supabase/README.md. Empty: a short sign-up form is used instead.
+  // Leads (Supabase project "everything-cuet"). The anon key is public by design; the database only lets
+  // visitors add rows. login: "form" saves the short sign-up form (name, phone, course) to the signups table.
+  // "auth" turns on Google and email-code logins, once those are set up in Supabase (cuet/supabase/README.md).
   supabase: {
-    url: "",
-    anonKey: ""
+    url: "https://kvfgjsnhbyduntbsxqxs.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2Zmdqc25oYnlkdW50YnN4cXhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3NzA1MzAsImV4cCI6MjEwOTM0NjUzMH0.i2rXj8eutxFa1qpqRGkKi7wH-sm5i8zmpdEAKjmf5Ew",
+    login: "form"
   },
   // Optional form endpoint (Formspree, Google Apps Script, etc.) that receives sign-ups and orders as JSON.
   formEndpoint: "",
@@ -27,6 +29,8 @@ window.ECUET_CONFIG = {
   partnerCodes: [],
   // Vetted seniors: { name, college, course, year, languages, verified: true }
   mentors: [],
+  // Real reviews from students you've helped, shown on Talk to a senior: { name: "Riya S.", college: "Hindu College, DU", text: "…" }
+  reviews: [],
   // College-wise student groups: { university: "University of Delhi", link: "https://chat.whatsapp.com/…" }
   groups: [],
   // Upcoming webinars: { title, date: "2027-02-10T18:00", link }

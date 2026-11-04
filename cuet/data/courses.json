@@ -64,7 +64,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "One language + Mathematics or Applied Mathematics + Accountancy, Business Studies or Economics. Some universities accept the General Aptitude Test in place of a subject."
   },
   {
    "key": "economics",
@@ -120,7 +121,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "One language + Mathematics or Applied Mathematics + one or two other subjects. Most good economics courses need Maths."
   },
   {
    "key": "english",
@@ -169,7 +171,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "English + two or three subjects of your choice, or the General Aptitude Test."
   },
   {
    "key": "psychology",
@@ -219,7 +222,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "One language + any three subjects, or the General Aptitude Test. Some universities want Psychology or Biology among them."
   },
   {
    "key": "humanities",
@@ -277,7 +281,8 @@
      "tier": "safe",
      "why": "Central university with many seats"
     }
-   ]
+   ],
+   "subjects": "One language + the subject you want to study (for example History or Political Science) + one or two more. Some universities accept the General Aptitude Test."
   },
   {
    "key": "bba",
@@ -343,7 +348,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "English + the General Aptitude Test at most universities. Some also ask for Mathematics."
   },
   {
    "key": "bsc-science",
@@ -396,7 +402,8 @@
      "tier": "safe",
      "why": "Central university with many seats"
     }
-   ]
+   ],
+   "subjects": "Physics + Chemistry + Mathematics, and usually a language."
   },
   {
    "key": "bsc-bio",
@@ -450,7 +457,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "Physics + Chemistry + Biology, and usually a language."
   },
   {
    "key": "cs",
@@ -505,7 +513,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "Mathematics + a language + the General Aptitude Test, or Physics and Chemistry for B.Sc Computer Science."
   },
   {
    "key": "btech",
@@ -548,7 +557,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "Physics + Chemistry + Mathematics. Most top engineering colleges use JEE instead of CUET."
   },
   {
    "key": "law",
@@ -600,7 +610,8 @@
      "tier": "safe",
      "why": "Law school that takes CUET"
     }
-   ]
+   ],
+   "subjects": "English + the General Aptitude Test at universities that use CUET. National law universities use CLAT instead."
   },
   {
    "key": "journalism",
@@ -653,7 +664,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "English + the General Aptitude Test, or English + any two subjects."
   },
   {
    "key": "design",
@@ -707,7 +719,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "The General Aptitude Test + a language where CUET is used. Most design schools (NID, NIFT and others) have their own test."
   },
   {
    "key": "liberal-arts",
@@ -757,7 +770,8 @@
      "tier": "safe",
      "why": "Liberal arts in Delhi NCR"
     }
-   ]
+   ],
+   "subjects": "One language + the General Aptitude Test, or any three subjects. Many liberal arts colleges have their own application instead."
   },
   {
    "key": "hotel",
@@ -803,7 +817,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "English + the General Aptitude Test. The IHMs use NCHM JEE instead."
   },
   {
    "key": "agriculture",
@@ -847,7 +862,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "Physics + Chemistry + Biology or Mathematics. Agriculture, where offered, also helps."
   },
   {
    "key": "languages",
@@ -902,7 +918,8 @@
      "tier": "safe",
      "why": "A university just for Sanskrit"
     }
-   ]
+   ],
+   "subjects": "The language you want to study + the General Aptitude Test or two subjects."
   },
   {
    "key": "physical-education",
@@ -941,7 +958,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "One language + the General Aptitude Test + the Physical Education paper. Some universities add a fitness test."
   },
   {
    "key": "forensic",
@@ -978,7 +996,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "Physics + Chemistry + Biology or Mathematics."
   },
   {
    "key": "food",
@@ -1016,7 +1035,8 @@
      "tier": "safe",
      "why": "Private university that takes CUET"
     }
-   ]
+   ],
+   "subjects": "Physics + Chemistry + Biology or Mathematics."
   }
  ]
 }

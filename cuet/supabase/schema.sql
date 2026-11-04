@@ -66,3 +66,23 @@ create policy "create own requests" on public.requests
 
 -- Replace with the email you log in with, then run this line.
 insert into public.admins (email) values ('your-email@example.com') on conflict do nothing;
+
+-- Sign-ups, bookings and reminder requests sent from the website without a login (login: "form" in config.js).
+-- Visitors can only add rows; nobody can read them through the API. View them in the Supabase Table Editor.
+create table if not exists public.signups (
+  id bigint generated always as identity primary key,
+  kind text not null check (char_length(kind) <= 40),
+  name text check (char_length(name) <= 120),
+  phone text check (char_length(phone) <= 20),
+  email text check (char_length(email) <= 160),
+  course text check (char_length(course) <= 120),
+  payload jsonb not null default '{}'::jsonb check (pg_column_size(payload) <= 16000),
+  page text check (char_length(page) <= 300),
+  created_at timestamptz not null default now()
+);
+alter table public.signups enable row level security;
+drop policy if exists "visitors can add" on public.signups;
+create policy "visitors can add" on public.signups for insert to anon, authenticated with check (true);
+drop policy if exists "admins read" on public.signups;
+create policy "admins read" on public.signups for select to authenticated using ((select public.is_admin()));
+revoke update, delete on public.signups from anon, authenticated;

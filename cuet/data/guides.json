@@ -1,0 +1,83 @@
+{
+  "note": "Short guides shown on #/guides. Written by Everything CUET from its own data; no outside links. Keep each one short.",
+  "guides": [
+    {
+      "slug": "cuet-2027-timeline",
+      "title": "CUET 2027: what happens when",
+      "summary": "From registration to admission, month by month.",
+      "minutes": 3,
+      "body": [
+        ["p", "CUET (UG) is the entrance test that central universities, and many state, deemed and private universities, use for undergraduate admission. Here is how a normal year runs. NTA announces the exact dates, so treat the months below as a guide."],
+        ["h", "February to March: register"],
+        ["p", "Registration usually opens in February. You fill one form, pick up to 5 subjects (languages, domain subjects and the General Aptitude Test) and choose exam cities. Pick subjects based on the courses you want, not just your Class 12 subjects."],
+        ["h", "May to early June: the exam"],
+        ["p", "The exam runs over a few weeks, in several shifts. Your admit card shows your date, shift and centre."],
+        ["h", "June to July: answer key and results"],
+        ["p", "NTA puts out a provisional answer key you can check, then the final result with your scores. Where a paper ran in several shifts, the score you get is a normalised score."],
+        ["h", "July onwards: apply to universities"],
+        ["p", "CUET scores alone don't get you a seat. You must also apply on each university's own portal (for example DU's CSAS) and fill your course and college preferences there. Allotment then happens in rounds."],
+        ["h", "Alongside: private college forms"],
+        ["p", "Colleges like Ashoka, Christ, Symbiosis and FLAME have their own forms and deadlines, often from November to March. Keep an eye on the Application forms page so you don't miss them."]
+      ]
+    },
+    {
+      "slug": "how-cuet-marking-works",
+      "title": "How CUET marking works",
+      "summary": "+5, −1, normalised scores and what a good score means.",
+      "minutes": 2,
+      "body": [
+        ["p", "Each CUET paper has 50 compulsory questions and takes 60 minutes."],
+        ["ul", ["+5 for a right answer", "−1 for a wrong answer", "0 if you leave it", "So the most you can score in one paper is 250"]],
+        ["h", "Should you guess?"],
+        ["p", "One wrong answer cancels a fifth of a right one. If you can rule out two of the four options, a guess is usually worth it. A blind guess usually is not."],
+        ["h", "Raw score vs normalised score"],
+        ["p", "When a paper is held in several shifts, NTA adjusts scores so that a harder shift and an easier shift can be compared fairly. Universities use the score on your scorecard, which can differ a little from what you work out from the answer key."],
+        ["h", "What is a good score?"],
+        ["p", "It depends on the course and university, and it changes every year. Universities publish closing scores round by round after admissions. Use our marks calculator to work out your raw score from the answer key."]
+      ]
+    },
+    {
+      "slug": "types-of-universities",
+      "title": "Central, state, deemed or private: what's the difference?",
+      "summary": "Fees, seats and how hard each one is to get into.",
+      "minutes": 3,
+      "body": [
+        ["h", "Central universities"],
+        ["p", "Run by the Government of India, for example the University of Delhi, BHU and Jamia Millia Islamia. Low fees and a lot of competition. Admission is through CUET."],
+        ["h", "State universities"],
+        ["p", "Run by a state government. Usually low fees. Some seats may be kept for students from that state."],
+        ["h", "Deemed universities"],
+        ["p", "Universities that set their own courses and fees. Some use CUET, some use their own tests."],
+        ["h", "Private universities"],
+        ["p", "Higher fees and usually easier admission. Many accept CUET scores; others use Class 12 marks, their own test or an interview."],
+        ["h", "Colleges with their own entrance"],
+        ["p", "Some of the best-known colleges don't use CUET at all: IITs and NITs (JEE), national law universities (CLAT), NID and NIFT (their own design tests), and colleges like Ashoka with their own applications. If you want one of these, apply to them separately."]
+      ]
+    },
+    {
+      "slug": "dream-target-safe",
+      "title": "How to choose your colleges: Dream, Target and Safe",
+      "summary": "A simple way to make a list you won't regret.",
+      "minutes": 2,
+      "body": [
+        ["p", "Don't apply only to the colleges everyone talks about. Split your list into three."],
+        ["ul", ["Dream: colleges you'd love to get into, even if it's a stretch", "Target: colleges where students with your scores usually get in", "Safe: colleges you're almost sure to get, which you'd still be happy to join"]],
+        ["p", "A good list has 2 to 3 Dream, 3 to 4 Target and 2 to 3 Safe colleges. When you fill preferences on a university portal, put Dream first and Safe last."],
+        ["h", "Think about more than the name"],
+        ["ul", ["The course: a strong course at a good college can beat a weak course at a famous one", "Fees and hostel", "The city, and how far it is from home"]],
+        ["p", "Save colleges to My List with the ☆ button, then share the list with your parents in one tap."]
+      ]
+    },
+    {
+      "slug": "colleges-without-cuet",
+      "title": "Good colleges that don't need CUET",
+      "summary": "Which entrance each one uses, so you don't miss the form.",
+      "minutes": 2,
+      "body": [
+        ["p", "CUET covers most central universities, but many top colleges use something else. Plan for these early, because their forms often close before CUET results are out."],
+        ["ul", ["Engineering: IITs and NITs use JEE; BITS uses BITSAT; VIT and Manipal have their own tests", "Law: national law universities use CLAT", "Design: NID uses its own design test; NIFT has its own entrance", "Management: IIM Indore and IIM Rohtak use IPMAT; other IIMs use JIPMAT", "Liberal arts and private universities: Ashoka, FLAME, Krea, Christ and Symbiosis have their own forms and deadlines", "Hotel management: the IHMs use NCHM JEE"]],
+        ["p", "Pick any course and choose \"Own entrance\" to see these colleges, or open Application forms for the ones with dates."]
+      ]
+    }
+  ]
+}
