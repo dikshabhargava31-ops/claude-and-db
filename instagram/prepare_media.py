@@ -82,8 +82,8 @@ def main():
     parser.add_argument("--type", choices=["post", "carousel", "reel", "story"], required=True)
     args = parser.parse_args()
 
-    if args.type == "carousel" and not 2 <= len(args.files) <= 10:
-        raise SystemExit("A carousel needs 2 to 10 files.")
+    if args.type == "carousel" and not 2 <= len(args.files) <= 20:
+        raise SystemExit("A carousel needs 2 to 20 files.")
     if args.type != "carousel" and len(args.files) != 1:
         raise SystemExit(f"A {args.type} takes exactly one file.")
 

@@ -2,7 +2,7 @@
 
 This tool posts to any number of Instagram accounts on a schedule, for free. You list your posts in `posts.csv`. Every 15 minutes, GitHub Actions publishes the ones that are due through Instagram's official API, then records them in `published.json` so nothing is posted twice.
 
-- **Post types:** single photos, carousels (2–10 photos or videos), Reels and Stories, each with an optional first comment.
+- **Post types:** single photos, carousels (2–20 photos or videos), Reels and Stories, each with an optional first comment.
 - **Timing:** GitHub often starts scheduled runs hours late, so a run doesn't just post what's due. While a post is coming up in the next 5½ hours, the run stays open, re-reads the schedule every 2 minutes and publishes each post on time. When its 5½ hours are up and another post is due within a day, it starts the next run itself, because GitHub has gone more than 7 hours without starting a scheduled run. The planner also starts a run whenever you save a post. Waiting uses free Actions minutes, because this repository is public.
 - **Safety:** a post that fails is retried in each of the next 2 runs, then left alone. A post more than 12 hours late is skipped, so an old date typed by mistake never posts.
 

@@ -43,6 +43,7 @@ STATE_FILE = HERE / "published.json"
 GRAPH_VERSION = os.environ.get("IG_GRAPH_VERSION", "v23.0")
 DEFAULT_TZ = os.environ.get("IG_TIMEZONE", "Asia/Kolkata")
 MAX_ATTEMPTS = 3
+MAX_CAROUSEL = 20   # Instagram accepted a 20-item carousel through the API on 6 Nov 2026
 RETRY_GAP = timedelta(minutes=10)
 WATCH_POLL = timedelta(minutes=2)
 REPORTED_SKIPS = set()
@@ -239,8 +240,8 @@ def load_posts(tz_name):
             if kind == "post" and (len(media) != 1 or is_video(media[0])):
                 problems.append(f"{where}: a post needs exactly one image (use reel for a video)")
                 continue
-            if kind == "carousel" and not 2 <= len(media) <= 10:
-                problems.append(f"{where}: a carousel needs 2 to 10 media links separated by |")
+            if kind == "carousel" and not 2 <= len(media) <= MAX_CAROUSEL:
+                problems.append(f"{where}: a carousel needs 2 to {MAX_CAROUSEL} media links separated by |")
                 continue
             if kind == "reel" and (len(media) != 1 or not is_video(media[0])):
                 problems.append(f"{where}: a reel needs exactly one .mp4 or .mov video")
@@ -711,6 +712,17 @@ def cmd_probe(args):
         raise SystemExit(f"No account named '{name}'.")
     graph = Graph(accounts[name])
     url = args.url
+    if url.startswith("carousel:"):
+        # "carousel:<count>:<image link>": build a carousel of that many copies, without publishing it
+        _, count, url = url.split(":", 2)
+        try:
+            children = [graph.container(image_url=url, is_carousel_item="true") for _ in range(int(count))]
+            graph.wait_until_ready(graph.container(media_type="CAROUSEL", children=",".join(children)))
+        except PostError as e:
+            print(f"REJECTED a {count}-item carousel: {e}")
+            return 1
+        print(f"OK       Instagram accepted a {count}-item carousel (nothing was published)")
+        return 0
     try:
         if is_video(url):
             container = graph.video_container(url, "REELS")
