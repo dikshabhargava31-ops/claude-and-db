@@ -259,6 +259,13 @@
       "published_at": "2026-11-06T20:18+00:00",
       "media_id": "18398002957160086",
       "permalink": "https://www.instagram.com/p/DfacmV4oH3P/"
+    },
+    "ipa-20261107-0144-qn2e": {
+      "account": "ipa",
+      "type": "post",
+      "published_at": "2026-11-06T20:18+00:00",
+      "media_id": "18107088287321758",
+      "permalink": "https://www.instagram.com/p/Dfaco6GoGdf/"
     }
   },
   "failed": {
@@ -268,10 +275,5 @@
       "last_try": "2026-10-28T10:53+00:00"
     }
   },
-  "claims": {
-    "ipa-20261107-0144-qn2e": {
-      "run": "42265114125",
-      "at": "2026-11-06T20:18:22+00:00"
-    }
-  }
+  "claims": {}
 }
