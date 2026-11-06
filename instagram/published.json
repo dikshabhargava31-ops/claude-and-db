@@ -237,6 +237,14 @@
       "published_at": "2026-11-06T12:22+00:00",
       "media_id": "18122694367949061",
       "permalink": "https://www.instagram.com/p/DfZmKTblDzt/"
+    },
+    "cuet-20261106-1800-amga": {
+      "account": "cuet",
+      "type": "carousel",
+      "published_at": "2026-11-06T12:41+00:00",
+      "media_id": "18079823111412199",
+      "permalink": "https://www.instagram.com/p/DfZnN4GlNO9/",
+      "found_existing": true
     }
   },
   "failed": {
@@ -244,17 +252,7 @@
       "attempts": 3,
       "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
       "last_try": "2026-10-28T10:53+00:00"
-    },
-    "cuet-20261106-1800-amga": {
-      "attempts": 1,
-      "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
-      "last_try": "2026-11-06T12:31+00:00"
     }
   },
-  "claims": {
-    "cuet-20261106-1800-amga": {
-      "run": "42215232712",
-      "at": "2026-11-06T12:30:00+00:00"
-    }
-  }
+  "claims": {}
 }
