@@ -645,11 +645,18 @@ def cmd_run(args):
         git_sync()
         posts, _ = load_posts(args.timezone)
         TempRelease.clean_up()
+    started_code = Path(__file__).read_bytes()
     while True:
         state = load_state()
         failures += publish_due(accounts, posts, state, args)
         if args.sync:
             git_sync()
+            if Path(__file__).read_bytes() != started_code:
+                # The sync brought a newer scheduler; this run still runs the old one (on 6 Nov a
+                # watcher started before carousels went up to 20 skipped a 14-item carousel).
+                print("UPDATED  the scheduler changed on GitHub; handing over to a run with the new version")
+                chain_next_run(args)
+                break
         if args.dry_run or not args.watch_hours:
             break
         upcoming = next_due(posts, load_state())
