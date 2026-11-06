@@ -394,12 +394,13 @@ const IST = 330 * 60e3, LATE_LIMIT_MS = 12 * 3600e3, MAX_ATTEMPTS = 3, MB = 1024
 // big single files ("Timed out validating the rule"). Instagram allows 300 MB for reels, 100 for the rest.
 const FILE_LIMIT = 20 * MB, PART_SIZE = 20 * MB, REEL_LIMIT = 300 * MB, VIDEO_LIMIT = 100 * MB;
 const VIDEO_RE = /\.(mp4|mov|m4v|parts\.json)$/i, NOT_JPEG_RE = /\.(png|webp|gif|heic|avif|bmp)$/i;
+const MAX_CAROUSEL = 20;   // Instagram accepted a 20-item carousel through the API on 6 Nov 2026
 const EXPORT_GUIDE = "https://github.com/dikshabhargava31-ops/claude-and-db/blob/main/instagram/EXPORT-GUIDE.md";
 const TYPE_LABEL = {post: "Photo", carousel: "Carousel", reel: "Reel", story: "Story"};
 const TYPE_ICON = {post: "photo", carousel: "carousel", reel: "reel", story: "story"};
 const TYPE_HINT = {
   post: "One photo, 4:5 (1080×1350) to landscape. Square works too.",
-  carousel: "2 to 10 photos or videos. Drag the order with the arrows.",
+  carousel: "2 to 20 photos or videos. Drag the order with the arrows.",
   reel: "One video, 9:16, 3 seconds to 15 minutes.",
   story: "One photo or video (up to 60 s), 9:16. Stories have no caption.",
 };
@@ -786,7 +787,7 @@ function mediaIssues() {
   if (!n) out.push({err: true, text: "Add a photo or video."});
   if (t === "post" && (n > 1 || vids.length)) out.push({err: true, text: vids.length ? "A photo post can't have a video. Choose Reel." : "A photo post takes one photo. Choose Carousel for several."});
   if (t === "carousel" && n === 1) out.push({err: true, text: "A carousel needs at least 2 photos or videos."});
-  if (t === "carousel" && n > 10) out.push({err: true, text: "A carousel can have at most 10 items."});
+  if (t === "carousel" && n > MAX_CAROUSEL) out.push({err: true, text: `A carousel can have at most ${MAX_CAROUSEL} items.`});
   if (t === "reel" && (n !== 1 || imgs.length)) out.push({err: true, text: "A reel is one video."});
   if (t === "story" && n > 1) out.push({err: true, text: "A story is one photo or video."});
   C.media.forEach((m, i) => {
