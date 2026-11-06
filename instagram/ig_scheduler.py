@@ -711,6 +711,17 @@ def cmd_probe(args):
         raise SystemExit(f"No account named '{name}'.")
     graph = Graph(accounts[name])
     url = args.url
+    if url.startswith("carousel:"):
+        # "carousel:<count>:<image link>": build a carousel of that many copies, without publishing it
+        _, count, url = url.split(":", 2)
+        try:
+            children = [graph.container(image_url=url, is_carousel_item="true") for _ in range(int(count))]
+            graph.wait_until_ready(graph.container(media_type="CAROUSEL", children=",".join(children)))
+        except PostError as e:
+            print(f"REJECTED a {count}-item carousel: {e}")
+            return 1
+        print(f"OK       Instagram accepted a {count}-item carousel (nothing was published)")
+        return 0
     try:
         if is_video(url):
             container = graph.video_container(url, "REELS")
