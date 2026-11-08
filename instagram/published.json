@@ -288,6 +288,13 @@
       "media_id": "18602694862065603",
       "permalink": "https://www.instagram.com/p/DfcMAVwkcGK/",
       "found_existing": true
+    },
+    "ipa-20261108-0600-67i5": {
+      "account": "ipa",
+      "type": "reel",
+      "published_at": "2026-11-08T00:31+00:00",
+      "media_id": "18097829870548249",
+      "permalink": "https://www.instagram.com/reel/DfdeT8HDcwP/"
     }
   },
   "failed": {
@@ -297,10 +304,5 @@
       "last_try": "2026-10-28T10:53+00:00"
     }
   },
-  "claims": {
-    "ipa-20261108-0600-67i5": {
-      "run": "42415708077",
-      "at": "2026-11-08T00:30:00+00:00"
-    }
-  }
+  "claims": {}
 }
