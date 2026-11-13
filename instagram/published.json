@@ -309,6 +309,13 @@
       "published_at": "2026-11-13T04:41+00:00",
       "media_id": "17912777313563634",
       "permalink": "https://www.instagram.com/reel/Dfqy7nFhB4l/"
+    },
+    "parthu-20261113-1800-lcaj": {
+      "account": "parthu",
+      "type": "carousel",
+      "published_at": "2026-11-13T12:31+00:00",
+      "media_id": "18471782512187235",
+      "permalink": "https://www.instagram.com/p/DfrowcylSMM/"
     }
   },
   "failed": {
@@ -318,10 +325,5 @@
       "last_try": "2026-10-28T10:53+00:00"
     }
   },
-  "claims": {
-    "parthu-20261113-1800-lcaj": {
-      "run": "43394696807",
-      "at": "2026-11-13T12:30:00+00:00"
-    }
-  }
+  "claims": {}
 }
