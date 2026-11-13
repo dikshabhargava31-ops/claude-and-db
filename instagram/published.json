@@ -309,6 +309,11 @@
       "attempts": 3,
       "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
       "last_try": "2026-10-28T10:53+00:00"
+    },
+    "parthu-20261113-1000-3kgx": {
+      "attempts": 1,
+      "error": "Instagram could not process the media: ERROR",
+      "last_try": "2026-11-13T04:31+00:00"
     }
   },
   "claims": {
