@@ -13,7 +13,6 @@
   "keep_keywords": ["legal", "contract", "asci", "dpdp", "vendor", "pricing", "price", "strategy", "founder",
                     "approve", "approval", "hire", "hiring", "interview", "agreement", "sign"],
   "quick_keywords": ["send", "share", "call", "reply", "forward", "upload", "remind", "follow up", "check"],
-  "notify_team": false,
   "team": [
     {"name": "Riya", "role": "Office and HR assistant", "good_at": ["salary slip", "offer letter", "relieving letter", "bank details", "payroll register", "duty"]},
     {"name": "Aman", "role": "Academic coordinator", "good_at": ["report card", "ptm", "test paper", "sign-up sheet", "school letter"]},
