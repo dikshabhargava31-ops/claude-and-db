@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Daily Ops Assistant: plans the day from the IPA Priority Board and sends it to WhatsApp.
+"""Daily Ops Assistant: plans the day from the IPA Priority Board and sends it to Gmail and your laptop.
 
 Three runs a day (the "Daily assistant" workflow, India time):
 
   morning  Reads every open task on the board, picks the day's plan (one important task first,
            then the urgent ones, then quick wins), decides what to hand off and to whom, assigns
-           those tasks on the board, and sends the to-do list to WhatsApp.
+           those tasks on the board, and sends you the to-do list.
   midday   Checks the morning plan against the board and nudges about the first task that
            hasn't moved, with a five-minute first step.
   evening  Counts what got done, lists what carries over, and names tomorrow's first task.
@@ -21,8 +21,9 @@ or printed in the public Actions log.
 Environment:
   BOARD_TOKEN         GitHub token that can read and write ipa_task (Contents: read and write)
   ANTHROPIC_API_KEY   optional; without it the plan comes from built-in rules
-  WHATSAPP_PHONE      your number with country code, e.g. +9198xxxxxxxx
-  CALLMEBOT_APIKEY    the key CallMeBot sends you (free)
+  GMAIL_ADDRESS, GMAIL_APP_PASSWORD   send the messages as an email to yourself (EMAIL_TO for another inbox)
+  NTFY_TOPIC          a private topic name: pop-up notifications on your laptop or phone through ntfy.sh
+  WHATSAPP_PHONE, CALLMEBOT_APIKEY    optional: also send to WhatsApp through CallMeBot
 """
 import argparse
 import base64
@@ -420,13 +421,13 @@ def morning_message(plan, tasks, cfg, day, handed):
 
 
 def forward_message(plan):
-    """One WhatsApp with a ready-to-forward line for each person."""
+    """A ready-to-send WhatsApp line for each person."""
     if not plan["delegate"]:
         return None
     people = {}
     for d in plan["delegate"]:
         people.setdefault(d["to"], []).append(d["message"])
-    parts = ["*Hand-off messages* · long-press, copy, forward"]
+    parts = ["*Hand-off messages* · copy each one and send it on WhatsApp"]
     for who, msgs in people.items():
         parts += ["", f"*{who}*"] + msgs
     return "\n".join(parts)
@@ -480,33 +481,84 @@ def evening_message(saved, board, cfg, day):
     return "\n".join(lines)
 
 
-# ---------------------------------------------------------------- WhatsApp
+# ---------------------------------------------------------------- sending
 
-def send_whatsapp(text, dry_run):
-    if dry_run:
-        print(text, end="\n\n---\n\n")
-        return True
-    phone = os.environ.get("WHATSAPP_PHONE", "").strip()
-    if not phone:
-        print("WHATSAPP_PHONE is not set; nothing sent.", file=sys.stderr)
-        return False
-    key = os.environ.get("CALLMEBOT_APIKEY", "").strip()
-    if not key:
-        print("Add the CALLMEBOT_APIKEY secret to send WhatsApp messages.", file=sys.stderr)
-        return False
+BOARD_URL = "https://dikshabhargava31-ops.github.io/claude-and-db/priority/"
+
+
+def as_html(text):
+    """WhatsApp-style *bold* and _italic_ to simple HTML for the email."""
+    import html
+    out = html.escape(text)
+    out = re.sub(r"\*([^*\n]+)\*", r"<b>\1</b>", out)
+    out = re.sub(r"(?<![\w])_([^_\n]+)_(?![\w])", r"<i>\1</i>", out)
+    return ("<div style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.55;color:#1f2328\">"
+            + out.replace("\n", "<br>") + f"<br><br><a href=\"{BOARD_URL}\">Open the IPA Priority Board</a></div>")
+
+
+def as_markdown(text):
+    """WhatsApp-style *bold* and _italic_ to Markdown for the ntfy notification."""
+    out = re.sub(r"\*([^*\n]+)\*", r"**\1**", text)
+    return re.sub(r"(?<![\w])_([^_\n]+)_(?![\w])", r"*\1*", out)
+
+
+def send_email(text, title):
+    import smtplib
+    from email.message import EmailMessage
+    user = os.environ["GMAIL_ADDRESS"].strip()
+    m = EmailMessage()
+    m["Subject"], m["From"], m["To"] = title, f"{BOT} <{user}>", os.environ.get("EMAIL_TO", "").strip() or user
+    m.set_content(re.sub(r"[*_]", "", text) + f"\n\nBoard: {BOARD_URL}")
+    m.add_alternative(as_html(text), subtype="html")
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=40) as smtp:
+        smtp.login(user, os.environ["GMAIL_APP_PASSWORD"].replace(" ", ""))
+        smtp.send_message(m)
+
+
+def send_ntfy(text, title, urgent=False):
+    topic = os.environ["NTFY_TOPIC"].strip()
+    req = urllib.request.Request(f"https://ntfy.sh/{urllib.parse.quote(topic)}", data=as_markdown(text).encode(), headers={
+        "Title": title.encode("ascii", "ignore").decode(), "Markdown": "yes", "Click": BOARD_URL,
+        "Tags": "clipboard", "Priority": "high" if urgent else "default", "User-Agent": "daily-ops-assistant"})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        r.read()
+
+
+def send_whatsapp(text, phone, key):
     q = urllib.parse.urlencode({"phone": phone, "text": text, "apikey": key})
     req = urllib.request.Request(f"https://api.callmebot.com/whatsapp.php?{q}", headers={"User-Agent": "daily-ops-assistant"})
-    for attempt in range(3):
-        try:
-            with urllib.request.urlopen(req, timeout=40) as r:
-                body = r.read().decode(errors="replace")
-                if r.status < 300 and "ERROR" not in body.upper()[:400]:
-                    return True
-                print(f"WhatsApp gateway answered HTTP {r.status}.", file=sys.stderr)
-        except urllib.error.URLError as e:
-            print(f"WhatsApp send failed ({getattr(e, 'code', e.reason)}).", file=sys.stderr)
-        time.sleep(5 * (attempt + 1))
-    return False
+    with urllib.request.urlopen(req, timeout=40) as r:
+        if "ERROR" in r.read().decode(errors="replace").upper()[:400]:
+            raise RuntimeError("CallMeBot refused the message")
+
+
+def notify(text, dry_run, title, urgent=False):
+    """Send one message to every channel that has its secrets: Gmail, laptop/phone (ntfy), WhatsApp (CallMeBot)."""
+    if dry_run:
+        print(f"[{title}]\n{text}", end="\n\n---\n\n")
+        return True
+    env = os.environ.get
+    channels = []
+    if env("GMAIL_ADDRESS") and env("GMAIL_APP_PASSWORD"):
+        channels.append(("Gmail", lambda: send_email(text, title)))
+    if env("NTFY_TOPIC"):
+        channels.append(("laptop notification", lambda: send_ntfy(text, title, urgent)))
+    if env("WHATSAPP_PHONE") and env("CALLMEBOT_APIKEY"):
+        channels.append(("WhatsApp", lambda: send_whatsapp(text, env("WHATSAPP_PHONE").strip(), env("CALLMEBOT_APIKEY").strip())))
+    if not channels:
+        print("No channel set up: add GMAIL_ADDRESS and GMAIL_APP_PASSWORD, or NTFY_TOPIC (assistant/README.md).", file=sys.stderr)
+        return False
+    sent = 0
+    for name, send in channels:
+        for attempt in range(3):
+            try:
+                send()
+                sent += 1
+                break
+            except Exception as e:  # report the kind of failure only; the log is public
+                print(f"{name}: send failed ({type(e).__name__}{': ' + str(getattr(e, 'code', '')) if getattr(e, 'code', None) else ''}).", file=sys.stderr)
+                time.sleep(5 * (attempt + 1))
+    return sent > 0
 
 
 # ---------------------------------------------------------------- runs
@@ -534,7 +586,8 @@ def morning(args):
     wins = [t["t"].strip() for t in all_tasks if done_on(t, yesterday) and norm(t.get("doneBy") or cfg["me"]) == norm(cfg["me"])]
     open_tasks = [t for t in all_tasks if t["_status"] != "Done" and not t["_pdone"]]
     if not open_tasks:
-        send_whatsapp(f"*Good morning {cfg['me']}* · {day:%a %d %b}\n\nThe board has no open tasks. Add today's work there and I'll plan it tomorrow.", args.dry_run)
+        notify(f"*Good morning {cfg['me']}* · {day:%a %d %b}\n\nThe board has no open tasks. Add today's work there and I'll plan it tomorrow.",
+               args.dry_run, f"Today's plan - {day:%a %d %b}")
         return
     candidates = [t for t in open_tasks if is_mine(t, cfg["me"])][:60]
     plan = None
@@ -549,10 +602,11 @@ def morning(args):
         plan["note"] = (plan["note"] + " " if plan["note"] else "") + (
             f"Weekly reset: {stale} tasks are 2+ weeks past their date. Give them new dates on the board, or delete the ones that no longer matter.")
     handed = apply_delegations(plan, token, cfg, day, args.dry_run)
-    ok = send_whatsapp(morning_message(plan, candidates, cfg, day, handed), args.dry_run)
+    text = morning_message(plan, candidates, cfg, day, handed)
     fwd = forward_message(plan)
-    if fwd:
-        send_whatsapp(fwd, args.dry_run)
+    n = len(plan["top"])
+    ok = notify(text + (f"\n\n━━━━━━━━━━\n\n{fwd}" if fwd else ""), args.dry_run,
+                f"Today's plan - {n} task{'s' if n != 1 else ''} - {day:%a %d %b}")
     if token and not args.dry_run:
         path = f"{PLANS_DIR}/{day.isoformat()}.json"
         _, sha = read_file(path, token)
@@ -574,10 +628,12 @@ def followup(args, kind):
             print("No plan for today yet; skipping the midday nudge.")
             return
         text = midday_message(saved, board, cfg, day)
+        title = "Midday check"
     else:
         text = evening_message(saved or {}, board, cfg, day)
+        title = f"Day done - {day:%a %d %b}"
     if text:
-        ok = send_whatsapp(text, args.dry_run)
+        ok = notify(text, args.dry_run, title, urgent=kind == "midday")
         print(f"{kind.capitalize()} message sent: {ok}.")
 
 

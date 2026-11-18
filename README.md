@@ -32,7 +32,7 @@ Data is saved in the browser's local storage. Use **Settings & backup** to expor
 
 ## Daily Ops Assistant
 
-`assistant/` plans each day from the IPA Priority Board and sends it to WhatsApp: a to-do list at 08:42, a nudge at 13:17 and a wrap-up at 18:47 (Monday to Saturday, India time). It decides what to hand off, assigns it on the board and writes the message to forward. Setup and settings: `assistant/README.md`.
+`assistant/` plans each day from the IPA Priority Board and sends it to you by Gmail and as a laptop notification: a to-do list at 08:42, a nudge at 13:17 and a wrap-up at 18:47 (Monday to Saturday, India time). It decides what to hand off, assigns it on the board and writes the message to forward. Setup and settings: `assistant/README.md`.
 
 ## Video studio
 
