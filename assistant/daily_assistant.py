@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Daily Ops Assistant: plans the day from the IPA Priority Board and sends it to Gmail and your laptop.
+"""Daily Ops Assistant: plans the day from the IPA Ops Board and sends it to Gmail and your laptop.
 
 Three runs a day (the "Daily assistant" workflow, India time):
 
@@ -11,7 +11,7 @@ Three runs a day (the "Daily assistant" workflow, India time):
   evening  Counts what got done, lists what carries over, and names tomorrow's first task.
            Also asks you to chase hand-offs that are overdue.
 
-The board's data (data.json) and this assistant's settings and saved plans stay in the private
+The board's data (ops.json) and this assistant's settings and saved plans stay in the private
 repository dikshabhargava31-ops/ipa_task; nothing personal is written to this public repository
 or printed in the public Actions log.
 
@@ -41,7 +41,7 @@ from pathlib import Path
 
 IST = dt.timezone(dt.timedelta(hours=5, minutes=30))
 BOARD = {"owner": "dikshabhargava31-ops", "repo": "ipa_task", "branch": "main"}
-DATA_PATH = "data.json"
+DATA_PATH = "ops.json"  # the IPA Ops Board (priority/index.html)
 CONFIG_PATH = "assistant/config.json"
 PLANS_DIR = "assistant/plans"
 BOT = "Ops Assistant"
@@ -228,8 +228,10 @@ Rules:
 - The first top task is the most important strategic task that can move today, even if something smaller is louder.
 - Never put more than {max_top} tasks in "top". Overdue routine work can go in "quick" or be delegated.
 - {me} keeps only work that needs {me}: {keep}. Everything else that a team member can do, delegate.
-- Delegate only to names in the team list, and match the work to what each person has done before or is good at.
-  If nobody fits, keep it. Don't delegate a task that's already assigned to someone else.
+- Delegate only to names in the team list, and only work that clearly matches a person's role, KRAs and daily duties
+  (for example test papers to the typist, reels to the video editor, lead calls to sales, data entry to the back office).
+  Planning, target-setting, budgets, pricing, anything with management or the founder, and decisions stay with {me}.
+  If nobody clearly fits, keep it. Hand off at most 5 tasks a day. Don't delegate a task already assigned to someone.
 - Every task id you use must come from the task list. Each id appears in at most one list.
 - Write the way {me} talks: short, plain, spoken English. Nothing dramatic or formal.
 - Answer only by calling report_plan once."""
@@ -305,7 +307,8 @@ def plan_with_rules(tasks, board, cfg, day, yesterday_wins):
     mine = [t for t in tasks if is_mine(t, cfg["me"])]
     plan = {"top": [], "quick": [], "delegate": [], "later": [], "note": ""}
     used = set()
-    for t in mine:
+    # With the Ops Board, only Claude hands work off: keyword rules can't tell planning from routine work.
+    for t in ([] if OPS else mine):
         text = norm(t["t"])
         if not any(k in text for k in keep_kw) and not t.get("delegatedAt"):
             who = pick_person(t)
@@ -344,7 +347,7 @@ def clean_plan(plan, tasks, board, cfg):
     allowed = {norm(n): n for n in team_names(board, cfg)}
     by_id = {t["id"]: t for t in tasks}
     used, out = set(), {"top": [], "quick": [], "delegate": [], "later": [], "note": str(plan.get("note", ""))[:240]}
-    for d in plan.get("delegate", []):
+    for d in plan.get("delegate", [])[:5]:
         t = by_id.get(d.get("id"))
         if (t and d["id"] not in used and norm(d.get("to")) in allowed and is_mine(t, cfg["me"])
                 and not t.get("delegatedAt")):  # handed off before and taken back: it stays yours
@@ -368,22 +371,22 @@ def apply_delegations(plan, token, cfg, day, dry_run):
     """Assign the delegated tasks on the board, replaying on the latest copy if someone saved meanwhile."""
     if not plan["delegate"] or not cfg.get("auto_assign", True) or dry_run or not token:
         return 0
-    now = dt.datetime.now(dt.timezone.utc).isoformat().replace("+00:00", "Z")
+    now = dt.datetime.now(dt.timezone.utc).isoformat()[:19] + "Z"
     for _ in range(4):
-        board, sha = read_file(DATA_PATH, token)
+        ops, sha = read_file(DATA_PATH, token)
+        ids = {norm(p["name"]): p["id"] for p in ops.get("people", [])}
         changed = 0
         for d in plan["delegate"]:
-            for p in board.get("projects", []):
-                for t in p.get("tasks") or []:
-                    if t.get("id") == d["id"] and is_mine({**t, "who": t.get("who")}, cfg["me"]) and status_of(t) != "Done":
-                        t.update({"who": d["to"], "delegatedAt": now, "delegatedBy": BOT, "delegatedReason": d["reason"],
-                                  "updatedBy": BOT, "updatedAt": now})
-                        changed += 1
+            for t in ops.get("tasks", []):
+                if t.get("id") == d["id"] and t.get("who") in ("me", "", None) and status_of(t) != "Done" and norm(d["to"]) in ids:
+                    t.update({"who": ids[norm(d["to"])], "delegatedAt": now, "assignedAt": now, "delegatedBy": BOT,
+                              "delegatedReason": d["reason"]})
+                    changed += 1
         if not changed:
             return 0
         first = plan["delegate"][0]
-        msg = f"Board: {BOT} assigned {changed} task{'s' if changed > 1 else ''} ({first['to']}{' and others' if changed > 1 else ''})"
-        status = write_file(DATA_PATH, board, sha, msg, token)
+        msg = f"Ops board: {BOT} assigned {changed} task{'s' if changed > 1 else ''} ({first['to']}{' and others' if changed > 1 else ''})"
+        status = write_file(DATA_PATH, ops, sha, msg, token)
         if status in (200, 201):
             return changed
         if status != 409:
@@ -391,6 +394,86 @@ def apply_delegations(plan, token, cfg, day, dry_run):
             return 0
         time.sleep(2)
     return 0
+
+
+# ---------------------------------------------------------------- routines, follow-ups, reviews (Ops Board)
+
+def routine_state(r, d, since):
+    """Same rules as the board: daily Mon–Sat; weekly from its weekday; monthly inside its day window (+5 days)."""
+    done_map = OPS.get("routineDone", {})
+    dow = d.isoweekday() % 7  # Sunday = 0, as in the board
+    if r["freq"] == "daily":
+        key, due, overdue = d.isoformat(), dow != 0 and d.isoformat() >= since, False
+    elif r["freq"] == "weekly":
+        y, w, _ = d.isocalendar()
+        key = f"{y}-W{w:02d}"
+        due_day = d - dt.timedelta(days=dow - r.get("dow", 1))
+        due, overdue = dow != 0 and dow >= r.get("dow", 1) and due_day.isoformat() >= since, dow > r.get("dow", 1)
+    elif r["freq"] == "monthly":
+        key = d.isoformat()[:7]
+        last = (d.replace(day=28) + dt.timedelta(days=4)).replace(day=1) - dt.timedelta(days=1)
+        to = min(r.get("to", 31), last.day)
+        start = d.replace(day=min(r.get("from", 1), last.day))
+        in_window = d.day >= r.get("from", 1) and start.isoformat() >= since
+        due, overdue = in_window and d.day <= to + 5, in_window and d.day > to
+    else:
+        return False, False
+    return due and done_map.get(r["id"]) != key, overdue
+
+
+def routines_due(day):
+    since = OPS.get("routineSince", "2000-01-01")
+    out = [(r, od) for r in OPS.get("routines", []) for due, od in [routine_state(r, day, since)] if due]
+    return sorted(out, key=lambda x: not x[1])
+
+
+def follow_ups(day):
+    """Team tasks to check on: stuck, due within a day, or no check-in for 2+ days."""
+    names = {p["id"]: p["name"] for p in OPS.get("people", [])}
+    out = []
+    for t in OPS.get("tasks", []):
+        if t.get("who") in ("me", "", None) or status_of(t) == "Done":
+            continue
+        left = days_left(t, day)
+        last = (t.get("lastCheck") or t.get("assignedAt") or t.get("createdAt") or "")[:10]
+        quiet = (day - dt.date.fromisoformat(last)).days if last else 99
+        if status_of(t) == "Stuck" or (left is not None and left <= 1) or quiet >= 2:
+            why = "stuck" if status_of(t) == "Stuck" else (f"{-left}d overdue" if left is not None and left < 0 else
+                  "due today" if left == 0 else "due tomorrow" if left == 1 else f"no check-in for {quiet}d" if quiet < 99 else "no check-in yet")
+            out.append((left if left is not None else 99, f"{short(t['t'], 55)} — {names.get(t['who'], t['who'])} ({why})"))
+    return [x for _, x in sorted(out)]
+
+
+def reviews_left(day):
+    if day.day < 25:
+        return None
+    month = day.isoformat()[:7]
+    done = (OPS.get("reviews") or {}).get(month, {})
+    return [p["name"] for p in OPS.get("people", []) if not (done.get(p["id"]) or {}).get("k")]
+
+
+def ops_lines(day, evening=False):
+    """Extra lines for the morning and evening messages when the Ops Board is in use."""
+    if not OPS:
+        return []
+    lines = []
+    due = routines_due(day)
+    if due and not evening:
+        lines += ["", f"*Routine today* ({len(due)})"]
+        lines += [f"• {short(r['task'], 70)}{' — overdue' if od else ''}" for r, od in due[:8]]
+        if len(due) > 8:
+            lines.append(f"…and {len(due) - 8} more on the board")
+    elif due and evening:
+        lines += ["", f"*Routine still open today:* {len(due)}. Tick the ones you did on the board."]
+    fu = follow_ups(day)
+    if fu:
+        lines += ["", "*Follow up with the team*"] + [f"• {x}" for x in fu[:6]]
+        if len(fu) > 6:
+            lines.append(f"…and {len(fu) - 6} more on the board")
+    left = reviews_left(day)
+    if left:
+        lines += ["", f"*KRA reviews:* {len(left)} left for {day:%B} ({', '.join(n.split()[0] for n in left[:5])}{'…' if len(left) > 5 else ''})."]
+    return lines
 
 
 # ---------------------------------------------------------------- messages
@@ -421,6 +504,7 @@ def morning_message(plan, tasks, cfg, day, handed):
         lines.append("")
     if plan["later"]:
         lines.append(f"*Not today:* {len(plan['later'])} task{'s' if len(plan['later']) > 1 else ''} can wait.")
+    lines += ops_lines(day)
     if plan.get("note"):
         lines += ["", plan["note"]]
     return "\n".join(lines).strip()
@@ -464,7 +548,7 @@ def evening_message(saved, board, cfg, day):
     team_wins = [t for t in tasks if done_on(t, day) and t not in wins]
     top = [by_id[x["id"]] for x in saved.get("top", []) if x["id"] in by_id] if saved else []
     carry = [t for t in top if t["_status"] != "Done"]
-    chase = [t for t in tasks if t.get("delegatedBy") == BOT and t["_status"] != "Done" and (days_left(t, day) or 1) <= 0]
+    chase = [] if OPS else [t for t in tasks if t.get("delegatedBy") == BOT and t["_status"] != "Done" and (days_left(t, day) or 1) <= 0]
     lines = [f"*Day done* · {day:%a %d %b}", ""]
     if wins:
         lines.append(f"You finished *{len(wins)}* task{'s' if len(wins) != 1 else ''}" +
@@ -483,6 +567,7 @@ def evening_message(saved, board, cfg, day):
     if day.weekday() == 5 or day.weekday() == 4:
         week = [t for t in tasks if t["_status"] == "Done" and any(done_on(t, day - dt.timedelta(days=i)) for i in range(6))]
         lines += ["", f"This week: {len(week)} tasks closed across the board. Worth one line in your impact log."]
+    lines += ops_lines(day, evening=True)
     lines += ["", "Mark anything you finished on the board so tomorrow's list is right."]
     return "\n".join(lines)
 
@@ -499,7 +584,7 @@ def as_html(text):
     out = re.sub(r"\*([^*\n]+)\*", r"<b>\1</b>", out)
     out = re.sub(r"(?<![\w])_([^_\n]+)_(?![\w])", r"<i>\1</i>", out)
     return ("<div style=\"font-family:Arial,sans-serif;font-size:15px;line-height:1.55;color:#1f2328\">"
-            + out.replace("\n", "<br>") + f"<br><br><a href=\"{BOARD_URL}\">Open the IPA Priority Board</a></div>")
+            + out.replace("\n", "<br>") + f"<br><br><a href=\"{BOARD_URL}\">Open the IPA Ops Board</a></div>")
 
 
 def as_markdown(text):
@@ -594,19 +679,55 @@ def notify(text, dry_run, title, urgent=False):
 
 # ---------------------------------------------------------------- runs
 
+OPS = {}  # the Ops Board's data for this run: people, routines, reviews
+
+
+def ops_to_board(ops):
+    """The Ops Board keeps one task list; the planner works on tasks grouped by project, with names in `who`."""
+    names = {p["id"]: p["name"] for p in ops.get("people", [])}
+    projects = {p["name"]: {"id": p["name"], "name": p["name"], "priority": p.get("priority", 99), "tasks": []}
+                for p in ops.get("projects", [])}
+    for t in ops.get("tasks", []):
+        name = t.get("project") or "General"
+        proj = projects.setdefault(name, {"id": name, "name": name, "priority": 99, "tasks": []})
+        who = "" if t.get("who") in ("me", "", None) else names.get(t["who"], t["who"])
+        proj["tasks"].append({**t, "who": who, "doneBy": who or ops.get("me", "")})
+    return {"projects": list(projects.values())}
+
+
+def team_from_ops(ops):
+    """Each person's role, KRAs and daily duties tell the planner what to hand them."""
+    team = []
+    for p in ops.get("people", []):
+        good = [k["kra"] for k in p.get("kras", []) if k["kra"] != "Daily task sheet"]
+        good += [d for d in (p.get("duties") or {}).get("daily", []) if "task sheet" not in d.lower()]
+        team.append({"name": p["name"], "role": p.get("role", ""), "good_at": good})
+    return team
+
+
 def load(args):
+    global OPS
     token = os.environ.get("BOARD_TOKEN", "").strip()
     if args.board:
-        board = json.loads(Path(args.board).read_text())
-        cfg = json.loads(Path(args.config).read_text()) if args.config else {}
-        return board, {**DEFAULT_CONFIG, **cfg}, None
-    if not token:
-        sys.exit("Add the BOARD_TOKEN secret: a GitHub token that can read and write dikshabhargava31-ops/ipa_task.")
-    board, _ = read_file(DATA_PATH, token)
-    if not board:
-        sys.exit("The board has no data.json yet.")
-    cfg, _ = read_file(CONFIG_PATH, token)
-    return board, {**DEFAULT_CONFIG, **(cfg or {})}, token
+        data = json.loads(Path(args.board).read_text())
+        cfg = {**DEFAULT_CONFIG, **(json.loads(Path(args.config).read_text()) if args.config else {})}
+        token = None
+    else:
+        if not token:
+            sys.exit("Add the BOARD_TOKEN secret: a GitHub token that can read and write dikshabhargava31-ops/ipa_task.")
+        data, _ = read_file(DATA_PATH, token)
+        if not data:
+            sys.exit("The board has no ops.json yet.")
+        cfg, _ = read_file(CONFIG_PATH, token)
+        cfg = {**DEFAULT_CONFIG, **(cfg or {})}
+    if "people" not in data:  # an old Priority Board file (tests)
+        OPS = {}
+        return data, cfg, token
+    OPS = data
+    cfg["me"] = data.get("me") or cfg["me"]
+    if data.get("people"):
+        cfg["team"] = team_from_ops(data)
+    return ops_to_board(data), cfg, token
 
 
 def morning(args):
