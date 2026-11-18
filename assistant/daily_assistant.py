@@ -162,7 +162,9 @@ def done_on(t, day):
 
 def label(t, day):
     d = days_left(t, day)
-    when = "" if d is None else f" ({-d}d overdue)" if d < 0 else " (today)" if d == 0 else " (tomorrow)" if d == 1 else ""
+    # Long-overdue dates are stale plans, not news: say "overdue" once instead of counting the days.
+    when = ("" if d is None else f" ({-d}d overdue)" if -7 <= d < 0 else " (overdue)" if d < -7
+            else " (today)" if d == 0 else " (tomorrow)" if d == 1 else "")
     return f"{t['t'].strip()}{when}"
 
 
@@ -306,7 +308,7 @@ def plan_with_rules(tasks, board, cfg, day, yesterday_wins):
                 plan["delegate"].append({"id": t["id"], "to": who, "reason": "similar to work they've done",
                                          "message": f"Hi {who}, can you take “{t['t'].strip()}” ({t['_project']}){due}? Tell me when it's done."})
                 used.add(t["id"])
-    rest = [t for t in mine if t["id"] not in used]
+    rest = [t for t in mine if t["id"] not in used and t["_status"] != "Waiting"]  # waiting on someone else
     strategic = sorted([t for t in rest if band(t, day) <= 2], key=lambda t: (rank(t), band(t, day), t["_ppri"]))
     first = strategic[0] if strategic else (rest[0] if rest else None)
     if first:
@@ -398,12 +400,12 @@ def morning_message(plan, tasks, cfg, day, handed):
         lines.append("*Do these, in this order*")
         for i, x in enumerate(plan["top"], 1):
             t = by_id[x["id"]]
-            lines.append(f"{i}. {short(label(t, day))} — _{t['_project']}_")
+            lines.append(f"{i}. {short(label(t, day), 95)} — _{t['_project']}_")
             lines.append(f"   ↳ Start: {short(x['first_step'], 80)}")
         lines.append("")
     if plan["quick"]:
         lines.append("*Quick ones (one 30-min slot)*")
-        lines += [f"• {short(label(by_id[i], day))}" for i in plan["quick"]]
+        lines += [f"• {short(label(by_id[i], day), 95)}" for i in plan["quick"]]
         lines.append("")
     if plan["delegate"]:
         lines.append(f"*Handed off{' (assigned on the board)' if handed else ''}*")
@@ -542,6 +544,10 @@ def morning(args):
         except Exception as e:  # the rules below still give a usable plan
             print(f"Claude planning failed ({type(e).__name__}); using the built-in rules.", file=sys.stderr)
     plan = clean_plan(plan or plan_with_rules(candidates, board, cfg, day, wins), candidates, board, cfg)
+    stale = sum(1 for t in candidates if (days_left(t, day) or 0) < -14)
+    if stale >= 5 and day.weekday() == 0:  # Mondays: clear the backlog so the list stays believable
+        plan["note"] = (plan["note"] + " " if plan["note"] else "") + (
+            f"Weekly reset: {stale} tasks are 2+ weeks past their date. Give them new dates on the board, or delete the ones that no longer matter.")
     handed = apply_delegations(plan, token, cfg, day, args.dry_run)
     ok = send_whatsapp(morning_message(plan, candidates, cfg, day, handed), args.dry_run)
     fwd = forward_message(plan)
