@@ -1,0 +1,22 @@
+{
+  "me": "Diksha",
+  "auto_assign": true,
+  "max_top": 3,
+  "max_quick": 4,
+  "priority_order": ["PARTHU", "Mentorship", "CUET", "YouTube"],
+  "keep": [
+    "Legal judgment: contracts, ASCI and DPDP checks, anything you sign",
+    "Money and vendor decisions, pricing, payroll approval",
+    "Strategy, priorities and anything the founder must hear from you",
+    "Hiring, firing and performance conversations"
+  ],
+  "keep_keywords": ["legal", "contract", "asci", "dpdp", "vendor", "pricing", "price", "strategy", "founder",
+                    "approve", "approval", "hire", "hiring", "interview", "agreement", "sign"],
+  "quick_keywords": ["send", "share", "call", "reply", "forward", "upload", "remind", "follow up", "check"],
+  "team": [
+    {"name": "Riya", "role": "Office and HR assistant", "good_at": ["salary slip", "offer letter", "relieving letter", "bank details", "payroll register", "duty"]},
+    {"name": "Aman", "role": "Academic coordinator", "good_at": ["report card", "ptm", "test paper", "sign-up sheet", "school letter"]},
+    {"name": "Neha", "role": "Content and social media", "good_at": ["reel", "instagram", "caption", "thumbnail", "post", "cuet"]},
+    {"name": "Karan", "role": "Admissions counsellor", "good_at": ["kylas", "lead", "call", "admission", "scholarship", "i-star"]}
+  ]
+}

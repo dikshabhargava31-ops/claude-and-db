@@ -30,6 +30,10 @@ Data is saved in the browser's local storage. Use **Settings & backup** to expor
 - **Back up / Restore:** download a copy of the board, or replace it for everyone from a copy.
 - **Files:** GitHub Pages can't store uploads, so add work as links (for example Google Drive).
 
+## Daily Ops Assistant
+
+`assistant/` plans each day from the IPA Priority Board and sends it to WhatsApp: a to-do list at 08:42, a nudge at 13:17 and a wrap-up at 18:47 (Monday to Saturday, India time). It decides what to hand off, assigns it on the board and writes the message to forward. Setup and settings: `assistant/README.md`.
+
 ## Video studio
 
 Claude Code makes videos here with HyperFrames (skills in `.claude/skills/`). Each video lives in `videos/<name>/`. `CLAUDE.md` maps trending styles (vertical reels, word-by-word captions, kinetic type, beat-synced edits, launch promos) to the right tool. `scripts/setup-video-tools.sh` installs auto-editor, PySceneDetect and yt-dlp (`--full` adds Demucs); cloud sessions run it automatically. To control DaVinci Resolve or transcribe locally, see `docs/local-video-setup.md`.

@@ -1,0 +1,63 @@
+name: Daily assistant
+
+# Plans the day from the IPA Priority Board and sends it to WhatsApp (assistant/README.md).
+# Monday to Saturday, India time: 08:42 to-do list, 13:17 nudge, 18:47 wrap-up.
+# Secrets: BOARD_TOKEN, WHATSAPP_PHONE and CALLMEBOT_APIKEY (or TWILIO_*); ANTHROPIC_API_KEY is optional.
+# This repository is public, so the run log only prints counts, never task names.
+on:
+  schedule:
+    - cron: "12 3 * * 1-6"    # 08:42 IST: morning plan
+    - cron: "47 7 * * 1-6"    # 13:17 IST: midday nudge
+    - cron: "17 13 * * 1-6"   # 18:47 IST: evening wrap-up
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Which message to send now"
+        type: choice
+        options: [morning, midday, evening]
+        default: morning
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-assistant
+  cancel-in-progress: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pick the message
+        id: mode
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT: ${{ inputs.mode }}
+        run: |
+          case "$SCHEDULE" in
+            "12 3 * * 1-6") mode=morning ;;
+            "47 7 * * 1-6") mode=midday ;;
+            "17 13 * * 1-6") mode=evening ;;
+            *) mode="${INPUT:-morning}" ;;
+          esac
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+
+      - name: Install the Anthropic SDK
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        if: steps.mode.outputs.mode == 'morning'
+        run: '[ -z "$ANTHROPIC_API_KEY" ] || pip install -q "anthropic>=1.1"'
+
+      - name: Send
+        env:
+          BOARD_TOKEN: ${{ secrets.BOARD_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_WHATSAPP_FROM: ${{ secrets.TWILIO_WHATSAPP_FROM }}
+        run: python3 assistant/daily_assistant.py "${{ steps.mode.outputs.mode }}"
