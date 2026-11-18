@@ -2,7 +2,9 @@ name: Daily assistant
 
 # Plans the day from the IPA Priority Board and sends it to WhatsApp (assistant/README.md).
 # Monday to Saturday, India time: 08:42 to-do list, 13:17 nudge, 18:47 wrap-up.
-# Secrets: BOARD_TOKEN, WHATSAPP_PHONE and CALLMEBOT_APIKEY (or TWILIO_*); ANTHROPIC_API_KEY is optional.
+# Secrets: BOARD_TOKEN, WHATSAPP_PHONE, and META_TOKEN + META_PHONE_NUMBER_ID + META_WABA_ID (Meta's WhatsApp
+# Cloud API) or CALLMEBOT_APIKEY. ANTHROPIC_API_KEY is optional. Run mode "templates" once to submit the
+# message templates to Meta for approval.
 # This repository is public, so the run log only prints counts, never task names.
 on:
   schedule:
@@ -14,7 +16,7 @@ on:
       mode:
         description: "Which message to send now"
         type: choice
-        options: [morning, midday, evening]
+        options: [morning, midday, evening, templates]
         default: morning
 
 permissions:
@@ -56,6 +58,9 @@ jobs:
           BOARD_TOKEN: ${{ secrets.BOARD_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           WHATSAPP_PHONE: ${{ secrets.WHATSAPP_PHONE }}
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          META_PHONE_NUMBER_ID: ${{ secrets.META_PHONE_NUMBER_ID }}
+          META_WABA_ID: ${{ secrets.META_WABA_ID }}
           CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}

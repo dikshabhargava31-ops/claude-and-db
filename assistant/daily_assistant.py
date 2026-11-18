@@ -22,6 +22,8 @@ Environment:
   BOARD_TOKEN         GitHub token that can read and write ipa_task (Contents: read and write)
   ANTHROPIC_API_KEY   optional; without it the plan comes from built-in rules
   WHATSAPP_PHONE      your number with country code, e.g. +9198xxxxxxxx
+  META_TOKEN, META_PHONE_NUMBER_ID   Meta's WhatsApp Cloud API (sends the approved templates), or
+  META_WABA_ID        with the `templates` command: submits the templates to Meta for approval
   CALLMEBOT_APIKEY    the key CallMeBot sends you (free), or instead:
   TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM   for Twilio's WhatsApp API
 """
@@ -64,6 +66,7 @@ DEFAULT_CONFIG = {
     "keep_keywords": ["legal", "contract", "asci", "dpdp", "vendor", "pricing", "price", "strategy", "founder",
                       "approve", "approval", "hire", "hiring", "interview", "salary revision", "agreement", "sign"],
     "team": [],
+    "notify_team": False,
     "quick_keywords": ["send", "share", "call", "reply", "forward", "upload", "remind", "follow up", "check"],
 }
 
@@ -392,15 +395,29 @@ def short(text, n=70):
     return text if len(text) <= n else text[:n - 1].rstrip() + "…"
 
 
+def param(text, n=300):
+    """Meta template blanks can't hold line breaks, tabs or long runs of spaces, or be empty."""
+    text = " ".join(str(text or "").replace("*", "").replace("_", "").split())
+    return short(text, n) if text else "None"
+
+
+def msg(text, template=None, params=()):
+    # A filled-in template must stay under Meta's 1,024 characters, so share what's left among the blanks.
+    room = (1000 - len(TEMPLATES[template][0])) // max(len(params), 1) if template else 300
+    return {"text": text, "template": template, "params": [param(x, max(60, room)) for x in params]}
+
+
 def morning_message(plan, tasks, cfg, day, handed):
     by_id = {t["id"]: t for t in tasks}
     lines = [f"*Good morning {cfg['me']}* · {day:%a %d %b}", ""]
+    tops = []
     if plan["top"]:
         lines.append("*Do these, in this order*")
         for i, x in enumerate(plan["top"], 1):
             t = by_id[x["id"]]
             lines.append(f"{i}. {short(label(t, day))} — _{t['_project']}_")
             lines.append(f"   ↳ Start: {short(x['first_step'], 80)}")
+            tops.append(f"{short(label(t, day))} ({t['_project']}). Start: {short(x['first_step'], 80)}")
         lines.append("")
     if plan["quick"]:
         lines.append("*Quick ones (one 30-min slot)*")
@@ -411,24 +428,43 @@ def morning_message(plan, tasks, cfg, day, handed):
         lines += [f"• {short(by_id[d['id']]['t'], 55)} → *{d['to']}*" for d in plan["delegate"]]
         lines.append("_Messages to forward are below._")
         lines.append("")
-    if plan["later"]:
-        lines.append(f"*Not today:* {len(plan['later'])} task{'s' if len(plan['later']) > 1 else ''} can wait.")
+    later = f"{len(plan['later'])} task{'s' if len(plan['later']) > 1 else ''} can wait." if plan["later"] else ""
+    if later:
+        lines.append(f"*Not today:* {later}")
     if plan.get("note"):
         lines += ["", plan["note"]]
-    return "\n".join(lines).strip()
+    tops += ["Nothing else. Protect the time for the ones above.", "None", "None"][:3 - len(tops)]
+    return msg("\n".join(lines).strip(), "ops_daily_plan", [
+        f"{cfg['me']} ({day:%a %d %b})", *tops[:3],
+        "; ".join(short(by_id[i]["t"], 50) for i in plan["quick"]) or "None today",
+        "; ".join(f"{short(by_id[d['id']]['t'], 45)} to {d['to']}" for d in plan["delegate"]) or "Nothing today",
+        " ".join(x for x in (plan.get("note"), f"Not today: {later}" if later else "") if x) or "Start with number 1."])
 
 
-def forward_message(plan):
-    """One WhatsApp with a ready-to-forward line for each person."""
-    if not plan["delegate"]:
+def forward_message(plan, skip=()):
+    """One WhatsApp with a ready-to-forward line for each person (except those messaged directly)."""
+    items = [d for d in plan["delegate"] if d["to"] not in skip]
+    if not items:
         return None
     people = {}
-    for d in plan["delegate"]:
+    for d in items:
         people.setdefault(d["to"], []).append(d["message"])
     parts = ["*Hand-off messages* · long-press, copy, forward"]
     for who, msgs in people.items():
         parts += ["", f"*{who}*"] + msgs
-    return "\n".join(parts)
+    flat = " | ".join(f"{who}: {' '.join(m)}" for who, m in people.items())
+    return msg("\n".join(parts), "ops_handoff_notes", [short(flat, 900)])
+
+
+def assigned_message(d, task, cfg, day):
+    """Sent straight to the team member (Meta only, when notify_team is on)."""
+    due = task.get("due")
+    left = days_left(task, day)
+    when = ("this week" if left is None else "today" if left == 0 else
+            f"today (it was due {dt.date.fromisoformat(due[:10]):%a %d %b})" if left < 0 else f"{dt.date.fromisoformat(due[:10]):%a %d %b}")
+    text = (f"Hi {d['to']}, you have a new task from {cfg['me']} on the IPA board.\n\nTask: {task['t'].strip()}\n"
+            f"Due: {when}\n\nPlease message {cfg['me']} if anything is unclear, and mark it done on the board when finished.")
+    return msg(text, "ops_task_assigned", [d["to"], cfg["me"], f"{task['t'].strip()} ({task['_project']})", when])
 
 
 def midday_message(saved, board, cfg, day):
@@ -439,13 +475,15 @@ def midday_message(saved, board, cfg, day):
     if not top:
         return None
     if not pending:
-        return f"*All {len(top)} of today's tasks are done.* That's the day's real work finished. Anything else is extra."
+        return msg(f"*All {len(top)} of today's tasks are done.* That's the day's real work finished. Anything else is extra.",
+                   "ops_midday", [f"All {len(top)}", "nothing, the main work is finished", "anything else today is extra"])
     t = pending[0]
+    step = short(t["_step"], 80) or "open it and work for 25 minutes"
     lines = [f"*Midday check* · {len(done)} of {len(top)} done", "",
              f"Next: *{short(t['t'])}*" + (" (not started yet)" if t["_status"] == "Not started" else ""),
-             f"Just this: {short(t['_step'], 80) or 'open it and work for 25 minutes'}.",
+             f"Just this: {step}.",
              "Phone face down for 25 minutes, then mark it on the board."]
-    return "\n".join(lines)
+    return msg("\n".join(lines), "ops_midday", [f"{len(done)} of {len(top)}", short(t["t"]), step])
 
 
 def evening_message(saved, board, cfg, day):
@@ -459,11 +497,15 @@ def evening_message(saved, board, cfg, day):
     chase = [t for t in tasks if t.get("delegatedBy") == BOT and t["_status"] != "Done" and (days_left(t, day) or 1) <= 0]
     lines = [f"*Day done* · {day:%a %d %b}", ""]
     if wins:
-        lines.append(f"You finished *{len(wins)}* task{'s' if len(wins) != 1 else ''}" +
-                     (f", your team finished {len(team_wins)}." if team_wins else "."))
+        head = f"You finished *{len(wins)}* task{'s' if len(wins) != 1 else ''}" + (f", your team finished {len(team_wins)}." if team_wins else ".")
+        done_txt = f"{len(wins)}: " + "; ".join(short(t["t"], 45) for t in wins[:5])
     else:
-        lines.append("Nothing is marked done on the board today. If you finished things, tick them: they count."
-                     + (f" Your team finished {len(team_wins)}." if team_wins else ""))
+        head = "Nothing is marked done on the board today. If you finished things, tick them: they count."
+        done_txt = "nothing marked done yet. If you finished things, tick them on the board: they count"
+    if team_wins:
+        head += "" if wins else f" Your team finished {len(team_wins)}."
+        done_txt += f". Your team finished {len(team_wins)}"
+    lines.append(head)
     lines += [f"✓ {short(t['t'])}" for t in wins[:5]]
     if carry:
         lines += ["", "*Carries over to tomorrow*"] + [f"• {short(t['t'])}" for t in carry]
@@ -472,23 +514,91 @@ def evening_message(saved, board, cfg, day):
     first = carry[0] if carry else None
     if first:
         lines += ["", f"Tomorrow's first task is already picked: *{short(first['t'])}*. Nothing to decide tonight."]
-    if day.weekday() == 5 or day.weekday() == 4:
+    if day.weekday() in (4, 5):
         week = [t for t in tasks if t["_status"] == "Done" and any(done_on(t, day - dt.timedelta(days=i)) for i in range(6))]
         lines += ["", f"This week: {len(week)} tasks closed across the board. Worth one line in your impact log."]
+        done_txt += f". This week: {len(week)} tasks closed across the board"
     lines += ["", "Mark anything you finished on the board so tomorrow's list is right."]
-    return "\n".join(lines)
+    return msg("\n".join(lines), "ops_evening", [
+        f"{me} ({day:%a %d %b})", done_txt,
+        "; ".join(short(t["t"], 50) for t in carry) or "nothing",
+        "; ".join(f"{short(t['t'], 40)} ({t.get('who')})" for t in chase[:5]) or "none",
+        short(first["t"]) if first else "tomorrow's plan, sent in the morning"])
 
 
 # ---------------------------------------------------------------- WhatsApp
 
-def send_whatsapp(text, dry_run):
+# Meta's WhatsApp Cloud API only lets a business number start a chat with an approved template.
+# `python3 assistant/daily_assistant.py templates` submits these to Meta for approval.
+TEMPLATES = {
+    "ops_daily_plan": ("Good morning {{1}}. Here is your plan for today.\n\nDo these, in this order:\n1. {{2}}\n2. {{3}}\n3. {{4}}\n\n"
+                       "Quick ones, in one 30-minute slot: {{5}}\n\nHanded off: {{6}}\n\nNote: {{7}}\n\n"
+                       "Mark tasks done on the IPA Priority Board as you finish them.",
+                       ["Diksha (Wed 18 Nov)", "Finalise rubric design (PARTHU.AI). Start: list 3 criteria",
+                        "JEE report cards (IPA Operations). Start: open last term's file", "Nothing else. Protect the time for the ones above.",
+                        "Share sign-up form; Reply to school", "Salary slips to Riya", "Yesterday you finished the landing page copy."]),
+    "ops_handoff_notes": ("Hand-off messages for today. Copy each one and forward it:\n\n{{1}}\n\n"
+                          "Each task is already assigned on the IPA Priority Board.",
+                          ["Riya: Hi Riya, can you take the November salary slips today? Tell me when it's done."]),
+    "ops_midday": ("Midday check: {{1}} of today's main tasks are done.\n\nNext: {{2}}\nJust this first: {{3}}\n\n"
+                   "Put the phone face down for 25 minutes, then mark it on the board.",
+                   ["1 of 3", "Finalise rubric design", "list 3 criteria"]),
+    "ops_evening": ("Day done, {{1}}.\n\nYou finished: {{2}}\nCarries over: {{3}}\nHand-offs to chase: {{4}}\n\n"
+                    "Tomorrow starts with: {{5}}\n\nMark anything you finished on the board so tomorrow's list is right.",
+                    ["Diksha (Wed 18 Nov)", "2: Rubric design; Pricing call", "JEE report cards", "Salary slips (Riya)", "JEE report cards"]),
+    "ops_task_assigned": ("Hi {{1}}, you have a new task from {{2}} on the IPA board.\n\nTask: {{3}}\nDue: {{4}}\n\n"
+                          "Please message {{2}} if anything is unclear, and mark it done on the board when finished.",
+                          ["Riya", "Diksha", "November salary slips (IPA Operations)", "Wed 18 Nov"]),
+}
+GRAPH = f"https://graph.facebook.com/{os.environ.get('META_GRAPH_VERSION', 'v23.0')}"
+
+
+def meta_ready():
+    return bool(os.environ.get("META_TOKEN") and os.environ.get("META_PHONE_NUMBER_ID"))
+
+
+def graph(method, path, body=None):
+    req = urllib.request.Request(f"{GRAPH}/{path}", method=method, data=json.dumps(body).encode() if body else None,
+                                 headers={"Authorization": f"Bearer {os.environ['META_TOKEN']}", "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=40) as r:
+            return r.status, json.loads(r.read() or b"{}")
+    except urllib.error.HTTPError as e:
+        try:
+            return e.code, json.loads(e.read() or b"{}")
+        except ValueError:
+            return e.code, {}
+
+
+def send_whatsapp(m, dry_run, to=None):
+    """Send one message: an approved template through Meta, or plain text through CallMeBot or Twilio."""
+    if m is None:
+        return False
     if dry_run:
-        print(text, end="\n\n---\n\n")
+        print(m["text"], end="\n\n")
+        if m.get("template"):
+            print(f"[Meta template {m['template']}: " + " / ".join(m["params"]) + "]", end="\n\n")
+        print("---", end="\n\n")
         return True
-    phone = os.environ.get("WHATSAPP_PHONE", "").strip()
+    phone = (to or os.environ.get("WHATSAPP_PHONE", "")).strip()
     if not phone:
         print("WHATSAPP_PHONE is not set; nothing sent.", file=sys.stderr)
         return False
+    if meta_ready() and m.get("template"):
+        body = {"messaging_product": "whatsapp", "to": re.sub(r"\D", "", phone), "type": "template",
+                "template": {"name": m["template"], "language": {"code": os.environ.get("META_TEMPLATE_LANG", "en")},
+                             "components": [{"type": "body", "parameters": [{"type": "text", "text": x} for x in m["params"]]}]}}
+        for attempt in range(3):
+            status, j = graph("POST", f"{os.environ['META_PHONE_NUMBER_ID']}/messages", body)
+            if status < 300:
+                return True
+            err = j.get("error", {})
+            print(f"Meta refused {m['template']} (HTTP {status}, code {err.get('code')}): {err.get('message', '')[:160]}", file=sys.stderr)
+            if status < 500:
+                return False
+            time.sleep(5 * (attempt + 1))
+        return False
+    text = m["text"]
     if os.environ.get("CALLMEBOT_APIKEY"):
         q = urllib.parse.urlencode({"phone": phone, "text": text, "apikey": os.environ["CALLMEBOT_APIKEY"]})
         req = urllib.request.Request(f"https://api.callmebot.com/whatsapp.php?{q}", headers={"User-Agent": "daily-ops-assistant"})
@@ -499,7 +609,7 @@ def send_whatsapp(text, dry_run):
         req = urllib.request.Request(f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json", data=data, headers={
             "Authorization": "Basic " + base64.b64encode(f"{sid}:{tok}".encode()).decode()})
     else:
-        print("Add CALLMEBOT_APIKEY (or the TWILIO_* secrets) to send WhatsApp messages.", file=sys.stderr)
+        print("Add META_TOKEN and META_PHONE_NUMBER_ID (or CALLMEBOT_APIKEY) to send WhatsApp messages.", file=sys.stderr)
         return False
     for attempt in range(3):
         try:
@@ -512,6 +622,29 @@ def send_whatsapp(text, dry_run):
             print(f"WhatsApp send failed ({getattr(e, 'code', e.reason)}).", file=sys.stderr)
         time.sleep(5 * (attempt + 1))
     return False
+
+
+def templates(args):
+    """Submit any missing templates to Meta for approval and show each one's status."""
+    waba = os.environ.get("META_WABA_ID", "").strip()
+    if not (waba and os.environ.get("META_TOKEN")):
+        sys.exit("Add META_TOKEN and META_WABA_ID (your WhatsApp Business Account ID) first.")
+    lang = os.environ.get("META_TEMPLATE_LANG", "en")
+    status, j = graph("GET", f"{waba}/message_templates?fields=name,status,language,rejected_reason&limit=200")
+    if status >= 300:
+        sys.exit(f"Could not list templates (HTTP {status}): {j.get('error', {}).get('message', '')}")
+    have = {(t["name"], t.get("language")): t for t in j.get("data", [])}
+    for name, (body, example) in TEMPLATES.items():
+        t = have.get((name, lang))
+        if t:
+            why = f" ({t['rejected_reason']})" if t.get("rejected_reason") not in (None, "NONE") else ""
+            print(f"{name}: {t['status']}{why}")
+            continue
+        status, r = graph("POST", f"{waba}/message_templates", {
+            "name": name, "language": lang, "category": "UTILITY",
+            "components": [{"type": "BODY", "text": body, "example": {"body_text": [example]}}]})
+        print(f"{name}: " + (f"submitted, {r.get('status', 'PENDING')}" if status < 300 else
+                             f"refused (HTTP {status}): {r.get('error', {}).get('error_user_msg') or r.get('error', {}).get('message', '')}"))
 
 
 # ---------------------------------------------------------------- runs
@@ -539,7 +672,9 @@ def morning(args):
     wins = [t["t"].strip() for t in all_tasks if done_on(t, yesterday) and norm(t.get("doneBy") or cfg["me"]) == norm(cfg["me"])]
     open_tasks = [t for t in all_tasks if t["_status"] != "Done" and not t["_pdone"]]
     if not open_tasks:
-        send_whatsapp(f"*Good morning {cfg['me']}* · {day:%a %d %b}\n\nThe board has no open tasks. Add today's work there and I'll plan it tomorrow.", args.dry_run)
+        send_whatsapp(msg(f"*Good morning {cfg['me']}* · {day:%a %d %b}\n\nThe board has no open tasks. Add today's work there and I'll plan it tomorrow.",
+                          "ops_daily_plan", [f"{cfg['me']} ({day:%a %d %b})", "The board has no open tasks.", "Add today's work to the board.",
+                                             "I'll plan it tomorrow morning.", "None", "Nothing", "Nothing to do here today."]), args.dry_run)
         return
     candidates = [t for t in open_tasks if is_mine(t, cfg["me"])][:60]
     plan = None
@@ -551,15 +686,21 @@ def morning(args):
     plan = clean_plan(plan or plan_with_rules(candidates, board, cfg, day, wins), candidates, board, cfg)
     handed = apply_delegations(plan, token, cfg, day, args.dry_run)
     ok = send_whatsapp(morning_message(plan, candidates, cfg, day, handed), args.dry_run)
-    fwd = forward_message(plan)
-    if fwd:
-        send_whatsapp(fwd, args.dry_run)
+    direct = set()
+    if cfg.get("notify_team") and (handed or args.dry_run) and (meta_ready() or args.dry_run):
+        phones = {norm(m["name"]): m.get("phone") for m in cfg.get("team", []) if m.get("phone")}
+        by_id = {t["id"]: t for t in candidates}
+        for d in plan["delegate"]:
+            if phones.get(norm(d["to"])) and send_whatsapp(assigned_message(d, by_id[d["id"]], cfg, day), args.dry_run,
+                                                           to=phones[norm(d["to"])]):
+                direct.add(d["to"])
+    send_whatsapp(forward_message(plan, skip=direct), args.dry_run)
     if token and not args.dry_run:
         path = f"{PLANS_DIR}/{day.isoformat()}.json"
         _, sha = read_file(path, token)
         write_file(path, {"date": day.isoformat(), "sent": ok, **plan}, sha, f"{BOT}: plan for {day:%d %b}", token)
     print(f"Morning plan: {len(plan['top'])} top, {len(plan['quick'])} quick, {len(plan['delegate'])} handed off "
-          f"({handed} assigned on the board). Sent: {ok}.")
+          f"({handed} assigned on the board, {len(direct)} told directly). Sent: {ok}.")
 
 
 def followup(args, kind):
@@ -584,7 +725,8 @@ def followup(args, kind):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("mode", choices=["morning", "midday", "evening"])
+    ap.add_argument("mode", choices=["morning", "midday", "evening", "templates"],
+                    help="templates: submit the WhatsApp templates to Meta and show their approval status")
     ap.add_argument("--dry-run", action="store_true", help="print the messages; send and change nothing")
     ap.add_argument("--no-ai", action="store_true", help="plan with the built-in rules only")
     ap.add_argument("--board", help="read a local data.json instead of the private repository (testing)")
@@ -593,7 +735,9 @@ def main():
     args = ap.parse_args()
     if args.board:
         args.dry_run = True
-    if args.mode == "morning":
+    if args.mode == "templates":
+        templates(args)
+    elif args.mode == "morning":
         morning(args)
     else:
         followup(args, args.mode)
