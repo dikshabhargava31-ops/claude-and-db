@@ -231,7 +231,8 @@ Rules:
 - Delegate only to names in the team list, and match the work to what each person has done before or is good at.
   If nobody fits, keep it. Don't delegate a task that's already assigned to someone else.
 - Every task id you use must come from the task list. Each id appears in at most one list.
-- Write the way {me} talks: short, plain, spoken English. Nothing dramatic or formal."""
+- Write the way {me} talks: short, plain, spoken English. Nothing dramatic or formal.
+- Answer only by calling report_plan once."""
 
 
 def plan_with_claude(tasks, board, cfg, day, yesterday_wins):
@@ -250,11 +251,16 @@ def plan_with_claude(tasks, board, cfg, day, yesterday_wins):
     system = SYSTEM.format(me=cfg["me"], priorities=" → ".join(cfg.get("priority_order") or []) or "board priority",
                            max_top=cfg.get("max_top", 3), keep="; ".join(cfg.get("keep") or []))
     client = anthropic.Anthropic()
-    response = client.messages.create(model=MODEL, max_tokens=4000, system=system,
-                                      messages=[{"role": "user", "content": prompt}],
-                                      tools=[PLAN_TOOL], tool_choice={"type": "tool", "name": "report_plan"})
-    block = next((b for b in response.content if b.type == "tool_use"), None)
-    return block.input if block else None
+    messages = [{"role": "user", "content": prompt}]
+    for _ in range(2):  # this model doesn't accept a forced tool choice, so ask again if it answers in text
+        response = client.messages.create(model=MODEL, max_tokens=4000, system=system, messages=messages,
+                                          tools=[PLAN_TOOL], tool_choice={"type": "auto"})
+        block = next((b for b in response.content if b.type == "tool_use" and b.name == "report_plan"), None)
+        if block:
+            return block.input
+        messages += [{"role": "assistant", "content": response.content},
+                     {"role": "user", "content": "Please give the plan by calling report_plan once."}]
+    return None
 
 
 def plan_with_rules(tasks, board, cfg, day, yesterday_wins):
@@ -511,18 +517,33 @@ def send_email(text, title):
     m.set_content(re.sub(r"[*_]", "", text) + f"\n\nBoard: {BOARD_URL}")
     m.add_alternative(as_html(text), subtype="html")
     password = "".join(os.environ["GMAIL_APP_PASSWORD"].split())
+    if "@" not in user or len(password) != 16 or not password.isalnum():
+        raise ValueError(f"check the secrets: GMAIL_ADDRESS {'looks right' if '@' in user else 'has no @'}, "
+                         f"GMAIL_APP_PASSWORD has {len(password)} letters (an app password has 16, letters only)")
+
+    def attempt(port):
+        stage = "connecting"
+        try:
+            smtp = smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=40) if port == 465 else smtplib.SMTP("smtp.gmail.com", 587, timeout=40)
+            with smtp:
+                stage = "greeting"
+                smtp.ehlo()
+                if port == 587:
+                    stage = "starting encryption"
+                    smtp.starttls()
+                    smtp.ehlo()
+                stage = "signing in"
+                smtp.login(user, password)
+                stage = "sending"
+                smtp.send_message(m)
+        except smtplib.SMTPException as e:
+            raise type(e)(f"port {port}, while {stage}: {e}") if isinstance(e, smtplib.SMTPServerDisconnected) else e
+
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=40) as smtp:
-            smtp.login(user, password)
-            smtp.send_message(m)
-    except (smtplib.SMTPServerDisconnected, smtplib.SMTPConnectError, OSError) as e:
-        if isinstance(e, smtplib.SMTPAuthenticationError):
-            raise
-        print(f"Gmail on port 465 failed ({type(e).__name__}: {e}); trying port 587.", file=sys.stderr)
-        with smtplib.SMTP("smtp.gmail.com", 587, timeout=40) as smtp:
-            smtp.starttls()
-            smtp.login(user, password)
-            smtp.send_message(m)
+        attempt(465)
+    except (smtplib.SMTPServerDisconnected, OSError) as e:
+        print(f"Gmail: {e}; trying port 587.", file=sys.stderr)
+        attempt(587)
 
 
 def send_ntfy(text, title, urgent=False):
