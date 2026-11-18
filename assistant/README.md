@@ -1,10 +1,10 @@
 # Daily Ops Assistant
 
-Plans your day from the **IPA Priority Board** and sends it to you by **Gmail** and as a **notification on your laptop** (and phone, if you like), Monday to Saturday:
+Plans your day from the **IPA Ops Board** (`ops.json`) and sends it to you by **Gmail** and as a **notification on your laptop** (and phone, if you like), Monday to Saturday:
 
 | Time (IST) | Message |
 | --- | --- |
-| 08:42 | **To-do list.** Up to 3 tasks in order, with the most important one (not the loudest) first, and a 5-minute first step for each. Quick tasks to batch in one slot. What it handed off, and to whom. What can wait. One line on what you finished yesterday. At the end, a ready-to-send WhatsApp note for each person. |
+| 08:42 | **To-do list.** Routine work due today, team tasks to follow up, and in the last week of the month the KRA reviews still to do. Up to 3 tasks in order, with the most important one (not the loudest) first, and a 5-minute first step for each. Quick tasks to batch in one slot. What it handed off, and to whom. What can wait. One line on what you finished yesterday. At the end, a ready-to-send WhatsApp note for each person. |
 | 13:17 | **Nudge.** How many of today's tasks are done, and the next one with its first small step. |
 | 18:47 | **Wrap-up.** What you and the team finished, what carries over, hand-offs to chase, and tomorrow's first task, so there's nothing to decide at night. On Fridays and Saturdays, the week's count for your impact log. |
 
@@ -13,7 +13,7 @@ Plans your day from the **IPA Priority Board** and sends it to you by **Gmail** 
 You don't choose. Every morning it looks at your open tasks (unassigned, or assigned to you) and:
 
 - **keeps** work that needs you: legal judgment, money and vendor decisions, strategy, founder conversations, hiring (the `keep` list in the settings);
-- **hands off** the rest to the team member who fits best, judged by what each person is good at and what they've done on the board before;
+- **hands off** work that clearly matches someone's role, KRAs and daily duties on the board (at most 5 a day; planning, targets and budgets stay with you). Only Claude makes hand-offs, so without `ANTHROPIC_API_KEY` nothing is handed off;
 - **assigns it on the board** (Assigned to: that person; the change is saved as "Ops Assistant"), and writes the message for you to forward.
 
 It never hands off a task twice. If you take a task back, it stays yours. With no team in the settings it only hands off work very like what someone has already done.

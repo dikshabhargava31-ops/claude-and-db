@@ -18,21 +18,18 @@ A single static page: `index.html`, plus `assets/`. There is no build step. It's
 
 Data is saved in the browser's local storage. Use **Settings & backup** to export or import it. Data from the earlier planner versions carries over.
 
-## IPA Priority Board
+## IPA Ops Board
 
-`priority/index.html` is the IPA Priority Board (no build step). It has the projects gallery, "Do this now", tasks (Kanban, by day, by project, calendar), a timeline, a folder for each project with notes, links and a work log, and idle-project reminders.
+`priority/index.html` is the **IPA Ops Board** (no build step), which replaced the IPA Priority Board on 19 Nov 2026. It's for Diksha only; the team gets their tasks and role sheets on WhatsApp.
 
-- **Private data:** the board's data is `data.json` in the private repository `dikshabhargava31-ops/ipa_task`, not in this public repository. The page has no data of its own, so anyone who isn't signed in sees nothing.
-- **Access:** add each person to `ipa_task` (Settings → Collaborators). They never need access to this repository, so their token can't change the website.
-- **Signing in:** each person enters their name and a [classic token](https://github.com/settings/tokens/new?scopes=repo&description=IPA%20Priority%20Board) with the `repo` box ticked. The token is kept only in that browser. Signing out removes it and the browser's copy of the board.
-- **Names:** every change is saved as a commit in the data repository with the editor's name. Tasks show who they're assigned to, who added them and who finished them. The work log and links show who added each entry. Use **Show tasks for** to see one person's tasks.
-- **Work log:** editors can delete entries. Deleting a "Done" entry keeps the task done.
-- **Back up / Restore:** download a copy of the board, or replace it for everyone from a copy.
-- **Files:** GitHub Pages can't store uploads, so add work as links (for example Google Drive).
+- **Today:** the day's tasks in order (from the daily assistant's plan), routine work due, team tasks that need a follow-up, and what's waiting for approval.
+- **Team:** one page per person with their tasks, a role sheet (daily, weekly and monthly duties, KRAs and review questions) and buttons to copy or send it on WhatsApp.
+- **Tasks:** everyone's tasks with filters; **KRA reviews:** monthly actual and status for each KRA, with notes and a message to send; **Meeting:** the Monday agenda, notes and action items; **Routine:** daily, weekly, monthly, season and yearly work to tick off each cycle; **Expenses:** spends with bills and approvals, and budget vs spent per category.
+- **Private data:** everything is `ops.json` in the private repository `dikshabhargava31-ops/ipa_task`. The page has no data of its own. Sign in with a name and a [classic token](https://github.com/settings/tokens/new?scopes=repo&description=IPA%20Ops%20Board) with `repo` ticked; the token stays in that browser. Every change is a commit there, so its history is the board's history. **Settings** downloads a backup.
 
 ## Daily Ops Assistant
 
-`assistant/` plans each day from the IPA Priority Board and sends it to you by Gmail and as a laptop notification: a to-do list at 08:42, a nudge at 13:17 and a wrap-up at 18:47 (Monday to Saturday, India time). It decides what to hand off, assigns it on the board and writes the message to forward. Setup and settings: `assistant/README.md`.
+`assistant/` plans each day from the IPA Ops Board and sends it to you by Gmail and as a laptop notification: a to-do list at 08:42, a nudge at 13:17 and a wrap-up at 18:47 (Monday to Saturday, India time). It lists routine work due and team follow-ups, decides what to hand off, assigns it on the board and writes the message to forward. Setup and settings: `assistant/README.md`.
 
 ## Video studio
 
