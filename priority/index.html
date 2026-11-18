@@ -107,7 +107,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13px}
     <button class="btn small" id="addTaskBtn" type="button">+ Task</button></div>
   <nav class="tabs" id="tabs">
     <a href="#today">Today</a><a href="#team">Team</a><a href="#tasks">Tasks</a><a href="#kra">KRA reviews</a>
-    <a href="#meeting">Meeting</a><a href="#routine">Routine</a><a href="#expenses">Expenses</a><a href="#settings">Settings</a>
+    <a href="#log">Work log</a><a href="#meeting">Meeting</a><a href="#routine">Routine</a><a href="#expenses">Expenses</a><a href="#settings">Settings</a>
   </nav>
 </header>
 <main class="wrap" id="app"></main>
@@ -243,8 +243,10 @@ function taskRow(t,opts={}){
 
 function vToday(){
   const mine=D.tasks.filter(t=>t.who==="me"&&open(t)).sort(cmp);
-  let top=[];if(plan&&plan.date===todayISO())top=(plan.top||[]).map(x=>D.tasks.find(t=>t.id===x.id)).filter(Boolean);
+  const dayList=D.tasks.filter(t=>t.plannedFor===todayISO()).sort((a,b)=>(a.order||0)-(b.order||0));
+  let top=dayList.slice();if(!top.length&&plan&&plan.date===todayISO())top=(plan.top||[]).map(x=>D.tasks.find(t=>t.id===x.id)).filter(Boolean);
   if(!top.length)top=mine.filter(t=>t.status!=="Waiting").slice(0,3);
+  const restMine=mine.filter(t=>!top.includes(t));
   const steps=Object.fromEntries(((plan&&plan.top)||[]).map(x=>[x.id,x.first_step]));
   const rs=D.routines.filter(r=>{const s=rState(r);return s.due&&!s.done}).sort((a,b)=>rState(b).overdue-rState(a).overdue);
   const fu=D.tasks.filter(needsFollowUp).sort(cmp);
@@ -254,10 +256,11 @@ function vToday(){
   return`<div class="page-head"><div><h1>${new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"})}</h1>
   <div class="sub">${doneToday?`${doneToday} done today. `:""}${mine.length} open tasks of yours, ${D.tasks.filter(t=>t.who!=="me"&&open(t)).length} with the team.</div></div></div>
   <div class="grid g2">
-   <section class="card"><h3>Do these, in this order</h3>${top.map((t,i)=>`<div class="row ${open(t)?"":"done"}"><input type="checkbox" data-done="${t.id}" ${open(t)?"":"checked"} aria-label="Done">
+   <section class="card"><h3>${dayList.length?`Your list for today <span class="count">${dayList.filter(open).length} left of ${dayList.length}</span>`:"Do these, in this order"}</h3>${top.map((t,i)=>`<div class="row ${open(t)?"":"done"}"><input type="checkbox" data-done="${t.id}" ${open(t)?"":"checked"} aria-label="Done">
      <div class="main"><div class="t"><b>${i+1}.</b> ${esc(t.t)}</div><div class="meta">${dueChip(t)}<span>${esc(t.project||"")}</span></div>
      ${steps[t.id]?`<div class="meta">Start: ${esc(steps[t.id])}</div>`:""}</div><button class="btn link" data-edit="${t.id}" type="button">Edit</button></div>`).join("")||`<div class="empty">Nothing open. Add a task with + Task.</div>`}
-     ${mine.length>3?`<details><summary>All my open tasks (${mine.length})</summary>${mine.slice(3).map(t=>taskRow(t)).join("")}</details>`:""}</section>
+     ${restMine.length?`<details><summary>My other open tasks (${restMine.length})</summary>${restMine.map(t=>taskRow(t)).join("")}</details>`:""}
+     <form class="form noprint" id="logQuick" style="margin-top:12px;grid-template-columns:1fr auto"><input type="text" name="text" placeholder="Did something not on the list? Log it here" required><button class="btn" type="submit">Log</button></form></section>
    <section class="card"><h3>Routine due <span class="count">${rs.length}</span></h3>${rs.map(r=>`<div class="row"><input type="checkbox" data-rdone="${r.id}" aria-label="Done">
      <div class="main"><div class="t">${esc(r.task)}</div><div class="meta">${rState(r).overdue?`<span class="chip crit">Overdue</span>`:""}<span class="chip">${esc(r.role)}</span><span>${esc(r.when)}</span><span>${esc(r.who)}</span></div></div></div>`).join("")||`<div class="empty">All routine work for today is done.</div>`}</section>
    <section class="card"><h3>Follow up with the team <span class="count">${fu.length}</span></h3>${fu.slice(0,12).map(t=>taskRow(t,{check:1})).join("")||`<div class="empty">Nobody needs a nudge today.</div>`}</section>
@@ -336,6 +339,31 @@ function vReview(){
   <div class="actions"><button class="btn" data-copy="review" type="button">Copy review</button><a class="btn" target="_blank" rel="noopener" href="${waLink(p,msg)}">Send on WhatsApp</a>
    <a class="btn" href="#person/${p.id}">Open ${esc(first(p.name))}'s page</a></div></section>`}
 
+/* Work log: every finished task, ticked routine, KRA review and anything logged by hand, by day. */
+function workLog(){
+  const out=[];const ist=s=>{const d=new Date(s);return iso(d)};
+  D.tasks.filter(t=>t.status==="Done"&&t.doneAt).forEach(t=>out.push({id:"t-"+t.id,at:t.doneAt,kind:t.who==="me"?"task":"team",text:t.t,area:t.project,who:t.who}));
+  (D.log||[]).forEach(x=>out.push({...x,own:true}));
+  Object.entries(D.reviews||{}).forEach(([m,ps])=>Object.entries(ps).forEach(([pid,r])=>{if(r.at)out.push({id:"rv-"+m+pid,at:r.at+"T12:00:00",kind:"review",text:`KRA review: ${whoName(pid)} (${monthName(m)})`})}));
+  (D.meetings||[]).forEach(m=>out.push({id:"mt-"+m.id,at:m.date+"T11:00:00",kind:"meeting",text:"Team meeting"}));
+  return out.map(x=>({...x,day:ist(x.at)})).sort((a,b)=>b.at.localeCompare(a.at))}
+function vLog(){
+  const all=workLog();const wk=new Date();wk.setDate(wk.getDate()-((wk.getDay()+6)%7));const wkISO=iso(wk);
+  const mine=x=>x.kind!=="team";const thisWeek=all.filter(x=>x.day>=wkISO);
+  const days=[...new Set(all.map(x=>x.day))].slice(0,30);
+  const kindChip={task:`<span class="chip ok">Task</span>`,team:`<span class="chip info">Team</span>`,routine:`<span class="chip">Routine</span>`,note:`<span class="chip vio">Logged</span>`,review:`<span class="chip warn">Review</span>`,meeting:`<span class="chip">Meeting</span>`};
+  return`<div class="page-head"><div><h1>Work log</h1><div class="sub">Everything you've done: finished tasks, routines, reviews, meetings, and anything you log here.</div></div></div>
+  <div class="kpis"><div class="kpi"><b>${thisWeek.filter(x=>x.kind==="task").length}</b><span>Tasks done this week</span></div>
+   <div class="kpi"><b>${thisWeek.filter(x=>x.kind==="routine").length}</b><span>Routines this week</span></div>
+   <div class="kpi"><b>${thisWeek.filter(x=>x.kind==="note").length}</b><span>Other work logged</span></div>
+   <div class="kpi"><b>${thisWeek.filter(x=>x.kind==="team").length}</b><span>Team tasks closed</span></div></div>
+  <section class="card" style="margin-bottom:14px"><h3>Log something you did</h3><form class="form" id="logForm" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+   <input type="text" name="text" placeholder="What you did" required style="grid-column:1/-1"><select name="area"><option value="">Area (optional)</option>${D.projects.map(p=>`<option>${esc(p.name)}</option>`).join("")}</select>
+   <input type="number" name="mins" min="0" step="5" placeholder="Minutes (optional)"><button class="btn primary" type="submit">Log it</button></form></section>
+  ${days.map(dy=>{const items=all.filter(x=>x.day===dy);return`<section class="card" style="margin-bottom:12px"><h3>${dy===todayISO()?"Today":fmt(dy)} <span class="count">${items.filter(mine).length} by you${items.some(x=>!mine(x))?`, ${items.filter(x=>!mine(x)).length} by the team`:""}</span></h3>
+   ${items.map(x=>`<div class="row"><div class="main"><div class="t">${esc(x.text)}</div><div class="meta">${kindChip[x.kind]||""}${x.kind==="team"?`<span>${esc(whoName(x.who))}</span>`:""}${x.area?`<span>${esc(x.area)}</span>`:""}${x.mins?`<span>${x.mins} min</span>`:""}
+    <span>${new Date(x.at).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})}</span></div></div>${x.own&&x.kind==="note"?`<button class="btn link" data-dellog="${x.id}" type="button">Remove</button>`:""}</div>`).join("")}</section>`}).join("")||`<div class="empty">Nothing yet. Finish a task or log something above.</div>`}`}
+
 function vMeeting(){
   const mt=D.meetings.slice().sort((a,b)=>b.date.localeCompare(a.date));const cur=mt.find(x=>x.date===todayISO());
   const acts=D.tasks.filter(t=>t.meeting&&open(t)).sort(cmp);
@@ -398,7 +426,7 @@ function vSettings(){
   <div class="actions"><button class="btn" data-backup type="button">Download a backup</button><a class="btn" target="_blank" rel="noopener" href="https://github.com/${GH.owner}/${GH.repo}/commits/${GH.branch}/ops.json">Change history</a>
   <button class="btn" data-signout type="button">Sign out</button></div></section>`}
 
-const VIEWS={today:vToday,team:vTeam,person:vPerson,tasks:vTasks,kra:vKra,review:vReview,meeting:vMeeting,routine:vRoutine,expenses:vExpenses,settings:vSettings};
+const VIEWS={log:vLog,today:vToday,team:vTeam,person:vPerson,tasks:vTasks,kra:vKra,review:vReview,meeting:vMeeting,routine:vRoutine,expenses:vExpenses,settings:vSettings};
 function render(force){
   if(!D)return;const app=$("#app");const y=scrollY;
   const keep=document.activeElement&&document.activeElement.matches("input[type=text],textarea,input[type=number],input[type=tel]")?document.activeElement:null;
@@ -421,8 +449,10 @@ document.addEventListener("change",e=>{const el=e.target;
   if(el.dataset.done){const t=T(el.dataset.done);if(!t)return;const done=el.checked;
     setTask(t.id,done?{status:"Done",doneAt:nowZ()}:{status:"Not started",doneAt:""},`${done?"finished":"reopened"} “${t.t}”`);if(done)toast("Done ✓");return}
   if(el.dataset.rdone){const r=D.routines.find(x=>x.id===el.dataset.rdone);const key=cycleKey(r);const on=el.checked;
-    mutate(d=>{if(on)d.routineDone[r.id]=key;else delete d.routineDone[r.id]},`${on?"ticked":"unticked"} routine “${r.task}”`);return}
-  if(el.dataset.rmanual){const r=D.routines.find(x=>x.id===el.dataset.rmanual);const on=el.checked;mutate(d=>{if(on)d.routineDone[r.id]=todayISO();else delete d.routineDone[r.id]},`ticked “${r.task}”`);return}
+    const lid="rt-"+r.id+"-"+key;mutate(d=>{d.log=d.log||[];if(on){d.routineDone[r.id]=key;if(!d.log.some(x=>x.id===lid))d.log.push({id:lid,at:nowZ(),kind:"routine",text:r.task,area:r.area})}
+      else{delete d.routineDone[r.id];d.log=d.log.filter(x=>x.id!==lid)}},`${on?"ticked":"unticked"} routine “${r.task}”`);return}
+  if(el.dataset.rmanual){const r=D.routines.find(x=>x.id===el.dataset.rmanual);const on=el.checked;const lid="rt-"+r.id+"-"+todayISO();
+    mutate(d=>{d.log=d.log||[];if(on){d.routineDone[r.id]=todayISO();if(!d.log.some(x=>x.id===lid))d.log.push({id:lid,at:nowZ(),kind:"routine",text:r.task,area:r.area})}else{delete d.routineDone[r.id];d.log=d.log.filter(x=>x.id!==lid)}},`ticked “${r.task}”`);return}
   if(el.dataset.f){filt[el.dataset.f]=el.value;render();return}
   if(el.id==="kraMonth"){kraMonth=el.value;render();return}
   if(el.id==="expMonth"){expMonth=el.value;render();return}
@@ -435,11 +465,14 @@ document.addEventListener("change",e=>{const el=e.target;
   if(el.dataset.mnotes){const id=el.dataset.mnotes,v=el.value;mutate(d=>{const x=d.meetings.find(z=>z.id===id);if(x)x.notes=v},"saved meeting notes");el.blur();return}
 });
 document.addEventListener("submit",e=>{const f=e.target;e.preventDefault();const v=Object.fromEntries(new FormData(f));
+  if(f.id==="logQuick"||f.id==="logForm"){const x={id:rid(),at:nowZ(),kind:"note",text:v.text.trim(),area:v.area||"",mins:+v.mins||0};
+    mutate(d=>{d.log=d.log||[];if(!d.log.some(z=>z.id===x.id))d.log.push(x)},"logged work");f.reset();toast("Logged");return}
   if(f.id==="newTask"||f.id==="dlgTask"){addTask(v);f.reset();if(f.id==="dlgTask")$("#dlg").close();toast("Task added");return}
   if(f.dataset.addfor){addTask({...v,who:f.dataset.addfor});f.reset();return}
   if(f.id==="newAction"){const cur=D.meetings.find(x=>x.date===todayISO());addTask({...v,meeting:cur?cur.id:"m-"+todayISO(),project:"Team & HR"});f.reset();return}
   if(f.id==="newExp"){const x={id:rid(),...v,amount:+v.amount||0,createdAt:nowZ()};mutate(d=>{if(!d.expenses.some(z=>z.id===x.id))d.expenses.push(x)},`logged an expense of ${rupee(x.amount)}`);toast("Expense added");return}
-  if(f.id==="taskForm"){const id=f.dataset.id;const t=T(id);const patch={t:v.t.trim(),who:v.who,project:v.project,due:v.due,pri:v.pri,status:v.status,note:v.note};
+  if(f.id==="taskForm"){const id=f.dataset.id;const t=T(id);const patch={t:v.t.trim(),who:v.who,project:v.project,due:v.due,pri:v.pri,status:v.status,note:v.note,plannedFor:v.plannedFor||""};
+    if(v.plannedFor&&v.plannedFor!==t.plannedFor)patch.order=Math.max(0,...D.tasks.filter(x=>x.plannedFor===v.plannedFor).map(x=>x.order||0))+1;
     if(v.status==="Done"&&t.status!=="Done")patch.doneAt=nowZ();if(v.who!==t.who&&v.who!=="me")patch.assignedAt=nowZ();
     setTask(id,patch,`edited “${patch.t}”`);$("#dlg").close();return}
   if(f.id==="dutyForm"){const id=f.dataset.id;const lines=s=>s.split("\n").map(x=>x.replace(/^[•\-\s]+/,"").trim()).filter(Boolean);
@@ -467,6 +500,7 @@ document.addEventListener("click",e=>{const el=e.target.closest("button,[data-pe
   if(ds.backup!==undefined){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,1)],{type:"application/json"}));a.download=`ipa-ops-board-${todayISO()}.json`;a.click();return}
   if(ds.signout!==undefined){try{localStorage.removeItem(AUTH_KEY)}catch(_){}location.reload();return}
   if(ds.close!==undefined){$("#dlg").close();return}
+  if(ds.dellog){const id=ds.dellog;mutate(d=>{d.log=(d.log||[]).filter(x=>x.id!==id)},"removed a log entry");return}
   if(ds.deltask){const t=T(ds.deltask);if(confirm(`Delete “${t.t}”?`)){mutate(d=>{d.tasks=d.tasks.filter(x=>x.id!==t.id)},`deleted “${t.t}”`);$("#dlg").close()}return}
   if(ds.delroutine){const r=D.routines.find(x=>x.id===ds.delroutine);if(confirm(`Delete routine “${r.task}”?`)){mutate(d=>{d.routines=d.routines.filter(x=>x.id!==r.id);delete d.routineDone[r.id]},`deleted routine “${r.task}”`);$("#dlg").close()}return}
 });
@@ -487,7 +521,8 @@ function editTask(id){
     <div><label class="l">Project</label>${sel("project",[["","No project"],...D.projects.map(p=>[p.name,p.name])],t.project)}</div>
     <div><label class="l">Due</label><input type="date" name="due" value="${esc((t.due||"").slice(0,10))}"></div>
     <div><label class="l">Priority</label>${sel("pri",[["High","High"],["Medium","Medium"],["Low","Low"]],t.pri||"Medium")}</div>
-    <div><label class="l">Status</label>${sel("status",["Not started","In progress","Waiting","Stuck","Done"].map(s=>[s,s]),t.status)}</div></div>
+    <div><label class="l">Status</label>${sel("status",["Not started","In progress","Waiting","Stuck","Done"].map(s=>[s,s]),t.status)}</div>
+    <div><label class="l">On my day list for</label><input type="date" name="plannedFor" value="${esc(t.plannedFor||"")}"></div></div>
    <div><label class="l">Notes</label><textarea name="note">${esc(t.note||"")}</textarea></div>
    ${t.delegatedBy?`<div class="sub">Handed off by the ${esc(t.delegatedBy)}${t.delegatedReason?": "+esc(t.delegatedReason):""}</div>`:""}
    <div class="actions"><button class="btn primary" type="submit">Save</button><button class="btn" type="button" data-close>Cancel</button><button class="btn" type="button" data-deltask="${t.id}" style="margin-left:auto">Delete</button></div></form>`)}
@@ -528,7 +563,7 @@ function signInPage(err){
 async function signIn(v){me={name:v.name.trim(),token:v.token.trim()};try{await start();localStorage.setItem(AUTH_KEY,JSON.stringify({...me,canWrite:true}))}catch(e){me=null;signInPage("That token can't open the board. Check it has the “repo” box ticked.")}}
 async function start(){
   setSync("Loading…");const r=await readFile(GH.path);if(!r.data)throw new Error("no data");D=r.data;sha=r.sha;
-  D.routineDone=D.routineDone||{};if(!D.routineSince)D.routineSince=todayISO();D.reviews=D.reviews||{};D.meetings=D.meetings||[];D.expenses=D.expenses||[];D.budget=D.budget||{};
+  D.routineDone=D.routineDone||{};D.log=D.log||[];if(!D.routineSince)D.routineSince=todayISO();D.reviews=D.reviews||{};D.meetings=D.meetings||[];D.expenses=D.expenses||[];D.budget=D.budget||{};
   $("#top").hidden=false;setSync("Up to date");route();
   try{const p=await readFile(`assistant/plans/${todayISO()}.json`);plan=p.data;if(view==="today")render()}catch(_){}
   setInterval(async()=>{if(pending.length||saving||document.hidden)return;try{const x=await readFile(GH.path);if(x.sha!==sha){D=x.data;sha=x.sha;render()}}catch(_){}},120000)}

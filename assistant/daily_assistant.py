@@ -487,9 +487,12 @@ def morning_message(plan, tasks, cfg, day, handed):
     by_id = {t["id"]: t for t in tasks}
     lines = [f"*Good morning {cfg['me']}* · {day:%a %d %b}", ""]
     if plan["top"]:
-        lines.append("*Do these, in this order*")
+        lines.append("*Your list for today*" if plan.get("day_list") else "*Do these, in this order*")
         for i, x in enumerate(plan["top"], 1):
             t = by_id[x["id"]]
+            if plan.get("day_list"):
+                lines.append(f"{i}. {short(t['t'], 160)}")
+                continue
             lines.append(f"{i}. {short(label(t, day), 95)} — _{t['_project']}_")
             lines.append(f"   ↳ Start: {short(x['first_step'], 80)}")
         lines.append("")
@@ -741,15 +744,23 @@ def morning(args):
         notify(f"*Good morning {cfg['me']}* · {day:%a %d %b}\n\nThe board has no open tasks. Add today's work there and I'll plan it tomorrow.",
                args.dry_run, f"Today's plan - {day:%a %d %b}")
         return
-    candidates = [t for t in open_tasks if is_mine(t, cfg["me"])][:60]
+    candidates = [t for t in open_tasks if is_mine(t, cfg["me"])]
+    # Tasks you put on today's list (plannedFor = today) are sent as you wrote them, in your order.
+    day_list = sorted([t for t in candidates if t.get("plannedFor") == day.isoformat()], key=lambda t: t.get("order") or 0)
+    rest = [t for t in candidates if t not in day_list][:60]
+    candidates = day_list + rest
     plan = None
     if os.environ.get("ANTHROPIC_API_KEY") and not args.no_ai:
         try:
-            plan = plan_with_claude(candidates, board, cfg, day, wins)
+            plan = plan_with_claude(rest or candidates, board, cfg, day, wins)
         except Exception as e:  # the rules below still give a usable plan
             detail = getattr(e, "message", None) or str(e)
             print(f"Claude planning failed ({type(e).__name__}: {str(detail)[:300]}); using the built-in rules.", file=sys.stderr)
-    plan = clean_plan(plan or plan_with_rules(candidates, board, cfg, day, wins), candidates, board, cfg)
+    plan = clean_plan(plan or plan_with_rules(rest, board, cfg, day, wins), rest, board, cfg)
+    if day_list:  # your own list replaces the suggested top tasks and quick ones; hand-offs come from the rest
+        plan["top"] = [{"id": t["id"], "why": "on your list", "first_step": ""} for t in day_list]
+        plan["quick"] = []
+        plan["day_list"] = True
     stale = sum(1 for t in candidates if (days_left(t, day) or 0) < -14)
     if stale >= 5 and day.weekday() == 0:  # Mondays: clear the backlog so the list stays believable
         plan["note"] = (plan["note"] + " " if plan["note"] else "") + (
