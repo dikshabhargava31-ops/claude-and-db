@@ -505,14 +505,24 @@ def as_markdown(text):
 def send_email(text, title):
     import smtplib
     from email.message import EmailMessage
-    user = os.environ["GMAIL_ADDRESS"].strip()
+    user = "".join(os.environ["GMAIL_ADDRESS"].split())
     m = EmailMessage()
     m["Subject"], m["From"], m["To"] = title, f"{BOT} <{user}>", os.environ.get("EMAIL_TO", "").strip() or user
     m.set_content(re.sub(r"[*_]", "", text) + f"\n\nBoard: {BOARD_URL}")
     m.add_alternative(as_html(text), subtype="html")
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=40) as smtp:
-        smtp.login(user, os.environ["GMAIL_APP_PASSWORD"].replace(" ", ""))
-        smtp.send_message(m)
+    password = "".join(os.environ["GMAIL_APP_PASSWORD"].split())
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=40) as smtp:
+            smtp.login(user, password)
+            smtp.send_message(m)
+    except (smtplib.SMTPServerDisconnected, smtplib.SMTPConnectError, OSError) as e:
+        if isinstance(e, smtplib.SMTPAuthenticationError):
+            raise
+        print(f"Gmail on port 465 failed ({type(e).__name__}: {e}); trying port 587.", file=sys.stderr)
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=40) as smtp:
+            smtp.starttls()
+            smtp.login(user, password)
+            smtp.send_message(m)
 
 
 def send_ntfy(text, title, urgent=False):
@@ -555,8 +565,8 @@ def notify(text, dry_run, title, urgent=False):
                 send()
                 sent += 1
                 break
-            except Exception as e:  # report the kind of failure only; the log is public
-                print(f"{name}: send failed ({type(e).__name__}{': ' + str(getattr(e, 'code', '')) if getattr(e, 'code', None) else ''}).", file=sys.stderr)
+            except Exception as e:  # server replies name the problem but never contain the password
+                print(f"{name}: send failed ({type(e).__name__}: {str(e)[:300]}).", file=sys.stderr)
                 time.sleep(5 * (attempt + 1))
     return sent > 0
 
@@ -595,7 +605,8 @@ def morning(args):
         try:
             plan = plan_with_claude(candidates, board, cfg, day, wins)
         except Exception as e:  # the rules below still give a usable plan
-            print(f"Claude planning failed ({type(e).__name__}); using the built-in rules.", file=sys.stderr)
+            detail = getattr(e, "message", None) or str(e)
+            print(f"Claude planning failed ({type(e).__name__}: {str(detail)[:300]}); using the built-in rules.", file=sys.stderr)
     plan = clean_plan(plan or plan_with_rules(candidates, board, cfg, day, wins), candidates, board, cfg)
     stale = sum(1 for t in candidates if (days_left(t, day) or 0) < -14)
     if stale >= 5 and day.weekday() == 0:  # Mondays: clear the backlog so the list stays believable
