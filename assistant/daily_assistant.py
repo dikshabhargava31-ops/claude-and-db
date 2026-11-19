@@ -680,6 +680,32 @@ def notify(text, dry_run, title, urgent=False):
     return sent > 0
 
 
+# ---------------------------------------------------------------- once a day per message
+
+SENT_DIR = "assistant/sent"
+
+
+def already_sent(mode, token, day):
+    """GitHub sometimes starts a scheduled run late or not at all, so each message has backup times.
+    The first run that sends records it here; later backup runs for the same message stay quiet."""
+    if not token:
+        return False
+    done, _ = read_file(f"{SENT_DIR}/{day.isoformat()}.json", token)
+    return bool((done or {}).get(mode))
+
+
+def mark_sent(mode, token, day):
+    if not token:
+        return
+    for _ in range(3):
+        done, sha = read_file(f"{SENT_DIR}/{day.isoformat()}.json", token)
+        done = done or {}
+        done[mode] = dt.datetime.now(IST).isoformat(timespec="minutes")
+        if write_file(f"{SENT_DIR}/{day.isoformat()}.json", done, sha, f"{BOT}: sent the {mode} message", token) in (200, 201):
+            return
+        time.sleep(2)
+
+
 # ---------------------------------------------------------------- runs
 
 OPS = {}  # the Ops Board's data for this run: people, routines, reviews
@@ -736,6 +762,9 @@ def load(args):
 def morning(args):
     board, cfg, token = load(args)
     day = today()
+    if args.once and already_sent("morning", token, day):
+        print("The morning message already went out today.")
+        return
     all_tasks = flatten(board, day)
     yesterday = day - dt.timedelta(days=1 if day.weekday() else 2)
     wins = [t["t"].strip() for t in all_tasks if done_on(t, yesterday) and norm(t.get("doneBy") or cfg["me"]) == norm(cfg["me"])]
@@ -775,6 +804,8 @@ def morning(args):
         path = f"{PLANS_DIR}/{day.isoformat()}.json"
         _, sha = read_file(path, token)
         write_file(path, {"date": day.isoformat(), "sent": ok, **plan}, sha, f"{BOT}: plan for {day:%d %b}", token)
+    if ok and not args.dry_run:
+        mark_sent("morning", token, day)
     print(f"Morning plan: {len(plan['top'])} top, {len(plan['quick'])} quick, {len(plan['delegate'])} handed off "
           f"({handed} assigned on the board). Sent: {ok}.")
 
@@ -782,6 +813,9 @@ def morning(args):
 def followup(args, kind):
     board, cfg, token = load(args)
     day = today()
+    if args.once and already_sent(kind, token, day):
+        print(f"The {kind} message already went out today.")
+        return
     saved = None
     if args.plan:
         saved = json.loads(Path(args.plan).read_text())
@@ -798,6 +832,8 @@ def followup(args, kind):
         title = f"Day done - {day:%a %d %b}"
     if text:
         ok = notify(text, args.dry_run, title, urgent=kind == "midday")
+        if ok and not args.dry_run:
+            mark_sent(kind, token, day)
         print(f"{kind.capitalize()} message sent: {ok}.")
 
 
@@ -806,6 +842,7 @@ def main():
     ap.add_argument("mode", choices=["morning", "midday", "evening"])
     ap.add_argument("--dry-run", action="store_true", help="print the messages; send and change nothing")
     ap.add_argument("--no-ai", action="store_true", help="plan with the built-in rules only")
+    ap.add_argument("--once", action="store_true", help="skip if this message already went out today (scheduled runs)")
     ap.add_argument("--board", help="read a local data.json instead of the private repository (testing)")
     ap.add_argument("--config", help="with --board: a local config.json")
     ap.add_argument("--plan", help="with --board: a local saved plan for midday/evening")
