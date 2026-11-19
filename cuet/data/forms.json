@@ -1,6 +1,6 @@
 {
  "note": "UG 2027 application forms for colleges with their own admissions. links: official college or test pages only. deadlines: reported dates, each with the page it came from; confirm on the official site. status: open, upcoming (not open yet), closed, check (2027 dates not found).",
- "checked": "2026-10-26",
+ "checked": "2026-11-19",
  "forms": [
   {
    "id": "iim-bangalore-ug",
@@ -31,12 +31,27 @@
      "source": "https://news.careers360.com/iim-bangalore-ug-admissions-2026-applications-begin-august-17-bsc-hons-in-economics-data-science-courses-eligibility-entrance-test"
     },
     {
+     "label": "Domestic applications closed",
+     "date": "2026-10-17",
+     "source": "https://ug.iimb.ac.in/ug-admissions-2027/"
+    },
+    {
      "label": "Entrance test (tentative)",
      "date": "2026-11-15",
      "source": "https://www.pw.live/ipmat/exams/iim-bangalore-bsc-ug-2027-form"
+    },
+    {
+     "label": "IIMB UG Admission Test",
+     "date": "2026-11-15",
+     "source": "https://ug.iimb.ac.in/ug-admissions-2027/"
+    },
+    {
+     "label": "International applications close",
+     "date": "2026-12-20T17:00:00+05:30",
+     "source": "https://ug.iimb.ac.in/ug-admissions-2027/"
     }
    ],
-   "note": "Applications ran 17 Aug–15 Oct 2026. Interviews 2nd–3rd week of Jan 2027; offers expected 3rd week of Feb 2027 (tentative).",
+   "note": "Domestic applications for the 2027-31 batch closed on 17 October 2026 and the UG Admission Test was held on 15 November 2026; interviews are expected in the 2nd–3rd week of January 2027 and offers in the 3rd week of February 2027 (both tentative, no exact dates yet), while overseas/international applicants can still apply until 20 December 2026, 5 pm IST.",
    "acceptsCuet": null
   },
   {
@@ -67,19 +82,29 @@
    ],
    "deadlines": [
     {
+     "label": "AMC Round (closed)",
+     "date": "2026-09-15",
+     "source": "https://www.ashoka.edu.in/undergraduate-admissions-timelines/"
+    },
+    {
      "label": "Round 1",
-     "date": "2026-11-23T23:59:00+05:30",
-     "source": "https://university.careers360.com/articles/ashoka-university-application-form-2027"
+     "date": "2026-11-23",
+     "source": "https://www.ashoka.edu.in/undergraduate-admissions-timelines/"
     },
     {
      "label": "Round 2",
-     "date": "2027-01-20T23:59:00+05:30",
-     "source": "https://university.careers360.com/articles/ashoka-university-application-form-2027"
+     "date": "2027-01-20",
+     "source": "https://www.ashoka.edu.in/undergraduate-admissions-timelines/"
     },
     {
      "label": "Round 3",
-     "date": "2027-04-14T23:59:00+05:30",
-     "source": "https://university.careers360.com/articles/ashoka-university-application-form-2027"
+     "date": "2027-04-14",
+     "source": "https://www.ashoka.edu.in/undergraduate-admissions-timelines/"
+    },
+    {
+     "label": "Round 4 (subject to change)",
+     "date": "2027-05-23",
+     "source": "https://www.ashoka.edu.in/undergraduate-admissions-timelines/"
     },
     {
      "label": "Round 4",
@@ -87,7 +112,7 @@
      "source": "https://university.careers360.com/articles/ashoka-university-application-form-2027"
     }
    ],
-   "note": "Round 1 assessment reported for 6 Dec 2026.",
+   "note": "Applications for August 2027 are open; the Round 1 deadline is 23 November 2026 and its mandatory assessment is on 6 December 2026 (Round 2 assessment is on 31 January 2027, Round 3 on 25 April 2027, Round 4 on 30 May 2027, and Round 4 dates may change); the official page gives no time of day for deadlines.",
    "acceptsCuet": null
   },
   {
@@ -150,8 +175,29 @@
      "https://www.ssla.edu.in/"
     ]
    ],
-   "note": "2027 registration page is live. Dates not published in the sources found.",
-   "deadlines": [],
+   "note": "Rolling Admissions for 2027 are open. Rounds 1 and 2 have closed, so the last chance is to apply by 6 Dec 2026 (fee Rs 2,500) for the online interview on 12–13 Dec 2026. The SET 2027 dates have not been announced on the official site yet; only news sites expect registration to open in December 2026.",
+   "deadlines": [
+    {
+     "label": "RAP Round 1 application deadline",
+     "date": "2026-10-04",
+     "source": "https://www.ssla.edu.in/admissions"
+    },
+    {
+     "label": "RAP Round 2 application deadline",
+     "date": "2026-11-15",
+     "source": "https://www.ssla.edu.in/admissions"
+    },
+    {
+     "label": "RAP Round 3 (final) application deadline",
+     "date": "2026-12-06",
+     "source": "https://www.ssla.edu.in/admissions"
+    },
+    {
+     "label": "RAP window closes",
+     "date": "2026-12-13",
+     "source": "https://www.ssla.edu.in/admissions"
+    }
+   ],
    "acceptsCuet": null
   },
   {
@@ -225,12 +271,22 @@
      "source": "https://matchtocollege.com/news-and-updates/christ-university-ug-admissions-2027-28-application-open"
     },
     {
+     "label": "Applications close – Entrance Test programmes (Selection Process I)",
+     "date": "2026-11-25T17:00:00+05:30",
+     "source": "https://christuniversity.in/admission/ugpg-selection-process-dates-2027"
+    },
+    {
      "label": "Non-entrance-test programmes",
      "date": "2026-12-06T17:00:00+05:30",
      "source": "https://matchtocollege.com/news-and-updates/christ-university-ug-admissions-2027-28-application-open"
+    },
+    {
+     "label": "Applications close – Non-Entrance Test programmes (Selection Process I)",
+     "date": "2026-12-06T17:00:00+05:30",
+     "source": "https://christuniversity.in/admission/ugpg-selection-process-dates-2027"
     }
    ],
-   "note": "Entrance test reported for 5 Dec 2026; selection 11–13 Dec; final list 21 Dec 2026, 10 PM.",
+   "note": "Selection Process I for 2027: applications opened 15 Oct 2026. The online entrance test is on 5 Dec 2026. SA/MP/PI rounds run 11–13 Dec (ET programmes) and 11–12 Dec (non-ET programmes), and the final selection list comes out on 21 Dec 2026. \"CHRIST-CUET\" is the university's own test, not NTA's CUET (UG). No later selection-process dates have been announced yet.",
    "acceptsCuet": null
   },
   {
@@ -259,8 +315,34 @@
      "https://www.flame.edu.in/admissions/ug/admission-schedule"
     ]
    ],
-   "note": "FLAME says the 2027–28 cycle begins Sep/Oct 2026; round dates were not yet in the sources found. Last cycle opened with an Early Decision round (deadline 30 Nov).",
-   "deadlines": [],
+   "note": "Applications for B.A./B.Sc./BBA/BBA(CM) close on 29 Nov 2026 for the Early Decision cycle (FEAT on 4–6 Dec 2026), and the last cycle closes on 2 May 2027. FLAME says dates may change, its selection page does not list CUET, and B.Des has its own schedule, which was not checked.",
+   "deadlines": [
+    {
+     "label": "Early Decision Online Cycle (Dec 2026) – applications close",
+     "date": "2026-11-29",
+     "source": "https://www.flame.edu.in/admissions/ug/admission-schedule"
+    },
+    {
+     "label": "Online Cycle I (Jan 2027) – applications close",
+     "date": "2027-01-03",
+     "source": "https://www.flame.edu.in/admissions/ug/admission-schedule"
+    },
+    {
+     "label": "Online Cycle II (Feb 2027) – applications close",
+     "date": "2027-02-01",
+     "source": "https://www.flame.edu.in/admissions/ug/admission-schedule"
+    },
+    {
+     "label": "Online Cycle III (Apr 2027) – applications close",
+     "date": "2027-03-28",
+     "source": "https://www.flame.edu.in/admissions/ug/admission-schedule"
+    },
+    {
+     "label": "Online Cycle IV (May 2027) – final application deadline",
+     "date": "2027-05-02",
+     "source": "https://www.flame.edu.in/admissions/ug/admission-schedule"
+    }
+   ],
    "acceptsCuet": null
   },
   {
@@ -270,7 +352,7 @@
    "city": "Sri City",
    "fromDoc": true,
    "entrance": "Application + online assessment + interview",
-   "status": "check",
+   "status": "open",
    "links": [
     [
      "Apply",
@@ -281,8 +363,34 @@
      "https://krea.edu.in/applications/"
     ]
    ],
-   "note": "Apply in only one round per cycle. 2027 round dates not published in the sources found.",
-   "deadlines": [],
+   "note": "Applications for the 2027–28 BA/BSc (Hons) intake opened on 28 August 2026; Round 1 has closed, and the next deadline is Round 2 on 14 December 2026, with KAT on 28–30 December 2026 (Krea says the dates may change).",
+   "deadlines": [
+    {
+     "label": "Round 1 applications close",
+     "date": "2026-10-25",
+     "source": "https://krea.edu.in/sias/admissions/ba-bsc/honours/admissions-schedule/"
+    },
+    {
+     "label": "Round 2 applications close",
+     "date": "2026-12-14",
+     "source": "https://krea.edu.in/sias/admissions/ba-bsc/honours/admissions-schedule/"
+    },
+    {
+     "label": "Round 3 applications close",
+     "date": "2027-01-17",
+     "source": "https://krea.edu.in/sias/admissions/ba-bsc/honours/admissions-schedule/"
+    },
+    {
+     "label": "Round 4 applications close",
+     "date": "2027-04-18",
+     "source": "https://krea.edu.in/sias/admissions/ba-bsc/honours/admissions-schedule/"
+    },
+    {
+     "label": "Round 5 applications close",
+     "date": "2027-05-30",
+     "source": "https://krea.edu.in/sias/admissions/ba-bsc/honours/admissions-schedule/"
+    }
+   ],
    "acceptsCuet": null
   },
   {
@@ -297,6 +405,10 @@
     [
      "Website",
      "https://jgu.edu.in/"
+    ],
+    [
+     "Apply (new link)",
+     "https://admissions.jgu.edu.in"
     ]
    ],
    "note": "Reported application fee ₹3,000 for most programmes. 2027 dates not published in the sources found.",
@@ -309,7 +421,7 @@
    "type": "Technology (BTech)",
    "city": "Mohali",
    "entrance": "JEE Main / SAT / ACT + application",
-   "status": "check",
+   "status": "open",
    "links": [
     [
      "Admissions",
@@ -318,10 +430,45 @@
     [
      "UG admissions policy (PDF)",
      "https://media.plaksha.edu.in/Undergraduate_Admissions_Policy.pdf"
+    ],
+    [
+     "Apply (new link)",
+     "https://btech-applications.plaksha.edu.in/2026-27-lp/"
     ]
    ],
-   "note": "Last cycle had five rounds, the first closing 15 Dec. 2027 dates not published in the sources found.",
-   "deadlines": [],
+   "note": "BTech applications for 2027 are taken in five rounds, and you may submit only one application per round; the Round 1 interviews run from 18 Nov 2026 to 4 Jan 2027, and CUET is not mentioned on the admissions pages.",
+   "deadlines": [
+    {
+     "label": "Applications open (Round 1)",
+     "date": "2026-11-14",
+     "source": "https://plaksha.edu.in/admissions/undergraduate/domestic"
+    },
+    {
+     "label": "Round 1 deadline",
+     "date": "2026-12-20",
+     "source": "https://plaksha.edu.in/admissions/undergraduate/domestic"
+    },
+    {
+     "label": "Round 2 deadline",
+     "date": "2027-02-15",
+     "source": "https://plaksha.edu.in/admissions/undergraduate/domestic"
+    },
+    {
+     "label": "Round 3 deadline",
+     "date": "2027-03-24",
+     "source": "https://plaksha.edu.in/admissions/undergraduate/domestic"
+    },
+    {
+     "label": "Round 4 deadline",
+     "date": "2027-05-02",
+     "source": "https://plaksha.edu.in/admissions/undergraduate/domestic"
+    },
+    {
+     "label": "Round 5 deadline",
+     "date": "2027-06-06",
+     "source": "https://plaksha.edu.in/admissions/undergraduate/domestic"
+    }
+   ],
    "fromDoc": false,
    "acceptsCuet": null
   },
@@ -337,6 +484,10 @@
     [
      "Website",
      "https://snu.edu.in/"
+    ],
+    [
+     "Apply (new link)",
+     "https://ugapplications.snu.edu.in/"
     ]
    ],
    "note": "2027–28 applications reported open from 16 Oct 2026. Application fee reports differ (₹1,500 / ₹2,500): check the portal.",
@@ -350,7 +501,7 @@
    "city": "Ahmedabad",
    "entrance": "AU-UAT, CUET (BA/BSc), JEE Main (BTech)",
    "acceptsCuet": true,
-   "status": "upcoming",
+   "status": "open",
    "links": [
     [
      "Admission calendar",
@@ -359,10 +510,25 @@
     [
      "Admissions team",
      "https://ahduni.edu.in/admission/undergraduate-admission/admission-team/"
+    ],
+    [
+     "Apply (new link)",
+     "https://undergraduateadmissions.ahduni.edu.in/"
     ]
    ],
-   "note": "UG 2027 pre-registration reported open from 1 Oct 2026; full application expected Nov–Dec 2026.",
-   "deadlines": [],
+   "note": "Early Admission 2 (all programmes except BTech) is open from 15 Nov to 8 Dec 2026, with decisions on 10 Feb 2027; Regular round and BTech dates have not been announced yet.",
+   "deadlines": [
+    {
+     "label": "Early Admission 1 closes",
+     "date": "2026-11-14",
+     "source": "https://ahduni.edu.in/admission/undergraduate-admission/admission-calendar/"
+    },
+    {
+     "label": "Early Admission 2 closes",
+     "date": "2026-12-08",
+     "source": "https://ahduni.edu.in/admission/undergraduate-admission/admission-calendar/"
+    }
+   ],
    "fromDoc": false
   },
   {
@@ -376,18 +542,32 @@
     [
      "Website",
      "https://azimpremjiuniversity.edu.in/"
+    ],
+    [
+     "Apply (new link)",
+     "https://apply.azimpremjiuniversity.edu.in/signup"
     ]
    ],
    "deadlines": [
     {
+     "label": "Round 1 applications close (BA/BSc)",
+     "date": "2026-11-20",
+     "source": "https://azimpremjiuniversity.edu.in/undergraduate/admissions-calendar"
+    },
+    {
      "label": "Round 1",
      "date": "2026-11-20T23:59:00+05:30",
      "source": "https://matchtocollege.com/news-and-updates/azim-premji-university-ug-admissions-2027-round-1-applications"
+    },
+    {
+     "label": "Round 2 applications close (BA/BSc)",
+     "date": "2027-04-02",
+     "source": "https://azimpremjiuniversity.edu.in/undergraduate/admissions-calendar"
     }
    ],
-   "note": "National Entrance Test reported for 20 Dec 2026; interviews 4–8 Jan 2027.",
+   "note": "Round 1: apply by 20 Nov 2026, NET on 20 Dec 2026, interviews 4–8 Jan 2027. Round 2: apply by 2 Apr 2027, NET on 2 May 2027, interviews 17–21 May 2027. The window to upload CUET-UG or other external scores opens around May/June 2027. The university doesn't give a closing time for either deadline.",
    "fromDoc": false,
-   "acceptsCuet": null
+   "acceptsCuet": true
   },
   {
    "id": "masters-union",
@@ -401,16 +581,25 @@
     [
      "Website",
      "https://mastersunion.org/"
+    ],
+    [
+     "Apply (new link)",
+     "https://mastersunion.org/ug-applynow"
     ]
    ],
    "deadlines": [
     {
+     "label": "Early Round (closed)",
+     "date": "2026-09-30",
+     "source": "https://mastersunion.org/ug-admissions-and-fees"
+    },
+    {
      "label": "Round 1",
-     "date": "2026-12-15T23:59:00+05:30",
-     "source": "https://matchtocollege.com/news-and-updates/masters-union-ug-admissions-2027-round-1-open-apply-dec-15"
+     "date": "2026-12-15",
+     "source": "https://mastersunion.org/ug-admissions-and-fees"
     }
    ],
-   "note": "Classes for the 2027 batch start August 2027.",
+   "note": "Round 1 for the August 2027 batch is open from 5 Oct to 15 Dec 2026, with the test, interviews and results in Oct/Nov 2026; you can send a CUET, JEE, IPMAT or SAT score to skip the scholarship test, and the official site gives no closing time and no later rounds yet.",
    "fromDoc": false
   },
   {
@@ -428,6 +617,10 @@
     [
      "Website",
      "https://www.atlasuniversity.edu.in/"
+    ],
+    [
+     "Apply (new link)",
+     "https://www.atlasuniversity.edu.in/applicationform"
     ]
    ],
    "deadlines": [
@@ -437,12 +630,32 @@
      "source": "https://matchtocollege.com/news-and-updates/atlas-skilltech-university-mumbai-admissions-2027-open"
     },
     {
+     "label": "BBA/BBA (Hons.) (ISME) – Business Aptitude Test window ends (Cycle 1)",
+     "date": "2026-11-18",
+     "source": "https://www.atlasuniversity.edu.in/schools/isme/admissions/undergraduate/admissions-bba-bachelor-of-business-administration"
+    },
+    {
+     "label": "B.Sc (Hons.) (ISME) – Aptitude Test & Interview window ends (Cycle 1)",
+     "date": "2026-11-27",
+     "source": "https://www.atlasuniversity.edu.in/admissions/ug-admissions"
+    },
+    {
+     "label": "B.Tech (uGDX) – Application deadline",
+     "date": "2026-12-08",
+     "source": "https://www.atlasuniversity.edu.in/schools/ugdx/admissions/ugdx-admissions"
+    },
+    {
      "label": "B.Tech (uGDX)",
      "date": "2026-12-08T23:59:00+05:30",
      "source": "https://matchtocollege.com/news-and-updates/atlas-skilltech-university-mumbai-admissions-2027-open"
+    },
+    {
+     "label": "B.Des / B.Tech (ISDI) – Cycle 2 aptitude test window ends",
+     "date": "2026-12-15",
+     "source": "https://www.atlasuniversity.edu.in/admissions/ug-admissions"
     }
    ],
-   "note": "B.Des, B.Sc and BBA LL.B. deadlines for this round have passed.",
+   "note": "Applications for the July 2027 intake opened on 11 Sep 2026. For BBA, the official pages disagree: the BBA page shows the aptitude test open until 18 Nov 2026, but the main UG admissions page already says \"Closed\", so students should check with ATLAS before planning around it. The 11 Nov 2026 BBA date we listed before was not found on any official page. The uGDX B.Tech application deadline is 8 Dec 2026, with results on 18 Dec. No CUET use was mentioned.",
    "fromDoc": false,
    "acceptsCuet": null
   },
@@ -457,9 +670,13 @@
     [
      "Website",
      "https://www.iimidr.ac.in/"
+    ],
+    [
+     "Apply (new link)",
+     "https://iimidr.ac.in/programmes/academic-programmes/five-year-integrated-programme-in-management-ipm/ipm-admissions-details/"
     ]
    ],
-   "note": "Not notified yet; registration expected around Feb–Mar 2027. IPMAT Indore scores are also used by IIM Ranchi, IIM Shillong, IIM Amritsar and IIM Sirmaur (each with its own form).",
+   "note": "IIM Indore announced on 9 November 2026 that IPMAT 2027 will be held on Saturday, 24 April 2027 (afternoon shift), but it has not yet announced when registration opens or closes, and the links on its page are still for the 2026 cycle.",
    "deadlines": [],
    "fromDoc": false,
    "acceptsCuet": null
@@ -475,6 +692,10 @@
     [
      "Website",
      "https://www.iimrohtak.ac.in/"
+    ],
+    [
+     "Apply (new link)",
+     "https://www.iimrohtak.ac.in/ipm-admission.php"
     ]
    ],
    "note": "Not notified yet; registration expected Feb–Apr 2027. Separate form from IPMAT Indore.",
@@ -493,6 +714,10 @@
     [
      "NTA",
      "https://nta.ac.in/"
+    ],
+    [
+     "Apply (new link)",
+     "https://exams.nta.nic.in/jipmat/"
     ]
    ],
    "note": "One form covers both IIMs. NTA has not released the 2027 bulletin; registration expected Feb–Apr 2027.",
@@ -533,12 +758,17 @@
    ],
    "deadlines": [
     {
+     "label": "SLAT 2027 registration and payment close",
+     "date": "2026-12-04",
+     "source": "https://www.slat-test.org/important-dates.php"
+    },
+    {
      "label": "Registration",
      "date": "2026-12-04T23:59:00+05:30",
      "source": "https://law.careers360.com/articles/slat-2027-registration"
     }
    ],
-   "note": "Tests reported for 19 and 26 Dec 2026.",
+   "note": "Registration and payment close on 4 December 2026, test dates are 19 and 26 December 2026 (admit cards out 11 and 18 December), and results come out on 12 January 2027; the official site gives no closing time, so check before the last day.",
    "fromDoc": false,
    "acceptsCuet": null
   },
