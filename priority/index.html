@@ -107,7 +107,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:13px}
     <button class="btn small" id="addTaskBtn" type="button">+ Task</button></div>
   <nav class="tabs" id="tabs">
     <a href="#today">Today</a><a href="#team">Team</a><a href="#tasks">Tasks</a><a href="#kra">KRA reviews</a>
-    <a href="#log">Work log</a><a href="#meeting">Meeting</a><a href="#routine">Routine</a><a href="#expenses">Expenses</a><a href="#settings">Settings</a>
+    <a href="#coach">Coach</a><a href="#log">Work log</a><a href="#meeting">Meeting</a><a href="#routine">Routine</a><a href="#expenses">Expenses</a><a href="#settings">Settings</a>
   </nav>
 </header>
 <main class="wrap" id="app"></main>
@@ -260,6 +260,7 @@ function vToday(){
      <div class="main"><div class="t"><b>${i+1}.</b> ${esc(t.t)}</div><div class="meta">${dueChip(t)}<span>${esc(t.project||"")}</span></div>
      ${steps[t.id]?`<div class="meta">Start: ${esc(steps[t.id])}</div>`:""}</div><button class="btn link" data-edit="${t.id}" type="button">Edit</button></div>`).join("")||`<div class="empty">Nothing open. Add a task with + Task.</div>`}
      ${restMine.length?`<details><summary>My other open tasks (${restMine.length})</summary>${restMine.map(t=>taskRow(t)).join("")}</details>`:""}
+     ${plan&&plan.date===todayISO()&&plan.coo_move?`<div class="row" style="margin-top:6px"><div class="main"><div class="t"><b>COO move today:</b> ${esc(plan.coo_move)}</div></div><a class="btn small" href="#coach">Coach</a></div>`:""}
      <form class="form noprint" id="logQuick" style="margin-top:12px;grid-template-columns:1fr auto"><input type="text" name="text" placeholder="Did something not on the list? Log it here" required><button class="btn" type="submit">Log</button></form></section>
    <section class="card"><h3>Routine due <span class="count">${rs.length}</span></h3>${rs.map(r=>`<div class="row"><input type="checkbox" data-rdone="${r.id}" aria-label="Done">
      <div class="main"><div class="t">${esc(r.task)}</div><div class="meta">${rState(r).overdue?`<span class="chip crit">Overdue</span>`:""}<span class="chip">${esc(r.role)}</span><span>${esc(r.when)}</span><span>${esc(r.who)}</span></div></div></div>`).join("")||`<div class="empty">All routine work for today is done.</div>`}</section>
@@ -364,6 +365,26 @@ function vLog(){
    ${items.map(x=>`<div class="row"><div class="main"><div class="t">${esc(x.text)}</div><div class="meta">${kindChip[x.kind]||""}${x.kind==="team"?`<span>${esc(whoName(x.who))}</span>`:""}${x.area?`<span>${esc(x.area)}</span>`:""}${x.mins?`<span>${x.mins} min</span>`:""}
     <span>${new Date(x.at).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})}</span></div></div>${x.own&&x.kind==="note"?`<button class="btn link" data-dellog="${x.id}" type="button">Remove</button>`:""}</div>`).join("")}</section>`}).join("")||`<div class="empty">Nothing yet. Finish a task or log something above.</div>`}`}
 
+/* COO coach: the weekly reports the daily assistant writes into ops.json (newest first). */
+function vCoach(){
+  const cs=(D.coach||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));const c=cs[0];
+  const move=plan&&plan.date===todayISO()&&plan.coo_move;
+  if(!c&&!move)return`<div class="page-head"><h1>Coach</h1></div><section class="card"><p>Your first weekly coaching arrives on Saturday evening. It reads your week on this board and tells you what you're missing, the COO actions to take and what to start at the centre for growth.</p></section>`;
+  const sec=(h,body)=>`<section class="card" style="margin-bottom:14px"><h3>${h}</h3>${body}</section>`;
+  return`<div class="page-head"><div><h1>Coach</h1><div class="sub">${c?`Week ending ${fmt(c.date)}`:""}</div></div></div>
+  ${move?sec("COO move today",`<p style="margin:0">${esc(move)}</p>`):""}
+  ${c?`<section class="card" style="margin-bottom:14px"><p style="margin:0;font-size:17px">${esc(c.headline)}</p></section>
+  <div class="grid g2">
+   ${sec("What you're missing",(c.missing||[]).map(x=>`<div class="row"><div class="main"><div class="t">${esc(x.gap)}</div><div class="meta">${esc(x.evidence)}</div></div></div>`).join(""))}
+   ${sec("Your COO actions this week",(c.coo_actions||[]).map((x,i)=>`<div class="row"><div class="main"><div class="t"><b>${i+1}.</b> ${esc(x.action)}</div><div class="meta">Why: ${esc(x.why)}</div><div class="meta">Start: ${esc(x.first_step)}</div></div>
+     <button class="btn small" data-coachtask="${esc(x.action)}" type="button">Add as task</button></div>`).join(""))}
+   ${sec("Grow the centre: start now",(c.growth||[]).map(x=>`<div class="row"><div class="main"><div class="t">${esc(x.idea)}</div><div class="meta">How: ${esc(x.how_to_start)}</div><div class="meta">Owner: ${esc(x.owner)} · Measure: ${esc(x.metric)}</div></div>
+     <button class="btn small" data-coachtask="${esc(x.idea)}" type="button">Add as task</button></div>`).join(""))}
+   ${sec("Number to track",`<p style="margin:0">${esc(c.number_to_track)}</p>`)}
+   ${sec("For the founder",`<p style="margin:0">${esc(c.impact_line)}</p><div class="actions"><button class="btn small" data-copytext="${esc(c.impact_line)}" type="button">Copy</button></div>`)}
+  </div>`:""}
+  ${cs.length>1?sec("Earlier weeks",cs.slice(1).map(x=>`<details><summary>${fmt(x.date)}: ${esc(x.headline)}</summary><ul class="duty">${(x.coo_actions||[]).map(a=>`<li>${esc(a.action)}</li>`).join("")}${(x.growth||[]).map(g=>`<li>${esc(g.idea)}</li>`).join("")}</ul></details>`).join("")):""}`}
+
 function vMeeting(){
   const mt=D.meetings.slice().sort((a,b)=>b.date.localeCompare(a.date));const cur=mt.find(x=>x.date===todayISO());
   const acts=D.tasks.filter(t=>t.meeting&&open(t)).sort(cmp);
@@ -426,7 +447,7 @@ function vSettings(){
   <div class="actions"><button class="btn" data-backup type="button">Download a backup</button><a class="btn" target="_blank" rel="noopener" href="https://github.com/${GH.owner}/${GH.repo}/commits/${GH.branch}/ops.json">Change history</a>
   <button class="btn" data-signout type="button">Sign out</button></div></section>`}
 
-const VIEWS={log:vLog,today:vToday,team:vTeam,person:vPerson,tasks:vTasks,kra:vKra,review:vReview,meeting:vMeeting,routine:vRoutine,expenses:vExpenses,settings:vSettings};
+const VIEWS={coach:vCoach,log:vLog,today:vToday,team:vTeam,person:vPerson,tasks:vTasks,kra:vKra,review:vReview,meeting:vMeeting,routine:vRoutine,expenses:vExpenses,settings:vSettings};
 function render(force){
   if(!D)return;const app=$("#app");const y=scrollY;
   const keep=document.activeElement&&document.activeElement.matches("input[type=text],textarea,input[type=number],input[type=tel]")?document.activeElement:null;
@@ -500,6 +521,8 @@ document.addEventListener("click",e=>{const el=e.target.closest("button,[data-pe
   if(ds.backup!==undefined){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,1)],{type:"application/json"}));a.download=`ipa-ops-board-${todayISO()}.json`;a.click();return}
   if(ds.signout!==undefined){try{localStorage.removeItem(AUTH_KEY)}catch(_){}location.reload();return}
   if(ds.close!==undefined){$("#dlg").close();return}
+  if(ds.coachtask){addTask({t:ds.coachtask,who:"me",project:"",due:""});toast("Added to your tasks");return}
+  if(ds.copytext){copy(ds.copytext);return}
   if(ds.dellog){const id=ds.dellog;mutate(d=>{d.log=(d.log||[]).filter(x=>x.id!==id)},"removed a log entry");return}
   if(ds.deltask){const t=T(ds.deltask);if(confirm(`Delete “${t.t}”?`)){mutate(d=>{d.tasks=d.tasks.filter(x=>x.id!==t.id)},`deleted “${t.t}”`);$("#dlg").close()}return}
   if(ds.delroutine){const r=D.routines.find(x=>x.id===ds.delroutine);if(confirm(`Delete routine “${r.task}”?`)){mutate(d=>{d.routines=d.routines.filter(x=>x.id!==r.id);delete d.routineDone[r.id]},`deleted routine “${r.task}”`);$("#dlg").close()}return}
@@ -565,7 +588,7 @@ async function start(){
   setSync("Loading…");const r=await readFile(GH.path);if(!r.data)throw new Error("no data");D=r.data;sha=r.sha;
   D.routineDone=D.routineDone||{};D.log=D.log||[];if(!D.routineSince)D.routineSince=todayISO();D.reviews=D.reviews||{};D.meetings=D.meetings||[];D.expenses=D.expenses||[];D.budget=D.budget||{};
   $("#top").hidden=false;setSync("Up to date");route();
-  try{const p=await readFile(`assistant/plans/${todayISO()}.json`);plan=p.data;if(view==="today")render()}catch(_){}
+  try{const p=await readFile(`assistant/plans/${todayISO()}.json`);plan=p.data;if(view==="today"||view==="coach")render()}catch(_){}
   setInterval(async()=>{if(pending.length||saving||document.hidden)return;try{const x=await readFile(GH.path);if(x.sha!==sha){D=x.data;sha=x.sha;render()}}catch(_){}},120000)}
 if(me&&me.token)start().catch(e=>signInPage(e.status===401||e.status===403||e.status===404?"Your sign-in has expired. Sign in again.":"Couldn't load the board. Check your connection and reload."));else signInPage();
 </script>

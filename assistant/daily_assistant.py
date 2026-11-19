@@ -213,8 +213,9 @@ PLAN_TOOL = {
                              "required": ["id", "to", "reason", "message"]}},
             "later": {"type": "array", "description": "Tasks to leave for later this week without guilt", "items": {"type": "string"}},
             "note": {"type": "string", "description": "One plain, specific line for the morning. Point to a real result from yesterday if there is one. No clichés, no motivational quotes, no emojis."},
+            "coo_move": {"type": "string", "description": "One concrete COO-level move for today, under 25 words: something that builds a system, hands off a recurring job, puts a number on results, or moves a strategic priority. Specific to this board, not generic advice."},
         },
-        "required": ["top", "quick", "delegate", "later", "note"],
+        "required": ["top", "quick", "delegate", "later", "note", "coo_move"],
     },
 }
 
@@ -507,7 +508,13 @@ def morning_message(plan, tasks, cfg, day, handed):
         lines.append("")
     if plan["later"]:
         lines.append(f"*Not today:* {len(plan['later'])} task{'s' if len(plan['later']) > 1 else ''} can wait.")
+    slipping = [by_id[x["id"]] for x in plan["top"] if (by_id[x["id"]].get("carried") or 0) >= 3]
+    if slipping:
+        lines += ["", "*Slipping*"] + [f"• {short(t['t'], 70)} has moved {t['carried']} days. Do 15 minutes first, hand it off, or drop it."
+                                        for t in slipping[:3]]
     lines += ops_lines(day)
+    if plan.get("coo_move"):
+        lines += ["", f"*COO move today:* {plan['coo_move']}"]
     if plan.get("note"):
         lines += ["", plan["note"]]
     return "\n".join(lines).strip()
@@ -707,6 +714,189 @@ def mark_sent(mode, token, day):
         time.sleep(2)
 
 
+# ---------------------------------------------------------------- smarter lists
+
+def update_ops(fn, msg, token):
+    """Change ops.json on the newest copy, retrying if the board saved in between. fn returns a count of changes."""
+    for _ in range(4):
+        ops, sha = read_file(DATA_PATH, token)
+        n = fn(ops)
+        if not n:
+            return 0
+        if write_file(DATA_PATH, ops, sha, f"Ops board: {BOT} {msg}", token) in (200, 201):
+            return n
+        time.sleep(2)
+    return 0
+
+
+def next_workday(day):
+    nxt = day + dt.timedelta(days=1)
+    return nxt + dt.timedelta(days=1) if nxt.weekday() == 6 else nxt
+
+
+def carry_over(token, day):
+    """Evening: unfinished tasks on today's list move to the end of the next working day's list."""
+    nxt = next_workday(day)
+
+    def fn(ops):
+        tasks = ops.get("tasks", [])
+        left = sorted([t for t in tasks if t.get("plannedFor") == day.isoformat() and status_of(t) != "Done" and t.get("who") in ("me", "", None)],
+                      key=lambda t: t.get("order") or 0)
+        start = max([t.get("order") or 0 for t in tasks if t.get("plannedFor") == nxt.isoformat()] or [0])
+        for i, t in enumerate(left, 1):
+            t.update({"plannedFor": nxt.isoformat(), "order": start + i, "carried": (t.get("carried") or 0) + 1})
+        return len(left)
+    return update_ops(fn, f"moved unfinished tasks to {nxt:%d %b}", token), nxt
+
+
+ASK = re.compile(r"^ask\s+(?P<who>.+?)\s+(?:to|for|about)\s+(?P<what>.+)$", re.I)
+
+
+def ask_followups(day_list, token, day):
+    """'Ask Sunil to make the KD Jain list' also becomes Sunil's task, so it shows up in follow-ups."""
+    people = {p["name"].replace(" Ma'am", "").split()[0].lower(): p for p in OPS.get("people", [])}
+    wanted = []
+    for t in day_list:
+        m = ASK.match(t["t"].strip())
+        if not m:
+            continue
+        key = m.group("who").replace(" Ma'am", "").replace(" ma'am", "").split()[0].lower()
+        if key in people:
+            what = m.group("what").strip()
+            wanted.append((t["id"], people[key]["id"], what[0].upper() + what[1:], t.get("project", "")))
+    if not wanted:
+        return 0
+    now = dt.datetime.now(dt.timezone.utc).isoformat()[:19] + "Z"
+
+    def fn(ops):
+        have = {x.get("fromTask") for x in ops.get("tasks", [])}
+        n = 0
+        for src, pid, what, project in wanted:
+            if src in have:
+                continue
+            ops["tasks"].append({"id": f"f{src}", "t": what, "who": pid, "project": project, "due": day.isoformat(), "pri": "High",
+                                 "status": "Not started", "note": "Asked by Diksha", "createdAt": now, "assignedAt": now, "fromTask": src})
+            n += 1
+        return n
+    return update_ops(fn, "added follow-ups for today's 'Ask …' tasks", token)
+
+
+# ---------------------------------------------------------------- the COO coach
+
+COACH_TOOL = {
+    "name": "report_coaching",
+    "description": "Report the weekly coaching. Call it exactly once.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "headline": {"type": "string", "description": "One sentence: the honest read on this week, with a number in it."},
+            "missing": {"type": "array", "description": "2 or 3 things she is missing or doing that hold her back from COO-level work. Each tied to evidence from the data.",
+                        "items": {"type": "object", "properties": {"gap": {"type": "string"}, "evidence": {"type": "string", "description": "Numbers or task names from this week"}},
+                                  "required": ["gap", "evidence"]}},
+            "coo_actions": {"type": "array", "description": "2 or 3 concrete actions for the coming week that a COO would take. Each doable within the week.",
+                            "items": {"type": "object", "properties": {"action": {"type": "string"}, "why": {"type": "string"}, "first_step": {"type": "string", "description": "Under 15 words"}},
+                                      "required": ["action", "why", "first_step"]}},
+            "growth": {"type": "array", "description": "1 or 2 things to implement now at the centre for growth (admissions, revenue, retention, results, brand). Specific to IPA's projects and team, with how to start and what to measure.",
+                       "items": {"type": "object", "properties": {"idea": {"type": "string"}, "how_to_start": {"type": "string"}, "owner": {"type": "string", "description": "Who on the team should run it"}, "metric": {"type": "string"}},
+                                 "required": ["idea", "how_to_start", "owner", "metric"]}},
+            "number_to_track": {"type": "string", "description": "One number to track next week, with this week's value if known."},
+            "impact_line": {"type": "string", "description": "One line she can forward to the founder about this week's results, with numbers. Plain, not boastful."},
+        },
+        "required": ["headline", "missing", "coo_actions", "growth", "number_to_track", "impact_line"],
+    },
+}
+
+COACH_SYSTEM = """You are an experienced COO and executive coach for {me}. {profile}
+
+Each week you read {me}'s operations board for an education institute (IPA): what {me} finished, what slipped, what was handed
+to the team, routines kept, KRA reviews, meetings and spending. Then you coach {me} towards a COO role.
+
+Be specific and honest, like a good mentor: point to real tasks and numbers from the data, never generic advice.
+Look for: urgent work crowding out the priority order ({priorities}); work {me} does that the team could do; tasks that keep
+slipping; follow-ups and reviews not happening; results not measured; the centre's growth levers (admissions pipeline,
+conversion, CUET counselling, mentorship programmes, PARTHU AI, content) not being pushed.
+Growth ideas must suit an Indian coaching institute and this team; name who should own them.
+Write in short, plain, spoken English. No clichés, no flattery, no emojis. Answer only by calling report_coaching once."""
+
+
+def week_data(day):
+    """A compact summary of the last 7 days from the board, for the coach."""
+    start = day - dt.timedelta(days=6)
+    names = {p["id"]: p["name"] for p in OPS.get("people", [])}
+    in_week = lambda s: bool(s) and start.isoformat() <= s[:10] <= day.isoformat()
+    tasks = OPS.get("tasks", [])
+    mine_done = [t for t in tasks if t.get("who") in ("me", "", None) and status_of(t) == "Done" and in_week(t.get("doneAt"))]
+    team_done = [t for t in tasks if t.get("who") not in ("me", "", None) and status_of(t) == "Done" and in_week(t.get("doneAt"))]
+    by_proj = {}
+    for t in mine_done:
+        by_proj[t.get("project") or "No project"] = by_proj.get(t.get("project") or "No project", 0) + 1
+    open_mine = [t for t in tasks if t.get("who") in ("me", "", None) and status_of(t) != "Done"]
+    overdue = [t for t in open_mine if (days_left(t, day) or 0) < 0]
+    team_open = [t for t in tasks if t.get("who") not in ("me", "", None) and status_of(t) != "Done"]
+    slipping = [t for t in open_mine if (t.get("carried") or 0) >= 2]
+    handed = [t for t in tasks if in_week(t.get("delegatedAt") or t.get("assignedAt"))]
+    logs = [x for x in OPS.get("log", []) if in_week(x.get("at"))]
+    routines_done = [x for x in logs if x.get("kind") == "routine"]
+    notes = [x for x in logs if x.get("kind") == "note"]
+    month = day.isoformat()[:7]
+    reviewed = len([1 for r in (OPS.get("reviews") or {}).get(month, {}).values() if r.get("k")])
+    meetings = [m for m in OPS.get("meetings", []) if in_week(m.get("date"))]
+    spent = sum(float(e.get("amount") or 0) for e in OPS.get("expenses", []) if (e.get("date") or "")[:7] == month and e.get("status") in ("Approved", "Paid"))
+    budget = sum(float(v or 0) for v in (OPS.get("budget") or {}).values())
+    L = [f"Week: {start:%d %b} to {day:%d %b %Y}.",
+         f"Finished by {OPS.get('me', 'her')}: {len(mine_done)} tasks. By project: " + "; ".join(f"{k}: {v}" for k, v in sorted(by_proj.items(), key=lambda x: -x[1])),
+         "Finished tasks: " + "; ".join(short(t["t"], 70) for t in mine_done[:25]),
+         f"Other work she logged: " + ("; ".join(short(x["text"], 60) for x in notes[:15]) or "none"),
+         f"Team finished: {len(team_done)} tasks (" + "; ".join(f"{short(t['t'], 40)} – {names.get(t['who'], t['who'])}" for t in team_done[:10]) + ")",
+         f"Handed to the team this week: {len(handed)}. Team tasks still open: {len(team_open)}, of which overdue: "
+         f"{len([t for t in team_open if (days_left(t, day) or 0) < 0])}.",
+         f"Her open tasks: {len(open_mine)}, overdue: {len(overdue)}. Overdue by project: " +
+         "; ".join(f"{k}: {v}" for k, v in sorted({(t.get('project') or '-'): sum(1 for x in overdue if x.get('project') == t.get('project')) for t in overdue}.items(), key=lambda x: -x[1])[:8]),
+         "Slipping (moved 2+ days): " + ("; ".join(f"{short(t['t'], 60)} ({t['carried']}x)" for t in slipping) or "none"),
+         f"Routines ticked this week: {len(routines_done)} of {len(OPS.get('routines', []))} defined.",
+         f"Team meetings held this week: {len(meetings)}. KRA reviews done for {month}: {reviewed} of {len(OPS.get('people', []))} people.",
+         f"Spending this month: ₹{spent:,.0f}" + (f" of a ₹{budget:,.0f} budget." if budget else " (no budget set)."),
+         "Projects in priority order: " + "; ".join(f"P{p['priority']} {p['name']}" for p in sorted(OPS.get("projects", []), key=lambda p: p.get("priority", 99))),
+         "Team: " + "; ".join(f"{p['name']} ({p['role']})" for p in OPS.get("people", []))]
+    return "\n".join(L)
+
+
+def coach(args):
+    board, cfg, token = load(args)
+    day = today()
+    if not OPS or not os.environ.get("ANTHROPIC_API_KEY") or args.no_ai:
+        print("The coach needs the Ops Board and ANTHROPIC_API_KEY.")
+        return
+    import anthropic
+    system = COACH_SYSTEM.format(me=cfg["me"], profile=cfg.get("profile", ""),
+                                 priorities=" → ".join(cfg.get("priority_order") or []))
+    messages = [{"role": "user", "content": week_data(day) + "\n\nCoach me for next week."}]
+    client, report = anthropic.Anthropic(), None
+    for _ in range(2):
+        response = client.messages.create(model=MODEL, max_tokens=6000, system=system, messages=messages,
+                                          tools=[COACH_TOOL], tool_choice={"type": "auto"})
+        block = next((b for b in response.content if b.type == "tool_use" and b.name == "report_coaching"), None)
+        if block:
+            report = block.input
+            break
+        messages += [{"role": "assistant", "content": response.content},
+                     {"role": "user", "content": "Please give it by calling report_coaching once."}]
+    if not report:
+        print("The coach didn't return a report.", file=sys.stderr)
+        return
+    L = [f"*Your weekly COO coach* · {day:%d %b}", "", report["headline"], "", "*What you're missing*"]
+    L += [f"• {x['gap']} _({x['evidence']})_" for x in report["missing"]]
+    L += ["", "*Your COO actions this week*"]
+    L += [f"{i}. {x['action']}\n   Why: {x['why']}\n   Start: {x['first_step']}" for i, x in enumerate(report["coo_actions"], 1)]
+    L += ["", "*Grow the centre: start now*"]
+    L += [f"• {x['idea']}\n   How: {x['how_to_start']}\n   Owner: {x['owner']} · Measure: {x['metric']}" for x in report["growth"]]
+    L += ["", f"*Number to track:* {report['number_to_track']}", "", f"*For the founder:* {report['impact_line']}"]
+    notify("\n".join(L), args.dry_run, f"Your weekly COO coach - {day:%d %b}")
+    if token and not args.dry_run:
+        entry = {"date": day.isoformat(), **report}
+        update_ops(lambda ops: ops.setdefault("coach", []).append(entry) or 1, "saved the weekly coaching", token)
+
+
 # ---------------------------------------------------------------- runs
 
 OPS = {}  # the Ops Board's data for this run: people, routines, reviews
@@ -786,7 +976,13 @@ def morning(args):
         except Exception as e:  # the rules below still give a usable plan
             detail = getattr(e, "message", None) or str(e)
             print(f"Claude planning failed ({type(e).__name__}: {str(detail)[:300]}); using the built-in rules.", file=sys.stderr)
+    coo_move = (plan or {}).get("coo_move", "")
     plan = clean_plan(plan or plan_with_rules(rest, board, cfg, day, wins), rest, board, cfg)
+    plan["coo_move"] = str(coo_move)[:220]
+    if token and not args.dry_run and day_list:
+        made = ask_followups(day_list, token, day)
+        if made:
+            print(f"Created {made} follow-up task(s) from 'Ask …' items.")
     if day_list:  # your own list replaces the suggested top tasks and quick ones; hand-offs come from the rest
         plan["top"] = [{"id": t["id"], "why": "on your list", "first_step": ""} for t in day_list]
         plan["quick"] = []
@@ -850,17 +1046,23 @@ def followup(args, kind):
     else:
         text = evening_message(saved or {}, board, cfg, day)
         title = f"Day done - {day:%a %d %b}"
+        if token and not args.dry_run:
+            moved, nxt = carry_over(token, day)
+            if moved:
+                text += f"\n\n*Moved to {nxt:%A}'s list:* {moved} unfinished task{'s' if moved != 1 else ''}, at the end. Change it on the board if you like."
     if text:
         ok = notify(text, args.dry_run, title, urgent=kind == "midday")
         if ok and not args.dry_run:
             mark_sent(kind, token, day)
         print(f"{kind.capitalize()} message sent: {ok}.")
+    if kind == "evening" and day.weekday() == 5 and not args.dry_run:
+        coach(args)  # Saturday evening: the weekly COO coaching report
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("mode", choices=["morning", "midday", "evening", "resend"],
-                    help="resend: send today's morning list again, without re-planning")
+    ap.add_argument("mode", choices=["morning", "midday", "evening", "resend", "coach"],
+                    help="resend: send today's morning list again, without re-planning. coach: the weekly COO coaching report now")
     ap.add_argument("--dry-run", action="store_true", help="print the messages; send and change nothing")
     ap.add_argument("--no-ai", action="store_true", help="plan with the built-in rules only")
     ap.add_argument("--once", action="store_true", help="skip if this message already went out today (scheduled runs)")
@@ -874,6 +1076,8 @@ def main():
         morning(args)
     elif args.mode == "resend":
         resend(args)
+    elif args.mode == "coach":
+        coach(args)
     else:
         followup(args, args.mode)
 

@@ -10,6 +10,13 @@ Plans your day from the **IPA Ops Board** (`ops.json`) and sends it to you by **
 | 13:17 | **Nudge.** How many of today's tasks are done, and the next one with its first small step. |
 | 18:47 | **Wrap-up.** What you and the team finished, what carries over, hand-offs to chase, and tomorrow's first task, so there's nothing to decide at night. On Fridays and Saturdays, the week's count for your impact log. |
 
+## Smarter lists and the COO coach
+
+- **Carry-over:** in the evening, unfinished tasks on today's list move to the end of the next working day's list. A task that has moved 3 days shows under *Slipping* in the morning: do 15 minutes first, hand it off, or drop it.
+- **"Ask X…" tasks:** a day-list task like "Ask Sunil to make the KD Jain list" also becomes Sunil's task, so it appears in team follow-ups.
+- **COO move:** each morning Claude adds one COO-level move for the day.
+- **Weekly COO coach:** every Saturday evening (or the workflow's `coach` option any time), Claude reads the week on the board and sends what you're missing, 2–3 COO actions, 1–2 growth moves for the centre with an owner and a measure, a number to track and a line for the founder. It's saved on the board's Coach tab. Your profile and goals for the coach are `profile` in `ipa_task/assistant/config.json`.
+
 ## How it decides what to hand off
 
 You don't choose. Every morning it looks at your open tasks (unassigned, or assigned to you) and:

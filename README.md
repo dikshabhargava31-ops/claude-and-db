@@ -24,6 +24,7 @@ Data is saved in the browser's local storage. Use **Settings & backup** to expor
 
 - **Today:** the day's tasks in order (from the daily assistant's plan), routine work due, team tasks that need a follow-up, and what's waiting for approval.
 - **Team:** one page per person with their tasks, a role sheet (daily, weekly and monthly duties, KRAs and review questions) and buttons to copy or send it on WhatsApp.
+- **Coach:** the weekly COO coaching (what you're missing, COO actions, growth moves for the centre, a number to track, a line for the founder), today's COO move, and earlier weeks.
 - **Work log:** everything done, by day: finished tasks, ticked routines, reviews, meetings, and anything typed in by hand, with weekly counts.
 - **Day list:** tasks set "On my day list for" a date show on Today in that order, and the morning message sends them as written.
 - **Tasks:** everyone's tasks with filters; **KRA reviews:** monthly actual and status for each KRA, with notes and a message to send; **Meeting:** the Monday agenda, notes and action items; **Routine:** daily, weekly, monthly, season and yearly work to tick off each cycle; **Expenses:** spends with bills and approvals, and budget vs spent per category.
