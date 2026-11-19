@@ -23,6 +23,10 @@ on:
         type: choice
         options: [morning, midday, evening, resend]
         default: morning
+      once:
+        description: "Skip if this message already went out today (used by the timed starts)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -43,6 +47,7 @@ jobs:
         env:
           SCHEDULE: ${{ github.event.schedule }}
           INPUT: ${{ inputs.mode }}
+          ONCE: ${{ inputs.once }}
         run: |
           case "$SCHEDULE" in
             "12 3 "*|"37 3 "*|"4 4 "*) mode=morning ;;
@@ -51,7 +56,7 @@ jobs:
             *) mode="${INPUT:-morning}" ;;
           esac
           echo "mode=$mode" >> "$GITHUB_OUTPUT"
-          if [ -n "$SCHEDULE" ]; then echo "once=--once" >> "$GITHUB_OUTPUT"; else echo "once=" >> "$GITHUB_OUTPUT"; fi
+          if [ -n "$SCHEDULE" ] || [ "$ONCE" = "true" ]; then echo "once=--once" >> "$GITHUB_OUTPUT"; else echo "once=" >> "$GITHUB_OUTPUT"; fi
 
       - name: Install the Anthropic SDK
         env:
