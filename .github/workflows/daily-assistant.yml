@@ -19,9 +19,9 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Which message to send now"
+        description: "Which message to send now (resend: this morning's list again, without re-planning)"
         type: choice
-        options: [morning, midday, evening]
+        options: [morning, midday, evening, resend]
         default: morning
 
 permissions:

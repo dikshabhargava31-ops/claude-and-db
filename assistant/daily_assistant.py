@@ -667,17 +667,18 @@ def notify(text, dry_run, title, urgent=False):
     if not channels:
         print("No channel set up: add GMAIL_ADDRESS and GMAIL_APP_PASSWORD, or NTFY_TOPIC (assistant/README.md).", file=sys.stderr)
         return False
-    sent = 0
+    sent = []
     for name, send in channels:
         for attempt in range(3):
             try:
                 send()
-                sent += 1
+                sent.append(name)
                 break
             except Exception as e:  # server replies name the problem but never contain the password
                 print(f"{name}: send failed ({type(e).__name__}: {str(e)[:300]}).", file=sys.stderr)
                 time.sleep(5 * (attempt + 1))
-    return sent > 0
+    print(f"\"{title}\" sent by: {', '.join(sent) or 'nothing'} (of {', '.join(n for n, _ in channels)}).")
+    return bool(sent)
 
 
 # ---------------------------------------------------------------- once a day per message
@@ -810,6 +811,25 @@ def morning(args):
           f"({handed} assigned on the board). Sent: {ok}.")
 
 
+def resend(args):
+    """Send today's morning list again as it was planned: no new plan and no new hand-offs."""
+    board, cfg, token = load(args)
+    day = today()
+    saved = json.loads(Path(args.plan).read_text()) if args.plan else (read_file(f"{PLANS_DIR}/{day.isoformat()}.json", token)[0] if token else None)
+    if not saved:
+        sys.exit("There is no plan for today yet; run the morning message instead.")
+    tasks = flatten(board, day)
+    by_id = {t["id"] for t in tasks}
+    plan = {k: saved.get(k) or [] for k in ("top", "quick", "delegate", "later")}
+    plan["top"] = [x for x in plan["top"] if x["id"] in by_id]
+    plan["quick"] = [i for i in plan["quick"] if i in by_id]
+    plan["delegate"] = [d for d in plan["delegate"] if d["id"] in by_id]
+    plan["note"], plan["day_list"] = saved.get("note", ""), saved.get("day_list", False)
+    text = morning_message(plan, tasks, cfg, day, bool(plan["delegate"]))
+    fwd = forward_message(plan)
+    notify(text + (f"\n\n━━━━━━━━━━\n\n{fwd}" if fwd else ""), args.dry_run, f"Today's plan (sent again) - {day:%a %d %b}")
+
+
 def followup(args, kind):
     board, cfg, token = load(args)
     day = today()
@@ -839,7 +859,8 @@ def followup(args, kind):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("mode", choices=["morning", "midday", "evening"])
+    ap.add_argument("mode", choices=["morning", "midday", "evening", "resend"],
+                    help="resend: send today's morning list again, without re-planning")
     ap.add_argument("--dry-run", action="store_true", help="print the messages; send and change nothing")
     ap.add_argument("--no-ai", action="store_true", help="plan with the built-in rules only")
     ap.add_argument("--once", action="store_true", help="skip if this message already went out today (scheduled runs)")
@@ -851,6 +872,8 @@ def main():
         args.dry_run = True
     if args.mode == "morning":
         morning(args)
+    elif args.mode == "resend":
+        resend(args)
     else:
         followup(args, args.mode)
 
