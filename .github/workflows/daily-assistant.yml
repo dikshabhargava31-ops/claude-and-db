@@ -21,7 +21,7 @@ on:
       mode:
         description: "Which message to send now (resend: this morning's list again, without re-planning)"
         type: choice
-        options: [morning, midday, evening, resend]
+        options: [morning, midday, evening, resend, coach]
         default: morning
       once:
         description: "Skip if this message already went out today (used by the timed starts)"
@@ -61,7 +61,7 @@ jobs:
       - name: Install the Anthropic SDK
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        if: steps.mode.outputs.mode == 'morning'
+        if: contains(fromJSON('["morning","evening","coach"]'), steps.mode.outputs.mode)
         run: '[ -z "$ANTHROPIC_API_KEY" ] || pip install -q "anthropic>=1.1"'
 
       - name: Send
