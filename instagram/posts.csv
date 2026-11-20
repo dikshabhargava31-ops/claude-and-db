@@ -1,4 +1,4 @@
-id,account,publish_at,type,media,caption,first_comment
+id,account,publish_at,type,media,caption,first_comment,collaborators,user_tags
 #example-post,ipa,2026-11-01 18:30,post,https://example.com/photo.jpg,"Caption for a single photo.
 Line breaks work inside quotes.",#hashtags #go #here
 #example-carousel,ipa,2026-11-02 19:00,carousel,https://example.com/1.jpg|https://example.com/2.jpg|https://example.com/3.mp4,Swipe through 👉,
@@ -772,3 +772,17 @@ Comment MENTOR for 1:1 help. (4/4) .
 #CUET2027 #CUETLanguage #CUETCutoff #CUETMistakes #EverythingCUET
 
 [CUET language paper, CUET English preparation, CUET cut-off, language test mandatory, high score no seat, CUET college list, CUET 2027]",
+cuet-20261120-1800-vrtf,cuet,2026-11-20 18:00,carousel,https://raw.githubusercontent.com/dikshabhargava31-ops/instagram-media/main/media/2026-11/20261120-1800-vrtf-1-mwotctwc.jpg|https://raw.githubusercontent.com/dikshabhargava31-ops/instagram-media/main/media/2026-11/20261120-1800-vrtf-2-mwotcvno.jpg|https://raw.githubusercontent.com/dikshabhargava31-ops/instagram-media/main/media/2026-11/20261120-1800-vrtf-3-mwotcx2h.jpg|https://raw.githubusercontent.com/dikshabhargava31-ops/instagram-media/main/media/2026-11/20261120-1800-vrtf-4-mwotcyzc.jpg|https://raw.githubusercontent.com/dikshabhargava31-ops/instagram-media/main/media/2026-11/20261120-1800-vrtf-5-mwotd0jo.jpg|https://raw.githubusercontent.com/dikshabhargava31-ops/instagram-media/main/media/2026-11/20261120-1800-vrtf-6-mwotd24l.jpg|https://raw.githubusercontent.com/dikshabhargava31-ops/instagram-media/main/media/2026-11/20261120-1800-vrtf-7-mwotd3js.jpg,"DU's top colleges needed up to 958.71 in 2026. 🎯
+
+Planning CUET 2027? Swipe for the 12 toughest college + course options, and what to do this Nov–Dec.
+
+Save this 📌 Comment MENTOR for 1:1 help with your CUET college list.
+.
+.
+.
+.
+.
+.
+#CUET2027 #DUCutoff #CUETCollegeList #DUAdmission #EverythingCUET
+
+[DU cut-off 2026, toughest DU colleges, Hindu College cut-off, CUET score for DU, CUET 2027 planning, CUET college list, DU top colleges]",,,
