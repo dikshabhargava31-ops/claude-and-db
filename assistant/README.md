@@ -1,6 +1,6 @@
 # Daily Ops Assistant
 
-GitHub's own schedule proved unreliable for this repository (on 19 Nov none of the timed runs started), so three scheduled tasks on the owner's Claude account start the workflow at 08:42, 13:17 and 18:47 IST with `once` ticked. GitHub's schedule stays as a backup: each message also has two backup times (morning 09:07 and 09:34, midday 13:47, evening 19:17 and 19:47). The first run that sends records it in `ipa_task/assistant/sent/`, and the backups then do nothing, so you never get a message twice. Running the workflow by hand always sends.
+GitHub's own schedule proved unreliable for this repository (on 19 Nov none of the timed runs started), so three scheduled tasks on the owner's Claude account start the workflow at 08:42, 13:17 and 18:47 IST with `once` ticked. GitHub's schedule stays as a backup: each message also has two backup times (morning 09:07 and 09:34, midday 13:47, evening 19:17 and 19:47). The first run that sends records it in `ipa_task/assistant/sent/`, and the backups then do nothing, so you never get a message twice. Timed runs also only send inside their window (India time: morning 07:00–12:00, midday 12:00–17:00, evening 17:30–23:00), so a run GitHub starts hours late does nothing. Running the workflow by hand always sends.
 
 Plans your day from the **IPA Ops Board** (`ops.json`) and sends it to you by **Gmail** and as a **notification on your laptop** (and phone, if you like), Monday to Saturday:
 
