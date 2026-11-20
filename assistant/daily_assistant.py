@@ -693,6 +693,29 @@ def notify(text, dry_run, title, urgent=False):
 SENT_DIR = "assistant/sent"
 
 
+# Timed runs only send inside their own window (India time). GitHub sometimes starts a scheduled run hours late:
+# on 19 Nov the evening run started at 03:08 the next day and treated that day as finished.
+WINDOWS = {"morning": (7, 0, 12, 0), "midday": (12, 0, 17, 0), "evening": (17, 30, 23, 0)}
+
+
+def in_window(mode):
+    now = dt.datetime.now(IST)
+    h1, m1, h2, m2 = WINDOWS[mode]
+    return (h1, m1) <= (now.hour, now.minute) < (h2, m2)
+
+
+def skip_timed_run(mode, args, token, day):
+    if not args.once:
+        return False
+    if not in_window(mode):
+        print(f"Not sending the {mode} message: it's {dt.datetime.now(IST):%H:%M} in India, outside its window.")
+        return True
+    if already_sent(mode, token, day):
+        print(f"The {mode} message already went out today.")
+        return True
+    return False
+
+
 def already_sent(mode, token, day):
     """GitHub sometimes starts a scheduled run late or not at all, so each message has backup times.
     The first run that sends records it here; later backup runs for the same message stay quiet."""
@@ -953,8 +976,7 @@ def load(args):
 def morning(args):
     board, cfg, token = load(args)
     day = today()
-    if args.once and already_sent("morning", token, day):
-        print("The morning message already went out today.")
+    if skip_timed_run("morning", args, token, day):
         return
     all_tasks = flatten(board, day)
     yesterday = day - dt.timedelta(days=1 if day.weekday() else 2)
@@ -1029,8 +1051,7 @@ def resend(args):
 def followup(args, kind):
     board, cfg, token = load(args)
     day = today()
-    if args.once and already_sent(kind, token, day):
-        print(f"The {kind} message already went out today.")
+    if skip_timed_run(kind, args, token, day):
         return
     saved = None
     if args.plan:
