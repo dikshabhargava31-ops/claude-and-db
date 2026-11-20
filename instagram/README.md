@@ -67,6 +67,8 @@ You can also add rows to `posts.csv` by hand, on github.com or in Excel or Googl
 | `media` | A public `https://` link to the file. For a carousel, put the links in order separated by `\|`. |
 | `caption` | The caption, up to 2,200 characters. Wrap it in quotes if it has commas or line breaks. |
 | `first_comment` | Optional, for example the hashtags. |
+| `collaborators` | Optional. Up to 3 Instagram usernames, separated by spaces (`@` optional). They get a Collab invite; once they accept, the post shows on their profile too. Photos, carousels and reels. |
+| `user_tags` | Optional. Up to 20 usernames to tag: on the photo, the reel, or a carousel's first photo. If Instagram refuses a collaborator or tag (a private or misspelled account), the post still goes out on time without them and the planner shows why. |
 
 ### Media files
 

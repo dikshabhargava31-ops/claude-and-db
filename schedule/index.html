@@ -351,6 +351,16 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
           <div class="lab"><span>First comment <span style="font-weight:400;color:var(--muted)">(optional, good for hashtags)</span></span></div>
           <input id="cComment" placeholder="#ajmer #education">
         </div>
+        <div id="cCollabWrap">
+          <div class="lab"><span>Collaborators <span style="font-weight:400;color:var(--muted)">(optional, up to 3)</span></span></div>
+          <input id="cCollab" placeholder="@username @another" autocomplete="off" spellcheck="false">
+          <div class="hint">They get an invite; once they accept, the post shows on their profile too.</div>
+        </div>
+        <div id="cTagsWrap">
+          <div class="lab"><span>Tag people <span style="font-weight:400;color:var(--muted)">(optional, up to 20)</span></span></div>
+          <input id="cTags" placeholder="@username @another" autocomplete="off" spellcheck="false">
+          <div class="hint" id="cTagsHint">Tagged on the photo or reel; on a carousel, on its first photo.</div>
+        </div>
         <div>
           <div class="lab">When <small>India time</small></div>
           <div class="whenrow"><input type="date" id="cDate" aria-label="Date"><input type="time" id="cTime" step="300" aria-label="Time"></div>
@@ -387,7 +397,17 @@ const GH = {owner: "dikshabhargava31-ops", repo: "claude-and-db", media: "instag
 const API = "https://api.github.com/";
 const RAW = `https://raw.githubusercontent.com/${GH.owner}/${GH.media}/main/`;
 const AUTH_KEY = "ig-planner-token", BOARD_AUTH_KEY = "ipa-priority-board-user", PREF_KEY = "ig-planner-prefs";
-const COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment"];
+const COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment", "collaborators", "user_tags"];
+const MAX_COLLABORATORS = 3, MAX_USER_TAGS = 20, USERNAME_RE = /^[A-Za-z0-9._]{1,30}$/;
+// "@a, b  c" -> ["a", "b", "c"], without repeats
+const parseNames = text => {
+  const out = [];
+  for (const part of String(text || "").split(/[\s,]+/)) {
+    const n = part.trim().replace(/^@+/, "");
+    if (n && !out.some(o => o.toLowerCase() === n.toLowerCase())) out.push(n);
+  }
+  return out;
+};
 const IST = 330 * 60e3, LATE_LIMIT_MS = 12 * 3600e3, MAX_ATTEMPTS = 3, MB = 1024 * 1024;
 // Videos over 20 MB are uploaded in 20 MB pieces listed in a .parts.json file, which the scheduler
 // joins at posting time: GitHub refuses files over 100 MB, and its secret-scanning check times out on
@@ -597,7 +617,8 @@ async function savePosts(change, message) {
   for (let attempt = 0; attempt < 3; attempt++) {
     const f = await gh(repoPath(GH.repo, `/contents/instagram/posts.csv?ref=${GH.branch}`));
     const all = parseCSV(decode(f.content));
-    const h = all[0] || COLUMNS, body = change(all.slice(1), h);
+    // older files lack the newer columns (collaborators, user_tags): add them at the end
+    const h0 = all[0] || COLUMNS, h = [...h0, ...COLUMNS.filter(c => !h0.includes(c))], body = change(all.slice(1), h);
     const text = [h, ...body].map(csvLine).join("\n") + "\n";
     try {
       await gh(repoPath(GH.repo, "/contents/instagram/posts.csv"), {method: "PUT",
@@ -757,13 +778,14 @@ function newComposer(day) {
   const time = day && day > todayStr() ? "18:30" : `${t.time.slice(0, 2)}:${t.time.slice(3) < "30" ? "30" : "00"}`;
   const fixedTime = date === t.date && time <= t.time ? `${pad(Math.min(23, +t.time.slice(0, 2) + 1))}:00` : time;
   return {editId: null, accounts: new Set(prefs.accounts && prefs.accounts.length ? prefs.accounts : acctKeys().slice(0, 1)),
-    type: "post", typeTouched: false, media: [], caption: "", comment: "", date, time: fixedTime, now: false};
+    type: "post", typeTouched: false, media: [], caption: "", comment: "", collab: "", tags: "", date, time: fixedTime, now: false};
 }
 
 function openComposer(c) {
   C = c; previewSlide = 0;
   $("cTitle").textContent = C.editId ? "Edit post" : "Create post";
   $("cCaption").value = C.caption; $("cComment").value = C.comment;
+  $("cCollab").value = C.collab; $("cTags").value = C.tags;
   $("cDate").value = C.date; $("cTime").value = C.time; $("cDate").min = todayStr();
   $("cStatus").textContent = ""; $("cStatus").className = "status"; $("cProgress").hidden = true;
   $("composer").hidden = false; document.body.style.overflow = "hidden";
@@ -808,6 +830,16 @@ function mediaIssues() {
     if (m.file && m.converted) out.push({err: false, text: `${label}${m.file.name} will be uploaded as a JPG.`});
   });
   if (!C.accounts.size) out.push({err: true, text: "Pick at least one account."});
+  if (C.type !== "story") {
+    const collab = parseNames(C.collab), tags = parseNames(C.tags);
+    const bad = [...collab, ...tags].find(n => !USERNAME_RE.test(n));
+    if (bad) out.push({err: true, text: `“${bad}” isn't an Instagram username (letters, numbers, dots and underscores).`});
+    if (collab.length > MAX_COLLABORATORS) out.push({err: true, text: `Instagram allows at most ${MAX_COLLABORATORS} collaborators.`});
+    if (tags.length > MAX_USER_TAGS) out.push({err: true, text: `Instagram allows at most ${MAX_USER_TAGS} tagged people.`});
+    if (C.type === "carousel" && tags.length && C.media.length && C.media.every(m => m.isVideo)) out.push({err: true, text: "People can only be tagged on a carousel's photos, and this one has none."});
+    const own = Object.values(accounts).map(u => String(u).toLowerCase());
+    if (collab.some(n => own.includes(n.toLowerCase()) && [...C.accounts].some(a => acctUser(a).toLowerCase() === n.toLowerCase()))) out.push({err: true, text: "An account can't be its own collaborator."});
+  }
   if (C.type !== "story" && C.caption.length > 2200) out.push({err: true, text: "The caption is over 2,200 characters."});
   if ((C.caption.match(/#[\w]+/g) || []).length > 30) out.push({err: true, text: "Instagram allows at most 30 hashtags."});
   return out;
@@ -818,7 +850,7 @@ function drawComposer() {
   $("cAccounts").innerHTML = acctKeys().map(k => `<button type="button" class="chip" data-cacct="${esc(k)}" aria-pressed="${C.accounts.has(k)}" ${C.editId ? "disabled" : ""}>${avatar(k)}@${esc(acctUser(k))}</button>`).join("");
   document.querySelectorAll("#cTypes button").forEach(b => b.setAttribute("aria-pressed", b.dataset.type === C.type));
   $("cTypeHint").textContent = TYPE_HINT[C.type];
-  $("cCaptionWrap").hidden = $("cCommentWrap").hidden = C.type === "story";
+  $("cCaptionWrap").hidden = $("cCommentWrap").hidden = $("cCollabWrap").hidden = $("cTagsWrap").hidden = C.type === "story";
   $("cMediaCount").textContent = C.media.length ? `${C.media.length} item${C.media.length > 1 ? "s" : ""}` : "";
   const car = C.media.length > 1;
   $("cMedia").innerHTML = C.media.map((m, i) => `<div class="mi${m.error ? " bad" : ""}${car ? " carousel" : ""}">
@@ -997,7 +1029,8 @@ async function saveComposer() {
     // 2. save the schedule
     status.textContent = "Saving…";
     const values = {publish_at: `${t.date} ${t.time}`, type: C.type, media: C.media.map(m => m.url).join("|"),
-      caption: C.type === "story" ? "" : C.caption, first_comment: C.type === "story" ? "" : C.comment.trim()};
+      caption: C.type === "story" ? "" : C.caption, first_comment: C.type === "story" ? "" : C.comment.trim(),
+      collaborators: C.type === "story" ? "" : parseNames(C.collab).join(" "), user_tags: C.type === "story" ? "" : parseNames(C.tags).join(" ")};
     const accts = [...C.accounts];
     const newRows = accts.map(a => ({...values, account: a, id: C.editId || `${a}-${base}`}));
     await savePosts((body, h) => {
@@ -1037,6 +1070,9 @@ function openDetails(id) {
     <div><div class="k">Account</div><span style="display:inline-flex;gap:6px;align-items:center">${avatar(p.account)}@${esc(acctUser(p.account))}</span></div>
     ${p.caption ? `<div><div class="k">Caption</div><div style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(p.caption)}</div></div>` : ""}
     ${p.first_comment ? `<div><div class="k">First comment</div>${esc(p.first_comment)}</div>` : ""}
+    ${p.collaborators ? `<div><div class="k">Collaborators</div>${parseNames(p.collaborators).map(n => "@" + esc(n)).join(" ")}</div>` : ""}
+    ${p.user_tags ? `<div><div class="k">Tagged</div>${parseNames(p.user_tags).map(n => "@" + esc(n)).join(" ")}</div>` : ""}
+    ${p.pub && p.pub.people_error ? `<div class="err-box">Posted without the collaborators and tagged people: Instagram said “${esc(p.pub.people_error)}”. Check the usernames, and that those accounts are public.</div>` : ""}
     ${p.pub && p.pub.permalink ? `<div><a href="${esc(p.pub.permalink)}" target="_blank" rel="noopener" style="color:var(--info)">Open on Instagram ↗</a></div>` : ""}`;
   drawDetailPreview();
   const live = !p.pub;
@@ -1056,7 +1092,7 @@ function composerFrom(p, copy) {
   const c = newComposer();
   Object.assign(c, {editId: copy ? null : p.id, accounts: new Set([p.account]), type: p.type, typeTouched: true,
     media: p.media.map(u => ({src: u, url: u, isVideo: isVideoUrl(u), poster: isVideoUrl(u) ? u.replace(VIDEO_RE, ".poster.jpg") : ""})),
-    caption: p.caption, comment: p.first_comment});
+    caption: p.caption, comment: p.first_comment, collab: p.collaborators || "", tags: p.user_tags || ""});
   if (!copy && p.when && p.when > new Date()) { const t = ist(p.when); c.date = t.date; c.time = t.time; }
   return c;
 }
@@ -1146,6 +1182,8 @@ $("cLinkAdd").addEventListener("click", addLink);
 $("cLink").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addLink(); } });
 $("cCaption").addEventListener("input", e => { C.caption = e.target.value; drawComposer(); });
 $("cComment").addEventListener("input", e => { C.comment = e.target.value; drawPreview(); });
+$("cCollab").addEventListener("input", e => { C.collab = e.target.value; drawComposer(); });
+$("cTags").addEventListener("input", e => { C.tags = e.target.value; drawComposer(); });
 $("cDate").addEventListener("change", e => { C.date = e.target.value; drawComposer(); });
 $("cTime").addEventListener("change", e => { C.time = e.target.value; drawComposer(); });
 $("cSave").addEventListener("click", saveComposer);
