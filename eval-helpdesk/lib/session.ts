@@ -6,7 +6,8 @@ import { createHmac, timingSafeEqual, createHash, randomBytes } from "node:crypt
 
 export type Session =
   | { role: "teacher"; tid: string; name: string; exp: number }
-  | { role: "owner"; exp: number };
+  | { role: "owner"; exp: number }
+  | { role: "developer"; exp: number }; // runs the evaluation app's Claude Code; sees only the Fixes page
 
 export const COOKIE = "hd_session";
 export const TEACHER_TTL_S = 60 * 60 * 12; // 12 h
@@ -31,7 +32,7 @@ export function decodeSession(token: string | undefined, secret: string, now = D
   try {
     const s = JSON.parse(Buffer.from(body, "base64url").toString()) as Session;
     if (typeof s.exp !== "number" || s.exp * 1000 < now) return null;
-    if (s.role !== "teacher" && s.role !== "owner") return null;
+    if (s.role !== "teacher" && s.role !== "owner" && s.role !== "developer") return null;
     return s;
   } catch {
     return null;

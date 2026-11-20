@@ -59,3 +59,7 @@ The Creator Research Studio app (research, topics, scripts and content planning)
 - **Settings** (`cuet/config.js`): WhatsApp number and an optional form endpoint for sign-ups and orders, prices, partner promo codes, vetted mentors, group links, webinars, news and YouTube videos. Until a WhatsApp number or endpoint is set, sign-ups and orders are kept only in the visitor's browser.
 - **Logins and leads:** students browse freely and log in (Google or an email code, through Supabase) when they save a college, turn on reminders, see predictor results, book a senior or order form filling, then give their name, mobile, Class 12 year, category, state and interest. Leads and requests are in Supabase and on the site's admin page (`#/admin`) with CSV download. Setup: `cuet/supabase/README.md`. Until Supabase is connected in `config.js`, a short sign-up form is used instead.
 - **Student data:** saved in the browser's local storage; nothing is sent anywhere unless the student submits a form.
+
+## Parthu Evaluation Helpdesk
+
+`eval-helpdesk/` is a separate Next.js app where teachers report mistakes made by the AI answer-copy evaluation portal. A Claude assistant replies with corrected marks and logs code fixes for the owner to approve; approved fixes reach the evaluation app's Claude Code by email, a Fixes page, a "check the helpdesk" command or GitHub issues. Setup and security: `eval-helpdesk/README.md`.

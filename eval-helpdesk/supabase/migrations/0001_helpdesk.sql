@@ -66,11 +66,25 @@ create table if not exists change_requests (
   owner_note text,
   decided_at timestamptz,
   done_at timestamptz,
+  done_note text,
+  github_issue_url text,
   created_at timestamptz not null default now()
 );
 create index if not exists change_requests_status_idx on change_requests(status, created_at desc);
 
+-- Keys that let a Claude Code (any account) read approved fixes and mark them done.
+-- Only a sha256 hash is stored; the key is shown once when the owner creates it.
+create table if not exists api_keys (
+  id uuid primary key default gen_random_uuid(),
+  label text not null,
+  key_hash text not null unique,
+  revoked boolean not null default false,
+  created_at timestamptz not null default now(),
+  last_used_at timestamptz
+);
+
 alter table teachers        enable row level security;
+alter table api_keys        enable row level security;
 alter table reports         enable row level security;
 alter table report_messages enable row level security;
 alter table copy_snapshots  enable row level security;
