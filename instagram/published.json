@@ -379,6 +379,13 @@
       "published_at": "2026-11-20T04:31+00:00",
       "media_id": "18084548243360888",
       "permalink": "https://www.instagram.com/reel/Df8zWfoCabV/"
+    },
+    "cuet-20261120-1007-jr3j": {
+      "account": "cuet",
+      "type": "reel",
+      "published_at": "2026-11-20T04:42+00:00",
+      "media_id": "17917559874508552",
+      "permalink": "https://www.instagram.com/reel/Df80mMoincc/"
     }
   },
   "failed": {
@@ -388,10 +395,5 @@
       "last_try": "2026-10-28T10:53+00:00"
     }
   },
-  "claims": {
-    "cuet-20261120-1007-jr3j": {
-      "run": "44653781530",
-      "at": "2026-11-20T04:41:45+00:00"
-    }
-  }
+  "claims": {}
 }
