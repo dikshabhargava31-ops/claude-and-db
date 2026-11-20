@@ -54,6 +54,22 @@ PARTS_SUFFIX = ".parts.json"
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".m4v"}
 TYPES = {"post", "carousel", "reel", "story"}
 COLUMNS = ["id", "account", "publish_at", "type", "media", "caption", "first_comment"]
+# Optional columns: Instagram usernames separated by spaces or commas (an @ in front is fine).
+# collaborators: invited as Collab co-authors (photo, carousel, reel; at most 3);
+# user_tags: tagged in the post (photo, reel, the carousel's first photo; at most 20).
+MAX_COLLABORATORS = 3
+MAX_USER_TAGS = 20
+USERNAME_RE = re.compile(r"^[A-Za-z0-9._]{1,30}$")
+
+
+def parse_usernames(text):
+    """'@a, b  c' -> ['a', 'b', 'c'], without repeats."""
+    names = []
+    for part in re.split(r"[\s,]+", text or ""):
+        name = part.strip().lstrip("@")
+        if name and name.lower() not in [n.lower() for n in names]:
+            names.append(name)
+    return names
 
 
 class PostError(Exception):
@@ -252,7 +268,26 @@ def load_posts(tz_name):
             if len(row["caption"]) > 2200:
                 problems.append(f"{where}: caption is over Instagram's 2200 characters")
                 continue
-            posts.append({**row, "type": kind, "media": media, "when": when, "line": line})
+            collaborators = parse_usernames(row.get("collaborators", ""))
+            user_tags = parse_usernames(row.get("user_tags", ""))
+            bad = [n for n in collaborators + user_tags if not USERNAME_RE.match(n)]
+            if bad:
+                problems.append(f"{where}: '{bad[0]}' isn't an Instagram username")
+                continue
+            if kind == "story" and (collaborators or user_tags):
+                problems.append(f"{where}: stories can't have collaborators or tagged people")
+                continue
+            if len(collaborators) > MAX_COLLABORATORS:
+                problems.append(f"{where}: at most {MAX_COLLABORATORS} collaborators")
+                continue
+            if len(user_tags) > MAX_USER_TAGS:
+                problems.append(f"{where}: at most {MAX_USER_TAGS} tagged people")
+                continue
+            if kind == "carousel" and user_tags and all(is_video(m) for m in media):
+                problems.append(f"{where}: people can only be tagged on a carousel's photos, and this one has none")
+                continue
+            posts.append({**row, "type": kind, "media": media, "when": when, "line": line,
+                          "collaborators": collaborators, "user_tags": user_tags})
     return posts, problems
 
 
@@ -392,32 +427,59 @@ class Graph:
         return self.container(image_url=url, **params)
 
 
-def publish(graph, post):
+def photo_tags(names):
+    """Tags for a photo: Instagram needs a spot for each; they go in a row near the bottom."""
+    return json.dumps([{"username": n, "x": round((i + 1) / (len(names) + 1), 3), "y": 0.9}
+                       for i, n in enumerate(names)])
+
+
+def create_container(graph, post, collaborators, user_tags):
     caption = post["caption"]
     kind = post["type"]
     media = post["media"]
+    people = {"collaborators": json.dumps(collaborators)} if collaborators else {}
 
     if kind == "post":
-        creation = graph.container(image_url=media[0], caption=caption)
-    elif kind == "reel":
-        creation = graph.video_container(media[0], "REELS", caption=caption, share_to_feed="true")
-    elif kind == "story":
+        tags = {"user_tags": photo_tags(user_tags)} if user_tags else {}
+        return graph.container(image_url=media[0], caption=caption, **people, **tags)
+    if kind == "reel":
+        tags = {"user_tags": json.dumps([{"username": n} for n in user_tags])} if user_tags else {}
+        return graph.video_container(media[0], "REELS", caption=caption, share_to_feed="true", **people, **tags)
+    if kind == "story":
         if is_video(media[0]):
-            creation = graph.video_container(media[0], "STORIES")
-        else:
-            creation = graph.container(image_url=media[0], media_type="STORIES")
-    else:
-        children = []
-        for url in media:
-            child = graph.media_container(url, is_carousel_item="true")
-            graph.wait_until_ready(child)
-            children.append(child)
-        creation = graph.container(media_type="CAROUSEL", children=",".join(children), caption=caption)
+            return graph.video_container(media[0], "STORIES")
+        return graph.container(image_url=media[0], media_type="STORIES")
+    children, tagged = [], False
+    for url in media:
+        extra = {}
+        if user_tags and not tagged and not is_video(url):
+            extra, tagged = {"user_tags": photo_tags(user_tags)}, True
+        child = graph.media_container(url, is_carousel_item="true", **extra)
+        graph.wait_until_ready(child)
+        children.append(child)
+    return graph.container(media_type="CAROUSEL", children=",".join(children), caption=caption, **people)
+
+
+def publish(graph, post):
+    collaborators, user_tags = post.get("collaborators") or [], post.get("user_tags") or []
+    people_error = ""
+    try:
+        creation = create_container(graph, post, collaborators, user_tags)
+    except PostError as e:
+        if not (collaborators or user_tags):
+            raise
+        # Instagram refuses the whole post when it can't invite or tag someone (a private or
+        # misspelled account). Post it on time without them and say so, rather than not at all.
+        people_error = str(e)
+        print(f"WARNING  {post['id']}: Instagram refused the collaborators or tagged people ({e}); posting without them")
+        creation = create_container(graph, post, [], [])
 
     graph.wait_until_ready(creation)
     media_id = graph.call("POST", f"{graph.user_id}/media_publish", creation_id=creation)["id"]
 
     result = {"media_id": media_id}
+    if people_error:
+        result["people_error"] = people_error
     try:
         result["permalink"] = graph.call("GET", media_id, fields="permalink").get("permalink", "")
     except PostError:
