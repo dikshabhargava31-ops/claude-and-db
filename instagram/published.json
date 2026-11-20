@@ -393,6 +393,13 @@
       "published_at": "2026-11-20T12:30+00:00",
       "media_id": "18112004564462242",
       "permalink": "https://www.instagram.com/p/Df9qO9Flfpb/"
+    },
+    "ipa-20261120-1803-n38p": {
+      "account": "ipa",
+      "type": "reel",
+      "published_at": "2026-11-20T12:38+00:00",
+      "media_id": "17923504602452256",
+      "permalink": "https://www.instagram.com/reel/Df9rBjnJ6Jw/"
     }
   },
   "failed": {
@@ -411,10 +418,6 @@
     "cuet-20261120-1800-vrtf": {
       "run": "44691408202",
       "at": "2026-11-20T12:30:48+00:00"
-    },
-    "ipa-20261120-1803-n38p": {
-      "run": "44691408202",
-      "at": "2026-11-20T12:37:17+00:00"
     }
   }
 }
