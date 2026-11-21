@@ -400,6 +400,13 @@
       "published_at": "2026-11-20T12:38+00:00",
       "media_id": "17923504602452256",
       "permalink": "https://www.instagram.com/reel/Df9rBjnJ6Jw/"
+    },
+    "cuet-20261121-1000-lvza": {
+      "account": "cuet",
+      "type": "reel",
+      "published_at": "2026-11-21T04:31+00:00",
+      "media_id": "18016580468987408",
+      "permalink": "https://www.instagram.com/reel/Df_YHqMCax0/"
     }
   },
   "failed": {
@@ -418,10 +425,6 @@
     "cuet-20261120-1800-vrtf": {
       "run": "44691408202",
       "at": "2026-11-20T12:30:48+00:00"
-    },
-    "cuet-20261121-1000-lvza": {
-      "run": "44838383153",
-      "at": "2026-11-21T04:30:00+00:00"
     }
   }
 }
