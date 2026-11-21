@@ -414,6 +414,13 @@
       "published_at": "2026-11-21T04:46+00:00",
       "media_id": "18099122057146913",
       "permalink": "https://www.instagram.com/reel/Df_Z0FORd1w/"
+    },
+    "parthu-20261121-1800-1o0d": {
+      "account": "parthu",
+      "type": "carousel",
+      "published_at": "2026-11-21T12:30+00:00",
+      "media_id": "17969353971196974",
+      "permalink": "https://www.instagram.com/p/DgAPBawEdb2/"
     }
   },
   "failed": {
@@ -432,10 +439,6 @@
     "cuet-20261120-1800-vrtf": {
       "run": "44691408202",
       "at": "2026-11-20T12:30:48+00:00"
-    },
-    "parthu-20261121-1800-1o0d": {
-      "run": "44895471680",
-      "at": "2026-11-21T12:30:00+00:00"
     }
   }
 }
