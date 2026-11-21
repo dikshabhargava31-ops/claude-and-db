@@ -435,9 +435,9 @@
       "last_try": "2026-10-28T10:53+00:00"
     },
     "cuet-20261121-1800-dpdq": {
-      "attempts": 1,
-      "error": "media: It takes too long to download the media.",
-      "last_try": "2026-11-21T12:30+00:00"
+      "attempts": 2,
+      "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
+      "last_try": "2026-11-21T12:41+00:00"
     }
   },
   "claims": {
