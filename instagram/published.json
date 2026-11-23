@@ -487,6 +487,14 @@
       "published_at": "2026-11-23T12:31+00:00",
       "media_id": "17930942148431988",
       "permalink": "https://www.instagram.com/p/DgFYqEyFrev/"
+    },
+    "cuet-20261123-1800-24ly": {
+      "account": "cuet",
+      "type": "carousel",
+      "published_at": "2026-11-23T12:43+00:00",
+      "media_id": "18124422428516748",
+      "permalink": "https://www.instagram.com/p/DgFY4K2Fju7/",
+      "found_existing": true
     }
   },
   "failed": {
@@ -499,17 +507,7 @@
       "attempts": 3,
       "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
       "last_try": "2026-10-28T10:53+00:00"
-    },
-    "cuet-20261123-1800-24ly": {
-      "attempts": 1,
-      "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
-      "last_try": "2026-11-23T12:33+00:00"
     }
   },
-  "claims": {
-    "cuet-20261123-1800-24ly": {
-      "run": "45172470355",
-      "at": "2026-11-23T12:31:17+00:00"
-    }
-  }
+  "claims": {}
 }
