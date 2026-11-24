@@ -118,6 +118,18 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
 
 /* list */
 .list{display:grid;gap:18px}
+.stats{display:grid;gap:12px}
+.stats .seg{justify-self:start}
+.swrap{overflow-x:auto}
+.stable{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stable th,.stable td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.stable th{font:500 11px/1 var(--f-mono);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);background:var(--panel)}
+.stable th:first-child,.stable td:first-child{text-align:left}
+.stable td.n{font-variant-numeric:tabular-nums}
+.stable td.z{color:var(--muted)}
+.stable td.tl{font-weight:600}
+.stable tr:last-child td{border-bottom:0}
+.stable tr.tot td{font-weight:600;background:var(--panel)}
 .lday h3{font:600 15px var(--f-display);margin:0 0 8px}
 .lday h3 small{font:400 13px var(--f-body);color:var(--muted);margin-left:6px}
 .lrow{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px;width:100%;text-align:left;padding:10px;border-radius:12px;border-left:4px solid var(--sc);font-weight:400;justify-content:stretch;align-items:start;margin-bottom:8px}
@@ -287,7 +299,7 @@ svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-widt
     <div class="bar">
       <div class="chips" id="acctFilter"></div>
       <div class="seg" id="viewSeg" role="group" aria-label="View">
-        <button data-view="month">Month</button><button data-view="week">Week</button><button data-view="list">List</button>
+        <button data-view="month">Month</button><button data-view="week">Week</button><button data-view="list">List</button><button data-view="stats">Stats</button>
       </div>
     </div>
     <div class="bar">
@@ -724,6 +736,46 @@ function renderList() {
     ${undated.length ? `<div class="lday"><h3>Date needs fixing</h3>${undated.map(row).join("")}</div>` : ""}</div>`;
 }
 
+// How many posts went out per account and type, from the scheduler's record (published.json),
+// for the month on screen or all time; plus what is still scheduled in that period.
+function renderStats() {
+  const all = prefs.statsAll === true;
+  const [y, m] = cursor.split("-").map(Number);
+  const prefix = `${y}-${pad(m)}`;
+  $("rangeTitle").textContent = all ? "All time" : new Date(Date.UTC(y, m - 1, 1)).toLocaleString("en-IN", {month: "long", year: "numeric", timeZone: "UTC"});
+  const inPeriod = d => d && !isNaN(d) && (all || ist(d).date.startsWith(prefix));
+  const f = prefs.accounts && prefs.accounts.length ? new Set(prefs.accounts) : null;
+  const known = [...acctKeys(), ...Object.values(state.published || {}).map(v => v.account).filter(Boolean)];
+  const rowsFor = [...new Set(known)].filter(a => !f || f.has(a));
+  const kinds = ["post", "carousel", "reel", "story"];
+  const zero = () => ({post: 0, carousel: 0, reel: 0, story: 0, total: 0, upcoming: 0});
+  const counts = Object.fromEntries(rowsFor.map(a => [a, zero()]));
+  const byId = Object.fromEntries(posts.map(p => [p.id, p]));
+  for (const [id, v] of Object.entries(state.published || {})) {
+    const row = byId[id];
+    const acct = v.account || (row && row.account), kind = v.type || (row && row.type);
+    const at = v.published_at ? new Date(v.published_at) : null;
+    if (!counts[acct] || !inPeriod(at)) continue;
+    if (kinds.includes(kind)) counts[acct][kind]++;
+    counts[acct].total++;
+  }
+  posts.filter(p => !p.pub && ["scheduled", "due", "retry"].includes(p.status) && inPeriod(p.when))
+    .forEach(p => { if (counts[p.account]) counts[p.account].upcoming++; });
+  const sum = zero();
+  rowsFor.forEach(a => Object.keys(sum).forEach(k => sum[k] += counts[a][k]));
+  const cell = (n, cls = "") => `<td class="n ${n ? "" : "z"} ${cls}">${n}</td>`;
+  const line = (label, c, cls = "") => `<tr class="${cls}"><td>${label}</td>${kinds.map(k => cell(c[k])).join("")}${cell(c.total, "tl")}${cell(c.upcoming)}</tr>`;
+  $("view").innerHTML = `<div class="stats">
+    <div class="seg" role="group" aria-label="Period"><button data-stats="month" aria-pressed="${!all}">By month</button><button data-stats="all" aria-pressed="${all}">All time</button></div>
+    <div class="swrap"><table class="stable">
+      <thead><tr><th>Account</th><th>Photos</th><th>Carousels</th><th>Reels</th><th>Stories</th><th>Posted</th><th>Scheduled</th></tr></thead>
+      <tbody>${rowsFor.map(a => line(`<span style="display:inline-flex;gap:6px;align-items:center">${avatar(a)}@${esc(acctUser(a))}</span>`, counts[a])).join("")}
+      ${rowsFor.length > 1 ? line("All accounts", sum, "tot") : ""}</tbody>
+    </table></div>
+    <p class="hint" style="margin:0">Posted: what this planner published ${all ? "so far" : "this month"}, by type. Scheduled: what is still waiting to go out${all ? "" : " this month"}. Posts made directly in the Instagram app aren't counted.</p>
+  </div>`;
+}
+
 function renderAlert() {
   const bad = posts.filter(p => p.status === "problem");
   $("alert").innerHTML = bad.length ? `<div class="alert">${icon("alert")}<span><b>${bad.length} post${bad.length > 1 ? "s" : ""}</b> didn't go out and need${bad.length > 1 ? "" : "s"} your attention.</span><button data-open="${esc(bad[0].id)}">Review</button></div>` : "";
@@ -738,7 +790,8 @@ function renderFilter() {
 function render() {
   document.querySelectorAll("#viewSeg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === prefs.view));
   renderFilter(); renderAlert();
-  ({month: renderMonth, week: renderWeek, list: renderList})[prefs.view]();
+  (({month: renderMonth, week: renderWeek, list: renderList, stats: renderStats})[prefs.view] || renderMonth)();
+  $("prev").hidden = $("next").hidden = $("today").hidden = prefs.view === "stats" && prefs.statsAll === true;
 }
 
 /* ---------- Instagram preview ---------- */
@@ -1135,6 +1188,7 @@ document.addEventListener("click", e => {
   if (d.new !== undefined) return openComposer(newComposer(d.new || null));
   if (d.dayjump) { cursor = d.dayjump; prefs.view = "list"; savePrefs(); render(); const x = $("d-" + d.dayjump); x && x.scrollIntoView({block: "start"}); return; }
   if (d.view) { prefs.view = d.view; savePrefs(); return render(); }
+  if (d.stats) { prefs.statsAll = d.stats === "all"; savePrefs(); return render(); }
   if (d.acct !== undefined) {
     const s = new Set(prefs.accounts || []);
     if (!d.acct) s.clear(); else s.has(d.acct) ? s.delete(d.acct) : s.add(d.acct);
