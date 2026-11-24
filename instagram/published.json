@@ -502,6 +502,13 @@
       "published_at": "2026-11-24T04:30+00:00",
       "media_id": "17912070540664879",
       "permalink": "https://www.instagram.com/reel/DgHGa7USH-0/"
+    },
+    "theopsroom-20261124-1000-53dy": {
+      "account": "theopsroom",
+      "type": "reel",
+      "published_at": "2026-11-24T04:32+00:00",
+      "media_id": "18379911094211836",
+      "permalink": "https://www.instagram.com/reel/DgHGkHtDFCq/"
     }
   },
   "failed": {
@@ -516,10 +523,5 @@
       "last_try": "2026-11-20T12:31+00:00"
     }
   },
-  "claims": {
-    "theopsroom-20261124-1000-53dy": {
-      "run": "45288998542",
-      "at": "2026-11-24T04:30:40+00:00"
-    }
-  }
+  "claims": {}
 }
