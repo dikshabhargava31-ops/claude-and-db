@@ -558,6 +558,13 @@
       "published_at": "2026-11-25T12:32+00:00",
       "media_id": "18419677000085614",
       "permalink": "https://www.instagram.com/p/DgKiWZJIMeC/"
+    },
+    "parthu-20261125-1800-a6e5": {
+      "account": "parthu",
+      "type": "carousel",
+      "published_at": "2026-11-25T12:33+00:00",
+      "media_id": "17940644085408185",
+      "permalink": "https://www.instagram.com/p/DgKifuooHjR/"
     }
   },
   "failed": {
@@ -572,10 +579,5 @@
       "last_try": "2026-11-20T12:31+00:00"
     }
   },
-  "claims": {
-    "parthu-20261125-1800-a6e5": {
-      "run": "45576801420",
-      "at": "2026-11-25T12:32:11+00:00"
-    }
-  }
+  "claims": {}
 }
