@@ -5,17 +5,7 @@ name: Daily assistant
 # Secrets: BOARD_TOKEN; GMAIL_ADDRESS + GMAIL_APP_PASSWORD and/or NTFY_TOPIC; ANTHROPIC_API_KEY is optional.
 # This repository is public, so the run log only prints counts, never task names.
 on:
-  # GitHub can start a scheduled run late or skip it, so each message has two backup times.
-  # The first run that sends records it in ipa_task (assistant/sent/); the others then do nothing.
-  schedule:
-    - cron: "12 3 * * 1-6"    # 08:42 IST: morning plan
-    - cron: "37 3 * * 1-6"    # 09:07 IST: morning backup
-    - cron: "4 4 * * 1-6"     # 09:34 IST: morning backup
-    - cron: "47 7 * * 1-6"    # 13:17 IST: midday nudge
-    - cron: "17 8 * * 1-6"    # 13:47 IST: midday backup
-    - cron: "17 13 * * 1-6"   # 18:47 IST: evening wrap-up
-    - cron: "47 13 * * 1-6"   # 19:17 IST: evening backup
-    - cron: "17 14 * * 1-6"   # 19:47 IST: evening backup
+  # Paused on 27 Nov 2026 at Diksha's request: no scheduled runs. Run it by hand from Actions if needed.
   workflow_dispatch:
     inputs:
       mode:
