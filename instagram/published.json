@@ -624,16 +624,21 @@
     }
   },
   "failed": {
-    "cuet-20261120-1800-vrtf": {
-      "attempts": 1,
-      "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
-      "last_try": "2026-11-20T12:31+00:00"
-    },
     "parthu-20261028-1600-zh3y": {
       "attempts": 3,
       "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
       "last_try": "2026-10-28T10:53+00:00"
+    },
+    "cuet-20261120-1800-vrtf": {
+      "attempts": 1,
+      "error": "media_publish: We restrict certain activity to protect our community. Tell us if you think we made a mistake.",
+      "last_try": "2026-11-20T12:31+00:00"
     }
   },
-  "claims": {}
+  "claims": {
+    "cuet-20261128-1800-xv5z": {
+      "run": "46124189582",
+      "at": "2026-11-28T12:30:00+00:00"
+    }
+  }
 }
