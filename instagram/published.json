@@ -614,6 +614,13 @@
       "published_at": "2026-11-27T12:33+00:00",
       "media_id": "18119714804587039",
       "permalink": "https://www.instagram.com/p/DgPsFVjG9MP/"
+    },
+    "parthu-20261128-1830-ctu8": {
+      "account": "parthu",
+      "type": "reel",
+      "published_at": "2026-11-28T04:30+00:00",
+      "media_id": "18115163339614621",
+      "permalink": "https://www.instagram.com/reel/DgRZn1ch-sc/"
     }
   },
   "failed": {
@@ -628,10 +635,5 @@
       "last_try": "2026-10-28T10:53+00:00"
     }
   },
-  "claims": {
-    "parthu-20261128-1830-ctu8": {
-      "run": "46098766422",
-      "at": "2026-11-28T04:30:02+00:00"
-    }
-  }
+  "claims": {}
 }
